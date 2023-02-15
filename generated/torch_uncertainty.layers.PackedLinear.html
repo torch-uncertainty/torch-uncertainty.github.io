@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PackedLinear &mdash; Torch Uncertainty 0.1.0 documentation</title>
@@ -11,15 +11,15 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Disagreement" href="torch_uncertainty.metrics.Disagreement.html" />
     <link rel="prev" title="PackedConv2d" href="torch_uncertainty.layers.PackedConv2d.html" /> 
 </head>
 
@@ -28,11 +28,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> Torch Uncertainty
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Torch Uncertainty
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -53,6 +57,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#metrics">Metrics</a></li>
 </ul>
 </li>
 </ul>
@@ -70,7 +75,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../api.html">API reference</a></li>
       <li class="breadcrumb-item active">PackedLinear</li>
       <li class="wy-breadcrumbs-aside">
@@ -87,11 +92,11 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.layers.PackedLinear">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.layers.</span></span><span class="sig-name descname"><span class="pre">PackedLinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rearrange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.layers.PackedLinear" title="Permalink to this definition"></a></dt>
-<dd><p>Packed-Ensemble style Linear layer.</p>
+<dd><p>Packed-Ensembles-style Linear layer.</p>
 <p>This layer computes fully-connected operation for a given number of
 estimators (<code class="xref py py-attr docutils literal notranslate"><span class="pre">num_estimators</span></code>) using a <cite>1x1</cite> convolution.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>in_features</strong> (<em>int</em>) – Number of input features of the linear layer.</p></li>
 <li><p><strong>out_features</strong> (<em>int</em>) – Number of channels produced by the linear layer.</p></li>
@@ -102,6 +107,16 @@ output. Defaults to <code class="docutils literal notranslate"><span class="pre"
 channels to output channels. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
 <li><p><strong>rearrange</strong> (<em>bool</em><em>, </em><em>optional</em>) – Rearrange the input and outputs for
 compatibility with previous and later layers. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>Note</strong> – Each ensemble member will only see
+<span class="math notranslate nohighlight">\(\frac{\text{in\_features}}{\text{n\_estimators}}\)</span> features,
+so when using <code class="xref py py-attr docutils literal notranslate"><span class="pre">groups</span></code> you should make sure that
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">in_features</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">out_features</span></code> are both divisible by
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">n_estimators</span></code> <span class="math notranslate nohighlight">\(\times\)</span><code class="xref py py-attr docutils literal notranslate"><span class="pre">groups</span></code>. However, the
+number of input and output features will be changed to comply with
+this constraint.</p></li>
+<li><p><strong>Note</strong> – The input should be of size (<cite>batch_size</cite>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">in_features</span></code>, 1,
+1). The (often) necessary rearrange operation is executed by
+default.</p></li>
 </ul>
 </dd>
 </dl>
@@ -114,6 +129,7 @@ compatibility with previous and later layers. Defaults to <code class="docutils 
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="torch_uncertainty.layers.PackedConv2d.html" class="btn btn-neutral float-left" title="PackedConv2d" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="torch_uncertainty.metrics.Disagreement.html" class="btn btn-neutral float-right" title="Disagreement" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
