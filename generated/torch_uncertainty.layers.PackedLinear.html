@@ -153,8 +153,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction_uncertainty.html">Introduction to classification uncertainty and modern deep neural networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
         
@@ -258,7 +260,7 @@
 <h1>PackedLinear<a class="headerlink" href="#packedlinear" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.layers.PackedLinear">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.layers.</span></span><span class="sig-name descname"><span class="pre">PackedLinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rearrange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.layers.PackedLinear" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.layers.</span></span><span class="sig-name descname"><span class="pre">PackedLinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rearrange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.layers.PackedLinear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Packed-Ensembles-style Linear layer.</p>
 <p>This layer computes fully-connected operation for a given number of
 estimators (<code class="xref py py-attr docutils literal notranslate"><span class="pre">num_estimators</span></code>) using a <cite>1x1</cite> convolution.</p>
@@ -267,26 +269,34 @@ estimators (<code class="xref py py-attr docutils literal notranslate"><span cla
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>in_features</strong> (<em>int</em>) – Number of input features of the linear layer.</p></li>
 <li><p><strong>out_features</strong> (<em>int</em>) – Number of channels produced by the linear layer.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – The width multiplier of the linear layer.</p></li>
 <li><p><strong>num_estimators</strong> (<em>int</em>) – The number of estimators grouped in the layer.</p></li>
+<li><p><strong>gamma</strong> (<em>int</em><em>, </em><em>optional</em>) – Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
 <li><p><strong>bias</strong> (<em>bool</em><em>, </em><em>optional</em>) – It <code class="docutils literal notranslate"><span class="pre">True</span></code>, adds a learnable bias to the
 output. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 <li><p><strong>groups</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of blocked connections from input
 channels to output channels. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
 <li><p><strong>rearrange</strong> (<em>bool</em><em>, </em><em>optional</em>) – Rearrange the input and outputs for
 compatibility with previous and later layers. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
-<li><p><strong>Note</strong> – Each ensemble member will only see
-<span class="math notranslate nohighlight">\(\frac{\text{in_features}}{\text{n_estimators}}\)</span> features,
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Each ensemble member will only see
+<span class="math notranslate nohighlight">\(\frac{\text{in_features}}{\text{num_estimators}}\)</span> features,
 so when using <code class="xref py py-attr docutils literal notranslate"><span class="pre">groups</span></code> you should make sure that
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">in_features</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">out_features</span></code> are both divisible by
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">n_estimators</span></code> <span class="math notranslate nohighlight">\(\times\)</span><code class="xref py py-attr docutils literal notranslate"><span class="pre">groups</span></code>. However, the
 number of input and output features will be changed to comply with
-this constraint.</p></li>
-<li><p><strong>Note</strong> – The input should be of size (<cite>batch_size</cite>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">in_features</span></code>, 1,
+this constraint.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The input should be of size (<cite>batch_size</cite>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">in_features</span></code>, 1,
 1). The (often) necessary rearrange operation is executed by
-default.</p></li>
-</ul>
-</dd>
-</dl>
+default.</p>
+</div>
 </dd></dl>
 
 </section>

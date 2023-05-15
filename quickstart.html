@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="genindex.html" />
   <link rel="search" title="Search" href="search.html" />
-  <link rel="next" title="Tutorials" href="auto_tutorials/index.html" />
+  <link rel="next" title="Introduction to classification uncertainty and modern deep neural networks" href="introduction_uncertainty.html" />
   <link rel="prev" title="Installation" href="installation.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
@@ -153,8 +153,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction_uncertainty.html">Introduction to classification uncertainty and modern deep neural networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
         
@@ -254,9 +256,12 @@
                 
   <section id="quickstart">
 <h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this heading">¶</a></h1>
-<p>You can use the Torch Uncertainty library at different levels. Let’s start with the highest-level usage.</p>
-<section id="using-the-cli-tool">
-<h2>Using the CLI tool<a class="headerlink" href="#using-the-cli-tool" title="Permalink to this heading">¶</a></h2>
+<p>Torch Uncertainty comes with different usage levels ranging from specific
+PyTorch layers to ready to train lightning-based models. The following
+presents a short introduction to each one of them. Let’s start with the
+highest-level usage.</p>
+<section id="using-the-lightning-based-cli-tool">
+<h2>Using the lightning-based CLI tool<a class="headerlink" href="#using-the-lightning-based-cli-tool" title="Permalink to this heading">¶</a></h2>
 <section id="procedure">
 <h3>Procedure<a class="headerlink" href="#procedure" title="Permalink to this heading">¶</a></h3>
 <p>The library provides a full-fledged trainer which can be used directly, via
@@ -276,11 +281,14 @@ an optimizer. Many procedures are available at torch_uncertainty/optimization_pr
 <li><p>the path to the data and logs folder, in the example below, the root of the library</p></li>
 <li><p>and finally, the name of your model (used for logs)</p></li>
 </ul>
-<p>Move to the directory containing your file and execute the code with <code class="code highlight bash docutils literal highlight-bash">python3<span class="w"> </span>experiment.py</code>. Add lightning arguments such as <code class="code highlight bash docutils literal highlight-bash">--accelerator<span class="w"> </span>gpu<span class="w"> </span>--devices<span class="w"> </span><span class="s2">&quot;0, 1&quot;</span></code> for multi-gpu training, etc.</p>
+<p>Move to the directory containing your file and execute the code with <code class="code highlight bash docutils literal highlight-bash">python3<span class="w"> </span>experiment.py</code>.
+Add lightning arguments such as <code class="code highlight bash docutils literal highlight-bash">--accelerator<span class="w"> </span>gpu<span class="w"> </span>--devices<span class="w"> </span><span class="s2">&quot;0, 1&quot;</span><span class="w"> </span>--benchmark<span class="w"> </span>True</code>
+for multi-gpu training and cuDNN benchmark, etc.</p>
 </section>
-<section id="exemple">
-<h3>Exemple<a class="headerlink" href="#exemple" title="Permalink to this heading">¶</a></h3>
-<p>The following code - available in the experiments folder - trains a Packed-Ensembles ResNet on CIFAR10:</p>
+<section id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h3>
+<p>The following code - <a class="reference external" href="https://github.com/ENSTA-U2IS/torch-uncertainty/blob/main/experiments/packed/resnet18_cifar10.py">available in the experiments folder</a> -
+trains a Packed-Ensembles ResNet-18 on CIFAR10:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
@@ -301,20 +309,96 @@ an optimizer. Many procedures are available at torch_uncertainty/optimization_pr
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>You may replace the architecture (which should be a Lightning Module), the
+<p>Run this model with, for instance, <code class="code highlight bash docutils literal highlight-bash">python3<span class="w"> </span>resnet18_cifar10.py<span class="w"> </span>--arch<span class="w"> </span><span class="m">18</span><span class="w"> </span>--accelerator<span class="w"> </span>gpu<span class="w"> </span>--devices<span class="w"> </span><span class="m">1</span><span class="w"> </span>--benchmark<span class="w"> </span>True<span class="w"> </span>--max_epochs<span class="w"> </span><span class="m">75</span><span class="w"> </span>--precision<span class="w"> </span><span class="m">16</span></code>.
+You may replace the architecture (which should be a Lightning Module), the
 Datamodule (a Lightning Datamodule), the loss or the optimization procedure to your likings.</p>
 </section>
 </section>
-<section id="using-your-own-trainer">
-<h2>Using your own trainer<a class="headerlink" href="#using-your-own-trainer" title="Permalink to this heading">¶</a></h2>
-<p>For now, the lightning trainer is the only training procedure available.
-In the meantime, feel free to reuse:</p>
-<ul class="simple">
-<li><p>the layers at torch_uncertainty/layers</p></li>
-<li><p>the models at torch_uncertainty/models</p></li>
-<li><p>the metrics at torch_uncertainty/metrics</p></li>
-<li><p>the datasets at torch_uncertainty/datasets</p></li>
-</ul>
+<section id="using-the-pytorch-based-models">
+<h2>Using the pytorch-based models<a class="headerlink" href="#using-the-pytorch-based-models" title="Permalink to this heading">¶</a></h2>
+<section id="id1">
+<h3>Procedure<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
+<p>If you prefer classic PyTorch pipelines, we provide PyTorch Modules that do not
+require Lightning.</p>
+<ol class="arabic simple">
+<li><p>Check the API reference under the <em>Models</em> section to ensure the architecture of your choice is supported by the library.</p></li>
+<li><p>Create a <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> in your training/testing script using one of the provided building functions listed in the API reference.</p></li>
+</ol>
+</section>
+<section id="id2">
+<h3>Example<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
+<p>You can initialize a Packed-Ensemble out of a ResNet18
+backbone using the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.models.resnet</span> <span class="kn">import</span> <span class="n">packed_resnet18</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">packed_resnet18</span><span class="p">(</span>
+    <span class="n">in_channels</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">num_estimators</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">num_classes</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="using-the-pytorch-based-layers">
+<h2>Using the pytorch-based layers<a class="headerlink" href="#using-the-pytorch-based-layers" title="Permalink to this heading">¶</a></h2>
+<section id="id3">
+<h3>Procedure<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
+<p>It is likely that your desired architecture is not supported by our library.
+In that case, you might be interested in directly using the actual layers.</p>
+<ol class="arabic simple">
+<li><p>Check the API reference for specific layers of your choosing.</p></li>
+<li><p>Import the layers and use them as you would for any vanilla PyTorch layers.</p></li>
+</ol>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Do not hesitate to go to the API reference to get better explanations on the
+layer usage.</p>
+</div>
+</section>
+<section id="id4">
+<h3>Example<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
+<p>You can create a Packed-Ensemble <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> model with the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">einops</span> <span class="kn">import</span> <span class="n">rearrange</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.layers</span> <span class="kn">import</span> <span class="n">PackedConv2d</span><span class="p">,</span> <span class="n">PackedLinear</span>
+
+<span class="k">class</span> <span class="nc">PackedNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">gamma</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">PackedConv2d</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">PackedConv2d</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">PackedLinear</span><span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">PackedLinear</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">84</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span> <span class="o">=</span> <span class="n">PackedLinear</span><span class="p">(</span><span class="mi">84</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="n">M</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;e (m c) h w -&gt; (m e) c h w&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span>
+        <span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+<span class="n">packed_net</span> <span class="o">=</span> <span class="n">PackedNet</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="other-usage">
+<h2>Other usage<a class="headerlink" href="#other-usage" title="Permalink to this heading">¶</a></h2>
+<p>Feel free to use any classes described in the API reference such as the metrics, datasets, etc.</p>
 </section>
 </section>
 
@@ -326,7 +410,7 @@ In the meantime, feel free to reuse:</p>
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="auto_tutorials/index.html" class="btn btn-neutral float-right" title="Tutorials" accesskey="n"
+    <a href="introduction_uncertainty.html" class="btn btn-neutral float-right" title="Introduction to classification uncertainty and modern deep neural networks" accesskey="n"
       rel="next">Next <img src="_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     
@@ -362,12 +446,22 @@ In the meantime, feel free to reuse:</p>
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">Quickstart</a><ul>
-<li><a class="reference internal" href="#using-the-cli-tool">Using the CLI tool</a><ul>
+<li><a class="reference internal" href="#using-the-lightning-based-cli-tool">Using the lightning-based CLI tool</a><ul>
 <li><a class="reference internal" href="#procedure">Procedure</a></li>
-<li><a class="reference internal" href="#exemple">Exemple</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#using-your-own-trainer">Using your own trainer</a></li>
+<li><a class="reference internal" href="#using-the-pytorch-based-models">Using the pytorch-based models</a><ul>
+<li><a class="reference internal" href="#id1">Procedure</a></li>
+<li><a class="reference internal" href="#id2">Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-the-pytorch-based-layers">Using the pytorch-based layers</a><ul>
+<li><a class="reference internal" href="#id3">Procedure</a></li>
+<li><a class="reference internal" href="#id4">Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-usage">Other usage</a></li>
 </ul>
 </li>
 </ul>

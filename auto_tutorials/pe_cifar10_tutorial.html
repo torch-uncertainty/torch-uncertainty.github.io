@@ -153,8 +153,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction_uncertainty.html">Introduction to classification uncertainty and modern deep neural networks</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
         
@@ -294,6 +296,8 @@ w.r.t. uncertainty quantification and OOD detection</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchvision</span>
 <span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
+
+<span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The output of torchvision datasets are PILImage images of range [0, 1].
@@ -326,28 +330,26 @@ the num_worker of torch.utils.data.DataLoader() to 0.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ./data/cifar-10-python.tar.gz
 
   0%|          | 0/170498071 [00:00&lt;?, ?it/s]
-  0%|          | 851968/170498071 [00:00&lt;00:21, 7979698.65it/s]
-  5%|4         | 8454144/170498071 [00:00&lt;00:03, 46897442.55it/s]
- 10%|9         | 16678912/170498071 [00:00&lt;00:02, 62737307.25it/s]
- 15%|#4        | 24969216/170498071 [00:00&lt;00:02, 70580066.54it/s]
- 20%|#9        | 33357824/170498071 [00:00&lt;00:01, 75295465.55it/s]
- 24%|##4       | 41746432/170498071 [00:00&lt;00:01, 78130316.79it/s]
- 29%|##9       | 49938432/170498071 [00:00&lt;00:01, 79332687.24it/s]
- 34%|###4      | 58130432/170498071 [00:00&lt;00:01, 80148402.59it/s]
- 39%|###8      | 66486272/170498071 [00:00&lt;00:01, 81110654.84it/s]
- 44%|####3     | 74612736/170498071 [00:01&lt;00:01, 80914187.33it/s]
- 49%|####8     | 82837504/170498071 [00:01&lt;00:01, 81250300.56it/s]
- 54%|#####3    | 91422720/170498071 [00:01&lt;00:00, 82533769.02it/s]
- 59%|#####8    | 99778560/170498071 [00:01&lt;00:00, 82776581.92it/s]
- 63%|######3   | 108068864/170498071 [00:01&lt;00:00, 81815087.15it/s]
- 68%|######8   | 116293632/170498071 [00:01&lt;00:00, 81898720.86it/s]
- 73%|#######3  | 124518400/170498071 [00:01&lt;00:00, 81086792.72it/s]
- 78%|#######7  | 132644864/170498071 [00:01&lt;00:00, 80581302.48it/s]
- 83%|########2 | 140935168/170498071 [00:01&lt;00:00, 81208714.82it/s]
- 87%|########7 | 149061632/170498071 [00:01&lt;00:00, 80704933.01it/s]
- 92%|#########2| 157155328/170498071 [00:02&lt;00:00, 80252192.05it/s]
- 97%|#########7| 165543936/170498071 [00:02&lt;00:00, 81282484.84it/s]
-100%|##########| 170498071/170498071 [00:02&lt;00:00, 77935986.80it/s]
+  1%|          | 884736/170498071 [00:00&lt;00:20, 8413885.72it/s]
+  6%|5         | 9633792/170498071 [00:00&lt;00:02, 53826138.23it/s]
+ 11%|#1        | 18907136/170498071 [00:00&lt;00:02, 71351896.20it/s]
+ 17%|#6        | 28475392/170498071 [00:00&lt;00:01, 80881381.77it/s]
+ 22%|##2       | 37847040/170498071 [00:00&lt;00:01, 85278389.61it/s]
+ 28%|##7       | 47087616/170498071 [00:00&lt;00:01, 87651984.59it/s]
+ 33%|###3      | 56623104/170498071 [00:00&lt;00:01, 90135802.02it/s]
+ 39%|###8      | 66060288/170498071 [00:00&lt;00:01, 91461541.45it/s]
+ 44%|####4     | 75431936/170498071 [00:00&lt;00:01, 92145705.01it/s]
+ 50%|####9     | 84803584/170498071 [00:01&lt;00:00, 92619582.57it/s]
+ 55%|#####5    | 94208000/170498071 [00:01&lt;00:00, 92780895.32it/s]
+ 61%|######    | 103677952/170498071 [00:01&lt;00:00, 93333164.70it/s]
+ 66%|######6   | 113016832/170498071 [00:01&lt;00:00, 92778072.02it/s]
+ 72%|#######1  | 122519552/170498071 [00:01&lt;00:00, 93440246.97it/s]
+ 77%|#######7  | 131891200/170498071 [00:01&lt;00:00, 92551306.07it/s]
+ 83%|########2 | 141328384/170498071 [00:01&lt;00:00, 92804793.79it/s]
+ 88%|########8 | 150732800/170498071 [00:01&lt;00:00, 93053542.51it/s]
+ 94%|#########3| 160071680/170498071 [00:01&lt;00:00, 92855439.57it/s]
+ 99%|#########9| 169476096/170498071 [00:01&lt;00:00, 93156862.12it/s]
+100%|##########| 170498071/170498071 [00:01&lt;00:00, 88349304.71it/s]
 Extracting ./data/cifar-10-python.tar.gz to ./data
 Files already downloaded and verified
 </pre></div>
@@ -377,7 +379,7 @@ Files already downloaded and verified
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">classes</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s1">5s</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)))</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_pe_cifar10_tutorial_001.png" srcset="../_images/sphx_glr_pe_cifar10_tutorial_001.png" alt="pe cifar10 tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>horse bird  car   bird
+<img src="../_images/sphx_glr_pe_cifar10_tutorial_001.png" srcset="../_images/sphx_glr_pe_cifar10_tutorial_001.png" alt="pe cifar10 tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>car   plane bird  ship
 </pre></div>
 </div>
 </section>
@@ -414,7 +416,9 @@ convolutional neural network.</p>
 <p>Let’s modify the vanilla classifier into a Packed-Ensemble classifier of
 parameters <span class="math notranslate nohighlight">\(M=4,\ \alpha=2\text{ and }\gamma=1\)</span>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">einops</span> <span class="kn">import</span> <span class="n">rearrange</span>
+
 <span class="kn">from</span> <span class="nn">torch_uncertainty.layers</span> <span class="kn">import</span> <span class="n">PackedConv2d</span><span class="p">,</span> <span class="n">PackedLinear</span>
+
 
 <span class="k">class</span> <span class="nc">PackedNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -422,14 +426,13 @@ parameters <span class="math notranslate nohighlight">\(M=4,\ \alpha=2\text{ and
         <span class="n">M</span> <span class="o">=</span> <span class="mi">4</span>
         <span class="n">alpha</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="n">gamma</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="c1"># The first layer is left as is since all the subnetworks have the</span>
-        <span class="c1"># input.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="o">*</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="c1"># The first layer does not use the number of estimators and gamma.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">PackedConv2d</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">PackedConv2d</span><span class="p">(</span><span class="mi">6</span><span class="o">*</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">16</span><span class="o">*</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">gamma</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">PackedLinear</span><span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">,</span> <span class="mi">120</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">gamma</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">PackedLinear</span><span class="p">(</span><span class="mi">120</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">,</span> <span class="mi">84</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">gamma</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span> <span class="o">=</span> <span class="n">PackedLinear</span><span class="p">(</span><span class="mi">84</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">M</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">PackedConv2d</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">PackedLinear</span><span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">PackedLinear</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">84</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span> <span class="o">=</span> <span class="n">PackedLinear</span><span class="p">(</span><span class="mi">84</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">M</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="n">M</span>
 
@@ -486,18 +489,18 @@ parameters <span class="math notranslate nohighlight">\(M=4,\ \alpha=2\text{ and
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Finished Training&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1,  2000] loss: 2.303
-[1,  4000] loss: 2.285
-[1,  6000] loss: 2.213
-[1,  8000] loss: 2.132
-[1, 10000] loss: 2.023
-[1, 12000] loss: 1.922
-[2,  2000] loss: 1.829
-[2,  4000] loss: 1.758
-[2,  6000] loss: 1.730
-[2,  8000] loss: 1.695
-[2, 10000] loss: 1.636
-[2, 12000] loss: 1.628
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1,  2000] loss: 2.817
+[1,  4000] loss: 2.174
+[1,  6000] loss: 2.037
+[1,  8000] loss: 1.902
+[1, 10000] loss: 1.821
+[1, 12000] loss: 1.765
+[2,  2000] loss: 1.708
+[2,  4000] loss: 1.664
+[2,  6000] loss: 1.658
+[2,  8000] loss: 1.647
+[2, 10000] loss: 1.613
+[2, 12000] loss: 1.596
 Finished Training
 </pre></div>
 </div>
@@ -547,7 +550,7 @@ model wasn’t necessary here, we only did it to illustrate how to do so):</p>
 </pre></div>
 </div>
 <p>The results seem pretty good.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  33.098 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  8.163 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-pe-cifar10-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/0f065f2b49eb94fae83c86f04cc9e95a/pe_cifar10_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">pe_cifar10_tutorial.py</span></code></a></p>

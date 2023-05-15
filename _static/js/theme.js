@@ -946,10 +946,10 @@ require = (function () { function r(e, n, t) { function o(i, f) { if (!n[i]) { i
       var tutorialUrlArray = $("#tutorial-type").text().split('/');
       tutorialUrlArray[0] = tutorialUrlArray[0] + "_source"
 
-      var githubLink = "https://github.com/pytorch/tutorials/blob/master/" + tutorialUrlArray.join("/") + ".py",
+      var githubLink = "https://github.com/ENSTA-U2IS/torch-uncertainty/blob/main/" + tutorialUrlArray.join("/") + ".py",
         notebookLink = $(".reference.download")[1].href,
         notebookDownloadPath = notebookLink.split('_downloads')[1],
-        colabLink = "https://colab.research.google.com/github/pytorch/tutorials/blob/gh-pages/_downloads" + notebookDownloadPath;
+        colabLink = "https://colab.research.google.com/github/torch-uncertainty/tutorials/blob/gh-pages/_downloads" + notebookDownloadPath;
 
       $("#google-colab-link").wrap("<a href=" + colabLink + " data-behavior='call-to-action-event' data-response='Run in Google Colab' target='_blank'/>");
       $("#download-notebook-link").wrap("<a href=" + notebookLink + " data-behavior='call-to-action-event' data-response='Download Notebook'/>");
