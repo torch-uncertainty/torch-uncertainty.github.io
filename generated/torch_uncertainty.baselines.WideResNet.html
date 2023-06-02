@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="PackedResNet" href="torch_uncertainty.baselines.PackedResNet.html" />
+  <link rel="next" title="torch_uncertainty.models.resnet.resnet18" href="torch_uncertainty.models.resnet.resnet18.html" />
   <link rel="prev" title="ResNet" href="torch_uncertainty.baselines.ResNet.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
@@ -153,9 +153,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../introduction_uncertainty.html">Introduction to classification uncertainty and modern deep neural networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction_uncertainty.html">Introduction to Classification Uncertainty</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
@@ -260,53 +261,70 @@
 <h1>WideResNet<a class="headerlink" href="#wideresnet" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.baselines.WideResNet">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.baselines.</span></span><span class="sig-name descname"><span class="pre">WideResNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimization_procedure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_entropy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_logits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imagenet_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.baselines.WideResNet" title="Permalink to this definition">¶</a></dt>
-<dd><p>LightningModule for Vanilla WideResNet.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.baselines.</span></span><span class="sig-name descname"><span class="pre">WideResNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimization_procedure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imagenet_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_entropy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_logits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_mi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_variation_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.baselines.WideResNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wide-ResNet28x10 backbone baseline for classification providing support
+for various versions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>num_classes</strong> (<em>int</em>) – Number of classes to predict.</p></li>
 <li><p><strong>in_channels</strong> (<em>int</em>) – Number of input channels.</p></li>
-<li><p><strong>loss</strong> (<em>torch.nn.Module</em>) – Training loss.</p></li>
+<li><p><strong>loss</strong> (<em>nn.Module</em>) – Training loss.</p></li>
 <li><p><strong>optimization_procedure</strong> (<em>Any</em>) – Optimization procedure, corresponds to
 what expect the <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/stable/common/lightning_module.html#configure-optimizers">LightningModule.configure_optimizers()</a>
 method.</p></li>
+<li><p><strong>version</strong> (<em>str</em>) – <p>Determines which Wide-ResNet version to use:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;vanilla&quot;</span></code>: original Wide-ResNet</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;packed&quot;</span></code>: Packed-Ensembles Wide-ResNet</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;batched&quot;</span></code>: BatchEnsemble Wide-ResNet</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;masked&quot;</span></code>: Masksemble Wide-ResNet</p></li>
+</ul>
+</p></li>
+<li><p><strong>imagenet_structure</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to use the ImageNet
+structure. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>num_estimators</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of estimators in the ensemble.
+Only used if <code class="xref py py-attr docutils literal notranslate"><span class="pre">version</span></code> is either <code class="docutils literal notranslate"><span class="pre">&quot;packed&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;batched&quot;</span></code>
+or <code class="docutils literal notranslate"><span class="pre">&quot;masked&quot;</span></code> Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 <li><p><strong>groups</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of groups in convolutions. Defaults to
 <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>scale</strong> (<em>float</em><em>, </em><em>optional</em>) – Expansion factor affecting the width of the
+estimators. Only used if <code class="xref py py-attr docutils literal notranslate"><span class="pre">version</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;masked&quot;</span></code>. Defaults
+to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – Expansion factor affecting the width of the
+estimators. Only used if <code class="xref py py-attr docutils literal notranslate"><span class="pre">version</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;packed&quot;</span></code>. Defaults
+to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>gamma</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of groups within each estimator. Only
+used if <code class="xref py py-attr docutils literal notranslate"><span class="pre">version</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;packed&quot;</span></code> and scales with
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">groups</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">1s</span></code>.</p></li>
 <li><p><strong>use_entropy</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to use the entropy
 values as the OOD criterion or not. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>use_logits</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to use the logits as the
 OOD criterion or not. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>use_mi</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to use the mutual
+information as the OOD criterion or not. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>use_variation_ratio</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to use the
+variation ratio as the OOD criterion or not. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>pretrained</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to use the pretrained
+weights or not. Only used if <code class="xref py py-attr docutils literal notranslate"><span class="pre">version</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;packed&quot;</span></code>.
+Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If <code class="xref py py-attr docutils literal notranslate"><span class="pre">version</span></code> is not either <code class="docutils literal notranslate"><span class="pre">&quot;vanilla&quot;</span></code>,
+    <code class="docutils literal notranslate"><span class="pre">&quot;packed&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;batched&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;masked&quot;</span></code>.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Wide-ResNet baseline ready for training and</dt><dd><p>evaluation.</p>
+</dd>
 </dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The OOD criterion is by defaults the confidence score.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Make sure at most only one of <code class="xref py py-attr docutils literal notranslate"><span class="pre">use_entropy</span></code> and
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">use_logits</span></code> attributes is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>. Otherwise a
-<code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError()</span></code> will be raised.</p>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.baselines.WideResNet.add_model_specific_args">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_model_specific_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent_parser</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.baselines.WideResNet.add_model_specific_args" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines the model’s attributes via command-line options:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">--groups</span> <span class="pre">[int]</span></code>: defines <code class="xref py py-attr docutils literal notranslate"><span class="pre">groups</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">--imagenet_structure</span></code>: sets <code class="xref py py-attr docutils literal notranslate"><span class="pre">imagenet_structure</span></code>. Defaults
-to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">--entropy</span></code>: sets <code class="xref py py-attr docutils literal notranslate"><span class="pre">use_entropy</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">--logits</span></code>: sets <code class="xref py py-attr docutils literal notranslate"><span class="pre">use_logits</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
-</ul>
-<p class="rubric">Example</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">script</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">num_estimators</span> <span class="mi">4</span> <span class="o">--</span><span class="n">alpha</span> <span class="mi">2</span>
-</pre></div>
-</div>
-</dd></dl>
-
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>LightningModule</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -319,7 +337,7 @@ to <code class="docutils literal notranslate"><span class="pre">True</span></cod
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="torch_uncertainty.baselines.PackedResNet.html" class="btn btn-neutral float-right" title="PackedResNet" accesskey="n"
+    <a href="torch_uncertainty.models.resnet.resnet18.html" class="btn btn-neutral float-right" title="torch_uncertainty.models.resnet.resnet18" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     
@@ -355,10 +373,7 @@ to <code class="docutils literal notranslate"><span class="pre">True</span></cod
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">WideResNet</a><ul>
-<li><a class="reference internal" href="#torch_uncertainty.baselines.WideResNet"><code class="docutils literal notranslate"><span class="pre">WideResNet</span></code></a><ul>
-<li><a class="reference internal" href="#torch_uncertainty.baselines.WideResNet.add_model_specific_args"><code class="docutils literal notranslate"><span class="pre">WideResNet.add_model_specific_args()</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#torch_uncertainty.baselines.WideResNet"><code class="docutils literal notranslate"><span class="pre">WideResNet</span></code></a></li>
 </ul>
 </li>
 </ul>
