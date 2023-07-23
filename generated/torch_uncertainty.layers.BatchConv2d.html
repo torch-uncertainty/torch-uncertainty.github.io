@@ -1,0 +1,501 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>BatchConv2d &mdash; TorchUncertainty 0.1.3 documentation</title>
+  
+
+  <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
+  
+  
+
+  
+
+  
+  
+  
+
+  
+
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="index" title="Index" href="../genindex.html" />
+  <link rel="search" title="Search" href="../search.html" />
+  <link rel="next" title="MaskedConv2d" href="torch_uncertainty.layers.MaskedConv2d.html" />
+  <link rel="prev" title="PackedConv2d" href="torch_uncertainty.layers.PackedConv2d.html" />
+  <!-- Google Analytics -->
+  <script type="text/javascript">
+    var collapsedSections = [];
+  </script>
+  
+  <!-- End Google Analytics -->
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+  <script>
+    MathJax = {
+        chtml: {
+            scale: 1,
+            minScale: 1,
+        },
+        svg: {
+            scale: 1,
+            minScale: 1,
+        }
+    }
+</script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css"
+    integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://torch-uncertainty.github.io/"
+        aria-label="OpenMMLab"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+  
+
+  <div class="table-of-contents-link-wrapper">
+    <span>Table of Contents</span>
+    <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+  </div>
+
+  <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+    <div class="pytorch-side-scroll">
+      <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <div class="pytorch-left-menu-search">
+          
+
+          
+          
+          
+          
+
+          
+
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        
+        
+        
+        
+        
+        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction_uncertainty.html">Introduction to Classification Uncertainty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+        
+        
+      </div>
+    </div>
+  </nav>
+
+  <div class="pytorch-container">
+    <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+      <div class="pytorch-breadcrumbs-wrapper">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+    <li>
+      <a href="../index.html">
+        Docs
+      </a> &gt;
+    </li>
+
+    
+    <li><a href="../api.html">API reference</a> &gt;</li>
+    
+    <li>BatchConv2d</li>
+    
+    <!-- 
+    <li class="pytorch-breadcrumbs-aside">
+      
+      
+      
+      
+      
+      <a href="/zh_CN//generated/torch_uncertainty.layers.BatchConv2d.html" class="fa fa-language"> 以中文阅读</a>
+      
+      
+    </li>
+    
+     -->
+  </ul>
+
+  
+</div>
+      </div>
+
+      <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+        Shortcuts
+      </div>
+    </div>
+
+    <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+      <div class="pytorch-content-left">
+
+        
+
+        <div class="pytorch-call-to-action-links">
+          <div id="tutorial-type">generated/torch_uncertainty.layers.BatchConv2d</div>
+
+          <!-- <div id="google-colab-link">
+            <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg" />
+            <div class="call-to-action-desktop-view">Run in Google Colab</div>
+            <div class="call-to-action-mobile-view">Colab</div>
+          </div> -->
+          <div id="download-notebook-link">
+            <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg" />
+            <div class="call-to-action-desktop-view">Download Notebook</div>
+            <div class="call-to-action-mobile-view">Notebook</div>
+          </div>
+          <div id="github-view-link">
+            <img class="call-to-action-img" src="../_static/images/pytorch-github.svg" />
+            <div class="call-to-action-desktop-view">View on GitHub</div>
+            <div class="call-to-action-mobile-view">GitHub</div>
+          </div>
+        </div>
+
+        
+        
+          <div class="rst-content">
+            
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+                
+                
+  <section id="batchconv2d">
+<h1>BatchConv2d<a class="headerlink" href="#batchconv2d" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="torch_uncertainty.layers.BatchConv2d">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.layers.</span></span><span class="sig-name descname"><span class="pre">BatchConv2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.layers.BatchConv2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies a 2D convolution over an input signal composed of several input
+planes using BatchEnsemble method to the incoming data.</p>
+<p>In the simplest case, the output value of the layer with input size
+<span class="math notranslate nohighlight">\((N, C_{in}, H_{in}, W_{in})\)</span> and output
+<span class="math notranslate nohighlight">\((N, C_{out}, H_{out}, W_{out})\)</span> can be precisely described as:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\text{out}(N_i, C_{\text{out}_j})=\
+&amp;\hat{b}(N_i,C_{\text{out}_j})
++\hat{S}(N_{i},C_{\text{out}_j}) \\
+&amp;\times \sum_{k = 0}^{C_{\text{in}} - 1}
+\text{weight}(C_{\text{out}_j}, k)\star (\text{input}(N_i, k)
+\times \hat{R}(N_i, k))\end{split}\]</div>
+<dl class="simple">
+<dt>Source:</dt><dd><p>Introduced by the paper <a class="reference external" href="https://arxiv.org/abs/2002.06715">BatchEnsemble: An Alternative Approach to
+Efficient Ensemble and Lifelong Learning</a>, we present here an implementation
+of a Conv2d BatchEnsemble layer in <a class="reference external" href="https://pytorch.org">PyTorch</a>
+heavily inspired by its <a class="reference external" href="https://github.com/google/edward2">official implementation</a> in <a class="reference external" href="https://www.tensorflow.org">TensorFlow</a>.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_channels</strong> (<em>int</em>) – number of channels in the input image.</p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – number of channels produced by the convolution.</p></li>
+<li><p><strong>kernel_size</strong> (<em>int</em><em> or </em><em>tuple</em>) – size of the convolving kernel.</p></li>
+<li><p><strong>num_estimators</strong> (<em>int</em>) – number of estimators in the ensemble referred as
+<span class="math notranslate nohighlight">\(M\)</span> here.</p></li>
+<li><p><strong>stride</strong> (<em>int</em><em> or </em><em>tuple</em><em>, </em><em>optional</em>) – stride of the convolution. Defaults to
+<code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>padding</strong> (<em>int</em><em>, </em><em>tuple</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – padding added to all four sides
+of the input. Defaults to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p><strong>dilation</strong> (<em>int</em><em> or </em><em>tuple</em><em>, </em><em>optional</em>) – spacing between kernel elements.
+Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>groups</strong> (<em>int</em><em>, </em><em>optional</em>) – number of blocked connections from input
+channels to output channels. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>bias</strong> (<em>bool</em><em>, </em><em>optional</em>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, adds a learnable bias to the
+output. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>weight</strong> (<em>torch.Tensor</em>) – the learnable weights of the module of shape
+<span class="math notranslate nohighlight">\((\text{out_channels}, \frac{\text{in_channels}}
+{\text{groups}},\)</span><span class="math notranslate nohighlight">\(\text{kernel_size[0]},
+\text{kernel_size[1]})\)</span> shared between the estimators. The values
+of these weights are sampled from <span class="math notranslate nohighlight">\(\mathcal{U}(-\sqrt{k},
+\sqrt{k})\)</span> where <span class="math notranslate nohighlight">\(k = \frac{\text{groups}}{C_\text{in} *
+\prod_{i=0}^{1}\text{kernel_size}[i]}\)</span>.</p></li>
+<li><p><strong>R</strong> (<em>torch.Tensor</em>) – the learnable matrice of shape <span class="math notranslate nohighlight">\((M, C_{in})\)</span> where each row
+consist of the vector <span class="math notranslate nohighlight">\(r_{i}\)</span> corresponding to the
+<span class="math notranslate nohighlight">\(i^{th}\)</span> ensemble member. The values are initialized from
+<span class="math notranslate nohighlight">\(\mathcal{N}(1.0, 0.5)\)</span>.</p></li>
+<li><p><strong>S</strong> (<em>torch.Tensor</em>) – the learnable matrice of shape <span class="math notranslate nohighlight">\((M, C_{out})\)</span> where each row
+consist of the vector <span class="math notranslate nohighlight">\(s_{i}\)</span> corresponding to the
+<span class="math notranslate nohighlight">\(i^{th}\)</span> ensemble member. The values are initialized from
+<span class="math notranslate nohighlight">\(\mathcal{N}(1.0, 0.5)\)</span>.</p></li>
+<li><p><strong>bias</strong> (<em>Optional</em><em>[</em><em>torch.Tensor</em><em>]</em>) – the learnable bias (<span class="math notranslate nohighlight">\(b\)</span>) of shape <span class="math notranslate nohighlight">\((M, C_{out})\)</span>
+where each row corresponds to the bias of the <span class="math notranslate nohighlight">\(i^{th}\)</span>
+ensemble member. If <code class="xref py py-attr docutils literal notranslate"><span class="pre">bias</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, the values are
+initialized from <span class="math notranslate nohighlight">\(\mathcal{U}(-\sqrt{k}, \sqrt{k})\)</span> where
+<span class="math notranslate nohighlight">\(k=\frac{\text{groups}}{C_\text{in}*\prod_{i=0}^{1}
+\text{kernel_size}[i]}\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt>Shape:</dt><dd><ul class="simple">
+<li><p>Input: <span class="math notranslate nohighlight">\((N, C_{in}, H_{in}, W_{in})\)</span>.</p></li>
+<li><p>Output: <span class="math notranslate nohighlight">\((N, C_{out}, H_{out}, W_{out})\)</span>.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[H_{out} = \left\lfloor\frac{H_{in} + 2 \times \text{padding}[0] -
+\text{dilation}[0] \times (\text{kernel_size}[0] - 1) - 1}
+{\text{stride}[0]} + 1\right\rfloor\]</div>
+<div class="math notranslate nohighlight">
+\[W_{out} = \left\lfloor\frac{W_{in}  + 2 \times \text{padding}[1] -
+\text{dilation}[1] \times (\text{kernel_size}[1] - 1) - 1}
+{\text{stride}[1]} + 1\right\rfloor\]</div>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Make sure that <span class="math notranslate nohighlight">\(M | N\)</span> when calling <code class="xref py py-func docutils literal notranslate"><span class="pre">forward()</span></code>.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># With square kernels, four estimators and equal stride</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Conv2dBE</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
+<span class="go">torch.Size([8, 32, 14, 14])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+              </article>
+              
+            </div>
+            <footer>
+  
+  <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+    
+    <a href="torch_uncertainty.layers.MaskedConv2d.html" class="btn btn-neutral float-right" title="MaskedConv2d" accesskey="n"
+      rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
+        class="next-page"></a>
+    
+    
+    <a href="torch_uncertainty.layers.PackedConv2d.html" class="btn btn-neutral" title="PackedConv2d" accesskey="p"
+      rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
+    
+  </div>
+  
+
+  <hr>
+
+  <div role="contentinfo">
+    <p>
+      &copy; Copyright 2023, Adrien Lafage and Olivier Laurent.
+
+    </p>
+  </div>
+  
+  <div>
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a
+      href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the
+      Docs</a>.
+  </div>
+   
+
+</footer>
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">BatchConv2d</a><ul>
+<li><a class="reference internal" href="#torch_uncertainty.layers.BatchConv2d"><code class="docutils literal notranslate"><span class="pre">BatchConv2d</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+    </section>
+  </div>
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" id="documentation_options" data-url_root="../"
+    src="../_static/documentation_options.js"></script>
+  <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+  <script src="../_static/jquery.js"></script>
+  <script src="../_static/underscore.js"></script>
+  <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+  <script src="../_static/doctools.js"></script>
+  <script src="../_static/sphinx_highlight.js"></script>
+  <script src="../_static/clipboard.min.js"></script>
+  <script src="../_static/copybutton.js"></script>
+  <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+  </div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://torch-uncertainty.github.io/" aria-label="OpenMMLab"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+          </li>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function (e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+
+</html>
