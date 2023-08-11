@@ -21,6 +21,9 @@
 From a Vanilla Classifier to a Packed-Ensemble
 ==============================================
 
+This tutorial is heavily inspired by PyTorch's `Training a Classifier <https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html#test-the-network-on-the-test-data>`_
+tutorial.
+
 Let's dive step by step into the process to modify a vanilla classifier into a
 packed-ensemble classifier.
 
@@ -55,7 +58,7 @@ Here is the outline of the process:
 1. Load and normalize CIFAR10
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-48
+.. GENERATED FROM PYTHON SOURCE LINES 45-51
 
 .. code-block:: default
 
@@ -72,18 +75,18 @@ Here is the outline of the process:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-51
+.. GENERATED FROM PYTHON SOURCE LINES 52-54
 
 The output of torchvision datasets are PILImage images of range [0, 1].
 We transform them to Tensors of normalized range [-1, 1].
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-56
+.. GENERATED FROM PYTHON SOURCE LINES 56-59
 
 .. note::
     If running on Windows and you get a BrokenPipeError, try setting
     the num_worker of torch.utils.data.DataLoader() to 0.
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-76
+.. GENERATED FROM PYTHON SOURCE LINES 59-79
 
 .. code-block:: default
 
@@ -116,18 +119,18 @@ We transform them to Tensors of normalized range [-1, 1].
  .. code-block:: none
 
     Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ./data/cifar-10-python.tar.gz
-      0%|          | 0/170498071 [00:00<?, ?it/s]      1%|          | 1998848/170498071 [00:00<00:08, 19973974.44it/s]      8%|▊         | 13533184/170498071 [00:00<00:02, 75967736.09it/s]     15%|█▍        | 25034752/170498071 [00:00<00:01, 93757525.68it/s]     21%|██▏       | 36569088/170498071 [00:00<00:01, 102208187.69it/s]     28%|██▊       | 48103424/170498071 [00:00<00:01, 106889614.95it/s]     35%|███▍      | 59637760/170498071 [00:00<00:01, 109685494.62it/s]     42%|████▏     | 70975488/170498071 [00:00<00:00, 110811215.32it/s]     48%|████▊     | 82313216/170498071 [00:00<00:00, 111607040.76it/s]     55%|█████▍    | 93487104/170498071 [00:00<00:00, 110274581.39it/s]     61%|██████▏   | 104529920/170498071 [00:01<00:00, 108577884.01it/s]     68%|██████▊   | 115408896/170498071 [00:01<00:00, 107686908.65it/s]     74%|███████▍  | 126189568/170498071 [00:01<00:00, 106435002.16it/s]     80%|████████  | 136839168/170498071 [00:01<00:00, 105999559.88it/s]     87%|████████▋ | 147488768/170498071 [00:01<00:00, 106091567.93it/s]     93%|█████████▎| 158138368/170498071 [00:01<00:00, 106183164.98it/s]     99%|█████████▉| 168787968/170498071 [00:01<00:00, 105357454.79it/s]    100%|██████████| 170498071/170498071 [00:01<00:00, 104041185.38it/s]
+      0%|          | 0/170498071 [00:00<?, ?it/s]      0%|          | 458752/170498071 [00:00<00:44, 3842734.10it/s]      4%|▎         | 6062080/170498071 [00:00<00:05, 32270076.87it/s]      9%|▊         | 14647296/170498071 [00:00<00:02, 55669253.87it/s]     13%|█▎        | 22413312/170498071 [00:00<00:02, 64069867.30it/s]     18%|█▊        | 29917184/170498071 [00:00<00:02, 67955321.68it/s]     22%|██▏       | 37978112/170498071 [00:00<00:01, 72094756.63it/s]     27%|██▋       | 45645824/170498071 [00:00<00:01, 73571164.68it/s]     32%|███▏      | 54394880/170498071 [00:00<00:01, 77924525.11it/s]     36%|███▋      | 62226432/170498071 [00:00<00:01, 77570650.23it/s]     41%|████      | 70025216/170498071 [00:01<00:01, 76569877.71it/s]     46%|████▋     | 78872576/170498071 [00:01<00:01, 79912448.11it/s]     51%|█████     | 86900736/170498071 [00:01<00:01, 79309804.60it/s]     56%|█████▌    | 94863360/170498071 [00:01<00:00, 78625782.26it/s]     60%|██████    | 102891520/170498071 [00:01<00:00, 79064797.09it/s]     65%|██████▍   | 110821376/170498071 [00:01<00:00, 77613806.33it/s]     70%|███████   | 119734272/170498071 [00:01<00:00, 80972232.32it/s]     75%|███████▍  | 127860736/170498071 [00:01<00:00, 80021368.48it/s]     80%|███████▉  | 136380416/170498071 [00:01<00:00, 81494380.28it/s]     86%|████████▌ | 146112512/170498071 [00:01<00:00, 86107033.79it/s]     91%|█████████ | 154763264/170498071 [00:02<00:00, 84184159.98it/s]     96%|█████████▌| 163905536/170498071 [00:02<00:00, 86290556.26it/s]    100%|██████████| 170498071/170498071 [00:02<00:00, 76601443.38it/s]
     Extracting ./data/cifar-10-python.tar.gz to ./data
     Files already downloaded and verified
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-78
+.. GENERATED FROM PYTHON SOURCE LINES 80-81
 
 Let us show some of the training images, for fun.
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-103
+.. GENERATED FROM PYTHON SOURCE LINES 81-106
 
 .. code-block:: default
 
@@ -169,19 +172,19 @@ Let us show some of the training images, for fun.
 
  .. code-block:: none
 
-    frog  car   deer  car  
+    plane plane truck horse
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-108
+.. GENERATED FROM PYTHON SOURCE LINES 107-111
 
 2. Define a Packed-Ensemble from a vanilla classifier
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 First we define a vanilla classifier for CIFAR10 for reference. We will use a
 convolutional neural network.
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-134
+.. GENERATED FROM PYTHON SOURCE LINES 111-137
 
 .. code-block:: default
 
@@ -218,12 +221,12 @@ convolutional neural network.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-137
+.. GENERATED FROM PYTHON SOURCE LINES 138-140
 
 Let's modify the vanilla classifier into a Packed-Ensemble classifier of 
 parameters :math:`M=4,\ \alpha=2\text{ and }\gamma=1`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-172
+.. GENERATED FROM PYTHON SOURCE LINES 140-175
 
 .. code-block:: default
 
@@ -269,13 +272,13 @@ parameters :math:`M=4,\ \alpha=2\text{ and }\gamma=1`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-176
+.. GENERATED FROM PYTHON SOURCE LINES 176-179
 
 3. Define a Loss function and optimizer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Let's use a Classification Cross-Entropy loss and SGD with momentum.
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-182
+.. GENERATED FROM PYTHON SOURCE LINES 179-185
 
 .. code-block:: default
 
@@ -292,13 +295,13 @@ Let's use a Classification Cross-Entropy loss and SGD with momentum.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-186
+.. GENERATED FROM PYTHON SOURCE LINES 186-189
 
 4. Train the Packed-Ensemble on the training data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Let's train the Packed-Ensemble on the training data.
 
-.. GENERATED FROM PYTHON SOURCE LINES 186-210
+.. GENERATED FROM PYTHON SOURCE LINES 189-213
 
 .. code-block:: default
 
@@ -334,28 +337,28 @@ Let's train the Packed-Ensemble on the training data.
 
  .. code-block:: none
 
-    [1,  2000] loss: 3.097
-    [1,  4000] loss: 2.242
-    [1,  6000] loss: 2.085
-    [1,  8000] loss: 1.969
-    [1, 10000] loss: 1.887
-    [1, 12000] loss: 1.820
-    [2,  2000] loss: 1.753
-    [2,  4000] loss: 1.703
-    [2,  6000] loss: 1.675
-    [2,  8000] loss: 1.637
-    [2, 10000] loss: 1.625
-    [2, 12000] loss: 1.599
+    [1,  2000] loss: 2.987
+    [1,  4000] loss: 2.218
+    [1,  6000] loss: 2.072
+    [1,  8000] loss: 1.965
+    [1, 10000] loss: 1.892
+    [1, 12000] loss: 1.815
+    [2,  2000] loss: 1.746
+    [2,  4000] loss: 1.714
+    [2,  6000] loss: 1.683
+    [2,  8000] loss: 1.664
+    [2, 10000] loss: 1.630
+    [2, 12000] loss: 1.613
     Finished Training
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-212
+.. GENERATED FROM PYTHON SOURCE LINES 214-215
 
 Save our trained model:
 
-.. GENERATED FROM PYTHON SOURCE LINES 212-216
+.. GENERATED FROM PYTHON SOURCE LINES 215-219
 
 .. code-block:: default
 
@@ -370,13 +373,13 @@ Save our trained model:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 217-220
+.. GENERATED FROM PYTHON SOURCE LINES 220-223
 
 5. Test the Packed-Ensemble on the test data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Let us display an image from the test set to get familiar.
 
-.. GENERATED FROM PYTHON SOURCE LINES 220-228
+.. GENERATED FROM PYTHON SOURCE LINES 223-231
 
 .. code-block:: default
 
@@ -406,12 +409,12 @@ Let us display an image from the test set to get familiar.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 229-231
+.. GENERATED FROM PYTHON SOURCE LINES 232-234
 
 Next, let us load back in our saved model (note: saving and re-loading the
 model wasn't necessary here, we only did it to illustrate how to do so):
 
-.. GENERATED FROM PYTHON SOURCE LINES 231-235
+.. GENERATED FROM PYTHON SOURCE LINES 234-238
 
 .. code-block:: default
 
@@ -432,11 +435,11 @@ model wasn't necessary here, we only did it to illustrate how to do so):
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 236-237
+.. GENERATED FROM PYTHON SOURCE LINES 239-240
 
 Let us see what the Packed-Ensemble thinks these examples above are:
 
-.. GENERATED FROM PYTHON SOURCE LINES 237-249
+.. GENERATED FROM PYTHON SOURCE LINES 240-252
 
 .. code-block:: default
 
@@ -460,19 +463,19 @@ Let us see what the Packed-Ensemble thinks these examples above are:
 
  .. code-block:: none
 
-    Predicted:  cat   ship  ship  plane
+    Predicted:  dog   car   car   ship 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 250-251
+.. GENERATED FROM PYTHON SOURCE LINES 253-254
 
 The results seem pretty good.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (2 minutes 11.971 seconds)
+   **Total running time of the script:** (2 minutes 11.730 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_pe_cifar10.py:

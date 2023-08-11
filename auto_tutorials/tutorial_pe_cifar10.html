@@ -264,6 +264,8 @@ to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="from-a-vanilla-classifier-to-a-packed-ensemble">
 <span id="sphx-glr-auto-tutorials-tutorial-pe-cifar10-py"></span><h1>From a Vanilla Classifier to a Packed-Ensemble<a class="headerlink" href="#from-a-vanilla-classifier-to-a-packed-ensemble" title="Permalink to this heading">¶</a></h1>
+<p>This tutorial is heavily inspired by PyTorch’s <a class="reference external" href="https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html#test-the-network-on-the-test-data">Training a Classifier</a>
+tutorial.</p>
 <p>Let’s dive step by step into the process to modify a vanilla classifier into a
 packed-ensemble classifier.</p>
 <section id="dataset">
@@ -331,23 +333,28 @@ the num_worker of torch.utils.data.DataLoader() to 0.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ./data/cifar-10-python.tar.gz
 
   0%|          | 0/170498071 [00:00&lt;?, ?it/s]
-  1%|          | 1998848/170498071 [00:00&lt;00:08, 19973974.44it/s]
-  8%|▊         | 13533184/170498071 [00:00&lt;00:02, 75967736.09it/s]
- 15%|█▍        | 25034752/170498071 [00:00&lt;00:01, 93757525.68it/s]
- 21%|██▏       | 36569088/170498071 [00:00&lt;00:01, 102208187.69it/s]
- 28%|██▊       | 48103424/170498071 [00:00&lt;00:01, 106889614.95it/s]
- 35%|███▍      | 59637760/170498071 [00:00&lt;00:01, 109685494.62it/s]
- 42%|████▏     | 70975488/170498071 [00:00&lt;00:00, 110811215.32it/s]
- 48%|████▊     | 82313216/170498071 [00:00&lt;00:00, 111607040.76it/s]
- 55%|█████▍    | 93487104/170498071 [00:00&lt;00:00, 110274581.39it/s]
- 61%|██████▏   | 104529920/170498071 [00:01&lt;00:00, 108577884.01it/s]
- 68%|██████▊   | 115408896/170498071 [00:01&lt;00:00, 107686908.65it/s]
- 74%|███████▍  | 126189568/170498071 [00:01&lt;00:00, 106435002.16it/s]
- 80%|████████  | 136839168/170498071 [00:01&lt;00:00, 105999559.88it/s]
- 87%|████████▋ | 147488768/170498071 [00:01&lt;00:00, 106091567.93it/s]
- 93%|█████████▎| 158138368/170498071 [00:01&lt;00:00, 106183164.98it/s]
- 99%|█████████▉| 168787968/170498071 [00:01&lt;00:00, 105357454.79it/s]
-100%|██████████| 170498071/170498071 [00:01&lt;00:00, 104041185.38it/s]
+  0%|          | 458752/170498071 [00:00&lt;00:44, 3842734.10it/s]
+  4%|▎         | 6062080/170498071 [00:00&lt;00:05, 32270076.87it/s]
+  9%|▊         | 14647296/170498071 [00:00&lt;00:02, 55669253.87it/s]
+ 13%|█▎        | 22413312/170498071 [00:00&lt;00:02, 64069867.30it/s]
+ 18%|█▊        | 29917184/170498071 [00:00&lt;00:02, 67955321.68it/s]
+ 22%|██▏       | 37978112/170498071 [00:00&lt;00:01, 72094756.63it/s]
+ 27%|██▋       | 45645824/170498071 [00:00&lt;00:01, 73571164.68it/s]
+ 32%|███▏      | 54394880/170498071 [00:00&lt;00:01, 77924525.11it/s]
+ 36%|███▋      | 62226432/170498071 [00:00&lt;00:01, 77570650.23it/s]
+ 41%|████      | 70025216/170498071 [00:01&lt;00:01, 76569877.71it/s]
+ 46%|████▋     | 78872576/170498071 [00:01&lt;00:01, 79912448.11it/s]
+ 51%|█████     | 86900736/170498071 [00:01&lt;00:01, 79309804.60it/s]
+ 56%|█████▌    | 94863360/170498071 [00:01&lt;00:00, 78625782.26it/s]
+ 60%|██████    | 102891520/170498071 [00:01&lt;00:00, 79064797.09it/s]
+ 65%|██████▍   | 110821376/170498071 [00:01&lt;00:00, 77613806.33it/s]
+ 70%|███████   | 119734272/170498071 [00:01&lt;00:00, 80972232.32it/s]
+ 75%|███████▍  | 127860736/170498071 [00:01&lt;00:00, 80021368.48it/s]
+ 80%|███████▉  | 136380416/170498071 [00:01&lt;00:00, 81494380.28it/s]
+ 86%|████████▌ | 146112512/170498071 [00:01&lt;00:00, 86107033.79it/s]
+ 91%|█████████ | 154763264/170498071 [00:02&lt;00:00, 84184159.98it/s]
+ 96%|█████████▌| 163905536/170498071 [00:02&lt;00:00, 86290556.26it/s]
+100%|██████████| 170498071/170498071 [00:02&lt;00:00, 76601443.38it/s]
 Extracting ./data/cifar-10-python.tar.gz to ./data
 Files already downloaded and verified
 </pre></div>
@@ -377,7 +384,7 @@ Files already downloaded and verified
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">classes</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s1">5s</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)))</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_tutorial_pe_cifar10_001.png" srcset="../_images/sphx_glr_tutorial_pe_cifar10_001.png" alt="tutorial pe cifar10" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>frog  car   deer  car
+<img src="../_images/sphx_glr_tutorial_pe_cifar10_001.png" srcset="../_images/sphx_glr_tutorial_pe_cifar10_001.png" alt="tutorial pe cifar10" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>plane plane truck horse
 </pre></div>
 </div>
 </section>
@@ -486,18 +493,18 @@ parameters <span class="math notranslate nohighlight">\(M=4,\ \alpha=2\text{ and
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Finished Training&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1,  2000] loss: 3.097
-[1,  4000] loss: 2.242
-[1,  6000] loss: 2.085
-[1,  8000] loss: 1.969
-[1, 10000] loss: 1.887
-[1, 12000] loss: 1.820
-[2,  2000] loss: 1.753
-[2,  4000] loss: 1.703
-[2,  6000] loss: 1.675
-[2,  8000] loss: 1.637
-[2, 10000] loss: 1.625
-[2, 12000] loss: 1.599
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1,  2000] loss: 2.987
+[1,  4000] loss: 2.218
+[1,  6000] loss: 2.072
+[1,  8000] loss: 1.965
+[1, 10000] loss: 1.892
+[1, 12000] loss: 1.815
+[2,  2000] loss: 1.746
+[2,  4000] loss: 1.714
+[2,  6000] loss: 1.683
+[2,  8000] loss: 1.664
+[2, 10000] loss: 1.630
+[2, 12000] loss: 1.613
 Finished Training
 </pre></div>
 </div>
@@ -543,11 +550,11 @@ model wasn’t necessary here, we only did it to illustrate how to do so):</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Predicted:  cat   ship  ship  plane
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Predicted:  dog   car   car   ship
 </pre></div>
 </div>
 <p>The results seem pretty good.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (2 minutes 11.971 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (2 minutes 11.730 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-pe-cifar10-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/7366852ad531da764526eff441c955fc/tutorial_pe_cifar10.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_pe_cifar10.py</span></code></a></p>
