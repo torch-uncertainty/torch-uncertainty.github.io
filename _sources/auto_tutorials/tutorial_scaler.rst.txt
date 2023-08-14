@@ -21,22 +21,26 @@
 Improve Top-label Calibration with Temperature Scaling
 ======================================================
 
-In this tutorial, we use torch-uncertainty to improve the calibration of the top-label predictions
-to improve the reliability of the underlying neural network.
+In this tutorial, we use *TorchUncertainty* to improve the calibration
+of the top-label predictions
+and the reliability of the underlying neural network.
 
-We also see how to use the datamodules outside any Lightning Trainer.
+We also see how to use the datamodules outside any Lightning trainers, 
+and how to use TorchUncertainty's models.
 
-1. Loading the utilities
+1. Loading the Utilities
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 In this tutorial, we will need:
 
-- torch to download the pretrained model
-- the Calibration Error metric to compute the ECE and evaluate the top-label calibration
+- torch for its objects
+- the "calibration error" metric to compute the ECE and evaluate the top-label calibration
 - the CIFAR-100 datamodule to handle the data
-- the Temperature Scaler to improve the top-label calibration
+- a ResNet 18 as starting model 
+- the temperature scaler to improve the top-label calibration
+- a utility to download hf models easily
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-30
+.. GENERATED FROM PYTHON SOURCE LINES 27-36
 
 .. code-block:: default
 
@@ -45,7 +49,9 @@ In this tutorial, we will need:
     from torchmetrics import CalibrationError
 
     from torch_uncertainty.datamodules import CIFAR100DataModule
+    from torch_uncertainty.models.resnet import resnet18
     from torch_uncertainty.post_processing import TemperatureScaler
+    from torch_uncertainty.utils import load_hf
 
 
 
@@ -54,20 +60,27 @@ In this tutorial, we will need:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-36
+.. GENERATED FROM PYTHON SOURCE LINES 37-42
 
-2. Downloading a Pre-trained Model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2. Loading a model from TorchUncertainty's HF
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To avoid training a model on CIFAR-100 from scratch, we will use here a model from https://github.com/chenyaofo/pytorch-cifar-models (thank you!)
+To avoid training a model on CIFAR-100 from scratch, we load a model from Hugging Face.
 This can be done in a one liner:
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-39
+.. GENERATED FROM PYTHON SOURCE LINES 42-52
 
 .. code-block:: default
 
 
-    model = torch.hub.load("chenyaofo/pytorch-cifar-models", "cifar100_resnet20", pretrained=True)
+    # Build the model
+    model = resnet18(in_channels=3, num_classes=100, groups=1, style="cifar")
+
+    # Download the weights (the config is not used here)
+    weights, config = load_hf("resnet18_c100")
+
+    # Load the weights in the pre-built model
+    model.load_state_dict(weights)
 
 
 
@@ -77,25 +90,23 @@ This can be done in a one liner:
 
  .. code-block:: none
 
-    /home/runner/work/torch-uncertainty/torch-uncertainty/.venv/lib/python3.10/site-packages/torch/hub.py:286: UserWarning: You are about to download and run code from an untrusted repository. In a future release, this won't be allowed. To add the repository to your trusted list, change the command to {calling_fn}(..., trust_repo=False) and a command prompt will appear asking for an explicit confirmation of trust, or load(..., trust_repo=True), which will assume that the prompt is to be answered with 'yes'. You can also use load(..., trust_repo='check') which will only prompt for confirmation if the repo is not already trusted. This will eventually be the default behaviour
-      warnings.warn(
-    Downloading: "https://github.com/chenyaofo/pytorch-cifar-models/zipball/master" to /home/runner/.cache/torch/hub/master.zip
-    Downloading: "https://github.com/chenyaofo/pytorch-cifar-models/releases/download/resnet/cifar100_resnet20-23dac2f1.pt" to /home/runner/.cache/torch/hub/checkpoints/cifar100_resnet20-23dac2f1.pt
-      0%|          | 0.00/1.11M [00:00<?, ?B/s]    100%|██████████| 1.11M/1.11M [00:00<00:00, 123MB/s]
+    Downloading resnet18_c100.ckpt:   0%|          | 0.00/45.0M [00:00<?, ?B/s]    Downloading resnet18_c100.ckpt:  47%|████▋     | 21.0M/45.0M [00:00<00:00, 110MB/s]    Downloading resnet18_c100.ckpt:  93%|█████████▎| 41.9M/45.0M [00:00<00:00, 87.1MB/s]    Downloading resnet18_c100.ckpt: 100%|██████████| 45.0M/45.0M [00:00<00:00, 91.3MB/s]
+    Downloading (…)lve/main/config.yaml:   0%|          | 0.00/1.30k [00:00<?, ?B/s]    Downloading (…)lve/main/config.yaml: 100%|██████████| 1.30k/1.30k [00:00<00:00, 9.28MB/s]
+
+    <All keys matched successfully>
 
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 53-59
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-46
-
-3. Setting up the Datamodule and Dataloader
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3. Setting up the Datamodule and Dataloaders
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To get the dataloader from the datamodule, just call prepare_data, setup, and 
 extract the first element of the test dataloader list. There are more than one 
 element if `:attr:ood_detection` is True.
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-54
+.. GENERATED FROM PYTHON SOURCE LINES 59-67
 
 .. code-block:: default
 
@@ -116,24 +127,24 @@ element if `:attr:ood_detection` is True.
  .. code-block:: none
 
     Downloading https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz to data/cifar-100-python.tar.gz
-      0%|          | 0/169001437 [00:00<?, ?it/s]      1%|          | 1769472/169001437 [00:00<00:09, 17192803.58it/s]      5%|▌         | 8814592/169001437 [00:00<00:03, 48099985.31it/s]      9%|▊         | 14581760/169001437 [00:00<00:02, 52034915.75it/s]     12%|█▏        | 21069824/169001437 [00:00<00:02, 57055333.89it/s]     17%|█▋        | 28475392/169001437 [00:00<00:02, 63090080.47it/s]     21%|██        | 35782656/169001437 [00:00<00:02, 66419652.20it/s]     25%|██▌       | 42434560/169001437 [00:00<00:01, 65175006.32it/s]     30%|██▉       | 50626560/169001437 [00:00<00:01, 70382036.04it/s]     34%|███▍      | 57704448/169001437 [00:00<00:01, 67854471.51it/s]     38%|███▊      | 64520192/169001437 [00:01<00:01, 66942772.04it/s]     42%|████▏     | 71237632/169001437 [00:01<00:01, 65309757.68it/s]     46%|████▌     | 77791232/169001437 [00:01<00:01, 64436993.84it/s]     50%|████▉     | 84246528/169001437 [00:01<00:01, 63561614.36it/s]     54%|█████▎    | 90636288/169001437 [00:01<00:01, 63319527.28it/s]     58%|█████▊    | 97419264/169001437 [00:01<00:01, 64636575.30it/s]     61%|██████▏   | 103907328/169001437 [00:01<00:01, 63645189.02it/s]     66%|██████▌   | 110886912/169001437 [00:01<00:00, 65359818.67it/s]     70%|██████▉   | 117833728/169001437 [00:01<00:00, 66528200.51it/s]     74%|███████▎  | 124518400/169001437 [00:01<00:00, 65479012.75it/s]     78%|███████▊  | 131104768/169001437 [00:02<00:00, 64934844.47it/s]     83%|████████▎ | 139526144/169001437 [00:02<00:00, 70502236.60it/s]     87%|████████▋ | 147488768/169001437 [00:02<00:00, 73068450.32it/s]     92%|█████████▏| 154959872/169001437 [00:02<00:00, 73513004.19it/s]     96%|█████████▌| 162332672/169001437 [00:02<00:00, 69285504.53it/s]    100%|██████████| 169001437/169001437 [00:02<00:00, 65214002.38it/s]
+      0%|          | 0/169001437 [00:00<?, ?it/s]      1%|          | 1802240/169001437 [00:00<00:09, 16880018.67it/s]      6%|▌         | 10289152/169001437 [00:00<00:02, 55641847.15it/s]     11%|█         | 18251776/169001437 [00:00<00:02, 66221835.64it/s]     16%|█▌        | 26247168/169001437 [00:00<00:01, 71511589.48it/s]     20%|██        | 34373632/169001437 [00:00<00:01, 74960359.38it/s]     25%|██▍       | 42139648/169001437 [00:00<00:01, 75847264.10it/s]     30%|██▉       | 50561024/169001437 [00:00<00:01, 78503420.90it/s]     35%|███▍      | 58884096/169001437 [00:00<00:01, 79984368.50it/s]     40%|███▉      | 66912256/169001437 [00:00<00:01, 79641400.68it/s]     45%|████▌     | 76218368/169001437 [00:01<00:01, 83729039.85it/s]     52%|█████▏    | 87261184/169001437 [00:01<00:00, 91858811.35it/s]     58%|█████▊    | 98697216/169001437 [00:01<00:00, 98654684.18it/s]     65%|██████▍   | 109838336/169001437 [00:01<00:00, 102491049.01it/s]     72%|███████▏  | 120946688/169001437 [00:01<00:00, 105014534.88it/s]     78%|███████▊  | 131989504/169001437 [00:01<00:00, 106572396.01it/s]     85%|████████▍ | 142966784/169001437 [00:01<00:00, 107534046.19it/s]     91%|█████████ | 154173440/169001437 [00:01<00:00, 108848309.00it/s]     98%|█████████▊| 165347328/169001437 [00:01<00:00, 109677597.42it/s]    100%|██████████| 169001437/169001437 [00:01<00:00, 91588248.58it/s] 
     Extracting data/cifar-100-python.tar.gz to data
     Files already downloaded and verified
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-62
+.. GENERATED FROM PYTHON SOURCE LINES 68-75
 
-4. Iterate on the Dataloader and compute the ECE
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+4. Iterating on the Dataloader and Computing the ECE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We first split the original test set into a calibration set and a test set for proper evaluation.
 
 When computing the ECE, you need to provide the likelihoods associated with the inputs.
 To do this, just call PyTorch's softmax.
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-83
+.. GENERATED FROM PYTHON SOURCE LINES 75-96
 
 .. code-block:: default
 
@@ -151,7 +162,7 @@ To do this, just call PyTorch's softmax.
     # Iterate on the calibration dataloader
     for sample, target in test_dataloader:
         logits = model(sample)
-        ece.update(logits, target)
+        ece.update(logits.softmax(-1), target)
 
     # Compute & print the calibration error
     cal = ece.compute()
@@ -166,21 +177,22 @@ To do this, just call PyTorch's softmax.
 
  .. code-block:: none
 
-    ECE before scaling - 10.8%.
+    ECE before scaling - 10.7%.
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-90
+.. GENERATED FROM PYTHON SOURCE LINES 97-104
 
-5. Fit the Scaler to Improve the Calibration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+5. Fitting the Scaler to Improve the Calibration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The TemperatureScaler has one parameter that can be used to temper the softmax.
 We minimize the tempered cross-entropy on a calibration set that we define here as
-a subset of the test set and containing 1000 data.
+a subset of the test set and containing 1000 data. Look at the code run by TemperatureScaler
+`fit` method for more details.
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-95
+.. GENERATED FROM PYTHON SOURCE LINES 104-109
 
 .. code-block:: default
 
@@ -197,22 +209,23 @@ a subset of the test set and containing 1000 data.
 
  .. code-block:: none
 
-      0%|          | 0/32 [00:00<?, ?it/s]      9%|▉         | 3/32 [00:00<00:01, 27.67it/s]     19%|█▉        | 6/32 [00:00<00:00, 27.89it/s]     28%|██▊       | 9/32 [00:00<00:00, 27.22it/s]     38%|███▊      | 12/32 [00:00<00:00, 27.57it/s]     47%|████▋     | 15/32 [00:00<00:00, 27.55it/s]     56%|█████▋    | 18/32 [00:00<00:00, 27.78it/s]     66%|██████▌   | 21/32 [00:00<00:00, 27.87it/s]     75%|███████▌  | 24/32 [00:00<00:00, 27.97it/s]     84%|████████▍ | 27/32 [00:00<00:00, 28.03it/s]     94%|█████████▍| 30/32 [00:01<00:00, 28.12it/s]    100%|██████████| 32/32 [00:01<00:00, 28.47it/s]
+      0%|          | 0/32 [00:00<?, ?it/s]      3%|▎         | 1/32 [00:00<00:06,  5.09it/s]      6%|▋         | 2/32 [00:00<00:06,  4.88it/s]      9%|▉         | 3/32 [00:00<00:05,  4.84it/s]     12%|█▎        | 4/32 [00:00<00:06,  4.63it/s]     16%|█▌        | 5/32 [00:01<00:05,  4.72it/s]     19%|█▉        | 6/32 [00:01<00:05,  4.80it/s]     22%|██▏       | 7/32 [00:01<00:05,  4.79it/s]     25%|██▌       | 8/32 [00:01<00:05,  4.73it/s]     28%|██▊       | 9/32 [00:01<00:04,  4.81it/s]     31%|███▏      | 10/32 [00:02<00:04,  4.81it/s]     34%|███▍      | 11/32 [00:02<00:04,  4.83it/s]     38%|███▊      | 12/32 [00:02<00:04,  4.79it/s]     41%|████      | 13/32 [00:02<00:03,  4.82it/s]     44%|████▍     | 14/32 [00:02<00:03,  4.84it/s]     47%|████▋     | 15/32 [00:03<00:03,  4.88it/s]     50%|█████     | 16/32 [00:03<00:03,  4.90it/s]     53%|█████▎    | 17/32 [00:03<00:03,  4.83it/s]     56%|█████▋    | 18/32 [00:03<00:02,  4.86it/s]     59%|█████▉    | 19/32 [00:03<00:02,  4.90it/s]     62%|██████▎   | 20/32 [00:04<00:02,  4.91it/s]     66%|██████▌   | 21/32 [00:04<00:02,  4.91it/s]     69%|██████▉   | 22/32 [00:04<00:02,  4.86it/s]     72%|███████▏  | 23/32 [00:04<00:01,  4.87it/s]     75%|███████▌  | 24/32 [00:04<00:01,  4.85it/s]     78%|███████▊  | 25/32 [00:05<00:01,  4.85it/s]     81%|████████▏ | 26/32 [00:05<00:01,  4.80it/s]     84%|████████▍ | 27/32 [00:05<00:01,  4.83it/s]     88%|████████▊ | 28/32 [00:05<00:00,  4.87it/s]     91%|█████████ | 29/32 [00:05<00:00,  4.89it/s]     94%|█████████▍| 30/32 [00:06<00:00,  4.90it/s]     97%|█████████▋| 31/32 [00:06<00:00,  4.80it/s]    100%|██████████| 32/32 [00:06<00:00,  4.94it/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-103
+.. GENERATED FROM PYTHON SOURCE LINES 110-118
 
-6. Iterate again to compute the improved ECE
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+6. Iterating Again to Compute the Improved ECE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We create a wrapper of the original model and the scaler using torch.nn.Sequential.
 This is possible because the scaler is derived from nn.Module.
 
-Note that you will need to first reset the ECE metric to avoid mixing the scores of the previous and current iterations.
+Note that you will need to first reset the ECE metric to avoid mixing the scores of
+the previous and current iterations.
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-119
+.. GENERATED FROM PYTHON SOURCE LINES 118-134
 
 .. code-block:: default
 
@@ -240,12 +253,12 @@ Note that you will need to first reset the ECE metric to avoid mixing the scores
 
  .. code-block:: none
 
-    ECE after scaling - 1.42%.
+    ECE after scaling - 2.33%.
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-128
+.. GENERATED FROM PYTHON SOURCE LINES 135-143
 
 The top-label calibration should be improved.
 
@@ -254,20 +267,20 @@ Notes
 
 Temperature scaling is very efficient when the calibration set is representative of the test set.
 In this case, we say that the calibration and test set are drawn from the same distribution.
-However, this may not be True in real-world cases where dataset shift could happen.
+However, this may not hold true in real-world cases where dataset shift could happen.
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-135
+.. GENERATED FROM PYTHON SOURCE LINES 145-150
 
 References
 ----------
 
-- **Expected Calibration Error:** Naeini, M. P., Cooper, G. F., & Hauskrecht, M. (2015). Obtaining Well Calibrated Probabilities Using Bayesian Binning. In `AAAI 2015 <https://arxiv.org/pdf/1411.0160.pdf>`_
-- **Temperature Scaling:** Guo, C., Pleiss, G., Sun, Y., & Weinberger, K. Q. (2017). On calibration of modern neural networks. In `ICML 2017 <https://arxiv.org/pdf/1706.04599.pdf>`_
+- **Expected Calibration Error:** Naeini, M. P., Cooper, G. F., & Hauskrecht, M. (2015). Obtaining Well Calibrated Probabilities Using Bayesian Binning. In `AAAI 2015 <https://arxiv.org/pdf/1411.0160.pdf>`_.
+- **Temperature Scaling:** Guo, C., Pleiss, G., Sun, Y., & Weinberger, K. Q. (2017). On calibration of modern neural networks. In `ICML 2017 <https://arxiv.org/pdf/1706.04599.pdf>`_.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 30.225 seconds)
+   **Total running time of the script:** (2 minutes 10.285 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_scaler.py:
