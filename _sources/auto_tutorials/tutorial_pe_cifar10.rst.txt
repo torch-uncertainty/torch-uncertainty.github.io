@@ -58,7 +58,7 @@ Here is the outline of the process:
 1. Load and normalize CIFAR10
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-51
+.. GENERATED FROM PYTHON SOURCE LINES 44-50
 
 .. code-block:: default
 
@@ -75,40 +75,57 @@ Here is the outline of the process:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-54
+.. GENERATED FROM PYTHON SOURCE LINES 51-53
 
 The output of torchvision datasets are PILImage images of range [0, 1].
 We transform them to Tensors of normalized range [-1, 1].
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-59
+.. GENERATED FROM PYTHON SOURCE LINES 55-58
 
 .. note::
     If running on Windows and you get a BrokenPipeError, try setting
     the num_worker of torch.utils.data.DataLoader() to 0.
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-79
+.. GENERATED FROM PYTHON SOURCE LINES 58-95
 
 .. code-block:: default
 
 
     transform = transforms.Compose(
-        [transforms.ToTensor(),
-         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+        [
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        ]
+    )
 
     batch_size = 4
 
-    trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
-                                            download=True, transform=transform)
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                              shuffle=True, num_workers=2)
+    trainset = torchvision.datasets.CIFAR10(
+        root="./data", train=True, download=True, transform=transform
+    )
+    trainloader = torch.utils.data.DataLoader(
+        trainset, batch_size=batch_size, shuffle=True, num_workers=2
+    )
 
-    testset = torchvision.datasets.CIFAR10(root='./data', train=False,
-                                           download=True, transform=transform)
-    testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
-                                             shuffle=False, num_workers=2)
+    testset = torchvision.datasets.CIFAR10(
+        root="./data", train=False, download=True, transform=transform
+    )
+    testloader = torch.utils.data.DataLoader(
+        testset, batch_size=batch_size, shuffle=False, num_workers=2
+    )
 
-    classes = ('plane', 'car', 'bird', 'cat',
-               'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+    classes = (
+        "plane",
+        "car",
+        "bird",
+        "cat",
+        "deer",
+        "dog",
+        "frog",
+        "horse",
+        "ship",
+        "truck",
+    )
 
 
 
@@ -119,18 +136,18 @@ We transform them to Tensors of normalized range [-1, 1].
  .. code-block:: none
 
     Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ./data/cifar-10-python.tar.gz
-      0%|          | 0/170498071 [00:00<?, ?it/s]      0%|          | 32768/170498071 [00:00<11:47, 241000.05it/s]      0%|          | 229376/170498071 [00:00<03:00, 944595.49it/s]      1%|          | 917504/170498071 [00:00<01:00, 2807208.03it/s]      2%|▏         | 3637248/170498071 [00:00<00:17, 9543689.36it/s]      6%|▌         | 9699328/170498071 [00:00<00:07, 21942178.24it/s]      9%|▉         | 15761408/170498071 [00:00<00:04, 32467231.24it/s]     11%|█▏        | 19267584/170498071 [00:00<00:04, 32177352.29it/s]     14%|█▍        | 24608768/170498071 [00:00<00:03, 38108110.40it/s]     17%|█▋        | 28639232/170498071 [00:01<00:03, 37864982.10it/s]     19%|█▉        | 33128448/170498071 [00:01<00:03, 39856270.36it/s]     22%|██▏       | 37715968/170498071 [00:01<00:03, 41421297.13it/s]     25%|██▍       | 41943040/170498071 [00:01<00:03, 40562125.43it/s]     28%|██▊       | 47120384/170498071 [00:01<00:02, 43683276.87it/s]     30%|███       | 51544064/170498071 [00:01<00:02, 41783455.11it/s]     33%|███▎      | 56786944/170498071 [00:01<00:02, 44369423.92it/s]     36%|███▌      | 61276160/170498071 [00:01<00:02, 42653989.40it/s]     39%|███▉      | 66355200/170498071 [00:01<00:02, 44942730.34it/s]     42%|████▏     | 70909952/170498071 [00:02<00:02, 42926976.92it/s]     44%|████▍     | 75825152/170498071 [00:02<00:02, 43417953.96it/s]     47%|████▋     | 80216064/170498071 [00:02<00:02, 42975850.86it/s]     50%|████▉     | 85098496/170498071 [00:02<00:01, 44558899.65it/s]     53%|█████▎    | 89587712/170498071 [00:02<00:01, 42822327.43it/s]     55%|█████▌    | 94601216/170498071 [00:02<00:01, 44749241.10it/s]     58%|█████▊    | 99123200/170498071 [00:02<00:01, 42918964.70it/s]     61%|██████    | 104300544/170498071 [00:02<00:01, 44550629.19it/s]     64%|██████▍   | 108789760/170498071 [00:02<00:01, 43272801.97it/s]     67%|██████▋   | 113803264/170498071 [00:03<00:01, 45157922.20it/s]     69%|██████▉   | 118358016/170498071 [00:03<00:01, 43143944.02it/s]     72%|███████▏  | 123142144/170498071 [00:03<00:01, 43896600.27it/s]     75%|███████▍  | 127565824/170498071 [00:03<00:01, 42835966.18it/s]     78%|███████▊  | 132513792/170498071 [00:03<00:00, 44591122.78it/s]     80%|████████  | 137003008/170498071 [00:03<00:00, 42791937.72it/s]     83%|████████▎ | 142147584/170498071 [00:03<00:00, 44904904.19it/s]     86%|████████▌ | 146669568/170498071 [00:03<00:00, 43078383.57it/s]     89%|████████▉ | 151781376/170498071 [00:03<00:00, 44845708.90it/s]     92%|█████████▏| 156303360/170498071 [00:04<00:00, 43212788.66it/s]     95%|█████████▍| 161349632/170498071 [00:04<00:00, 43207276.17it/s]     97%|█████████▋| 165838848/170498071 [00:04<00:00, 43648976.13it/s]    100%|██████████| 170498071/170498071 [00:04<00:00, 39427119.84it/s]
+      0%|          | 0/170498071 [00:00<?, ?it/s]      0%|          | 32768/170498071 [00:00<10:28, 271049.07it/s]      0%|          | 229376/170498071 [00:00<02:41, 1051974.80it/s]      1%|          | 917504/170498071 [00:00<00:54, 3132940.31it/s]      2%|▏         | 3080192/170498071 [00:00<00:17, 9491684.46it/s]      4%|▍         | 7241728/170498071 [00:00<00:08, 20076002.67it/s]      7%|▋         | 12189696/170498071 [00:00<00:05, 29414705.29it/s]     10%|▉         | 16384000/170498071 [00:00<00:04, 33323020.78it/s]     12%|█▏        | 21233664/170498071 [00:00<00:03, 37972403.39it/s]     15%|█▍        | 25460736/170498071 [00:00<00:03, 39275658.25it/s]     18%|█▊        | 30244864/170498071 [00:01<00:03, 41863286.61it/s]     20%|██        | 34537472/170498071 [00:01<00:03, 42183451.12it/s]     23%|██▎       | 39518208/170498071 [00:01<00:02, 44464350.80it/s]     26%|██▌       | 44236800/170498071 [00:01<00:02, 43963995.76it/s]     29%|██▉       | 49414144/170498071 [00:01<00:02, 45963350.96it/s]     32%|███▏      | 54231040/170498071 [00:01<00:02, 46506816.37it/s]     35%|███▌      | 59703296/170498071 [00:01<00:02, 48800643.03it/s]     38%|███▊      | 64618496/170498071 [00:01<00:02, 48887813.00it/s]     41%|████      | 69730304/170498071 [00:01<00:02, 49278881.52it/s]     44%|████▍     | 74678272/170498071 [00:01<00:01, 49265513.73it/s]     47%|████▋     | 79626240/170498071 [00:02<00:01, 48170915.03it/s]     50%|████▉     | 84803584/170498071 [00:02<00:01, 48765386.41it/s]     53%|█████▎    | 89686016/170498071 [00:02<00:01, 48147635.85it/s]     56%|█████▌    | 95191040/170498071 [00:02<00:01, 50149527.58it/s]     59%|█████▉    | 100237312/170498071 [00:02<00:01, 49284371.33it/s]     62%|██████▏   | 105250816/170498071 [00:02<00:01, 49281464.86it/s]     65%|██████▍   | 110329856/170498071 [00:02<00:01, 49352652.74it/s]     68%|██████▊   | 115277824/170498071 [00:02<00:01, 48043406.47it/s]     71%|███████   | 120913920/170498071 [00:02<00:00, 49857444.79it/s]     74%|███████▍  | 125927424/170498071 [00:03<00:00, 49567155.20it/s]     77%|███████▋  | 130908160/170498071 [00:03<00:00, 48288813.51it/s]     80%|███████▉  | 136183808/170498071 [00:03<00:00, 49225127.68it/s]     83%|████████▎ | 141131776/170498071 [00:03<00:00, 48620646.10it/s]     86%|████████▌ | 146538496/170498071 [00:03<00:00, 49746441.71it/s]     89%|████████▉ | 151519232/170498071 [00:03<00:00, 49750966.88it/s]     92%|█████████▏| 156499968/170498071 [00:03<00:00, 48928528.04it/s]     95%|█████████▍| 161579008/170498071 [00:03<00:00, 49464799.72it/s]     98%|█████████▊| 166559744/170498071 [00:03<00:00, 48041290.18it/s]    100%|██████████| 170498071/170498071 [00:03<00:00, 43284596.12it/s]
     Extracting ./data/cifar-10-python.tar.gz to ./data
     Files already downloaded and verified
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-81
+.. GENERATED FROM PYTHON SOURCE LINES 96-97
 
 Let us show some of the training images, for fun.
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-106
+.. GENERATED FROM PYTHON SOURCE LINES 97-122
 
 .. code-block:: default
 
@@ -143,7 +160,7 @@ Let us show some of the training images, for fun.
 
 
     def imshow(img):
-        img = img / 2 + 0.5     # unnormalize
+        img = img / 2 + 0.5  # unnormalize
         npimg = img.numpy()
         plt.imshow(np.transpose(npimg, (1, 2, 0)))
         plt.show()
@@ -156,7 +173,7 @@ Let us show some of the training images, for fun.
     # show images
     imshow(torchvision.utils.make_grid(images))
     # print labels
-    print(' '.join(f'{classes[labels[j]]:5s}' for j in range(batch_size)))
+    print(" ".join(f"{classes[labels[j]]:5s}" for j in range(batch_size)))
 
 
 
@@ -172,19 +189,19 @@ Let us show some of the training images, for fun.
 
  .. code-block:: none
 
-    horse cat   car   dog  
+    dog   deer  bird  frog 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-111
+.. GENERATED FROM PYTHON SOURCE LINES 123-127
 
 2. Define a Packed-Ensemble from a vanilla classifier
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 First we define a vanilla classifier for CIFAR10 for reference. We will use a
 convolutional neural network.
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-137
+.. GENERATED FROM PYTHON SOURCE LINES 127-154
 
 .. code-block:: default
 
@@ -194,23 +211,24 @@ convolutional neural network.
 
 
     class Net(nn.Module):
-          def __init__(self):
-             super(Net, self).__init__()
-             self.conv1 = nn.Conv2d(3, 6, 5)
-             self.pool = nn.MaxPool2d(2, 2)
-             self.conv2 = nn.Conv2d(6, 16, 5)
-             self.fc1 = nn.Linear(16 * 5 * 5, 120)
-             self.fc2 = nn.Linear(120, 84)
-             self.fc3 = nn.Linear(84, 10)
-   
-          def forward(self, x):
-             x = self.pool(F.relu(self.conv1(x)))
-             x = self.pool(F.relu(self.conv2(x)))
-             x = x.flatten(1)
-             x = F.relu(self.fc1(x))
-             x = F.relu(self.fc2(x))
-             x = self.fc3(x)
-             return x
+        def __init__(self):
+            super(Net, self).__init__()
+            self.conv1 = nn.Conv2d(3, 6, 5)
+            self.pool = nn.MaxPool2d(2, 2)
+            self.conv2 = nn.Conv2d(6, 16, 5)
+            self.fc1 = nn.Linear(16 * 5 * 5, 120)
+            self.fc2 = nn.Linear(120, 84)
+            self.fc3 = nn.Linear(84, 10)
+
+        def forward(self, x):
+            x = self.pool(F.relu(self.conv1(x)))
+            x = self.pool(F.relu(self.conv2(x)))
+            x = x.flatten(1)
+            x = F.relu(self.fc1(x))
+            x = F.relu(self.fc2(x))
+            x = self.fc3(x)
+            return x
+
 
     net = Net()
 
@@ -221,12 +239,12 @@ convolutional neural network.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-140
+.. GENERATED FROM PYTHON SOURCE LINES 155-157
 
-Let's modify the vanilla classifier into a Packed-Ensemble classifier of 
+Let's modify the vanilla classifier into a Packed-Ensemble classifier of
 parameters :math:`M=4,\ \alpha=2\text{ and }\gamma=1`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-175
+.. GENERATED FROM PYTHON SOURCE LINES 157-191
 
 .. code-block:: default
 
@@ -252,16 +270,15 @@ parameters :math:`M=4,\ \alpha=2\text{ and }\gamma=1`.
             self.num_estimators = M
 
         def forward(self, x):
-             x = self.pool(F.relu(self.conv1(x)))
-             x = self.pool(F.relu(self.conv2(x)))
-             x = rearrange(
-                x, "e (m c) h w -> (m e) c h w", m=self.num_estimators
-            )
-             x = x.flatten(1)
-             x = F.relu(self.fc1(x))
-             x = F.relu(self.fc2(x))
-             x = self.fc3(x)
-             return x
+            x = self.pool(F.relu(self.conv1(x)))
+            x = self.pool(F.relu(self.conv2(x)))
+            x = rearrange(x, "e (m c) h w -> (m e) c h w", m=self.num_estimators)
+            x = x.flatten(1)
+            x = F.relu(self.fc1(x))
+            x = F.relu(self.fc2(x))
+            x = self.fc3(x)
+            return x
+
 
     packed_net = PackedNet()
 
@@ -272,13 +289,13 @@ parameters :math:`M=4,\ \alpha=2\text{ and }\gamma=1`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-179
+.. GENERATED FROM PYTHON SOURCE LINES 192-195
 
 3. Define a Loss function and optimizer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Let's use a Classification Cross-Entropy loss and SGD with momentum.
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-185
+.. GENERATED FROM PYTHON SOURCE LINES 195-201
 
 .. code-block:: default
 
@@ -295,19 +312,18 @@ Let's use a Classification Cross-Entropy loss and SGD with momentum.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 186-189
+.. GENERATED FROM PYTHON SOURCE LINES 202-205
 
 4. Train the Packed-Ensemble on the training data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Let's train the Packed-Ensemble on the training data.
 
-.. GENERATED FROM PYTHON SOURCE LINES 189-213
+.. GENERATED FROM PYTHON SOURCE LINES 205-228
 
 .. code-block:: default
 
 
     for epoch in range(2):  # loop over the dataset multiple times
-        
         running_loss = 0.0
         for i, data in enumerate(trainloader, 0):
             # get the inputs; data is a list of [inputs, labels]
@@ -323,11 +339,11 @@ Let's train the Packed-Ensemble on the training data.
 
             # print statistics
             running_loss += loss.item()
-            if i % 2000 == 1999:    # print every 2000 mini-batches
-                print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 2000:.3f}')
+            if i % 2000 == 1999:  # print every 2000 mini-batches
+                print(f"[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 2000:.3f}")
                 running_loss = 0.0
 
-    print('Finished Training')
+    print("Finished Training")
 
 
 
@@ -337,33 +353,33 @@ Let's train the Packed-Ensemble on the training data.
 
  .. code-block:: none
 
-    [1,  2000] loss: 2.952
-    [1,  4000] loss: 2.211
-    [1,  6000] loss: 2.080
-    [1,  8000] loss: 1.968
-    [1, 10000] loss: 1.892
-    [1, 12000] loss: 1.828
-    [2,  2000] loss: 1.753
-    [2,  4000] loss: 1.710
-    [2,  6000] loss: 1.663
-    [2,  8000] loss: 1.647
-    [2, 10000] loss: 1.602
-    [2, 12000] loss: 1.603
+    [1,  2000] loss: 3.114
+    [1,  4000] loss: 2.205
+    [1,  6000] loss: 2.075
+    [1,  8000] loss: 1.991
+    [1, 10000] loss: 1.918
+    [1, 12000] loss: 1.808
+    [2,  2000] loss: 1.781
+    [2,  4000] loss: 1.724
+    [2,  6000] loss: 1.712
+    [2,  8000] loss: 1.671
+    [2, 10000] loss: 1.639
+    [2, 12000] loss: 1.618
     Finished Training
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 214-215
+.. GENERATED FROM PYTHON SOURCE LINES 229-230
 
 Save our trained model:
 
-.. GENERATED FROM PYTHON SOURCE LINES 215-219
+.. GENERATED FROM PYTHON SOURCE LINES 230-234
 
 .. code-block:: default
 
 
-    PATH = './cifar_packed_net.pth'
+    PATH = "./cifar_packed_net.pth"
     torch.save(packed_net.state_dict(), PATH)
 
 
@@ -373,13 +389,13 @@ Save our trained model:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 220-223
+.. GENERATED FROM PYTHON SOURCE LINES 235-238
 
 5. Test the Packed-Ensemble on the test data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Let us display an image from the test set to get familiar.
 
-.. GENERATED FROM PYTHON SOURCE LINES 223-231
+.. GENERATED FROM PYTHON SOURCE LINES 238-249
 
 .. code-block:: default
 
@@ -389,7 +405,10 @@ Let us display an image from the test set to get familiar.
 
     # print images
     imshow(torchvision.utils.make_grid(images))
-    print('GroundTruth: ', ' '.join(f'{classes[labels[j]]:5s}' for j in range(batch_size)))
+    print(
+        "GroundTruth: ",
+        " ".join(f"{classes[labels[j]]:5s}" for j in range(batch_size)),
+    )
 
 
 
@@ -409,12 +428,12 @@ Let us display an image from the test set to get familiar.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 232-234
+.. GENERATED FROM PYTHON SOURCE LINES 250-252
 
 Next, let us load back in our saved model (note: saving and re-loading the
 model wasn't necessary here, we only did it to illustrate how to do so):
 
-.. GENERATED FROM PYTHON SOURCE LINES 234-238
+.. GENERATED FROM PYTHON SOURCE LINES 252-256
 
 .. code-block:: default
 
@@ -435,11 +454,11 @@ model wasn't necessary here, we only did it to illustrate how to do so):
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 239-240
+.. GENERATED FROM PYTHON SOURCE LINES 257-258
 
 Let us see what the Packed-Ensemble thinks these examples above are:
 
-.. GENERATED FROM PYTHON SOURCE LINES 240-252
+.. GENERATED FROM PYTHON SOURCE LINES 258-271
 
 .. code-block:: default
 
@@ -452,7 +471,8 @@ Let us see what the Packed-Ensemble thinks these examples above are:
     _, predicted = torch.max(outputs, 1)
 
     print(
-        'Predicted: ', ' '.join(f'{classes[predicted[j]]:5s}' for j in range(batch_size))
+        "Predicted: ",
+        " ".join(f"{classes[predicted[j]]:5s}" for j in range(batch_size)),
     )
 
 
@@ -463,19 +483,19 @@ Let us see what the Packed-Ensemble thinks these examples above are:
 
  .. code-block:: none
 
-    Predicted:  frog  ship  ship  ship 
+    Predicted:  cat   car   car   ship 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 253-254
+.. GENERATED FROM PYTHON SOURCE LINES 272-273
 
 The results seem pretty good.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (2 minutes 6.739 seconds)
+   **Total running time of the script:** (3 minutes 15.934 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_pe_cifar10.py:

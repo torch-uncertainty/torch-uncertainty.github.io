@@ -40,7 +40,7 @@
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
   <link rel="next" title="NegativeLogLikelihood" href="torch_uncertainty.metrics.NegativeLogLikelihood.html" />
-  <link rel="prev" title="JensenShannonDivergence" href="torch_uncertainty.metrics.JensenShannonDivergence.html" />
+  <link rel="prev" title="Entropy" href="torch_uncertainty.metrics.Entropy.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -280,28 +280,34 @@ an ensemble of estimators.</p>
 </dd>
 </dl>
 <dl>
-<dt>Inputs:</dt><dd><ul class="simple">
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">probs</span></code>: <span class="math notranslate nohighlight">\((B, N, C)\)</span></p></li>
-</ul>
-<p>where <span class="math notranslate nohighlight">\(B\)</span> is the batch size, <span class="math notranslate nohighlight">\(C\)</span> is the number of classes
-and <span class="math notranslate nohighlight">\(N\)</span> is the number of estimators.</p>
+<dt>Inputs:</dt><dd><ul>
+<li><dl>
+<dt><code class="xref py py-attr docutils literal notranslate"><span class="pre">probs</span></code>: the likelihoods provided by the ensemble as a Tensor</dt><dd><p>of shape <span class="math notranslate nohighlight">\((B, N, C)\)</span>,</p>
+<p>where <span class="math notranslate nohighlight">\(B\)</span> is the batch size, <span class="math notranslate nohighlight">\(N\)</span> is the number of
+estimators, and <span class="math notranslate nohighlight">\(C\)</span> is the number of classes.</p>
 </dd>
 </dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>A higher mutual information means a higher uncertainty.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Make sure that the probabilities in <code class="xref py py-attr docutils literal notranslate"><span class="pre">probs</span></code> are normalized to sum
-to one.</p>
-</div>
+</li>
+</ul>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>ValueError</strong> – If <code class="xref py py-attr docutils literal notranslate"><span class="pre">reduction</span></code> is not one of <code class="docutils literal notranslate"><span class="pre">'mean'</span></code>, <code class="docutils literal notranslate"><span class="pre">'sum'</span></code>,
     <code class="docutils literal notranslate"><span class="pre">'none'</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A higher mutual information can be interpreted as a higher epistemic
+uncertainty. The Mutual Information is also computationally equivalent
+to the Generalized Jensen-Shannon Divergence (GJSD).</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Make sure that the probabilities in <code class="xref py py-attr docutils literal notranslate"><span class="pre">probs</span></code> are normalized to sum
+to one.</p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.MutualInformation.compute">
 <span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.MutualInformation.compute" title="Permalink to this definition">¶</a></dt>
@@ -316,7 +322,10 @@ previously.</p>
 probabilities.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>probs</strong> (<em>torch.Tensor</em>) – Probabilities from the ensemble.</p>
+<dd class="field-odd"><p><strong>probs</strong> (<em>torch.Tensor</em>) – Likelihoods from the ensemble of shape
+<span class="math notranslate nohighlight">\((B, N, C)\)</span>, where <span class="math notranslate nohighlight">\(B\)</span> is the batch size,
+<span class="math notranslate nohighlight">\(N\)</span> is the number of estimators and <span class="math notranslate nohighlight">\(C\)</span> is the
+number of classes.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -338,7 +347,7 @@ probabilities.</p>
         class="next-page"></a>
     
     
-    <a href="torch_uncertainty.metrics.JensenShannonDivergence.html" class="btn btn-neutral" title="JensenShannonDivergence" accesskey="p"
+    <a href="torch_uncertainty.metrics.Entropy.html" class="btn btn-neutral" title="Entropy" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>

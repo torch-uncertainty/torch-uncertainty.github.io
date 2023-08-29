@@ -311,67 +311,83 @@ We transform them to Tensors of normalized range [-1, 1].</p>
 the num_worker of torch.utils.data.DataLoader() to 0.</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
-    <span class="p">[</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-     <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))])</span>
+    <span class="p">[</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 
 <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">4</span>
 
-<span class="n">trainset</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">CIFAR10</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;./data&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                        <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
-<span class="n">trainloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">trainset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
-                                          <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">trainset</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">CIFAR10</span><span class="p">(</span>
+    <span class="n">root</span><span class="o">=</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span>
+<span class="p">)</span>
+<span class="n">trainloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
+    <span class="n">trainset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
 
-<span class="n">testset</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">CIFAR10</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;./data&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                       <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
-<span class="n">testloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">testset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
-                                         <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">testset</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">CIFAR10</span><span class="p">(</span>
+    <span class="n">root</span><span class="o">=</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span>
+<span class="p">)</span>
+<span class="n">testloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
+    <span class="n">testset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
 
-<span class="n">classes</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;plane&#39;</span><span class="p">,</span> <span class="s1">&#39;car&#39;</span><span class="p">,</span> <span class="s1">&#39;bird&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;deer&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">,</span> <span class="s1">&#39;frog&#39;</span><span class="p">,</span> <span class="s1">&#39;horse&#39;</span><span class="p">,</span> <span class="s1">&#39;ship&#39;</span><span class="p">,</span> <span class="s1">&#39;truck&#39;</span><span class="p">)</span>
+<span class="n">classes</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;plane&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;car&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bird&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;deer&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dog&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;frog&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;horse&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ship&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;truck&quot;</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ./data/cifar-10-python.tar.gz
 
   0%|          | 0/170498071 [00:00&lt;?, ?it/s]
-  0%|          | 32768/170498071 [00:00&lt;11:47, 241000.05it/s]
-  0%|          | 229376/170498071 [00:00&lt;03:00, 944595.49it/s]
-  1%|          | 917504/170498071 [00:00&lt;01:00, 2807208.03it/s]
-  2%|▏         | 3637248/170498071 [00:00&lt;00:17, 9543689.36it/s]
-  6%|▌         | 9699328/170498071 [00:00&lt;00:07, 21942178.24it/s]
-  9%|▉         | 15761408/170498071 [00:00&lt;00:04, 32467231.24it/s]
- 11%|█▏        | 19267584/170498071 [00:00&lt;00:04, 32177352.29it/s]
- 14%|█▍        | 24608768/170498071 [00:00&lt;00:03, 38108110.40it/s]
- 17%|█▋        | 28639232/170498071 [00:01&lt;00:03, 37864982.10it/s]
- 19%|█▉        | 33128448/170498071 [00:01&lt;00:03, 39856270.36it/s]
- 22%|██▏       | 37715968/170498071 [00:01&lt;00:03, 41421297.13it/s]
- 25%|██▍       | 41943040/170498071 [00:01&lt;00:03, 40562125.43it/s]
- 28%|██▊       | 47120384/170498071 [00:01&lt;00:02, 43683276.87it/s]
- 30%|███       | 51544064/170498071 [00:01&lt;00:02, 41783455.11it/s]
- 33%|███▎      | 56786944/170498071 [00:01&lt;00:02, 44369423.92it/s]
- 36%|███▌      | 61276160/170498071 [00:01&lt;00:02, 42653989.40it/s]
- 39%|███▉      | 66355200/170498071 [00:01&lt;00:02, 44942730.34it/s]
- 42%|████▏     | 70909952/170498071 [00:02&lt;00:02, 42926976.92it/s]
- 44%|████▍     | 75825152/170498071 [00:02&lt;00:02, 43417953.96it/s]
- 47%|████▋     | 80216064/170498071 [00:02&lt;00:02, 42975850.86it/s]
- 50%|████▉     | 85098496/170498071 [00:02&lt;00:01, 44558899.65it/s]
- 53%|█████▎    | 89587712/170498071 [00:02&lt;00:01, 42822327.43it/s]
- 55%|█████▌    | 94601216/170498071 [00:02&lt;00:01, 44749241.10it/s]
- 58%|█████▊    | 99123200/170498071 [00:02&lt;00:01, 42918964.70it/s]
- 61%|██████    | 104300544/170498071 [00:02&lt;00:01, 44550629.19it/s]
- 64%|██████▍   | 108789760/170498071 [00:02&lt;00:01, 43272801.97it/s]
- 67%|██████▋   | 113803264/170498071 [00:03&lt;00:01, 45157922.20it/s]
- 69%|██████▉   | 118358016/170498071 [00:03&lt;00:01, 43143944.02it/s]
- 72%|███████▏  | 123142144/170498071 [00:03&lt;00:01, 43896600.27it/s]
- 75%|███████▍  | 127565824/170498071 [00:03&lt;00:01, 42835966.18it/s]
- 78%|███████▊  | 132513792/170498071 [00:03&lt;00:00, 44591122.78it/s]
- 80%|████████  | 137003008/170498071 [00:03&lt;00:00, 42791937.72it/s]
- 83%|████████▎ | 142147584/170498071 [00:03&lt;00:00, 44904904.19it/s]
- 86%|████████▌ | 146669568/170498071 [00:03&lt;00:00, 43078383.57it/s]
- 89%|████████▉ | 151781376/170498071 [00:03&lt;00:00, 44845708.90it/s]
- 92%|█████████▏| 156303360/170498071 [00:04&lt;00:00, 43212788.66it/s]
- 95%|█████████▍| 161349632/170498071 [00:04&lt;00:00, 43207276.17it/s]
- 97%|█████████▋| 165838848/170498071 [00:04&lt;00:00, 43648976.13it/s]
-100%|██████████| 170498071/170498071 [00:04&lt;00:00, 39427119.84it/s]
+  0%|          | 32768/170498071 [00:00&lt;10:28, 271049.07it/s]
+  0%|          | 229376/170498071 [00:00&lt;02:41, 1051974.80it/s]
+  1%|          | 917504/170498071 [00:00&lt;00:54, 3132940.31it/s]
+  2%|▏         | 3080192/170498071 [00:00&lt;00:17, 9491684.46it/s]
+  4%|▍         | 7241728/170498071 [00:00&lt;00:08, 20076002.67it/s]
+  7%|▋         | 12189696/170498071 [00:00&lt;00:05, 29414705.29it/s]
+ 10%|▉         | 16384000/170498071 [00:00&lt;00:04, 33323020.78it/s]
+ 12%|█▏        | 21233664/170498071 [00:00&lt;00:03, 37972403.39it/s]
+ 15%|█▍        | 25460736/170498071 [00:00&lt;00:03, 39275658.25it/s]
+ 18%|█▊        | 30244864/170498071 [00:01&lt;00:03, 41863286.61it/s]
+ 20%|██        | 34537472/170498071 [00:01&lt;00:03, 42183451.12it/s]
+ 23%|██▎       | 39518208/170498071 [00:01&lt;00:02, 44464350.80it/s]
+ 26%|██▌       | 44236800/170498071 [00:01&lt;00:02, 43963995.76it/s]
+ 29%|██▉       | 49414144/170498071 [00:01&lt;00:02, 45963350.96it/s]
+ 32%|███▏      | 54231040/170498071 [00:01&lt;00:02, 46506816.37it/s]
+ 35%|███▌      | 59703296/170498071 [00:01&lt;00:02, 48800643.03it/s]
+ 38%|███▊      | 64618496/170498071 [00:01&lt;00:02, 48887813.00it/s]
+ 41%|████      | 69730304/170498071 [00:01&lt;00:02, 49278881.52it/s]
+ 44%|████▍     | 74678272/170498071 [00:01&lt;00:01, 49265513.73it/s]
+ 47%|████▋     | 79626240/170498071 [00:02&lt;00:01, 48170915.03it/s]
+ 50%|████▉     | 84803584/170498071 [00:02&lt;00:01, 48765386.41it/s]
+ 53%|█████▎    | 89686016/170498071 [00:02&lt;00:01, 48147635.85it/s]
+ 56%|█████▌    | 95191040/170498071 [00:02&lt;00:01, 50149527.58it/s]
+ 59%|█████▉    | 100237312/170498071 [00:02&lt;00:01, 49284371.33it/s]
+ 62%|██████▏   | 105250816/170498071 [00:02&lt;00:01, 49281464.86it/s]
+ 65%|██████▍   | 110329856/170498071 [00:02&lt;00:01, 49352652.74it/s]
+ 68%|██████▊   | 115277824/170498071 [00:02&lt;00:01, 48043406.47it/s]
+ 71%|███████   | 120913920/170498071 [00:02&lt;00:00, 49857444.79it/s]
+ 74%|███████▍  | 125927424/170498071 [00:03&lt;00:00, 49567155.20it/s]
+ 77%|███████▋  | 130908160/170498071 [00:03&lt;00:00, 48288813.51it/s]
+ 80%|███████▉  | 136183808/170498071 [00:03&lt;00:00, 49225127.68it/s]
+ 83%|████████▎ | 141131776/170498071 [00:03&lt;00:00, 48620646.10it/s]
+ 86%|████████▌ | 146538496/170498071 [00:03&lt;00:00, 49746441.71it/s]
+ 89%|████████▉ | 151519232/170498071 [00:03&lt;00:00, 49750966.88it/s]
+ 92%|█████████▏| 156499968/170498071 [00:03&lt;00:00, 48928528.04it/s]
+ 95%|█████████▍| 161579008/170498071 [00:03&lt;00:00, 49464799.72it/s]
+ 98%|█████████▊| 166559744/170498071 [00:03&lt;00:00, 48041290.18it/s]
+100%|██████████| 170498071/170498071 [00:03&lt;00:00, 43284596.12it/s]
 Extracting ./data/cifar-10-python.tar.gz to ./data
 Files already downloaded and verified
 </pre></div>
@@ -385,7 +401,7 @@ Files already downloaded and verified
 
 
 <span class="k">def</span> <span class="nf">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.5</span>     <span class="c1"># unnormalize</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.5</span>  <span class="c1"># unnormalize</span>
     <span class="n">npimg</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">npimg</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -398,10 +414,10 @@ Files already downloaded and verified
 <span class="c1"># show images</span>
 <span class="n">imshow</span><span class="p">(</span><span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span><span class="n">images</span><span class="p">))</span>
 <span class="c1"># print labels</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">classes</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s1">5s</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">classes</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s2">5s</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)))</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_tutorial_pe_cifar10_001.png" srcset="../_images/sphx_glr_tutorial_pe_cifar10_001.png" alt="tutorial pe cifar10" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>horse cat   car   dog
+<img src="../_images/sphx_glr_tutorial_pe_cifar10_001.png" srcset="../_images/sphx_glr_tutorial_pe_cifar10_001.png" alt="tutorial pe cifar10" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>dog   deer  bird  frog
 </pre></div>
 </div>
 </section>
@@ -414,23 +430,24 @@ convolutional neural network.</p>
 
 
 <span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-      <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-         <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-         <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-         <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-         <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-         <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
-         <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">84</span><span class="p">)</span>
-         <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">84</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">84</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">84</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
-      <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
-         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
-         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-         <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-         <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-         <span class="k">return</span> <span class="n">x</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span>
+
 
 <span class="n">net</span> <span class="o">=</span> <span class="n">Net</span><span class="p">()</span>
 </pre></div>
@@ -458,16 +475,15 @@ parameters <span class="math notranslate nohighlight">\(M=4,\ \alpha=2\text{ and
         <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="n">M</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
-         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
-         <span class="n">x</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span>
-            <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;e (m c) h w -&gt; (m e) c h w&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span>
-        <span class="p">)</span>
-         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-         <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-         <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-         <span class="k">return</span> <span class="n">x</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;e (m c) h w -&gt; (m e) c h w&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc3</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span>
+
 
 <span class="n">packed_net</span> <span class="o">=</span> <span class="n">PackedNet</span><span class="p">()</span>
 </pre></div>
@@ -487,7 +503,6 @@ parameters <span class="math notranslate nohighlight">\(M=4,\ \alpha=2\text{ and
 <h3>4. Train the Packed-Ensemble on the training data<a class="headerlink" href="#train-the-packed-ensemble-on-the-training-data" title="Permalink to this heading">¶</a></h3>
 <p>Let’s train the Packed-Ensemble on the training data.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>  <span class="c1"># loop over the dataset multiple times</span>
-
     <span class="n">running_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trainloader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
         <span class="c1"># get the inputs; data is a list of [inputs, labels]</span>
@@ -503,30 +518,30 @@ parameters <span class="math notranslate nohighlight">\(M=4,\ \alpha=2\text{ and
 
         <span class="c1"># print statistics</span>
         <span class="n">running_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2000</span> <span class="o">==</span> <span class="mi">1999</span><span class="p">:</span>    <span class="c1"># print every 2000 mini-batches</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="n">epoch</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">:</span><span class="s1">5d</span><span class="si">}</span><span class="s1">] loss: </span><span class="si">{</span><span class="n">running_loss</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2000</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2000</span> <span class="o">==</span> <span class="mi">1999</span><span class="p">:</span>  <span class="c1"># print every 2000 mini-batches</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">epoch</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2">] loss: </span><span class="si">{</span><span class="n">running_loss</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2000</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">running_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Finished Training&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finished Training&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1,  2000] loss: 2.952
-[1,  4000] loss: 2.211
-[1,  6000] loss: 2.080
-[1,  8000] loss: 1.968
-[1, 10000] loss: 1.892
-[1, 12000] loss: 1.828
-[2,  2000] loss: 1.753
-[2,  4000] loss: 1.710
-[2,  6000] loss: 1.663
-[2,  8000] loss: 1.647
-[2, 10000] loss: 1.602
-[2, 12000] loss: 1.603
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1,  2000] loss: 3.114
+[1,  4000] loss: 2.205
+[1,  6000] loss: 2.075
+[1,  8000] loss: 1.991
+[1, 10000] loss: 1.918
+[1, 12000] loss: 1.808
+[2,  2000] loss: 1.781
+[2,  4000] loss: 1.724
+[2,  6000] loss: 1.712
+[2,  8000] loss: 1.671
+[2, 10000] loss: 1.639
+[2, 12000] loss: 1.618
 Finished Training
 </pre></div>
 </div>
 <p>Save our trained model:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PATH</span> <span class="o">=</span> <span class="s1">&#39;./cifar_packed_net.pth&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PATH</span> <span class="o">=</span> <span class="s2">&quot;./cifar_packed_net.pth&quot;</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">packed_net</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">PATH</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -539,7 +554,10 @@ Finished Training
 
 <span class="c1"># print images</span>
 <span class="n">imshow</span><span class="p">(</span><span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span><span class="n">images</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;GroundTruth: &#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">classes</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s1">5s</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;GroundTruth: &quot;</span><span class="p">,</span>
+    <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">classes</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s2">5s</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)),</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_tutorial_pe_cifar10_002.png" srcset="../_images/sphx_glr_tutorial_pe_cifar10_002.png" alt="tutorial pe cifar10" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>GroundTruth:  cat   ship  ship  plane
@@ -563,15 +581,16 @@ model wasn’t necessary here, we only did it to illustrate how to do so):</p>
 <span class="n">_</span><span class="p">,</span> <span class="n">predicted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span>
-    <span class="s1">&#39;Predicted: &#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">classes</span><span class="p">[</span><span class="n">predicted</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s1">5s</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">))</span>
+    <span class="s2">&quot;Predicted: &quot;</span><span class="p">,</span>
+    <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">classes</span><span class="p">[</span><span class="n">predicted</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s2">5s</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)),</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Predicted:  frog  ship  ship  ship
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Predicted:  cat   car   car   ship
 </pre></div>
 </div>
 <p>The results seem pretty good.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (2 minutes 6.739 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (3 minutes 15.934 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-pe-cifar10-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/7366852ad531da764526eff441c955fc/tutorial_pe_cifar10.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_pe_cifar10.py</span></code></a></p>
