@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TemperatureScaler &mdash; TorchUncertainty 0.1.4 documentation</title>
+  <title>TemperatureScaler &mdash; TorchUncertainty 0.1.5 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -261,7 +261,7 @@
 <h1>TemperatureScaler<a class="headerlink" href="#temperaturescaler" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.post_processing.TemperatureScaler">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.post_processing.</span></span><span class="sig-name descname"><span class="pre">TemperatureScaler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.post_processing.TemperatureScaler" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.post_processing.</span></span><span class="sig-name descname"><span class="pre">TemperatureScaler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/post_processing/calibration/temperature_scaler.html#TemperatureScaler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.post_processing.TemperatureScaler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Temperature scaling post-processing for calibrated probabilities.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -277,15 +277,37 @@ for optimization. Defaults to None.</p></li>
 </dd>
 </dl>
 <dl class="simple">
-<dt>Reference:</dt><dd><dl class="simple">
-<dt>Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. On calibration</dt><dd><p>of modern neural networks. In ICML 2017.</p>
-</dd>
-</dl>
+<dt>Reference:</dt><dd><p>Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. On calibration
+of modern neural networks. In ICML 2017.</p>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.post_processing.TemperatureScaler.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibration_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_logits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.post_processing.TemperatureScaler.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the temperature parameters to the calibration data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>nn.Module</em>) – Model to calibrate.</p></li>
+<li><p><strong>calibration_set</strong> (<em>Dataset</em>) – Calibration dataset.</p></li>
+<li><p><strong>save_logits</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save the logits and
+labels. Defaults to False.</p></li>
+<li><p><strong>progress</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to show a progress bar.
+Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Calibrated scaler.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#torch_uncertainty.post_processing.TemperatureScaler" title="torch_uncertainty.post_processing.TemperatureScaler">TemperatureScaler</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.post_processing.TemperatureScaler.set_temperature">
-<span class="sig-name descname"><span class="pre">set_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.post_processing.TemperatureScaler.set_temperature" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">set_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/post_processing/calibration/temperature_scaler.html#TemperatureScaler.set_temperature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.post_processing.TemperatureScaler.set_temperature" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the temperature to a fixed value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -343,6 +365,7 @@ for optimization. Defaults to None.</p></li>
               <ul>
 <li><a class="reference internal" href="#">TemperatureScaler</a><ul>
 <li><a class="reference internal" href="#torch_uncertainty.post_processing.TemperatureScaler"><code class="docutils literal notranslate"><span class="pre">TemperatureScaler</span></code></a><ul>
+<li><a class="reference internal" href="#torch_uncertainty.post_processing.TemperatureScaler.fit"><code class="docutils literal notranslate"><span class="pre">TemperatureScaler.fit()</span></code></a></li>
 <li><a class="reference internal" href="#torch_uncertainty.post_processing.TemperatureScaler.set_temperature"><code class="docutils literal notranslate"><span class="pre">TemperatureScaler.set_temperature()</span></code></a></li>
 </ul>
 </li>

@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>BayesLinear &mdash; TorchUncertainty 0.1.4 documentation</title>
+  <title>BayesConv2d &mdash; TorchUncertainty 0.1.5 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -39,8 +39,8 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="BayesConv1d" href="torch_uncertainty.layers.bayesian_layers.BayesConv1d.html" />
-  <link rel="prev" title="MaskedConv2d" href="torch_uncertainty.layers.MaskedConv2d.html" />
+  <link rel="next" title="BayesConv3d" href="torch_uncertainty.layers.bayesian.BayesConv3d.html" />
+  <link rel="prev" title="BayesConv1d" href="torch_uncertainty.layers.bayesian.BayesConv1d.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -198,7 +198,7 @@
     
     <li><a href="../api.html">API reference</a> &gt;</li>
     
-    <li>BayesLinear</li>
+    <li>BayesConv2d</li>
     
     <!-- 
     <li class="pytorch-breadcrumbs-aside">
@@ -207,7 +207,7 @@
       
       
       
-      <a href="/zh_CN//generated/torch_uncertainty.layers.bayesian_layers.BayesLinear.html" class="fa fa-language"> 以中文阅读</a>
+      <a href="/zh_CN//generated/torch_uncertainty.layers.bayesian.BayesConv2d.html" class="fa fa-language"> 以中文阅读</a>
       
       
     </li>
@@ -230,7 +230,7 @@
         
 
         <div class="pytorch-call-to-action-links">
-          <div id="tutorial-type">generated/torch_uncertainty.layers.bayesian_layers.BayesLinear</div>
+          <div id="tutorial-type">generated/torch_uncertainty.layers.bayesian.BayesConv2d</div>
 
           <!-- <div id="google-colab-link">
             <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg" />
@@ -257,52 +257,28 @@
               <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
                 
                 
-  <section id="bayeslinear">
-<h1>BayesLinear<a class="headerlink" href="#bayeslinear" title="Permalink to this heading">¶</a></h1>
+  <section id="bayesconv2d">
+<h1>BayesConv2d<a class="headerlink" href="#bayesconv2d" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="torch_uncertainty.layers.bayesian_layers.BayesLinear">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.layers.bayesian_layers.</span></span><span class="sig-name descname"><span class="pre">BayesLinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_sigma_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_sigma_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_pi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-7.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.layers.bayesian_layers.BayesLinear" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bayesian Linear Layer with Mixture of Normals prior and Normal posterior</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>in_features</strong> (<em>int</em>) – Number of input features</p></li>
-<li><p><strong>out_features</strong> (<em>int</em>) – Number of output features</p></li>
-<li><p><strong>prior_mu</strong> (<em>float</em><em>, </em><em>optional</em>) – Mean of the prior distribution
-Defaults to 0.0.</p></li>
-<li><p><strong>prior_sigma_1</strong> (<em>float</em><em>, </em><em>optional</em>) – Standard deviation of the first prior
-distribution. Defaults to 0.1.</p></li>
-<li><p><strong>prior_sigma_2</strong> (<em>float</em><em>, </em><em>optional</em>) – Standard deviation of the second prior
-distribution. Defaults to 0.1.</p></li>
-<li><p><strong>prior_pi</strong> (<em>float</em><em>, </em><em>optional</em>) – Mixture control variable. Defaults to 0.1.</p></li>
-<li><p><strong>mu_init</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial mean of the posterior distribution.
-Defaults to 0.0.</p></li>
-<li><p><strong>sigma_init</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial standard deviation of the
-posterior distribution. Defaults to -7.0.</p></li>
-<li><p><strong>frozen</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to freeze the posterior distribution.
-Defaults to False.</p></li>
-<li><p><strong>bias</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to use a bias term. Defaults to True.</p></li>
-<li><p><strong>device</strong> (<em>optional</em>) – Device to use. Defaults to None.</p></li>
-<li><p><strong>dtype</strong> (<em>optional</em>) – Data type to use. Defaults to None.</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="simple">
-<dt>Paper Reference:</dt><dd><dl class="simple">
-<dt>Blundell, Charles, et al. “Weight uncertainty in neural networks”</dt><dd><p>ICML 2015.</p>
-</dd>
-</dl>
-</dd>
-</dl>
+<dt class="sig sig-object py" id="torch_uncertainty.layers.bayesian.BayesConv2d">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.layers.bayesian.</span></span><span class="sig-name descname"><span class="pre">BayesConv2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_sigma_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_sigma_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_pi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-6.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zeros'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/layers/bayesian/bayes_conv.html#BayesConv2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.layers.bayesian.BayesConv2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bayesian Conv2d Layer with Mixture of Normals prior and Normal
+posterior.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.layers.bayesian_layers.BayesLinear.freeze">
-<span class="sig-name descname"><span class="pre">freeze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.layers.bayesian_layers.BayesLinear.freeze" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="torch_uncertainty.layers.bayesian.BayesConv2d.freeze">
+<span class="sig-name descname"><span class="pre">freeze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.layers.bayesian.BayesConv2d.freeze" title="Permalink to this definition">¶</a></dt>
 <dd><p>Freeze the layer by setting the frozen attribute to True.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.layers.bayesian_layers.BayesLinear.unfreeze">
-<span class="sig-name descname"><span class="pre">unfreeze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.layers.bayesian_layers.BayesLinear.unfreeze" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="torch_uncertainty.layers.bayesian.BayesConv2d.sample">
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.layers.bayesian.BayesConv2d.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample the bayesian layer’s posterior.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.layers.bayesian.BayesConv2d.unfreeze">
+<span class="sig-name descname"><span class="pre">unfreeze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.layers.bayesian.BayesConv2d.unfreeze" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unfreeze the layer by setting the frozen attribute to False.</p>
 </dd></dl>
 
@@ -318,12 +294,12 @@ Defaults to False.</p></li>
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="torch_uncertainty.layers.bayesian_layers.BayesConv1d.html" class="btn btn-neutral float-right" title="BayesConv1d" accesskey="n"
+    <a href="torch_uncertainty.layers.bayesian.BayesConv3d.html" class="btn btn-neutral float-right" title="BayesConv3d" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     
     
-    <a href="torch_uncertainty.layers.MaskedConv2d.html" class="btn btn-neutral" title="MaskedConv2d" accesskey="p"
+    <a href="torch_uncertainty.layers.bayesian.BayesConv1d.html" class="btn btn-neutral" title="BayesConv1d" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>
@@ -353,10 +329,11 @@ Defaults to False.</p></li>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">BayesLinear</a><ul>
-<li><a class="reference internal" href="#torch_uncertainty.layers.bayesian_layers.BayesLinear"><code class="docutils literal notranslate"><span class="pre">BayesLinear</span></code></a><ul>
-<li><a class="reference internal" href="#torch_uncertainty.layers.bayesian_layers.BayesLinear.freeze"><code class="docutils literal notranslate"><span class="pre">BayesLinear.freeze()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.layers.bayesian_layers.BayesLinear.unfreeze"><code class="docutils literal notranslate"><span class="pre">BayesLinear.unfreeze()</span></code></a></li>
+<li><a class="reference internal" href="#">BayesConv2d</a><ul>
+<li><a class="reference internal" href="#torch_uncertainty.layers.bayesian.BayesConv2d"><code class="docutils literal notranslate"><span class="pre">BayesConv2d</span></code></a><ul>
+<li><a class="reference internal" href="#torch_uncertainty.layers.bayesian.BayesConv2d.freeze"><code class="docutils literal notranslate"><span class="pre">BayesConv2d.freeze()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.layers.bayesian.BayesConv2d.sample"><code class="docutils literal notranslate"><span class="pre">BayesConv2d.sample()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.layers.bayesian.BayesConv2d.unfreeze"><code class="docutils literal notranslate"><span class="pre">BayesConv2d.unfreeze()</span></code></a></li>
 </ul>
 </li>
 </ul>
