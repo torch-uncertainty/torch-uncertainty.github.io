@@ -289,6 +289,9 @@
 <span class="sd">        uncertainty. The Mutual Information is also computationally equivalent</span>
 <span class="sd">        to the Generalized Jensen-Shannon Divergence (GJSD).</span>
 
+<span class="sd">        The implementation of the mutual information clamps results to zero to</span>
+<span class="sd">        avoid negative values that could appear due to numerical instabilities</span>
+
 <span class="sd">    Warning:</span>
 <span class="sd">        Make sure that the probabilities in :attr:`probs` are normalized to sum</span>
 <span class="sd">        to one.</span>
@@ -350,7 +353,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes Mutual Information based on inputs passed in to ``update``</span>
 <span class="sd">        previously.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">values</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>

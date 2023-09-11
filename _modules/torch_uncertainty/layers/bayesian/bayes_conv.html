@@ -319,7 +319,6 @@
         <span class="n">stride</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
         <span class="n">padding</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
         <span class="n">dilation</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
-        <span class="n">prior_mu</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">prior_sigma_1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">prior_sigma_2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">prior_pi</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -357,7 +356,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stride</span> <span class="o">=</span> <span class="n">stride</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">padding</span> <span class="o">=</span> <span class="n">padding</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dilation</span> <span class="o">=</span> <span class="n">dilation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">prior_mu</span> <span class="o">=</span> <span class="n">prior_mu</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma_1</span> <span class="o">=</span> <span class="n">prior_sigma_1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prior_sigma_2</span> <span class="o">=</span> <span class="n">prior_sigma_2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prior_pi</span> <span class="o">=</span> <span class="n">prior_pi</span>
@@ -396,6 +394,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">register_parameter</span><span class="p">(</span><span class="s2">&quot;bias_mu&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">register_parameter</span><span class="p">(</span><span class="s2">&quot;bias_sigma&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight_prior_dist</span> <span class="o">=</span> <span class="n">PriorDistribution</span><span class="p">(</span>
+            <span class="n">prior_sigma_1</span><span class="p">,</span> <span class="n">prior_sigma_2</span><span class="p">,</span> <span class="n">prior_pi</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">bias</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bias_prior_dist</span> <span class="o">=</span> <span class="n">PriorDistribution</span><span class="p">(</span>
+                <span class="n">prior_sigma_1</span><span class="p">,</span> <span class="n">prior_sigma_2</span><span class="p">,</span> <span class="n">prior_pi</span>
+            <span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_parameters</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">weight_sampler</span> <span class="o">=</span> <span class="n">TrainableDistribution</span><span class="p">(</span>
@@ -404,14 +410,6 @@
         <span class="k">if</span> <span class="n">bias</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bias_sampler</span> <span class="o">=</span> <span class="n">TrainableDistribution</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bias_mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_sigma</span>
-            <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">weight_prior_dist</span> <span class="o">=</span> <span class="n">PriorDistribution</span><span class="p">(</span>
-            <span class="n">prior_sigma_1</span><span class="p">,</span> <span class="n">prior_sigma_2</span><span class="p">,</span> <span class="n">prior_pi</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="n">bias</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bias_prior_dist</span> <span class="o">=</span> <span class="n">PriorDistribution</span><span class="p">(</span>
-                <span class="n">prior_sigma_1</span><span class="p">,</span> <span class="n">prior_sigma_2</span><span class="p">,</span> <span class="n">prior_pi</span>
             <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -478,12 +476,11 @@
         <span class="n">stride</span><span class="p">:</span> <span class="n">_size_1_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">padding</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_size_1_t</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">dilation</span><span class="p">:</span> <span class="n">_size_1_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">prior_mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">prior_sigma_1</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
         <span class="n">prior_sigma_2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.002</span><span class="p">,</span>
         <span class="n">prior_pi</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">mu_init</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">sigma_init</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+        <span class="n">sigma_init</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">6.0</span><span class="p">,</span>
         <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -503,7 +500,6 @@
             <span class="n">stride_</span><span class="p">,</span>
             <span class="n">padding_</span><span class="p">,</span>
             <span class="n">dilation_</span><span class="p">,</span>
-            <span class="n">prior_mu</span><span class="p">,</span>
             <span class="n">prior_sigma_1</span><span class="p">,</span>
             <span class="n">prior_sigma_2</span><span class="p">,</span>
             <span class="n">prior_pi</span><span class="p">,</span>
@@ -580,7 +576,6 @@
         <span class="n">stride</span><span class="p">:</span> <span class="n">_size_2_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">padding</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_size_2_t</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">dilation</span><span class="p">:</span> <span class="n">_size_2_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">prior_mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">prior_sigma_1</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
         <span class="n">prior_sigma_2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.002</span><span class="p">,</span>
         <span class="n">prior_pi</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -605,7 +600,6 @@
             <span class="n">stride_</span><span class="p">,</span>
             <span class="n">padding_</span><span class="p">,</span>
             <span class="n">dilation_</span><span class="p">,</span>
-            <span class="n">prior_mu</span><span class="p">,</span>
             <span class="n">prior_sigma_1</span><span class="p">,</span>
             <span class="n">prior_sigma_2</span><span class="p">,</span>
             <span class="n">prior_pi</span><span class="p">,</span>
@@ -682,7 +676,6 @@
         <span class="n">stride</span><span class="p">:</span> <span class="n">_size_3_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">padding</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_size_3_t</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">dilation</span><span class="p">:</span> <span class="n">_size_3_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">prior_mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">prior_sigma_1</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
         <span class="n">prior_sigma_2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.002</span><span class="p">,</span>
         <span class="n">prior_pi</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -707,7 +700,6 @@
             <span class="n">stride_</span><span class="p">,</span>
             <span class="n">padding_</span><span class="p">,</span>
             <span class="n">dilation_</span><span class="p">,</span>
-            <span class="n">prior_mu</span><span class="p">,</span>
             <span class="n">prior_sigma_1</span><span class="p">,</span>
             <span class="n">prior_sigma_2</span><span class="p">,</span>
             <span class="n">prior_pi</span><span class="p">,</span>
