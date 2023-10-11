@@ -253,7 +253,7 @@
 
 <span class="kn">from</span> <span class="nn">einops</span> <span class="kn">import</span> <span class="n">rearrange</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
-<span class="kn">from</span> <span class="nn">torch.nn.common_types</span> <span class="kn">import</span> <span class="n">_size_2_t</span>
+<span class="kn">from</span> <span class="nn">torch.nn.common_types</span> <span class="kn">import</span> <span class="n">_size_1_t</span><span class="p">,</span> <span class="n">_size_2_t</span><span class="p">,</span> <span class="n">_size_3_t</span>
 
 
 <span class="c1"># fmt: on</span>
@@ -413,19 +413,121 @@
 <span class="k">class</span> <span class="nc">PackedConv1d</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Packed-Ensembles-style Conv1d layer.</span>
 
-<span class="sd">    Warning:</span>
-<span class="sd">        Not yet implemented (open an issue if desired).</span>
+<span class="sd">    Args:</span>
+<span class="sd">        in_channels (int): Number of channels in the input image.</span>
+<span class="sd">        out_channels (int): Number of channels produced by the convolution.</span>
+<span class="sd">        kernel_size (int or tuple): Size of the convolving kernel.</span>
+<span class="sd">        alpha (float): The channel multiplier of the convolutional layer.</span>
+<span class="sd">        num_estimators (int): Number of estimators in the ensemble.</span>
+<span class="sd">        gamma (int, optional): Defaults to ``1``.</span>
+<span class="sd">        stride (int or tuple, optional): Stride of the convolution.</span>
+<span class="sd">            Defaults to ``1``.</span>
+<span class="sd">        padding (int, tuple or str, optional): Padding added to both sides of</span>
+<span class="sd">            the input. Defaults to ``0``.</span>
+<span class="sd">        dilation (int or tuple, optional): Spacing between kernel elements.</span>
+<span class="sd">            Defaults to ``1``.</span>
+<span class="sd">        groups (int, optional): Number of blocked connexions from input</span>
+<span class="sd">            channels to output channels for each estimator. Defaults to ``1``.</span>
+<span class="sd">        minimum_channels_per_group (int, optional): Smallest possible number of</span>
+<span class="sd">            channels per group.</span>
+<span class="sd">        bias (bool, optional): If ``True``, adds a learnable bias to the</span>
+<span class="sd">            output. Defaults to ``True``.</span>
+
+<span class="sd">    Explanation Note:</span>
+<span class="sd">        Increasing :attr:`alpha` will increase the number of channels of the</span>
+<span class="sd">        ensemble, increasing its representation capacity. Increasing</span>
+<span class="sd">        :attr:`gamma` will increase the number of groups in the network and</span>
+<span class="sd">        therefore reduce the number of parameters.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Each ensemble member will only see</span>
+<span class="sd">        :math:`\frac{\text{in_channels}}{\text{num_estimators}}` channels,</span>
+<span class="sd">        so when using :attr:`groups` you should make sure that</span>
+<span class="sd">        :attr:`in_channels` and :attr:`out_channels` are both divisible by</span>
+<span class="sd">        :attr:`num_estimators` :math:`\times`:attr:`gamma` :math:`\times`</span>
+<span class="sd">        :attr:`groups`. However, the number of input and output channels will</span>
+<span class="sd">        be changed to comply with this constraint.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="s2">&quot;Open an issue if you would like this layer to be implemented.&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">out_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">kernel_size</span><span class="p">:</span> <span class="n">_size_1_t</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">gamma</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">stride</span><span class="p">:</span> <span class="n">_size_1_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">padding</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_size_1_t</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">dilation</span><span class="p">:</span> <span class="n">_size_1_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">minimum_channels_per_group</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+        <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">padding_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zeros&quot;</span><span class="p">,</span>
+        <span class="n">first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">factory_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">}</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="n">check_packed_parameters_consistency</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="n">num_estimators</span>
+
+        <span class="c1"># Define the number of channels of the underlying convolution</span>
+        <span class="n">extended_in_channels</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">in_channels</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">first</span> <span class="k">else</span> <span class="n">alpha</span><span class="p">))</span>
+        <span class="n">extended_out_channels</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="n">out_channels</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_estimators</span> <span class="k">if</span> <span class="n">last</span> <span class="k">else</span> <span class="n">alpha</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Define the number of groups of the underlying convolution</span>
+        <span class="n">actual_groups</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">first</span> <span class="k">else</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">groups</span> <span class="o">*</span> <span class="n">num_estimators</span>
+
+        <span class="k">while</span> <span class="p">(</span>
+            <span class="n">extended_in_channels</span> <span class="o">%</span> <span class="n">actual_groups</span> <span class="o">!=</span> <span class="mi">0</span>
+            <span class="ow">or</span> <span class="n">extended_in_channels</span> <span class="o">//</span> <span class="n">actual_groups</span>
+            <span class="o">&lt;</span> <span class="n">minimum_channels_per_group</span>
+        <span class="p">)</span> <span class="ow">and</span> <span class="n">actual_groups</span> <span class="o">//</span> <span class="p">(</span><span class="n">groups</span> <span class="o">*</span> <span class="n">num_estimators</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">gamma</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="n">actual_groups</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">groups</span> <span class="o">*</span> <span class="n">num_estimators</span>
+
+        <span class="c1"># fix if not divisible by groups</span>
+        <span class="k">if</span> <span class="n">extended_in_channels</span> <span class="o">%</span> <span class="n">actual_groups</span><span class="p">:</span>
+            <span class="n">extended_in_channels</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="n">num_estimators</span> <span class="o">-</span> <span class="n">extended_in_channels</span> <span class="o">%</span> <span class="n">actual_groups</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">extended_out_channels</span> <span class="o">%</span> <span class="n">actual_groups</span><span class="p">:</span>
+            <span class="n">extended_out_channels</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="n">num_estimators</span> <span class="o">-</span> <span class="n">extended_out_channels</span> <span class="o">%</span> <span class="n">actual_groups</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span>
+            <span class="n">in_channels</span><span class="o">=</span><span class="n">extended_in_channels</span><span class="p">,</span>
+            <span class="n">out_channels</span><span class="o">=</span><span class="n">extended_out_channels</span><span class="p">,</span>
+            <span class="n">kernel_size</span><span class="o">=</span><span class="n">kernel_size</span><span class="p">,</span>
+            <span class="n">stride</span><span class="o">=</span><span class="n">stride</span><span class="p">,</span>
+            <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span>
+            <span class="n">dilation</span><span class="o">=</span><span class="n">dilation</span><span class="p">,</span>
+            <span class="n">groups</span><span class="o">=</span><span class="n">actual_groups</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">,</span>
+            <span class="n">padding_mode</span><span class="o">=</span><span class="n">padding_mode</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="s2">&quot;Open an issue if you would like this layer to be implemented.&quot;</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">weight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The weight of the underlying convolutional layer.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="o">.</span><span class="n">weight</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The bias of the underlying convolutional layer.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="o">.</span><span class="n">bias</span>
 
 
 <div class="viewcode-block" id="PackedConv2d"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.PackedConv2d.html#torch_uncertainty.layers.PackedConv2d">[docs]</a><span class="k">class</span> <span class="nc">PackedConv2d</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -447,7 +549,7 @@
 <span class="sd">        groups (int, optional): Number of blocked connexions from input</span>
 <span class="sd">            channels to output channels for each estimator. Defaults to ``1``.</span>
 <span class="sd">        minimum_channels_per_group (int, optional): Smallest possible number of</span>
-<span class="sd">            hannels per group.</span>
+<span class="sd">            channels per group.</span>
 <span class="sd">        bias (bool, optional): If ``True``, adds a learnable bias to the</span>
 <span class="sd">            output. Defaults to ``True``.</span>
 
@@ -481,6 +583,7 @@
         <span class="n">groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">minimum_channels_per_group</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
         <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">padding_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zeros&quot;</span><span class="p">,</span>
         <span class="n">first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -529,7 +632,7 @@
             <span class="n">dilation</span><span class="o">=</span><span class="n">dilation</span><span class="p">,</span>
             <span class="n">groups</span><span class="o">=</span><span class="n">actual_groups</span><span class="p">,</span>
             <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">,</span>
-            <span class="n">padding_mode</span><span class="o">=</span><span class="s2">&quot;zeros&quot;</span><span class="p">,</span>
+            <span class="n">padding_mode</span><span class="o">=</span><span class="n">padding_mode</span><span class="p">,</span>
             <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -550,19 +653,121 @@
 <span class="k">class</span> <span class="nc">PackedConv3d</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Packed-Ensembles-style Conv3d layer.</span>
 
-<span class="sd">    Warning:</span>
-<span class="sd">        Not yet implemented (open an issue if desired).</span>
+<span class="sd">    Args:</span>
+<span class="sd">        in_channels (int): Number of channels in the input image.</span>
+<span class="sd">        out_channels (int): Number of channels produced by the convolution.</span>
+<span class="sd">        kernel_size (int or tuple): Size of the convolving kernel.</span>
+<span class="sd">        alpha (float): The channel multiplier of the convolutional layer.</span>
+<span class="sd">        num_estimators (int): Number of estimators in the ensemble.</span>
+<span class="sd">        gamma (int, optional): Defaults to ``1``.</span>
+<span class="sd">        stride (int or tuple, optional): Stride of the convolution.</span>
+<span class="sd">            Defaults to ``1``.</span>
+<span class="sd">        padding (int, tuple or str, optional): Padding added to all six sides</span>
+<span class="sd">            of the input. Defaults to ``0``.</span>
+<span class="sd">        dilation (int or tuple, optional): Spacing between kernel elements.</span>
+<span class="sd">            Defaults to ``1``.</span>
+<span class="sd">        groups (int, optional): Number of blocked connexions from input</span>
+<span class="sd">            channels to output channels for each estimator. Defaults to ``1``.</span>
+<span class="sd">        minimum_channels_per_group (int, optional): Smallest possible number of</span>
+<span class="sd">            channels per group.</span>
+<span class="sd">        bias (bool, optional): If ``True``, adds a learnable bias to the</span>
+<span class="sd">            output. Defaults to ``True``.</span>
+
+<span class="sd">    Explanation Note:</span>
+<span class="sd">        Increasing :attr:`alpha` will increase the number of channels of the</span>
+<span class="sd">        ensemble, increasing its representation capacity. Increasing</span>
+<span class="sd">        :attr:`gamma` will increase the number of groups in the network and</span>
+<span class="sd">        therefore reduce the number of parameters.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Each ensemble member will only see</span>
+<span class="sd">        :math:`\frac{\text{in_channels}}{\text{num_estimators}}` channels,</span>
+<span class="sd">        so when using :attr:`groups` you should make sure that</span>
+<span class="sd">        :attr:`in_channels` and :attr:`out_channels` are both divisible by</span>
+<span class="sd">        :attr:`num_estimators` :math:`\times`:attr:`gamma` :math:`\times`</span>
+<span class="sd">        :attr:`groups`. However, the number of input and output channels will</span>
+<span class="sd">        be changed to comply with this constraint.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="s2">&quot;Open an issue if you would like this layer to be implemented.&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">out_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">kernel_size</span><span class="p">:</span> <span class="n">_size_3_t</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">gamma</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">stride</span><span class="p">:</span> <span class="n">_size_3_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">padding</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_size_3_t</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">dilation</span><span class="p">:</span> <span class="n">_size_3_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">minimum_channels_per_group</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+        <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">padding_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zeros&quot;</span><span class="p">,</span>
+        <span class="n">first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">factory_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">}</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="n">check_packed_parameters_consistency</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="n">num_estimators</span>
+
+        <span class="c1"># Define the number of channels of the underlying convolution</span>
+        <span class="n">extended_in_channels</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">in_channels</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">first</span> <span class="k">else</span> <span class="n">alpha</span><span class="p">))</span>
+        <span class="n">extended_out_channels</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="n">out_channels</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_estimators</span> <span class="k">if</span> <span class="n">last</span> <span class="k">else</span> <span class="n">alpha</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Define the number of groups of the underlying convolution</span>
+        <span class="n">actual_groups</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">first</span> <span class="k">else</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">groups</span> <span class="o">*</span> <span class="n">num_estimators</span>
+
+        <span class="k">while</span> <span class="p">(</span>
+            <span class="n">extended_in_channels</span> <span class="o">%</span> <span class="n">actual_groups</span> <span class="o">!=</span> <span class="mi">0</span>
+            <span class="ow">or</span> <span class="n">extended_in_channels</span> <span class="o">//</span> <span class="n">actual_groups</span>
+            <span class="o">&lt;</span> <span class="n">minimum_channels_per_group</span>
+        <span class="p">)</span> <span class="ow">and</span> <span class="n">actual_groups</span> <span class="o">//</span> <span class="p">(</span><span class="n">groups</span> <span class="o">*</span> <span class="n">num_estimators</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">gamma</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="n">actual_groups</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">groups</span> <span class="o">*</span> <span class="n">num_estimators</span>
+
+        <span class="c1"># fix if not divisible by groups</span>
+        <span class="k">if</span> <span class="n">extended_in_channels</span> <span class="o">%</span> <span class="n">actual_groups</span><span class="p">:</span>
+            <span class="n">extended_in_channels</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="n">num_estimators</span> <span class="o">-</span> <span class="n">extended_in_channels</span> <span class="o">%</span> <span class="n">actual_groups</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">extended_out_channels</span> <span class="o">%</span> <span class="n">actual_groups</span><span class="p">:</span>
+            <span class="n">extended_out_channels</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="n">num_estimators</span> <span class="o">-</span> <span class="n">extended_out_channels</span> <span class="o">%</span> <span class="n">actual_groups</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv3d</span><span class="p">(</span>
+            <span class="n">in_channels</span><span class="o">=</span><span class="n">extended_in_channels</span><span class="p">,</span>
+            <span class="n">out_channels</span><span class="o">=</span><span class="n">extended_out_channels</span><span class="p">,</span>
+            <span class="n">kernel_size</span><span class="o">=</span><span class="n">kernel_size</span><span class="p">,</span>
+            <span class="n">stride</span><span class="o">=</span><span class="n">stride</span><span class="p">,</span>
+            <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span>
+            <span class="n">dilation</span><span class="o">=</span><span class="n">dilation</span><span class="p">,</span>
+            <span class="n">groups</span><span class="o">=</span><span class="n">actual_groups</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">,</span>
+            <span class="n">padding_mode</span><span class="o">=</span><span class="n">padding_mode</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="s2">&quot;Open an issue if you would like this layer to be implemented.&quot;</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">weight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The weight of the underlying convolutional layer.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="o">.</span><span class="n">weight</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The bias of the underlying convolutional layer.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="o">.</span><span class="n">bias</span>
 </pre></div>
 
               </article>

@@ -40,7 +40,7 @@
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
   <link rel="next" title="API reference" href="../api.html" />
-  <link rel="prev" title="Train a Bayesian Neural Network in Three Minutes" href="tutorial_bayesian.html" />
+  <link rel="prev" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -350,23 +350,24 @@ the num_worker of torch.utils.data.DataLoader() to 0.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ./data/cifar-10-python.tar.gz
 
   0%|          | 0/170498071 [00:00&lt;?, ?it/s]
-  1%|          | 1900544/170498071 [00:00&lt;00:08, 18984320.68it/s]
-  8%|▊         | 12910592/170498071 [00:00&lt;00:02, 72540173.04it/s]
- 13%|█▎        | 22773760/170498071 [00:00&lt;00:01, 84390299.67it/s]
- 19%|█▉        | 33193984/170498071 [00:00&lt;00:01, 92188451.92it/s]
- 26%|██▌       | 44433408/170498071 [00:00&lt;00:01, 99401341.41it/s]
- 33%|███▎      | 55508992/170498071 [00:00&lt;00:01, 103239594.71it/s]
- 39%|███▉      | 66715648/170498071 [00:00&lt;00:00, 106063520.49it/s]
- 46%|████▌     | 77889536/170498071 [00:00&lt;00:00, 107764588.67it/s]
- 52%|█████▏    | 88670208/170498071 [00:00&lt;00:00, 106446398.74it/s]
- 59%|█████▊    | 99876864/170498071 [00:01&lt;00:00, 108151172.56it/s]
- 65%|██████▌   | 110919680/170498071 [00:01&lt;00:00, 108822542.09it/s]
- 72%|███████▏  | 122290176/170498071 [00:01&lt;00:00, 110218746.11it/s]
- 78%|███████▊  | 133365760/170498071 [00:01&lt;00:00, 110300625.00it/s]
- 85%|████████▍ | 144670720/170498071 [00:01&lt;00:00, 111097066.15it/s]
- 91%|█████████▏| 155844608/170498071 [00:01&lt;00:00, 111251327.96it/s]
- 98%|█████████▊| 166985728/170498071 [00:01&lt;00:00, 111188053.87it/s]
-100%|██████████| 170498071/170498071 [00:01&lt;00:00, 104131584.55it/s]
+  1%|          | 917504/170498071 [00:00&lt;00:20, 8256380.51it/s]
+  6%|▌         | 10158080/170498071 [00:00&lt;00:02, 55473273.77it/s]
+ 12%|█▏        | 20807680/170498071 [00:00&lt;00:01, 78142363.21it/s]
+ 18%|█▊        | 31391744/170498071 [00:00&lt;00:01, 88828632.19it/s]
+ 24%|██▍       | 41648128/170498071 [00:00&lt;00:01, 93693314.80it/s]
+ 31%|███       | 52133888/170498071 [00:00&lt;00:01, 97308568.39it/s]
+ 37%|███▋      | 62291968/170498071 [00:00&lt;00:01, 98618356.02it/s]
+ 42%|████▏     | 72220672/170498071 [00:00&lt;00:00, 98282966.92it/s]
+ 48%|████▊     | 82083840/170498071 [00:00&lt;00:00, 97518437.35it/s]
+ 54%|█████▍    | 91881472/170498071 [00:01&lt;00:00, 97170331.34it/s]
+ 60%|█████▉    | 101613568/170498071 [00:01&lt;00:00, 96538224.20it/s]
+ 66%|██████▌   | 111804416/170498071 [00:01&lt;00:00, 98148346.82it/s]
+ 72%|███████▏  | 122322944/170498071 [00:01&lt;00:00, 100195865.44it/s]
+ 78%|███████▊  | 132808704/170498071 [00:01&lt;00:00, 101525989.13it/s]
+ 84%|████████▍ | 143196160/170498071 [00:01&lt;00:00, 102226748.22it/s]
+ 90%|█████████ | 153616384/170498071 [00:01&lt;00:00, 102761282.08it/s]
+ 96%|█████████▌| 164036608/170498071 [00:01&lt;00:00, 103184196.73it/s]
+100%|██████████| 170498071/170498071 [00:01&lt;00:00, 95629754.85it/s]
 Extracting ./data/cifar-10-python.tar.gz to ./data
 Files already downloaded and verified
 </pre></div>
@@ -396,7 +397,7 @@ Files already downloaded and verified
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">classes</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s2">5s</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)))</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_tutorial_pe_cifar10_001.png" srcset="../_images/sphx_glr_tutorial_pe_cifar10_001.png" alt="tutorial pe cifar10" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>bird  plane bird  cat
+<img src="../_images/sphx_glr_tutorial_pe_cifar10_001.png" srcset="../_images/sphx_glr_tutorial_pe_cifar10_001.png" alt="tutorial pe cifar10" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ship  dog   cat   frog
 </pre></div>
 </div>
 </section>
@@ -504,18 +505,18 @@ parameters <span class="math notranslate nohighlight">\(M=4,\ \alpha=2\text{ and
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finished Training&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1,  2000] loss: 3.003
-[1,  4000] loss: 2.194
-[1,  6000] loss: 2.055
-[1,  8000] loss: 1.936
-[1, 10000] loss: 1.864
-[1, 12000] loss: 1.789
-[2,  2000] loss: 1.722
-[2,  4000] loss: 1.686
-[2,  6000] loss: 1.659
-[2,  8000] loss: 1.631
-[2, 10000] loss: 1.604
-[2, 12000] loss: 1.577
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1,  2000] loss: 2.916
+[1,  4000] loss: 2.179
+[1,  6000] loss: 2.027
+[1,  8000] loss: 1.935
+[1, 10000] loss: 1.852
+[1, 12000] loss: 1.796
+[2,  2000] loss: 1.732
+[2,  4000] loss: 1.708
+[2,  6000] loss: 1.676
+[2,  8000] loss: 1.648
+[2, 10000] loss: 1.627
+[2, 12000] loss: 1.614
 Finished Training
 </pre></div>
 </div>
@@ -565,11 +566,11 @@ model wasn’t necessary here, we only did it to illustrate how to do so):</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Predicted:  cat   ship  car   ship
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Predicted:  cat   ship  ship  ship
 </pre></div>
 </div>
 <p>The results seem pretty good.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (2 minutes 44.536 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (2 minutes 42.208 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-pe-cifar10-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/7366852ad531da764526eff441c955fc/tutorial_pe_cifar10.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_pe_cifar10.py</span></code></a></p>
@@ -596,7 +597,7 @@ model wasn’t necessary here, we only did it to illustrate how to do so):</p>
         class="next-page"></a>
     
     
-    <a href="tutorial_bayesian.html" class="btn btn-neutral" title="Train a Bayesian Neural Network in Three Minutes" accesskey="p"
+    <a href="tutorial_der_cubic.html" class="btn btn-neutral" title="Deep Evidential Regression on a Toy Example" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>
