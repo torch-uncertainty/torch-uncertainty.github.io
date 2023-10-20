@@ -298,16 +298,18 @@
 <span class="sd">            Determines which Wide-ResNet version to use:</span>
 
 <span class="sd">            - ``&quot;vanilla&quot;``: original Wide-ResNet</span>
+<span class="sd">            - ``&quot;mc-dropout&quot;``: Monte Carlo Dropout Wide-ResNet</span>
 <span class="sd">            - ``&quot;packed&quot;``: Packed-Ensembles Wide-ResNet</span>
 <span class="sd">            - ``&quot;batched&quot;``: BatchEnsemble Wide-ResNet</span>
 <span class="sd">            - ``&quot;masked&quot;``: Masksemble Wide-ResNet</span>
-<span class="sd">            - ``&quot;mimo&quot;``: MIMO ResNet</span>
+<span class="sd">            - ``&quot;mimo&quot;``: MIMO Wide-ResNet</span>
 
 <span class="sd">        style (bool, optional): (str, optional): Which ResNet style to use.</span>
 <span class="sd">        Defaults to ``imagenet``.</span>
 <span class="sd">        num_estimators (int, optional): Number of estimators in the ensemble.</span>
 <span class="sd">            Only used if :attr:`version` is either ``&quot;packed&quot;``, ``&quot;batched&quot;``</span>
 <span class="sd">            or ``&quot;masked&quot;`` Defaults to ``None``.</span>
+<span class="sd">        dropout_rate (float, optional): Dropout rate. Defaults to ``0.0``.</span>
 <span class="sd">        groups (int, optional): Number of groups in convolutions. Defaults to</span>
 <span class="sd">            ``1``.</span>
 <span class="sd">        scale (float, optional): Expansion factor affecting the width of the</span>
@@ -345,9 +347,10 @@
 <span class="sd">            evaluation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">single</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;vanilla&quot;</span><span class="p">]</span>
-    <span class="n">ensemble</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;packed&quot;</span><span class="p">,</span> <span class="s2">&quot;batched&quot;</span><span class="p">,</span> <span class="s2">&quot;masked&quot;</span><span class="p">,</span> <span class="s2">&quot;mimo&quot;</span><span class="p">]</span>
+    <span class="n">ensemble</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;packed&quot;</span><span class="p">,</span> <span class="s2">&quot;batched&quot;</span><span class="p">,</span> <span class="s2">&quot;masked&quot;</span><span class="p">,</span> <span class="s2">&quot;mimo&quot;</span><span class="p">,</span> <span class="s2">&quot;mc-dropout&quot;</span><span class="p">]</span>
     <span class="n">versions</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;vanilla&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">wideresnet28x10</span><span class="p">],</span>
+        <span class="s2">&quot;mc-dropout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">wideresnet28x10</span><span class="p">],</span>
         <span class="s2">&quot;packed&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">packed_wideresnet28x10</span><span class="p">],</span>
         <span class="s2">&quot;batched&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">batched_wideresnet28x10</span><span class="p">],</span>
         <span class="s2">&quot;masked&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">masked_wideresnet28x10</span><span class="p">],</span>
@@ -360,9 +363,12 @@
         <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">loss</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
         <span class="n">optimization_procedure</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-        <span class="n">version</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;vanilla&quot;</span><span class="p">,</span> <span class="s2">&quot;packed&quot;</span><span class="p">,</span> <span class="s2">&quot;batched&quot;</span><span class="p">,</span> <span class="s2">&quot;masked&quot;</span><span class="p">,</span> <span class="s2">&quot;mimo&quot;</span><span class="p">],</span>
+        <span class="n">version</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+            <span class="s2">&quot;vanilla&quot;</span><span class="p">,</span> <span class="s2">&quot;mc-dropout&quot;</span><span class="p">,</span> <span class="s2">&quot;packed&quot;</span><span class="p">,</span> <span class="s2">&quot;batched&quot;</span><span class="p">,</span> <span class="s2">&quot;masked&quot;</span><span class="p">,</span> <span class="s2">&quot;mimo&quot;</span>
+        <span class="p">],</span>
         <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;imagenet&quot;</span><span class="p">,</span>
         <span class="n">num_estimators</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">dropout_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">groups</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">scale</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">alpha</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -389,7 +395,20 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown version: </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># version specific params</span>
-        <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;packed&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;vanilla&quot;</span><span class="p">:</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;dropout_rate&quot;</span><span class="p">:</span> <span class="n">dropout_rate</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;mc-dropout&quot;</span><span class="p">:</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;dropout_rate&quot;</span><span class="p">:</span> <span class="n">dropout_rate</span><span class="p">,</span>
+                    <span class="s2">&quot;num_estimators&quot;</span><span class="p">:</span> <span class="n">num_estimators</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;packed&quot;</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
                 <span class="p">{</span>
                     <span class="s2">&quot;num_estimators&quot;</span><span class="p">:</span> <span class="n">num_estimators</span><span class="p">,</span>
@@ -438,7 +457,7 @@
                 <span class="n">use_logits</span><span class="o">=</span><span class="n">use_logits</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">version</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ensemble</span><span class="p">:</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># version in cls.ensemble</span>
             <span class="k">return</span> <span class="n">ClassificationEnsemble</span><span class="p">(</span>
                 <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
                 <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
@@ -449,10 +468,6 @@
                 <span class="n">use_mi</span><span class="o">=</span><span class="n">use_mi</span><span class="p">,</span>
                 <span class="n">use_variation_ratio</span><span class="o">=</span><span class="n">use_variation_ratio</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2"> is not in </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">single</span><span class="si">}</span><span class="s2"> nor </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">ensemble</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
