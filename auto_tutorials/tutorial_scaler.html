@@ -33,14 +33,15 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx-codeautolink.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Training a LeNet with Monte-Carlo Dropout" href="tutorial_mc_dropout.html" />
-  <link rel="prev" title="Train a Bayesian Neural Network in Three Minutes" href="tutorial_bayesian.html" />
+  <link rel="next" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
+  <link rel="prev" title="Training a LeNet with Monte-Carlo Dropout" href="tutorial_mc_dropout.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -311,12 +312,13 @@ This can be done in a one liner:</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading resnet18_c100.ckpt:   0%|          | 0.00/45.0M [00:00&lt;?, ?B/s]
-Downloading resnet18_c100.ckpt:  47%|████▋     | 21.0M/45.0M [00:00&lt;00:00, 151MB/s]
-Downloading resnet18_c100.ckpt:  93%|█████████▎| 41.9M/45.0M [00:01&lt;00:00, 32.3MB/s]
+Downloading resnet18_c100.ckpt:  47%|████▋     | 21.0M/45.0M [00:00&lt;00:00, 83.5MB/s]
+Downloading resnet18_c100.ckpt:  70%|██████▉   | 31.5M/45.0M [00:00&lt;00:00, 30.0MB/s]
+Downloading resnet18_c100.ckpt: 100%|██████████| 45.0M/45.0M [00:01&lt;00:00, 29.3MB/s]
 Downloading resnet18_c100.ckpt: 100%|██████████| 45.0M/45.0M [00:01&lt;00:00, 32.3MB/s]
 
 Downloading (…)lve/main/config.yaml:   0%|          | 0.00/1.30k [00:00&lt;?, ?B/s]
-Downloading (…)lve/main/config.yaml: 100%|██████████| 1.30k/1.30k [00:00&lt;00:00, 8.10MB/s]
+Downloading (…)lve/main/config.yaml: 100%|██████████| 1.30k/1.30k [00:00&lt;00:00, 9.52MB/s]
 
 &lt;All keys matched successfully&gt;
 </pre></div>
@@ -326,8 +328,8 @@ Downloading (…)lve/main/config.yaml: 100%|██████████| 1.30
 <h2>3. Setting up the Datamodule and Dataloaders<a class="headerlink" href="#setting-up-the-datamodule-and-dataloaders" title="Permalink to this heading">¶</a></h2>
 <p>To get the dataloader from the datamodule, just call prepare_data, setup, and
 extract the first element of the test dataloader list. There are more than one
-element if <cite>:attr:ood_detection</cite> is True.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dm</span> <span class="o">=</span> <span class="n">CIFAR100DataModule</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">ood_detection</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+element if <cite>:attr:evaluate_ood</cite> is True.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dm</span> <span class="o">=</span> <span class="n">CIFAR100DataModule</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">evaluate_ood</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
 <span class="n">dm</span><span class="o">.</span><span class="n">prepare_data</span><span class="p">()</span>
 <span class="n">dm</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
 
@@ -341,23 +343,34 @@ element if <cite>:attr:ood_detection</cite> is True.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz to data/cifar-100-python.tar.gz
 
   0%|          | 0/169001437 [00:00&lt;?, ?it/s]
-  1%|          | 917504/169001437 [00:00&lt;00:18, 8935341.38it/s]
-  7%|▋         | 11763712/169001437 [00:00&lt;00:02, 66766804.78it/s]
- 14%|█▎        | 23199744/169001437 [00:00&lt;00:01, 88338437.24it/s]
- 21%|██        | 34832384/169001437 [00:00&lt;00:01, 99237772.94it/s]
- 27%|██▋       | 46006272/169001437 [00:00&lt;00:01, 103661710.95it/s]
- 34%|███▍      | 57573376/169001437 [00:00&lt;00:01, 107671890.58it/s]
- 40%|████      | 68386816/169001437 [00:00&lt;00:00, 107596435.70it/s]
- 47%|████▋     | 79855616/169001437 [00:00&lt;00:00, 109741477.14it/s]
- 54%|█████▍    | 90865664/169001437 [00:00&lt;00:00, 106779575.68it/s]
- 60%|██████    | 101875712/169001437 [00:01&lt;00:00, 107679728.06it/s]
- 67%|██████▋   | 112689152/169001437 [00:01&lt;00:00, 102857533.66it/s]
- 73%|███████▎  | 123371520/169001437 [00:01&lt;00:00, 103883376.52it/s]
- 79%|███████▉  | 133922816/169001437 [00:01&lt;00:00, 104316284.55it/s]
- 85%|████████▌ | 144441344/169001437 [00:01&lt;00:00, 104560703.68it/s]
- 92%|█████████▏| 155090944/169001437 [00:01&lt;00:00, 105104539.51it/s]
- 98%|█████████▊| 165642240/169001437 [00:01&lt;00:00, 104774199.10it/s]
-100%|██████████| 169001437/169001437 [00:01&lt;00:00, 101309670.78it/s]
+  1%|          | 1441792/169001437 [00:00&lt;00:11, 14391068.23it/s]
+  4%|▍         | 7536640/169001437 [00:00&lt;00:03, 41692042.73it/s]
+  8%|▊         | 14221312/169001437 [00:00&lt;00:02, 53077988.40it/s]
+ 12%|█▏        | 20447232/169001437 [00:00&lt;00:02, 56692775.75it/s]
+ 16%|█▌        | 27164672/169001437 [00:00&lt;00:02, 60346766.38it/s]
+ 20%|█▉        | 33226752/169001437 [00:00&lt;00:02, 59445128.13it/s]
+ 24%|██▎       | 39911424/169001437 [00:00&lt;00:02, 61807790.76it/s]
+ 27%|██▋       | 46104576/169001437 [00:00&lt;00:02, 61069523.38it/s]
+ 31%|███       | 52232192/169001437 [00:00&lt;00:01, 60596363.34it/s]
+ 35%|███▍      | 58556416/169001437 [00:01&lt;00:01, 61348154.31it/s]
+ 38%|███▊      | 64716800/169001437 [00:01&lt;00:01, 60969612.58it/s]
+ 42%|████▏     | 71008256/169001437 [00:01&lt;00:01, 61500030.46it/s]
+ 46%|████▌     | 77496320/169001437 [00:01&lt;00:01, 62473440.44it/s]
+ 50%|████▉     | 83755008/169001437 [00:01&lt;00:01, 61622387.86it/s]
+ 53%|█████▎    | 90144768/169001437 [00:01&lt;00:01, 62270161.63it/s]
+ 57%|█████▋    | 96632832/169001437 [00:01&lt;00:01, 62970817.40it/s]
+ 61%|██████    | 102957056/169001437 [00:01&lt;00:01, 62608462.21it/s]
+ 65%|██████▍   | 109248512/169001437 [00:01&lt;00:00, 61125396.96it/s]
+ 68%|██████▊   | 115736576/169001437 [00:01&lt;00:00, 62185543.25it/s]
+ 72%|███████▏  | 121995264/169001437 [00:02&lt;00:00, 62219162.91it/s]
+ 76%|███████▌  | 128253952/169001437 [00:02&lt;00:00, 61813927.70it/s]
+ 80%|███████▉  | 135004160/169001437 [00:02&lt;00:00, 63154690.59it/s]
+ 84%|████████▎ | 141328384/169001437 [00:02&lt;00:00, 62673741.40it/s]
+ 87%|████████▋ | 147718144/169001437 [00:02&lt;00:00, 62950823.52it/s]
+ 91%|█████████ | 154042368/169001437 [00:02&lt;00:00, 62866527.70it/s]
+ 95%|█████████▍| 160432128/169001437 [00:02&lt;00:00, 63127909.46it/s]
+ 99%|█████████▊| 166756352/169001437 [00:02&lt;00:00, 62819545.34it/s]
+100%|██████████| 169001437/169001437 [00:02&lt;00:00, 60921704.35it/s]
 Extracting data/cifar-100-python.tar.gz to data
 Files already downloaded and verified
 </pre></div>
@@ -394,18 +407,16 @@ of the test set.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ECE before scaling - </span><span class="si">{</span><span class="n">cal</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.3</span><span class="si">}</span><span class="s2">%.&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE before scaling - 13.0%.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE before scaling - 12.0%.
 </pre></div>
 </div>
 <p>We also compute and plot the top-label calibration figure. We see that the
 model is not well calibrated.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cal_plot</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">cal_plot</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_tutorial_scaler_001.png" srcset="../_images/sphx_glr_tutorial_scaler_001.png" alt="tutorial scaler" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 500x500 with 1 Axes&gt;, &lt;Axes: xlabel=&#39;Top-class Confidence (%)&#39;, ylabel=&#39;Success Rate (%)&#39;&gt;)
-</pre></div>
-</div>
-</section>
+<img src="../_images/sphx_glr_tutorial_scaler_001.png" srcset="../_images/sphx_glr_tutorial_scaler_001.png" alt="tutorial scaler" class = "sphx-glr-single-img"/></section>
 <section id="fitting-the-scaler-to-improve-the-calibration">
 <h2>5. Fitting the Scaler to Improve the Calibration<a class="headerlink" href="#fitting-the-scaler-to-improve-the-calibration" title="Permalink to this heading">¶</a></h2>
 <p>The TemperatureScaler has one parameter that can be used to temper the softmax.
@@ -418,38 +429,38 @@ a subset of the test set and containing 1000 data. Look at the code run by Tempe
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/32 [00:00&lt;?, ?it/s]
-  3%|▎         | 1/32 [00:00&lt;00:07,  4.41it/s]
-  6%|▋         | 2/32 [00:00&lt;00:06,  4.38it/s]
-  9%|▉         | 3/32 [00:00&lt;00:06,  4.66it/s]
- 12%|█▎        | 4/32 [00:00&lt;00:05,  4.85it/s]
- 16%|█▌        | 5/32 [00:01&lt;00:05,  5.02it/s]
- 19%|█▉        | 6/32 [00:01&lt;00:05,  4.92it/s]
- 22%|██▏       | 7/32 [00:01&lt;00:05,  4.62it/s]
- 25%|██▌       | 8/32 [00:01&lt;00:05,  4.78it/s]
- 28%|██▊       | 9/32 [00:01&lt;00:04,  4.84it/s]
- 31%|███▏      | 10/32 [00:02&lt;00:04,  4.89it/s]
- 34%|███▍      | 11/32 [00:02&lt;00:04,  4.97it/s]
- 38%|███▊      | 12/32 [00:02&lt;00:04,  4.67it/s]
- 41%|████      | 13/32 [00:02&lt;00:03,  4.81it/s]
- 44%|████▍     | 14/32 [00:02&lt;00:03,  4.68it/s]
- 47%|████▋     | 15/32 [00:03&lt;00:03,  4.76it/s]
- 50%|█████     | 16/32 [00:03&lt;00:03,  4.87it/s]
- 53%|█████▎    | 17/32 [00:03&lt;00:03,  4.52it/s]
- 56%|█████▋    | 18/32 [00:03&lt;00:03,  4.64it/s]
- 59%|█████▉    | 19/32 [00:03&lt;00:02,  4.79it/s]
- 62%|██████▎   | 20/32 [00:04&lt;00:02,  4.93it/s]
- 66%|██████▌   | 21/32 [00:04&lt;00:02,  5.04it/s]
- 69%|██████▉   | 22/32 [00:04&lt;00:02,  4.74it/s]
- 72%|███████▏  | 23/32 [00:04&lt;00:01,  4.88it/s]
- 75%|███████▌  | 24/32 [00:04&lt;00:01,  4.92it/s]
- 78%|███████▊  | 25/32 [00:05&lt;00:01,  4.99it/s]
- 81%|████████▏ | 26/32 [00:05&lt;00:01,  5.06it/s]
- 84%|████████▍ | 27/32 [00:05&lt;00:01,  4.72it/s]
- 88%|████████▊ | 28/32 [00:05&lt;00:00,  4.88it/s]
- 91%|█████████ | 29/32 [00:06&lt;00:00,  4.97it/s]
- 94%|█████████▍| 30/32 [00:06&lt;00:00,  5.01it/s]
- 97%|█████████▋| 31/32 [00:06&lt;00:00,  5.07it/s]
-100%|██████████| 32/32 [00:06&lt;00:00,  4.96it/s]
+  3%|▎         | 1/32 [00:00&lt;00:06,  4.54it/s]
+  6%|▋         | 2/32 [00:00&lt;00:06,  4.47it/s]
+  9%|▉         | 3/32 [00:00&lt;00:05,  4.87it/s]
+ 12%|█▎        | 4/32 [00:00&lt;00:05,  5.17it/s]
+ 16%|█▌        | 5/32 [00:00&lt;00:05,  5.28it/s]
+ 19%|█▉        | 6/32 [00:01&lt;00:04,  5.22it/s]
+ 22%|██▏       | 7/32 [00:01&lt;00:05,  4.91it/s]
+ 25%|██▌       | 8/32 [00:01&lt;00:04,  5.13it/s]
+ 28%|██▊       | 9/32 [00:01&lt;00:04,  5.27it/s]
+ 31%|███▏      | 10/32 [00:01&lt;00:04,  5.35it/s]
+ 34%|███▍      | 11/32 [00:02&lt;00:03,  5.45it/s]
+ 38%|███▊      | 12/32 [00:02&lt;00:03,  5.52it/s]
+ 41%|████      | 13/32 [00:02&lt;00:03,  5.05it/s]
+ 44%|████▍     | 14/32 [00:02&lt;00:03,  5.24it/s]
+ 47%|████▋     | 15/32 [00:02&lt;00:03,  5.37it/s]
+ 50%|█████     | 16/32 [00:03&lt;00:02,  5.43it/s]
+ 53%|█████▎    | 17/32 [00:03&lt;00:02,  5.30it/s]
+ 56%|█████▋    | 18/32 [00:03&lt;00:02,  5.39it/s]
+ 59%|█████▉    | 19/32 [00:03&lt;00:02,  5.08it/s]
+ 62%|██████▎   | 20/32 [00:03&lt;00:02,  5.26it/s]
+ 66%|██████▌   | 21/32 [00:04&lt;00:02,  5.37it/s]
+ 69%|██████▉   | 22/32 [00:04&lt;00:01,  5.45it/s]
+ 72%|███████▏  | 23/32 [00:04&lt;00:01,  5.50it/s]
+ 75%|███████▌  | 24/32 [00:04&lt;00:01,  5.08it/s]
+ 78%|███████▊  | 25/32 [00:04&lt;00:01,  5.25it/s]
+ 81%|████████▏ | 26/32 [00:04&lt;00:01,  5.37it/s]
+ 84%|████████▍ | 27/32 [00:05&lt;00:00,  5.48it/s]
+ 88%|████████▊ | 28/32 [00:05&lt;00:00,  5.55it/s]
+ 91%|█████████ | 29/32 [00:05&lt;00:00,  5.58it/s]
+ 94%|█████████▍| 30/32 [00:05&lt;00:00,  5.15it/s]
+ 97%|█████████▋| 31/32 [00:05&lt;00:00,  5.31it/s]
+100%|██████████| 32/32 [00:05&lt;00:00,  5.39it/s]
 </pre></div>
 </div>
 </section>
@@ -476,18 +487,16 @@ the previous and current iterations.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ECE after scaling - </span><span class="si">{</span><span class="n">cal</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.3</span><span class="si">}</span><span class="s2">%.&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE after scaling - 5.5%.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE after scaling - 5.08%.
 </pre></div>
 </div>
 <p>We finally compute and plot the scaled top-label calibration figure. We see
 that the model is now better calibrated.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cal_plot</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">cal_plot</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_tutorial_scaler_002.png" srcset="../_images/sphx_glr_tutorial_scaler_002.png" alt="tutorial scaler" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 500x500 with 1 Axes&gt;, &lt;Axes: xlabel=&#39;Top-class Confidence (%)&#39;, ylabel=&#39;Success Rate (%)&#39;&gt;)
-</pre></div>
-</div>
-<p>The top-label calibration should be improved.</p>
+<img src="../_images/sphx_glr_tutorial_scaler_002.png" srcset="../_images/sphx_glr_tutorial_scaler_002.png" alt="tutorial scaler" class = "sphx-glr-single-img"/><p>The top-label calibration should be improved.</p>
 </section>
 <section id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this heading">¶</a></h2>
@@ -501,7 +510,7 @@ However, this may not hold true in real-world cases where dataset shift could ha
 <li><p><strong>Expected Calibration Error:</strong> Naeini, M. P., Cooper, G. F., &amp; Hauskrecht, M. (2015). Obtaining Well Calibrated Probabilities Using Bayesian Binning. In <a class="reference external" href="https://arxiv.org/pdf/1411.0160.pdf">AAAI 2015</a>.</p></li>
 <li><p><strong>Temperature Scaling:</strong> Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. (2017). On calibration of modern neural networks. In <a class="reference external" href="https://arxiv.org/pdf/1706.04599.pdf">ICML 2017</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 31.238 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 30.147 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-scaler-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/1be01891b8f2e6a7bd1a0bb5e68c5f96/tutorial_scaler.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_scaler.py</span></code></a></p>
@@ -522,12 +531,12 @@ However, this may not hold true in real-world cases where dataset shift could ha
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="tutorial_mc_dropout.html" class="btn btn-neutral float-right" title="Training a LeNet with Monte-Carlo Dropout" accesskey="n"
+    <a href="tutorial_der_cubic.html" class="btn btn-neutral float-right" title="Deep Evidential Regression on a Toy Example" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     
     
-    <a href="tutorial_bayesian.html" class="btn btn-neutral" title="Train a Bayesian Neural Network in Three Minutes" accesskey="p"
+    <a href="tutorial_mc_dropout.html" class="btn btn-neutral" title="Training a LeNet with Monte-Carlo Dropout" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>

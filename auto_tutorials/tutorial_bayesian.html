@@ -33,13 +33,14 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx-codeautolink.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Improve Top-label Calibration with Temperature Scaling" href="tutorial_scaler.html" />
+  <link rel="next" title="Training a LeNet with Monte-Carlo Dropout" href="tutorial_mc_dropout.html" />
   <link rel="prev" title="Tutorials" href="index.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
@@ -395,28 +396,28 @@ logs will be saved in the root/logs folder.</p>
 Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-images-idx3-ubyte.gz
 
   0%|          | 0/9912422 [00:00&lt;?, ?it/s]
-100%|██████████| 9912422/9912422 [00:00&lt;00:00, 269916064.48it/s]
+100%|██████████| 9912422/9912422 [00:00&lt;00:00, 293997887.38it/s]
 Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
 
 Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz
 Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-labels-idx1-ubyte.gz
 
   0%|          | 0/28881 [00:00&lt;?, ?it/s]
-100%|██████████| 28881/28881 [00:00&lt;00:00, 154312985.76it/s]
+100%|██████████| 28881/28881 [00:00&lt;00:00, 190165924.37it/s]
 Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
 
 Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz
 Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-images-idx3-ubyte.gz
 
   0%|          | 0/1648877 [00:00&lt;?, ?it/s]
-100%|██████████| 1648877/1648877 [00:00&lt;00:00, 177026426.31it/s]
+100%|██████████| 1648877/1648877 [00:00&lt;00:00, 202752606.17it/s]
 Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
 
 Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz
 Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-labels-idx1-ubyte.gz
 
   0%|          | 0/4542 [00:00&lt;?, ?it/s]
-100%|██████████| 4542/4542 [00:00&lt;00:00, 34574462.37it/s]
+100%|██████████| 4542/4542 [00:00&lt;00:00, 48351595.86it/s]
 Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
 
 /home/runner/work/torch-uncertainty/torch-uncertainty/.venv/lib/python3.10/site-packages/torch/utils/data/dataloader.py:557: UserWarning: This DataLoader will create 4 worker processes in total. Our suggested max number of worker in current system is 2, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
@@ -424,11 +425,11 @@ Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        Test metric             DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-       hp/test_acc          0.9596999883651733
-      hp/test_brier         0.06186172366142273
-       hp/test_ece          0.02013850025832653
-   hp/test_entropy_id       0.1951211541891098
-       hp/test_nll          0.13322432339191437
+       hp/test_acc          0.9635999798774719
+      hp/test_brier         0.05691760778427124
+       hp/test_ece          0.01661386713385582
+   hp/test_entropy_id       0.17052528262138367
+       hp/test_nll          0.12449268996715546
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 </pre></div>
 </div>
@@ -474,12 +475,12 @@ Predicted digits:  7 2 1 0
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>LeNet &amp; MNIST:</strong> LeCun, Y., Bottou, L., Bengio, Y., &amp; Haffner, P. (1998). Gradient-based learning applied to document recognition. <a class="reference external" href="http://vision.stanford.edu/cs598_spring07/papers/Lecun98.pdf">Proceedings of the IEEE</a></p></li>
-<li><p><strong>Bayesian Neural Networks:</strong> Blundell, C., Cornebise, J., Kavukcuoglu, K., &amp; Wierstra, D. (2015). Weight Uncertainty in Neural Networks <a class="reference external" href="https://arxiv.org/pdf/1505.05424.pdf">ICML 2015</a></p></li>
-<li><p><strong>The Adam optimizer:</strong> Kingma, D. P., &amp; Ba, J. (2014). “Adam: A method for stochastic optimization.” <a class="reference external" href="https://arxiv.org/pdf/1412.6980.pdf">ICLR 2015</a></p></li>
-<li><p><strong>The Blitz</strong> <a class="reference external" href="https://github.com/piEsposito/blitz-bayesian-deep-learning">library</a> (for the hyperparameters)</p></li>
+<li><p><strong>LeNet &amp; MNIST:</strong> LeCun, Y., Bottou, L., Bengio, Y., &amp; Haffner, P. (1998). Gradient-based learning applied to document recognition. <a class="reference external" href="http://vision.stanford.edu/cs598_spring07/papers/Lecun98.pdf">Proceedings of the IEEE</a>.</p></li>
+<li><p><strong>Bayesian Neural Networks:</strong> Blundell, C., Cornebise, J., Kavukcuoglu, K., &amp; Wierstra, D. (2015). Weight Uncertainty in Neural Networks. <a class="reference external" href="https://arxiv.org/pdf/1505.05424.pdf">ICML 2015</a>.</p></li>
+<li><p><strong>The Adam optimizer:</strong> Kingma, D. P., &amp; Ba, J. (2014). “Adam: A method for stochastic optimization.” <a class="reference external" href="https://arxiv.org/pdf/1412.6980.pdf">ICLR 2015</a>.</p></li>
+<li><p><strong>The Blitz</strong> <a class="reference external" href="https://github.com/piEsposito/blitz-bayesian-deep-learning">library</a> (for the hyperparameters).</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 55.180 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 53.064 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-bayesian-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/56f95495cd97dc331deccb21dabdae6a/tutorial_bayesian.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_bayesian.py</span></code></a></p>
@@ -500,7 +501,7 @@ Predicted digits:  7 2 1 0
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="tutorial_scaler.html" class="btn btn-neutral float-right" title="Improve Top-label Calibration with Temperature Scaling" accesskey="n"
+    <a href="tutorial_mc_dropout.html" class="btn btn-neutral float-right" title="Training a LeNet with Monte-Carlo Dropout" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     

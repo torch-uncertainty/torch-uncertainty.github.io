@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
   <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx-codeautolink.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
@@ -264,15 +265,17 @@ quantification in PyTorch.</p>
 Specifically, we are open to changing these guidelines as the project evolves.</p>
 <section id="the-scope-of-torchuncertainty">
 <h2>The scope of TorchUncertainty<a class="headerlink" href="#the-scope-of-torchuncertainty" title="Permalink to this heading">¶</a></h2>
-<p>TorchUncertainty can host every method - if possible linked to a paper -
+<p>TorchUncertainty can host any method - if possible linked to a paper - and
 roughly contained in the following fields:
-- uncertainty quantification in general, including Bayesian deep learning,
+* uncertainty quantification in general, including Bayesian deep learning,
 Monte Carlo dropout, ensemble methods, etc.
-- Out-of-distribution detection methods
-- Applications (e.g. object detection, segmentation, etc.)</p>
+* Out-of-distribution detection methods
+* Applications (e.g. object detection, segmentation, etc.)</p>
 </section>
 <section id="common-guidelines">
 <h2>Common guidelines<a class="headerlink" href="#common-guidelines" title="Permalink to this heading">¶</a></h2>
+<section id="clean-development-install-of-torchuncertainty">
+<h3>Clean development install of TorchUncertainty<a class="headerlink" href="#clean-development-install-of-torchuncertainty" title="Permalink to this heading">¶</a></h3>
 <p>If you are interested in contributing to torch_uncertainty, we first advise you
 to follow the following steps to reproduce a clean development environment
 ensuring continuous integration does not break.</p>
@@ -283,15 +286,36 @@ ensuring continuous integration does not break.</p>
 <code class="code highlight bash docutils literal highlight-bash">poetry<span class="w"> </span>install<span class="w"> </span>--with<span class="w"> </span>dev</code></p></li>
 <li><p>Install pre-commit hooks with <code class="code highlight bash docutils literal highlight-bash">pre-commit<span class="w"> </span>install</code></p></li>
 </ol>
-<p>We are using black for code formatting, flake8 for linting, and isort for the
-imports. The pre-commit hooks will ensure that your code is properly formatted
-and linted before committing.</p>
+<p>If you have issues with poetry, add <code class="code highlight bash docutils literal highlight-bash"><span class="nv">PYTHON_KEYRING_BACKEND</span><span class="o">=</span>keyring.backends.null.Keyring</code>
+at the beginning of every <code class="code highlight bash docutils literal highlight-bash">poetry</code> command.</p>
+</section>
+<section id="build-the-documentation-locally">
+<h3>Build the documentation locally<a class="headerlink" href="#build-the-documentation-locally" title="Permalink to this heading">¶</a></h3>
+<p>To build the documentation, reinstall TorchUncertainty with the packages of the docs
+group:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">poetry</span> <span class="n">install</span> <span class="o">--</span><span class="k">with</span> <span class="n">dev</span><span class="p">,</span><span class="n">docs</span>
+</pre></div>
+</div>
+<p>Then navigate to <code class="code highlight bash docutils literal highlight-bash">./docs</code> and build the documentation with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">html</span>
+</pre></div>
+</div>
+<p>Optionally, specify <code class="code highlight bash docutils literal highlight-bash">html-noplot</code> instead of <code class="code highlight bash docutils literal highlight-bash">html</code> to avoid running the tutorials.</p>
+</section>
+<section id="guidelines">
+<h3>Guidelines<a class="headerlink" href="#guidelines" title="Permalink to this heading">¶</a></h3>
+<p>We are using ruff for code formatting, linting, and imports (as a drop-in
+replacement for black, isort, and flake8). The pre-commit hooks will ensure
+that your code is properly formatted and linted before committing.</p>
+<p>To make your changes, create a branch on a personal fork, whose name is not
+dev nor main.</p>
 <p>Before submitting a final pull request, that we will review, please try your
 best not to reduce the code coverage and do document your code.</p>
 <p>Try to include an emoji at the start of each commit message following the suggestions
 from <a class="reference external" href="https://gist.github.com/parmentf/035de27d6ed1dce0b36a">this page</a>.</p>
 <p>If you implement a method, please add a reference to the corresponding paper in the
 <a class="reference external" href="https://torch-uncertainty.github.io/references.html">references page</a>.</p>
+</section>
 <section id="datasets-datamodules">
 <h3>Datasets &amp; Datamodules<a class="headerlink" href="#datasets-datamodules" title="Permalink to this heading">¶</a></h3>
 <p>We intend to include datamodules for the most popular datasets only.</p>
@@ -299,8 +323,8 @@ from <a class="reference external" href="https://gist.github.com/parmentf/035de2
 <section id="post-processing-methods">
 <h3>Post-processing methods<a class="headerlink" href="#post-processing-methods" title="Permalink to this heading">¶</a></h3>
 <p>For now, we intend to follow scikit-learn style API for post-processing
-methods (except that we use a validation dataset for now). You can get
-inspiration from the already implemented
+methods (except that we use a validation dataset instead of a numpy array).
+You may get inspiration from the already implemented
 <a class="reference external" href="https://github.com/ENSTA-U2IS/torch-uncertainty/blob/dev/torch_uncertainty/post_processing/calibration/temperature_scaler.py">temperature-scaling</a>.</p>
 </section>
 </section>
@@ -358,6 +382,9 @@ Face are likely to stay Apache 2.0.</p>
 <li><a class="reference internal" href="#">Contributing</a><ul>
 <li><a class="reference internal" href="#the-scope-of-torchuncertainty">The scope of TorchUncertainty</a></li>
 <li><a class="reference internal" href="#common-guidelines">Common guidelines</a><ul>
+<li><a class="reference internal" href="#clean-development-install-of-torchuncertainty">Clean development install of TorchUncertainty</a></li>
+<li><a class="reference internal" href="#build-the-documentation-locally">Build the documentation locally</a></li>
+<li><a class="reference internal" href="#guidelines">Guidelines</a></li>
 <li><a class="reference internal" href="#datasets-datamodules">Datasets &amp; Datamodules</a></li>
 <li><a class="reference internal" href="#post-processing-methods">Post-processing methods</a></li>
 </ul>

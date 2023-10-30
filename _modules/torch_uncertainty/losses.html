@@ -32,6 +32,7 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/sphinx-codeautolink.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -253,11 +254,11 @@
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 
 <span class="kn">from</span> <span class="nn">.layers.bayesian</span> <span class="kn">import</span> <span class="n">bayesian_modules</span>
 
 
-<span class="c1"># fmt: on</span>
 <div class="viewcode-block" id="KLDiv"><a class="viewcode-back" href="../../generated/torch_uncertainty.losses.KLDiv.html#torch_uncertainty.losses.KLDiv">[docs]</a><span class="k">class</span> <span class="nc">KLDiv</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;KL divergence loss for Bayesian Neural Networks. Gathers the KL from the</span>
 <span class="sd">    modules computed in the forward passes.</span>
@@ -351,7 +352,7 @@
         <span class="k">return</span> <span class="n">aggregated_elbo</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span></div></div>
 
 
-<span class="k">class</span> <span class="nc">NIGLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="NIGLoss"><a class="viewcode-back" href="../../generated/torch_uncertainty.losses.NIGLoss.html#torch_uncertainty.losses.NIGLoss">[docs]</a><span class="k">class</span> <span class="nc">NIGLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The Normal Inverse-Gamma loss.</span>
 
 <span class="sd">    Args:</span>
@@ -422,7 +423,179 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">loss</span>
+            <span class="k">return</span> <span class="n">loss</span></div>
+
+
+<div class="viewcode-block" id="DECLoss"><a class="viewcode-back" href="../../generated/torch_uncertainty.losses.DECLoss.html#torch_uncertainty.losses.DECLoss">[docs]</a><span class="k">class</span> <span class="nc">DECLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The deep evidential classification loss.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        annealing_step (int): Annealing step for the weight of the</span>
+<span class="sd">        regularization term.</span>
+<span class="sd">        reg_weight (float): Fixed weight of the regularization term.</span>
+<span class="sd">        loss_type (str, optional): Specifies the loss type to apply to the</span>
+<span class="sd">        Dirichlet parameters: ``&#39;mse&#39;`` | ``&#39;log&#39;`` | ``&#39;digamma&#39;``.</span>
+<span class="sd">        reduction (str, optional): Specifies the reduction to apply to the</span>
+<span class="sd">        output:``&#39;none&#39;`` | ``&#39;mean&#39;`` | ``&#39;sum&#39;``.</span>
+
+<span class="sd">    Reference:</span>
+<span class="sd">        Sensoy, M., Kaplan, L., &amp; Kandemir, M. (2018). Evidential deep</span>
+<span class="sd">        learning to quantify classification uncertainty. NeurIPS 2018.</span>
+<span class="sd">        https://arxiv.org/abs/1806.01768.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">annealing_step</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">reg_weight</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">loss_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span>
+        <span class="n">reduction</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">reg_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">reg_weight</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The regularization weight should be non-negative, but got &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">reg_weight</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reg_weight</span> <span class="o">=</span> <span class="n">reg_weight</span>
+
+        <span class="k">if</span> <span class="n">annealing_step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">annealing_step</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The annealing step should be positive, but got &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">annealing_step</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span> <span class="o">=</span> <span class="n">annealing_step</span>
+
+        <span class="k">if</span> <span class="n">reduction</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span> <span class="ow">and</span> <span class="n">reduction</span> <span class="o">!=</span> <span class="s2">&quot;mean&quot;</span> <span class="ow">and</span> <span class="n">reduction</span> <span class="o">!=</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">reduction</span><span class="si">}</span><span class="s2"> is not a valid value for reduction.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">=</span> <span class="n">reduction</span>
+
+        <span class="k">if</span> <span class="n">loss_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;digamma&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">loss_type</span><span class="si">}</span><span class="s2"> is not a valid value for mse/log/digamma loss.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_type</span> <span class="o">=</span> <span class="n">loss_type</span>
+
+    <span class="k">def</span> <span class="nf">_mse_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">evidence</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">evidence</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">evidence</span> <span class="o">+</span> <span class="mf">1.0</span>
+        <span class="n">strength</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">loglikelihood_err</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">targets</span> <span class="o">-</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">/</span> <span class="n">strength</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="n">loglikelihood_var</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+            <span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="n">strength</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">strength</span> <span class="o">*</span> <span class="n">strength</span> <span class="o">*</span> <span class="p">(</span><span class="n">strength</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span>
+            <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">loglikelihood_err</span> <span class="o">+</span> <span class="n">loglikelihood_var</span>
+        <span class="k">return</span> <span class="n">loss</span>
+
+    <span class="k">def</span> <span class="nf">_log_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">evidence</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">evidence</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">evidence</span> <span class="o">+</span> <span class="mf">1.0</span>
+        <span class="n">strength</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+            <span class="n">targets</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">strength</span><span class="p">)</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">alpha</span><span class="p">)),</span>
+            <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">loss</span>
+
+    <span class="k">def</span> <span class="nf">_digamma_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evidence</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">evidence</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">evidence</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">evidence</span> <span class="o">+</span> <span class="mf">1.0</span>
+        <span class="n">strength</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+            <span class="n">targets</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">digamma</span><span class="p">(</span><span class="n">strength</span><span class="p">)</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">digamma</span><span class="p">(</span><span class="n">alpha</span><span class="p">)),</span>
+            <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">loss</span>
+
+    <span class="k">def</span> <span class="nf">_kldiv_reg</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">evidence</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">num_classes</span> <span class="o">=</span> <span class="n">evidence</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">evidence</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">evidence</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">evidence</span> <span class="o">+</span> <span class="mf">1.0</span>
+
+        <span class="n">kl_alpha</span> <span class="o">=</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">targets</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="n">ones</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">device</span>
+        <span class="p">)</span>
+        <span class="n">sum_kl_alpha</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">kl_alpha</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">first_term</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">lgamma</span><span class="p">(</span><span class="n">sum_kl_alpha</span><span class="p">)</span>
+            <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">lgamma</span><span class="p">(</span><span class="n">kl_alpha</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">lgamma</span><span class="p">(</span><span class="n">ones</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">lgamma</span><span class="p">(</span><span class="n">ones</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="n">second_term</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">kl_alpha</span> <span class="o">-</span> <span class="n">ones</span><span class="p">)</span>
+            <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">digamma</span><span class="p">(</span><span class="n">kl_alpha</span><span class="p">)</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">digamma</span><span class="p">(</span><span class="n">sum_kl_alpha</span><span class="p">)),</span>
+            <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">first_term</span> <span class="o">+</span> <span class="n">second_term</span>
+        <span class="k">return</span> <span class="n">loss</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">evidence</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">current_epoch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="ow">and</span> <span class="n">current_epoch</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The epoch num should be positive when </span><span class="se">\</span>
+<span class="s2">                annealing_step is settled, but got &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_epoch</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">targets</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># if no mixup or cutmix</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;DECLoss does not yet support mixup/cutmix.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># TODO: handle binary</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_type</span> <span class="o">==</span> <span class="s2">&quot;mse&quot;</span><span class="p">:</span>
+            <span class="n">loss_dirichlet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mse_loss</span><span class="p">(</span><span class="n">evidence</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_type</span> <span class="o">==</span> <span class="s2">&quot;log&quot;</span><span class="p">:</span>
+            <span class="n">loss_dirichlet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_loss</span><span class="p">(</span><span class="n">evidence</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># self.loss_type == &quot;digamma&quot;</span>
+            <span class="n">loss_dirichlet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_digamma_loss</span><span class="p">(</span><span class="n">evidence</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_weight</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">annealing_coef</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_weight</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">annealing_coef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_weight</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">annealing_coef</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">min</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+                    <span class="n">current_epoch</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">dtype</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+
+        <span class="n">loss_reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kldiv_reg</span><span class="p">(</span><span class="n">evidence</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_dirichlet</span> <span class="o">+</span> <span class="n">annealing_coef</span> <span class="o">*</span> <span class="n">loss_reg</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">loss</span></div>
 </pre></div>
 
               </article>

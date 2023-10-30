@@ -33,14 +33,15 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx-codeautolink.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
-  <link rel="prev" title="Improve Top-label Calibration with Temperature Scaling" href="tutorial_scaler.html" />
+  <link rel="next" title="Improve Top-label Calibration with Temperature Scaling" href="tutorial_scaler.html" />
+  <link rel="prev" title="Train a Bayesian Neural Network in Three Minutes" href="tutorial_bayesian.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -278,15 +279,16 @@ to download the full example code</p>
 <p>First, we have to load the following utilities from TorchUncertainty:</p>
 <ul class="simple">
 <li><p>the cli handler: cli_main and argument parser: init_args</p></li>
-<li><p>the model: LeNet, which lies in torch_uncertainty.models</p></li>
-<li><p>the classification training routine in the torch_uncertainty.training.classification module</p></li>
 <li><p>the datamodule that handles dataloaders: MNISTDataModule, which lies in the torch_uncertainty.datamodule</p></li>
+<li><p>the model: LeNet, which lies in torch_uncertainty.models</p></li>
+<li><p>a resnet baseline to get the command line arguments: ResNet, which lies in torch_uncertainty.baselines</p></li>
+<li><p>the classification training routine in the torch_uncertainty.training.classification module</p></li>
 <li><p>the optimizer wrapper in the torch_uncertainty.optimization_procedures module.</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty</span> <span class="kn">import</span> <span class="n">cli_main</span><span class="p">,</span> <span class="n">init_args</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <span class="n">MNISTDataModule</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.baselines</span> <span class="kn">import</span> <span class="n">ResNet</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.models.lenet</span> <span class="kn">import</span> <span class="n">lenet</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.baselines.classification</span> <span class="kn">import</span> <span class="n">ResNet</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.routines.classification</span> <span class="kn">import</span> <span class="n">ClassificationEnsemble</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.optimization_procedures</span> <span class="kn">import</span> <span class="n">optim_cifar10_resnet18</span>
 </pre></div>
@@ -295,7 +297,6 @@ to download the full example code</p>
 <p>We also import ArgvContext to avoid using the jupyter arguments as cli
 arguments, and therefore avoid errors.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
@@ -374,14 +375,14 @@ arguments.</p>
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
         Test metric               DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        hp/test_acc            0.9200999736785889
-       hp/test_brier           0.16807086765766144
-        hp/test_ece            0.17397180199623108
-    hp/test_entropy_id         0.8669572472572327
-hp/test_id_ens_disagreement    0.25137749314308167
-  hp/test_id_ens_entropy       0.5869900584220886
-     hp/test_id_ens_mi         0.2799672484397888
-        hp/test_nll            0.41506630182266235
+        hp/test_acc             0.909500002861023
+       hp/test_brier           0.18544375896453857
+        hp/test_ece            0.1773005574941635
+    hp/test_entropy_id         0.9010286927223206
+hp/test_id_ens_disagreement    0.2545500099658966
+  hp/test_id_ens_entropy       0.6208950877189636
+     hp/test_id_ens_mi         0.2801337242126465
+        hp/test_nll            0.44496607780456543
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 </pre></div>
 </div>
@@ -427,13 +428,13 @@ hp/test_id_ens_disagreement    0.25137749314308167
 <img src="../_images/sphx_glr_tutorial_mc_dropout_001.png" srcset="../_images/sphx_glr_tutorial_mc_dropout_001.png" alt="tutorial mc dropout" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
 Ground truth:  7 2 1 0
 Predicted digits for the image 0:  7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7
-Predicted digits for the image 1:  2 2 2 2 8 2 2 2 2 2 2 2 2 2 2 2
+Predicted digits for the image 1:  2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
 Predicted digits for the image 2:  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-Predicted digits for the image 3:  0 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+Predicted digits for the image 3:  0 0 0 0 6 0 0 0 6 0 6 0 0 0 0 6
 </pre></div>
 </div>
 <p>approximation of the posterior distribution.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 44.892 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 39.815 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-mc-dropout-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/46ea60156086ca54a12e3533b0b9d8b6/tutorial_mc_dropout.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_mc_dropout.py</span></code></a></p>
@@ -455,12 +456,12 @@ Predicted digits for the image 3:  0 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="tutorial_der_cubic.html" class="btn btn-neutral float-right" title="Deep Evidential Regression on a Toy Example" accesskey="n"
+    <a href="tutorial_scaler.html" class="btn btn-neutral float-right" title="Improve Top-label Calibration with Temperature Scaling" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     
     
-    <a href="tutorial_scaler.html" class="btn btn-neutral" title="Improve Top-label Calibration with Temperature Scaling" accesskey="p"
+    <a href="tutorial_bayesian.html" class="btn btn-neutral" title="Train a Bayesian Neural Network in Three Minutes" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>
