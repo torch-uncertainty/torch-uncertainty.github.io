@@ -41,7 +41,7 @@
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
   <link rel="next" title="Entropy" href="torch_uncertainty.metrics.Entropy.html" />
-  <link rel="prev" title="BrierScore" href="torch_uncertainty.metrics.BrierScore.html" />
+  <link rel="prev" title="CE" href="torch_uncertainty.metrics.CE.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -263,275 +263,10 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.</span></span><span class="sig-name descname"><span class="pre">Disagreement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/disagreement.html#Disagreement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement" title="Permalink to this definition">¶</a></dt>
-<dd><p>The Disagreement Metric to estimate the confidence of an ensemble of
-estimators.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>reduction</strong> (<em>str</em><em>, </em><em>optional</em>) – <p>Determines how to reduce over the
-<span class="math notranslate nohighlight">\(B\)</span>/batch dimension:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">'mean'</span></code> [default]: Averages score across samples</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'sum'</span></code>: Sum score across samples</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'none'</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code>: Returns score per sample</p></li>
-</ul>
-</p></li>
-<li><p><strong>kwargs</strong> – Additional keyword arguments, see <a class="reference external" href="https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs">Advanced metric settings</a>.</p></li>
-</ul>
-</dd>
-</dl>
-<dl>
-<dt>Inputs:</dt><dd><ul class="simple">
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">probs</span></code>: <span class="math notranslate nohighlight">\((B, N, C)\)</span></p></li>
-</ul>
-<p>where <span class="math notranslate nohighlight">\(B\)</span> is the batch size, <span class="math notranslate nohighlight">\(C\)</span> is the number of classes
-and <span class="math notranslate nohighlight">\(N\)</span> is the number of estimators.</p>
-</dd>
-</dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>A higher disagreement means a lower confidence.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Make sure that the probabilities in <code class="xref py py-attr docutils literal notranslate"><span class="pre">probs</span></code> are normalized to sum
-to one.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If <code class="xref py py-attr docutils literal notranslate"><span class="pre">reduction</span></code> is not one of <code class="docutils literal notranslate"><span class="pre">'mean'</span></code>, <code class="docutils literal notranslate"><span class="pre">'sum'</span></code>,
-    <code class="docutils literal notranslate"><span class="pre">'none'</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.add_state">
-<span class="sig-name descname"><span class="pre">add_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_reduce_fx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.add_state" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add metric state variable. Only used by subclasses.</p>
-<p>Metric state variables are either <cite>:class:`~torch.Tensor</cite> or an empty list, which can be appended to by the
-metric. Each state variable must have a unique name associated with it. State variables are accessible as
-attributes of the metric i.e, if <code class="docutils literal notranslate"><span class="pre">name</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;my_state&quot;</span></code> then its value can be accessed from an instance
-<code class="docutils literal notranslate"><span class="pre">metric</span></code> as <code class="docutils literal notranslate"><span class="pre">metric.my_state</span></code>. Metric states behave like buffers and parameters of <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>
-as they are also updated when <code class="docutils literal notranslate"><span class="pre">.to()</span></code> is called. Unlike parameters and buffers, metric states are not by
-default saved in the modules <code class="xref py py-attr docutils literal notranslate"><span class="pre">state_dict</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> – The name of the state variable. The variable will then be accessible at <code class="docutils literal notranslate"><span class="pre">self.name</span></code>.</p></li>
-<li><p><strong>default</strong> – Default value of the state; can either be a <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code> or an empty list.
-The state will be reset to this value when <code class="docutils literal notranslate"><span class="pre">self.reset()</span></code> is called.</p></li>
-<li><p><strong>dist_reduce_fx</strong> (<em>Optional</em>) – Function to reduce state across multiple processes in distributed mode.
-If value is <code class="docutils literal notranslate"><span class="pre">&quot;sum&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;cat&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;min&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;max&quot;</span></code> we will use <code class="docutils literal notranslate"><span class="pre">torch.sum</span></code>,
-<code class="docutils literal notranslate"><span class="pre">torch.mean</span></code>, <code class="docutils literal notranslate"><span class="pre">torch.cat</span></code>, <code class="docutils literal notranslate"><span class="pre">torch.min</span></code> and <code class="docutils literal notranslate"><span class="pre">torch.max`</span></code> respectively, each with argument
-<code class="docutils literal notranslate"><span class="pre">dim=0</span></code>. Note that the <code class="docutils literal notranslate"><span class="pre">&quot;cat&quot;</span></code> reduction only makes sense if the state is a list, and not
-a tensor. The user can also pass a custom function in this parameter.</p></li>
-<li><p><strong>persistent</strong> (<em>Optional</em>) – whether the state will be saved as part of the modules <code class="docutils literal notranslate"><span class="pre">state_dict</span></code>.
-Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-</ul>
-</dd>
-</dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Setting <code class="docutils literal notranslate"><span class="pre">dist_reduce_fx</span></code> to None will return the metric state synchronized across different processes.
-However, there won’t be any reduction function applied to the synchronized metric state.</p>
-<p>The metric states would be synced as follows</p>
-<ul class="simple">
-<li><p>If the metric state is <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>, the synced value will be a stacked <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>
-across the process dimension if the metric state was a <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>. The original
-<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code> metric state retains dimension and hence the synchronized output will be of shape
-<code class="docutils literal notranslate"><span class="pre">(num_process,</span> <span class="pre">...)</span></code>.</p></li>
-<li><p>If the metric state is a <code class="docutils literal notranslate"><span class="pre">list</span></code>, the synced value will be a <code class="docutils literal notranslate"><span class="pre">list</span></code> containing the
-combined elements from all processes.</p></li>
-</ul>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>When passing a custom function to <code class="docutils literal notranslate"><span class="pre">dist_reduce_fx</span></code>, expect the synchronized metric state to follow
-the format discussed in the above note.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">default</span></code> is not a <code class="docutils literal notranslate"><span class="pre">tensor</span></code> or an <code class="docutils literal notranslate"><span class="pre">empty</span> <span class="pre">list</span></code>.</p></li>
-<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">dist_reduce_fx</span></code> is not callable or one of <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;sum&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;cat&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;min&quot;</span></code>,
-    <code class="docutils literal notranslate"><span class="pre">&quot;max&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.clone">
-<span class="sig-name descname"><span class="pre">clone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.clone" title="Permalink to this definition">¶</a></dt>
-<dd><p>Make a copy of the metric.</p>
-</dd></dl>
-
-<dl class="py method">
+<dd><dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.compute">
 <span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/disagreement.html#Disagreement.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.compute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute Disagreement based on inputs passed in to <code class="docutils literal notranslate"><span class="pre">update</span></code>.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.device">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device</span></span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.device" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the device of the metric.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.double">
-<span class="sig-name descname"><span class="pre">double</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.double" title="Permalink to this definition">¶</a></dt>
-<dd><p>Override default and prevent dtype casting.</p>
-<p>Please use <code class="xref py py-meth docutils literal notranslate"><span class="pre">Metric.set_dtype()</span></code> instead.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.float">
-<span class="sig-name descname"><span class="pre">float</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.float" title="Permalink to this definition">¶</a></dt>
-<dd><p>Override default and prevent dtype casting.</p>
-<p>Please use <code class="xref py py-meth docutils literal notranslate"><span class="pre">Metric.set_dtype()</span></code> instead.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Aggregate and evaluate batch input directly.</p>
-<p>Serves the dual purpose of both computing the metric on the current batch of inputs but also add the batch
-statistics to the overall accumululating metric state. Input arguments are the exact same as corresponding
-<code class="docutils literal notranslate"><span class="pre">update</span></code> method. The returned output is the exact same as the output of <code class="docutils literal notranslate"><span class="pre">compute</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>args</strong> – Any arguments as required by the metric <code class="docutils literal notranslate"><span class="pre">update</span></code> method.</p></li>
-<li><p><strong>kwargs</strong> – Any keyword arguments as required by the metric <code class="docutils literal notranslate"><span class="pre">update</span></code> method.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The output of the <code class="docutils literal notranslate"><span class="pre">compute</span></code> method evaluated on the current batch.</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>TorchMetricsUserError</strong> – If the metric is already synced and <code class="docutils literal notranslate"><span class="pre">forward</span></code> is called again.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.half">
-<span class="sig-name descname"><span class="pre">half</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.half" title="Permalink to this definition">¶</a></dt>
-<dd><p>Override default and prevent dtype casting.</p>
-<p>Please use <code class="xref py py-meth docutils literal notranslate"><span class="pre">Metric.set_dtype()</span></code> instead.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.metric_state">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">metric_state</span></span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.metric_state" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the current state of the metric.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.persistent">
-<span class="sig-name descname"><span class="pre">persistent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.persistent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Change post-init if metric states should be saved to its state_dict.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">__</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Override this method plot the metric value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.reset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reset metric state variables to their default value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.set_dtype">
-<span class="sig-name descname"><span class="pre">set_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dst_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.set_dtype" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transfer all metric state to specific dtype. Special version of standard <cite>type</cite> method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dst_type</strong> – the desired type as string or dtype object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.state_dict">
-<span class="sig-name descname"><span class="pre">state_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">destination</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.state_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the current state of metric as an dictionary.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>destination</strong> – Optional dictionary, that if provided, the state of module will be updated into the dict and
-the same object is returned. Otherwise, an <code class="docutils literal notranslate"><span class="pre">OrderedDict</span></code> will be created and returned.</p></li>
-<li><p><strong>prefix</strong> – optional string, a prefix added to parameter and buffer names to compose the keys in state_dict.</p></li>
-<li><p><strong>keep_vars</strong> – by default the <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code> returned in the state dict are detached from autograd.
-If set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, detaching will not be performed.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.sync">
-<span class="sig-name descname"><span class="pre">sync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist_sync_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">should_sync</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distributed_available</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.sync" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sync function for manually controlling when metrics states should be synced across processes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dist_sync_fn</strong> – Function to be used to perform states synchronization</p></li>
-<li><p><strong>process_group</strong> – Specify the process group on which synchronization is called.
-default: <cite>None</cite> (which selects the entire world)</p></li>
-<li><p><strong>should_sync</strong> – Whether to apply to state synchronization. This will have an impact
-only when running in a distributed setting.</p></li>
-<li><p><strong>distributed_available</strong> – Function to determine if we are running inside a distributed setting</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>TorchMetricsUserError</strong> – If the metric is already synced and <code class="docutils literal notranslate"><span class="pre">sync</span></code> is called again.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.sync_context">
-<span class="sig-name descname"><span class="pre">sync_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist_sync_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">should_sync</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">should_unsync</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distributed_available</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.sync_context" title="Permalink to this definition">¶</a></dt>
-<dd><p>Context manager to synchronize states.</p>
-<p>This context manager is used in distributed setting and makes sure that the local cache states are restored
-after yielding the syncronized state.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dist_sync_fn</strong> – Function to be used to perform states synchronization</p></li>
-<li><p><strong>process_group</strong> – Specify the process group on which synchronization is called.
-default: <cite>None</cite> (which selects the entire world)</p></li>
-<li><p><strong>should_sync</strong> – Whether to apply to state synchronization. This will have an impact
-only when running in a distributed setting.</p></li>
-<li><p><strong>should_unsync</strong> – Whether to restore the cache state so that the metrics can
-continue to be accumulated.</p></li>
-<li><p><strong>distributed_available</strong> – Function to determine if we are running inside a distributed setting</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.type">
-<span class="sig-name descname"><span class="pre">type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dst_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Override default and prevent dtype casting.</p>
-<p>Please use <code class="xref py py-meth docutils literal notranslate"><span class="pre">Metric.set_dtype()</span></code> instead.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.unsync">
-<span class="sig-name descname"><span class="pre">unsync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">should_unsync</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.unsync" title="Permalink to this definition">¶</a></dt>
-<dd><p>Unsync function for manually controlling when metrics states should be reverted back to their local states.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>should_unsync</strong> – Whether to perform unsync</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -543,18 +278,6 @@ continue to be accumulated.</p></li>
 <dd class="field-odd"><p><strong>probs</strong> (<em>torch.Tensor</em>) – Probabilities from the model.</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.update_called">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_called</span></span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.update_called" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns <cite>True</cite> if <cite>update</cite> or <cite>forward</cite> has been called initialization or last <cite>reset</cite>.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.Disagreement.update_count">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_count</span></span><a class="headerlink" href="#torch_uncertainty.metrics.Disagreement.update_count" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of times <cite>update</cite> and/or <cite>forward</cite> has been called since initialization or last <cite>reset</cite>.</p>
 </dd></dl>
 
 </dd></dl>
@@ -574,7 +297,7 @@ continue to be accumulated.</p></li>
         class="next-page"></a>
     
     
-    <a href="torch_uncertainty.metrics.BrierScore.html" class="btn btn-neutral" title="BrierScore" accesskey="p"
+    <a href="torch_uncertainty.metrics.CE.html" class="btn btn-neutral" title="CE" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>
@@ -606,27 +329,8 @@ continue to be accumulated.</p></li>
               <ul>
 <li><a class="reference internal" href="#">Disagreement</a><ul>
 <li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement"><code class="docutils literal notranslate"><span class="pre">Disagreement</span></code></a><ul>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.add_state"><code class="docutils literal notranslate"><span class="pre">Disagreement.add_state()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.clone"><code class="docutils literal notranslate"><span class="pre">Disagreement.clone()</span></code></a></li>
 <li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.compute"><code class="docutils literal notranslate"><span class="pre">Disagreement.compute()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.device"><code class="docutils literal notranslate"><span class="pre">Disagreement.device</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.double"><code class="docutils literal notranslate"><span class="pre">Disagreement.double()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.float"><code class="docutils literal notranslate"><span class="pre">Disagreement.float()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.forward"><code class="docutils literal notranslate"><span class="pre">Disagreement.forward()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.half"><code class="docutils literal notranslate"><span class="pre">Disagreement.half()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.metric_state"><code class="docutils literal notranslate"><span class="pre">Disagreement.metric_state</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.persistent"><code class="docutils literal notranslate"><span class="pre">Disagreement.persistent()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.plot"><code class="docutils literal notranslate"><span class="pre">Disagreement.plot()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.reset"><code class="docutils literal notranslate"><span class="pre">Disagreement.reset()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.set_dtype"><code class="docutils literal notranslate"><span class="pre">Disagreement.set_dtype()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.state_dict"><code class="docutils literal notranslate"><span class="pre">Disagreement.state_dict()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.sync"><code class="docutils literal notranslate"><span class="pre">Disagreement.sync()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.sync_context"><code class="docutils literal notranslate"><span class="pre">Disagreement.sync_context()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.type"><code class="docutils literal notranslate"><span class="pre">Disagreement.type()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.unsync"><code class="docutils literal notranslate"><span class="pre">Disagreement.unsync()</span></code></a></li>
 <li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.update"><code class="docutils literal notranslate"><span class="pre">Disagreement.update()</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.update_called"><code class="docutils literal notranslate"><span class="pre">Disagreement.update_called</span></code></a></li>
-<li><a class="reference internal" href="#torch_uncertainty.metrics.Disagreement.update_count"><code class="docutils literal notranslate"><span class="pre">Disagreement.update_count</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -655,7 +359,6 @@ continue to be accumulated.</p></li>
   <script src="../_static/sphinx_highlight.js"></script>
   <script src="../_static/clipboard.min.js"></script>
   <script src="../_static/copybutton.js"></script>
-  <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   
 
   

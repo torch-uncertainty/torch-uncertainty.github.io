@@ -40,7 +40,7 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Improve Top-label Calibration with Temperature Scaling" href="tutorial_scaler.html" />
+  <link rel="next" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
   <link rel="prev" title="Train a Bayesian Neural Network in Three Minutes" href="tutorial_bayesian.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
@@ -281,13 +281,15 @@ to download the full example code</p>
 <li><p>the cli handler: cli_main and argument parser: init_args</p></li>
 <li><p>the datamodule that handles dataloaders: MNISTDataModule, which lies in the torch_uncertainty.datamodule</p></li>
 <li><p>the model: LeNet, which lies in torch_uncertainty.models</p></li>
+<li><p>the mc-dropout wrapper: mc_dropout, which lies in torch_uncertainty.models</p></li>
 <li><p>a resnet baseline to get the command line arguments: ResNet, which lies in torch_uncertainty.baselines</p></li>
 <li><p>the classification training routine in the torch_uncertainty.training.classification module</p></li>
 <li><p>the optimizer wrapper in the torch_uncertainty.optimization_procedures module.</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty</span> <span class="kn">import</span> <span class="n">cli_main</span><span class="p">,</span> <span class="n">init_args</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty</span> <span class="kn">import</span> <span class="n">cli_main</span><span class="p">,</span> <span class="n">init_args</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <span class="n">MNISTDataModule</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.models.lenet</span> <span class="kn">import</span> <span class="n">lenet</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.models.mc_dropout</span> <span class="kn">import</span> <span class="n">mc_dropout</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.baselines.classification</span> <span class="kn">import</span> <span class="n">ResNet</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.routines.classification</span> <span class="kn">import</span> <span class="n">ClassificationEnsemble</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.optimization_procedures</span> <span class="kn">import</span> <span class="n">optim_cifar10_resnet18</span>
@@ -296,7 +298,7 @@ to download the full example code</p>
 <p>We will also need import the neural network utils withing <cite>torch.nn</cite>.</p>
 <p>We also import ArgvContext to avoid using the jupyter arguments as cli
 arguments, and therefore avoid errors.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
@@ -309,11 +311,11 @@ arguments, and therefore avoid errors.</p>
 <p>In the following, we will need to define the root of the datasets and the
 logs, and to fake-parse the arguments needed for using the PyTorch Lightning
 Trainer. We also create the datamodule that handles the MNIST dataset,
-dataloaders and transforms. Finally, we create the model using the
-blueprint from torch_uncertainty.models.</p>
+dataloaders and transforms. We create the model using the
+blueprint from torch_uncertainty.models and we wrap it into mc-dropout.</p>
 <p>It is important to specify the arguments <code class="docutils literal notranslate"><span class="pre">version</span></code> as <code class="docutils literal notranslate"><span class="pre">mc-dropout</span></code>,
 <code class="docutils literal notranslate"><span class="pre">num_estimators</span></code> and the <code class="docutils literal notranslate"><span class="pre">dropout_rate</span></code> to use Monte Carlo dropout.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
 
 <span class="c1"># We mock the arguments for the trainer</span>
 <span class="k">with</span> <span class="n">ArgvContext</span><span class="p">(</span>
@@ -322,16 +324,16 @@ blueprint from torch_uncertainty.models.</p>
     <span class="s2">&quot;1&quot;</span><span class="p">,</span>
     <span class="s2">&quot;--enable_progress_bar&quot;</span><span class="p">,</span>
     <span class="s2">&quot;False&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;--version&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;mc-dropout&quot;</span><span class="p">,</span>
     <span class="s2">&quot;--dropout_rate&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;0.5&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;0.6&quot;</span><span class="p">,</span>
     <span class="s2">&quot;--num_estimators&quot;</span><span class="p">,</span>
     <span class="s2">&quot;16&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--max_epochs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;2&quot;</span>
 <span class="p">):</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">init_args</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">ResNet</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">MNISTDataModule</span><span class="p">)</span>
 
-<span class="n">net_name</span> <span class="o">=</span> <span class="s2">&quot;mc-dropout-lenet-mnist&quot;</span>
+<span class="n">net_name</span> <span class="o">=</span> <span class="s2">&quot;logs/mc-dropout-lenet-mnist&quot;</span>
 
 <span class="c1"># datamodule</span>
 <span class="n">args</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
@@ -344,6 +346,8 @@ blueprint from torch_uncertainty.models.</p>
     <span class="n">dropout_rate</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">dropout_rate</span><span class="p">,</span>
     <span class="n">num_estimators</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">,</span>
 <span class="p">)</span>
+
+<span class="n">mc_model</span> <span class="o">=</span> <span class="n">mc_dropout</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">,</span> <span class="n">last_layer</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -355,9 +359,9 @@ torch_uncertainty.training.classification. We provide the number of classes
 and channels, the optimizer wrapper, the dropout rate, and the number of
 forward passes to perform through the network, as well as all the default
 arguments.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">baseline</span> <span class="o">=</span> <span class="n">ClassificationEnsemble</span><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">baseline</span> <span class="o">=</span> <span class="n">ClassificationEnsemble</span><span class="p">(</span>
     <span class="n">num_classes</span><span class="o">=</span><span class="n">dm</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
-    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">mc_model</span><span class="p">,</span>
     <span class="n">loss</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">,</span>
     <span class="n">optimization_procedure</span><span class="o">=</span><span class="n">optim_cifar10_resnet18</span><span class="p">,</span>
     <span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">),</span>
@@ -367,20 +371,20 @@ arguments.</p>
 </section>
 <section id="gathering-everything-and-training-the-model">
 <h3>5. Gathering Everything and Training the Model<a class="headerlink" href="#gathering-everything-and-training-the-model" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">cli_main</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">net_name</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">cli_main</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">net_name</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
         Test metric               DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        hp/test_acc            0.9376999735832214
-       hp/test_brier           0.14965032041072845
-        hp/test_ece            0.18567827343940735
-    hp/test_entropy_id         0.8887413144111633
-hp/test_id_ens_disagreement    0.2160700261592865
-  hp/test_id_ens_entropy       0.6242626309394836
-     hp/test_id_ens_mi         0.2644786834716797
-        hp/test_nll            0.38148266077041626
+        hp/test_acc            0.9104999899864197
+       hp/test_brier           0.24236804246902466
+        hp/test_ece            0.2732112407684326
+    hp/test_entropy_id         1.2125513553619385
+hp/test_id_ens_disagreement    0.3368458151817322
+  hp/test_id_ens_entropy       0.8822073936462402
+     hp/test_id_ens_mi         0.3303440809249878
+        hp/test_nll            0.5863633751869202
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 </pre></div>
 </div>
@@ -389,7 +393,7 @@ hp/test_id_ens_disagreement    0.2160700261592865
 <h3>6. Testing the Model<a class="headerlink" href="#testing-the-model" title="Permalink to this heading">¶</a></h3>
 <p>Now that the model is trained, let’s test it on MNIST. Don’t forget to call
 .eval() to enable dropout at inference.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchvision</span>
 
@@ -425,20 +429,20 @@ hp/test_id_ens_disagreement    0.2160700261592865
 </div>
 <img src="../_images/sphx_glr_tutorial_mc_dropout_001.png" srcset="../_images/sphx_glr_tutorial_mc_dropout_001.png" alt="tutorial mc dropout" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
 Ground truth:  7 2 1 0
-Predicted digits for the image 0:  7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7
-Predicted digits for the image 1:  0 8 2 2 2 2 2 2 2 2 2 2 2 0 2 2
+Predicted digits for the image 0:  7 9 7 7 7 7 7 7 7 7 7 7 7 7 7 7
+Predicted digits for the image 1:  2 2 2 2 2 2 2 2 2 2 2 0 2 2 2 2
 Predicted digits for the image 2:  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-Predicted digits for the image 3:  0 0 0 0 0 8 8 8 5 0 0 0 0 8 8 0
+Predicted digits for the image 3:  0 8 8 0 0 0 8 9 8 0 0 8 0 8 0 0
 </pre></div>
 </div>
 <p>approximation of the posterior distribution.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 20.682 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 34.662 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-mc-dropout-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/46ea60156086ca54a12e3533b0b9d8b6/tutorial_mc_dropout.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_mc_dropout.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/4890df143fe34f5aa2106d4980500a99/tutorial_mc_dropout.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_dropout.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/46ea60156086ca54a12e3533b0b9d8b6/tutorial_mc_dropout.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_mc_dropout.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -454,7 +458,7 @@ Predicted digits for the image 3:  0 0 0 0 0 8 8 8 5 0 0 0 0 8 8 0
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="tutorial_scaler.html" class="btn btn-neutral float-right" title="Improve Top-label Calibration with Temperature Scaling" accesskey="n"
+    <a href="tutorial_der_cubic.html" class="btn btn-neutral float-right" title="Deep Evidential Regression on a Toy Example" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     

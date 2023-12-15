@@ -249,7 +249,7 @@
                 
                 
   <h1>Source code for torch_uncertainty.metrics.brier_score</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
@@ -258,43 +258,8 @@
 
 
 <div class="viewcode-block" id="BrierScore"><a class="viewcode-back" href="../../../generated/torch_uncertainty.metrics.BrierScore.html#torch_uncertainty.metrics.BrierScore">[docs]</a><span class="k">class</span> <span class="nc">BrierScore</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The Brier Score Metric.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        reduction (str, optional): Determines how to reduce over the</span>
-<span class="sd">            :math:`B`/batch dimension:</span>
-
-<span class="sd">            - ``&#39;mean&#39;`` [default]: Averages score across samples</span>
-<span class="sd">            - ``&#39;sum&#39;``: Sum score across samples</span>
-<span class="sd">            - ``&#39;none&#39;`` or ``None``: Returns score per sample</span>
-
-<span class="sd">        kwargs: Additional keyword arguments, see `Advanced metric settings</span>
-<span class="sd">            &lt;https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs&gt;`_.</span>
-
-<span class="sd">    Inputs:</span>
-<span class="sd">        - :attr:`probs`: :math:`(B, C)` or :math:`(B, N, C)`</span>
-<span class="sd">        - :attr:`target`: :math:`(B)` or :math:`(B, C)`</span>
-
-<span class="sd">        where :math:`B` is the batch size, :math:`C` is the number of classes</span>
-<span class="sd">        and :math:`N` is the number of estimators.</span>
-
-<span class="sd">    Note:</span>
-<span class="sd">        If :attr:`probs` is a 3D tensor, then the metric computes the mean of</span>
-<span class="sd">        the Brier score over the estimators ie. :math:`t = \frac{1}{N}</span>
-<span class="sd">        \sum_{i=0}^{N-1} BrierScore(probs[:,i,:], target)`.</span>
-
-<span class="sd">    Warning:</span>
-<span class="sd">        Make sure that the probabilities in :attr:`probs` are normalized to sum</span>
-<span class="sd">        to one.</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        ValueError:</span>
-<span class="sd">            If :attr:`reduction` is not one of ``&#39;mean&#39;``, ``&#39;sum&#39;``,</span>
-<span class="sd">            ``&#39;none&#39;`` or ``None``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">is_differentiable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">higher_is_better</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">higher_is_better</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">full_state_update</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -303,6 +268,41 @@
         <span class="n">reduction</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The Brier Score Metric.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            num_classes (int): Number of classes</span>
+<span class="sd">            reduction (str, optional): Determines how to reduce over the</span>
+<span class="sd">                :math:`B`/batch dimension:</span>
+
+<span class="sd">                - ``&#39;mean&#39;`` [default]: Averages score across samples</span>
+<span class="sd">                - ``&#39;sum&#39;``: Sum score across samples</span>
+<span class="sd">                - ``&#39;none&#39;`` or ``None``: Returns score per sample</span>
+
+<span class="sd">            kwargs: Additional keyword arguments, see `Advanced metric settings</span>
+<span class="sd">                &lt;https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs&gt;`_.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            - :attr:`probs`: :math:`(B, C)` or :math:`(B, N, C)`</span>
+<span class="sd">            - :attr:`target`: :math:`(B)` or :math:`(B, C)`</span>
+
+<span class="sd">            where :math:`B` is the batch size, :math:`C` is the number of classes</span>
+<span class="sd">            and :math:`N` is the number of estimators.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            If :attr:`probs` is a 3d tensor, then the metric computes the mean of</span>
+<span class="sd">            the Brier score over the estimators ie. :math:`t = \frac{1}{N}</span>
+<span class="sd">            \sum_{i=0}^{N-1} BrierScore(probs[:,i,:], target)`.</span>
+
+<span class="sd">        Warning:</span>
+<span class="sd">            Make sure that the probabilities in :attr:`probs` are normalized to sum</span>
+<span class="sd">            to one.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError:</span>
+<span class="sd">                If :attr:`reduction` is not one of ``&#39;mean&#39;``, ``&#39;sum&#39;``,</span>
+<span class="sd">                ``&#39;none&#39;`` or ``None``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">allowed_reduction</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -325,13 +325,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;total&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BrierScore.update"><a class="viewcode-back" href="../../../generated/torch_uncertainty.metrics.BrierScore.html#torch_uncertainty.metrics.BrierScore.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Update the current Brier score with a new tensor of probabilities.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the current Brier score with a new tensor of probabilities.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            probs (torch.Tensor): A probability tensor of shape</span>
 <span class="sd">                (batch, num_estimators, num_classes) or</span>
 <span class="sd">                (batch, num_classes)</span>
+<span class="sd">            target (torch.Tensor): A tensor of ground truth labels of shape</span>
+<span class="sd">                (batch, num_classes) or (batch)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">target</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">)</span>
@@ -360,8 +361,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">+=</span> <span class="n">batch_size</span></div>
 
 <div class="viewcode-block" id="BrierScore.compute"><a class="viewcode-back" href="../../../generated/torch_uncertainty.metrics.BrierScore.html#torch_uncertainty.metrics.BrierScore.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compute the final Brier score based on inputs passed to ``update``.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the final Brier score based on inputs passed to ``update``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.Tensor: The final value(s) for the Brier score</span>
@@ -369,10 +369,9 @@
         <span class="n">values</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># reduction is None</span>
-            <span class="k">return</span> <span class="n">values</span></div></div>
+        <span class="k">return</span> <span class="n">values</span></div></div>
 </pre></div>
 
               </article>

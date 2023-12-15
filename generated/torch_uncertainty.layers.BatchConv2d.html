@@ -263,7 +263,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.layers.BatchConv2d">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.layers.</span></span><span class="sig-name descname"><span class="pre">BatchConv2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/layers/batch_ensemble.html#BatchConv2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.layers.BatchConv2d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Applies a 2D convolution over an input signal composed of several input
+<dd><p>Applies a 2d convolution over an input signal composed of several input
 planes using BatchEnsemble method to the incoming data.</p>
 <p>In the simplest case, the output value of the layer with input size
 <span class="math notranslate nohighlight">\((N, C_{in}, H_{in}, W_{in})\)</span> and output
@@ -271,10 +271,10 @@ planes using BatchEnsemble method to the incoming data.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\text{out}(N_i, C_{\text{out}_j})=\
 &amp;\hat{b}(N_i,C_{\text{out}_j})
-+\hat{S}(N_{i},C_{\text{out}_j}) \\
++\hat{s_group}(N_{i},C_{\text{out}_j}) \\
 &amp;\times \sum_{k = 0}^{C_{\text{in}} - 1}
 \text{weight}(C_{\text{out}_j}, k)\star (\text{input}(N_i, k)
-\times \hat{R}(N_i, k))\end{split}\]</div>
+\times \hat{r_group}(N_i, k))\end{split}\]</div>
 <dl class="simple">
 <dt>Reference:</dt><dd><p>Introduced by the paper <a class="reference external" href="https://arxiv.org/abs/2002.06715">BatchEnsemble: An Alternative Approach to
 Efficient Ensemble and Lifelong Learning</a>, we present here an implementation
@@ -311,15 +311,15 @@ output. Defaults to <code class="docutils literal notranslate"><span class="pre"
 of these weights are sampled from <span class="math notranslate nohighlight">\(\mathcal{U}(-\sqrt{k},
 \sqrt{k})\)</span> where <span class="math notranslate nohighlight">\(k = \frac{\text{groups}}{C_\text{in} *
 \prod_{i=0}^{1}\text{kernel_size}[i]}\)</span>.</p></li>
-<li><p><strong>R</strong> (<em>torch.Tensor</em>) – the learnable matrice of shape <span class="math notranslate nohighlight">\((M, C_{in})\)</span> where each row
+<li><p><strong>r_group</strong> (<em>torch.Tensor</em>) – the learnable matrice of shape <span class="math notranslate nohighlight">\((M, C_{in})\)</span> where each row
 consist of the vector <span class="math notranslate nohighlight">\(r_{i}\)</span> corresponding to the
 <span class="math notranslate nohighlight">\(i^{th}\)</span> ensemble member. The values are initialized from
 <span class="math notranslate nohighlight">\(\mathcal{N}(1.0, 0.5)\)</span>.</p></li>
-<li><p><strong>S</strong> (<em>torch.Tensor</em>) – the learnable matrice of shape <span class="math notranslate nohighlight">\((M, C_{out})\)</span> where each row
+<li><p><strong>s_group</strong> (<em>torch.Tensor</em>) – the learnable matrice of shape <span class="math notranslate nohighlight">\((M, C_{out})\)</span> where each row
 consist of the vector <span class="math notranslate nohighlight">\(s_{i}\)</span> corresponding to the
 <span class="math notranslate nohighlight">\(i^{th}\)</span> ensemble member. The values are initialized from
 <span class="math notranslate nohighlight">\(\mathcal{N}(1.0, 0.5)\)</span>.</p></li>
-<li><p><strong>bias</strong> (<em>Optional</em><em>[</em><em>torch.Tensor</em><em>]</em>) – the learnable bias (<span class="math notranslate nohighlight">\(b\)</span>) of shape <span class="math notranslate nohighlight">\((M, C_{out})\)</span>
+<li><p><strong>bias</strong> (<em>torch.Tensor</em><em> | </em><em>None</em>) – the learnable bias (<span class="math notranslate nohighlight">\(b\)</span>) of shape <span class="math notranslate nohighlight">\((M, C_{out})\)</span>
 where each row corresponds to the bias of the <span class="math notranslate nohighlight">\(i^{th}\)</span>
 ensemble member. If <code class="xref py py-attr docutils literal notranslate"><span class="pre">bias</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, the values are
 initialized from <span class="math notranslate nohighlight">\(\mathcal{U}(-\sqrt{k}, \sqrt{k})\)</span> where

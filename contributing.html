@@ -280,20 +280,18 @@ Monte Carlo dropout, ensemble methods, etc.
 to follow the following steps to reproduce a clean development environment
 ensuring continuous integration does not break.</p>
 <ol class="arabic simple">
-<li><p>Install poetry on your workstation.</p></li>
-<li><p>Clone the repository.</p></li>
-<li><p>Install torch-uncertainty in editable mode poetry with dev packages:
-<code class="code highlight bash docutils literal highlight-bash">poetry<span class="w"> </span>install<span class="w"> </span>--with<span class="w"> </span>dev</code></p></li>
+<li><p>Check that you have PyTorch already installed on your system</p></li>
+<li><p>Clone the repository</p></li>
+<li><p>Install torch-uncertainty in editable mode with the dev packages:
+<code class="code highlight bash docutils literal highlight-bash">python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>dev<span class="o">]</span></code></p></li>
 <li><p>Install pre-commit hooks with <code class="code highlight bash docutils literal highlight-bash">pre-commit<span class="w"> </span>install</code></p></li>
 </ol>
-<p>If you have issues with poetry, add <code class="code highlight bash docutils literal highlight-bash"><span class="nv">PYTHON_KEYRING_BACKEND</span><span class="o">=</span>keyring.backends.null.Keyring</code>
-at the beginning of every <code class="code highlight bash docutils literal highlight-bash">poetry</code> command.</p>
 </section>
 <section id="build-the-documentation-locally">
 <h3>Build the documentation locally<a class="headerlink" href="#build-the-documentation-locally" title="Permalink to this heading">¶</a></h3>
 <p>To build the documentation, reinstall TorchUncertainty with the packages of the docs
 group:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">poetry</span> <span class="n">install</span> <span class="o">--</span><span class="k">with</span> <span class="n">dev</span><span class="p">,</span><span class="n">docs</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span><span class="p">[</span><span class="n">dev</span><span class="p">,</span><span class="n">docs</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Then navigate to <code class="code highlight bash docutils literal highlight-bash">./docs</code> and build the documentation with:</p>
@@ -304,17 +302,35 @@ group:</p>
 </section>
 <section id="guidelines">
 <h3>Guidelines<a class="headerlink" href="#guidelines" title="Permalink to this heading">¶</a></h3>
-<p>We are using ruff for code formatting, linting, and imports (as a drop-in
+<p><strong>Commits</strong></p>
+<p>We use ruff for code formatting, linting, and imports (as a drop-in
 replacement for black, isort, and flake8). The pre-commit hooks will ensure
 that your code is properly formatted and linted before committing.</p>
-<p>To make your changes, create a branch on a personal fork, whose name is not
-dev nor main.</p>
-<p>Before submitting a final pull request, that we will review, please try your
-best not to reduce the code coverage and do document your code.</p>
+<p>Please ensure that the tests are passing on your machine before pushing on a
+PR. This will avoid multiplying the number featureless commits. To do this,
+run, at the root of the folder:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pytest</span> <span class="n">tests</span>
+</pre></div>
+</div>
 <p>Try to include an emoji at the start of each commit message following the suggestions
 from <a class="reference external" href="https://gist.github.com/parmentf/035de27d6ed1dce0b36a">this page</a>.</p>
-<p>If you implement a method, please add a reference to the corresponding paper in the
-<a class="reference external" href="https://torch-uncertainty.github.io/references.html">references page</a>.</p>
+<p><strong>Pull requests</strong></p>
+<p>To make your changes, create a branch on a personal fork and create a PR when your contribution
+is mostly finished or if you need help.</p>
+<p>Check that your PR complies with the following conditions:
+* The name of your branch is not <cite>main</cite> nor <cite>dev</cite> (see issue #58)
+* Your PR does not reduce the code coverage
+* Your code is documented: the function signatures are typed, and the main functions have clear
+docstrings
+* Your code is mostly original, and the parts coming from licensed sources are explicitly
+stated as such
+* If you implement a method, please add a reference to the corresponding paper in the
+<a class="reference external" href="https://torch-uncertainty.github.io/references.html">references page</a>.
+* Also, remember to add TorchUncertainty to the list of libraries implementing this reference
+on <a class="reference external" href="https://paperswithcode.com">PapersWithCode</a>.</p>
+<p>If you need help to implement a method, increase the coverage, or solve ruff-raised errors,
+create the PR with the <cite>need-help</cite> flag and explain your problems in the comments. A maintainer
+will do their best to help you.</p>
 </section>
 <section id="datasets-datamodules">
 <h3>Datasets &amp; Datamodules<a class="headerlink" href="#datasets-datamodules" title="Permalink to this heading">¶</a></h3>

@@ -264,7 +264,7 @@
 <dt class="sig sig-object py" id="torch_uncertainty.layers.BatchLinear">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.layers.</span></span><span class="sig-name descname"><span class="pre">BatchLinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/layers/batch_ensemble.html#BatchLinear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.layers.BatchLinear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies a linear transformation using BatchEnsemble method to the
-incoming data: <span class="math notranslate nohighlight">\(y=(x\circ \hat{R})W^{T}\circ \hat{S} + \hat{b}\)</span>.</p>
+incoming data: <span class="math notranslate nohighlight">\(y=(x\circ \hat{r_group})W^{T}\circ \hat{s_group} + \hat{b}\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -291,15 +291,15 @@ heavily inspired by its <a class="reference external" href="https://github.com/g
 <span class="math notranslate nohighlight">\((H_{out}, H_{in})\)</span> shared between the estimators. The values
 are initialized from <span class="math notranslate nohighlight">\(\mathcal{U}(-\sqrt{k}, \sqrt{k})\)</span>,
 where <span class="math notranslate nohighlight">\(k = \frac{1}{H_{in}}\)</span>.</p></li>
-<li><p><strong>R</strong> (<em>torch.Tensor</em>) – the learnable matrice of shape <span class="math notranslate nohighlight">\((M, H_{in})\)</span> where each row
+<li><p><strong>r_group</strong> (<em>torch.Tensor</em>) – the learnable matrice of shape <span class="math notranslate nohighlight">\((M, H_{in})\)</span> where each row
 consist of the vector <span class="math notranslate nohighlight">\(r_{i}\)</span> corresponding to the
 <span class="math notranslate nohighlight">\(i^{th}\)</span> ensemble member. The values are initialized from
 <span class="math notranslate nohighlight">\(\mathcal{N}(1.0, 0.5)\)</span>.</p></li>
-<li><p><strong>S</strong> (<em>torch.Tensor</em>) – the learnable matrice of shape <span class="math notranslate nohighlight">\((M, H_{out})\)</span> where each row
+<li><p><strong>s_group</strong> (<em>torch.Tensor</em>) – the learnable matrice of shape <span class="math notranslate nohighlight">\((M, H_{out})\)</span> where each row
 consist of the vector <span class="math notranslate nohighlight">\(s_{i}\)</span> corresponding to the
 <span class="math notranslate nohighlight">\(i^{th}\)</span> ensemble member. The values are initialized from
 <span class="math notranslate nohighlight">\(\mathcal{N}(1.0, 0.5)\)</span>.</p></li>
-<li><p><strong>bias</strong> (<em>Optional</em><em>[</em><em>torch.Tensor</em><em>]</em>) – the learnable bias (<span class="math notranslate nohighlight">\(b\)</span>) of shape <span class="math notranslate nohighlight">\((M, H_{out})\)</span>
+<li><p><strong>bias</strong> (<em>torch.Tensor</em><em> | </em><em>None</em>) – the learnable bias (<span class="math notranslate nohighlight">\(b\)</span>) of shape <span class="math notranslate nohighlight">\((M, H_{out})\)</span>
 where each row corresponds to the bias of the <span class="math notranslate nohighlight">\(i^{th}\)</span>
 ensemble member. If <code class="xref py py-attr docutils literal notranslate"><span class="pre">bias</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, the values are
 initialized from <span class="math notranslate nohighlight">\(\mathcal{U}(-\sqrt{k}, \sqrt{k})\)</span> where

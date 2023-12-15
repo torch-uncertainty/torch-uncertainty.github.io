@@ -262,68 +262,8 @@
 <h1>VGG<a class="headerlink" href="#vgg" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.baselines.classification.VGG">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.baselines.classification.</span></span><span class="sig-name descname"><span class="pre">VGG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimization_procedure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'imagenet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_entropy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_logits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_mi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_variation_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/baselines/classification/vgg.html#VGG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.baselines.classification.VGG" title="Permalink to this definition">¶</a></dt>
-<dd><p>VGG backbone baseline for classification providing support for
-various versions and architectures.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>num_classes</strong> (<em>int</em>) – Number of classes to predict.</p></li>
-<li><p><strong>in_channels</strong> (<em>int</em>) – Number of input channels.</p></li>
-<li><p><strong>loss</strong> (<em>nn.Module</em>) – Training loss.</p></li>
-<li><p><strong>optimization_procedure</strong> (<em>Any</em>) – Optimization procedure, corresponds to
-what expect the <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/stable/common/lightning_module.html#configure-optimizers">LightningModule.configure_optimizers()</a>
-method.</p></li>
-<li><p><strong>version</strong> (<em>str</em>) – <p>Determines which VGG version to use:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;vanilla&quot;</span></code>: original VGG</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;mc-dropout&quot;</span></code>: Monte Carlo Dropout VGG</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;packed&quot;</span></code>: Packed-Ensembles VGG</p></li>
-</ul>
-</p></li>
-<li><p><strong>arch</strong> (<em>int</em>) – <p>Determines which VGG architecture to use:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">11</span></code>: VGG-11</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">13</span></code>: VGG-13</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">16</span></code>: VGG-16</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">19</span></code>: VGG-19</p></li>
-</ul>
-</p></li>
-<li><p><strong>style</strong> (<em>str</em><em>, </em><em>optional</em>) – Which VGG style to use. Defaults to</p></li>
-<li><p><strong>imagenet.</strong> – </p></li>
-<li><p><strong>num_estimators</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of estimators in the ensemble.
-Only used if <code class="xref py py-attr docutils literal notranslate"><span class="pre">version</span></code> is either <code class="docutils literal notranslate"><span class="pre">&quot;packed&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;batched&quot;</span></code>
-or <code class="docutils literal notranslate"><span class="pre">&quot;masked&quot;</span></code> Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-<li><p><strong>groups</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of groups in convolutions. Defaults to
-<code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
-<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – Expansion factor affecting the width of the
-estimators. Only used if <code class="xref py py-attr docutils literal notranslate"><span class="pre">version</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;packed&quot;</span></code>. Defaults
-to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-<li><p><strong>gamma</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of groups within each estimator. Only
-used if <code class="xref py py-attr docutils literal notranslate"><span class="pre">version</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;packed&quot;</span></code> and scales with
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">groups</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">1s</span></code>.</p></li>
-<li><p><strong>use_entropy</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to use the entropy
-values as the OOD criterion or not. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>use_logits</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to use the logits as the
-OOD criterion or not. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>use_mi</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to use the mutual
-information as the OOD criterion or not. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>use_variation_ratio</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to use the
-variation ratio as the OOD criterion or not. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If <code class="xref py py-attr docutils literal notranslate"><span class="pre">version</span></code> is not either <code class="docutils literal notranslate"><span class="pre">&quot;vanilla&quot;</span></code>,
-    <code class="docutils literal notranslate"><span class="pre">&quot;packed&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;batched&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;masked&quot;</span></code>.</p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>VGG baseline ready for training and evaluation.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>LightningModule</p>
-</dd>
-</dl>
-</dd></dl>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.baselines.classification.</span></span><span class="sig-name descname"><span class="pre">VGG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimization_procedure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_layer_dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'imagenet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_entropy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_logits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_mi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_variation_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/baselines/classification/vgg.html#VGG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.baselines.classification.VGG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </section>
 

@@ -249,7 +249,7 @@
                 
                 
   <h1>Source code for torch_uncertainty.post_processing.calibration.vector_scaler</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
@@ -258,27 +258,6 @@
 
 
 <div class="viewcode-block" id="VectorScaler"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.post_processing.VectorScaler.html#torch_uncertainty.post_processing.VectorScaler">[docs]</a><span class="k">class</span> <span class="nc">VectorScaler</span><span class="p">(</span><span class="n">Scaler</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Vector scaling post-processing for calibrated probabilities.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        num_classes (int): Number of classes.</span>
-<span class="sd">        init_w (float, optional): Initial value for the weights.</span>
-<span class="sd">            Defaults to 1.</span>
-<span class="sd">        init_b (float, optional): Initial value for the bias.</span>
-<span class="sd">            Defaults to 0.</span>
-<span class="sd">        lr (float, optional): Learning rate for the optimizer. Defaults to 0.1.</span>
-<span class="sd">        max_iter (int, optional): Maximum number of iterations for the</span>
-<span class="sd">            optimizer. Defaults to 100.</span>
-<span class="sd">        device (Optional[Literal[&quot;cpu&quot;, &quot;cuda&quot;]], optional): Device to use</span>
-<span class="sd">            for optimization. Defaults to None.</span>
-
-<span class="sd">    Reference:</span>
-<span class="sd">        Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. On calibration</span>
-<span class="sd">        of modern neural networks. In ICML 2017.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -286,12 +265,31 @@
         <span class="n">init_b</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
         <span class="n">max_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
-        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Vector scaling post-processing for calibrated probabilities.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            num_classes (int): Number of classes.</span>
+<span class="sd">            init_w (float, optional): Initial value for the weights.</span>
+<span class="sd">                Defaults to 1.</span>
+<span class="sd">            init_b (float, optional): Initial value for the bias.</span>
+<span class="sd">                Defaults to 0.</span>
+<span class="sd">            lr (float, optional): Learning rate for the optimizer. Defaults to 0.1.</span>
+<span class="sd">            max_iter (int, optional): Maximum number of iterations for the</span>
+<span class="sd">                optimizer. Defaults to 100.</span>
+<span class="sd">            device (Optional[Literal[&quot;cpu&quot;, &quot;cuda&quot;]], optional): Device to use</span>
+<span class="sd">                for optimization. Defaults to None.</span>
+
+<span class="sd">        Reference:</span>
+<span class="sd">            Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. On calibration</span>
+<span class="sd">            of modern neural networks. In ICML 2017.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_classes</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;num_classes must be an integer.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;num_classes must be an integer.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">num_classes</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of classes must be positive.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="n">num_classes</span>
@@ -299,8 +297,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="n">init_w</span><span class="p">,</span> <span class="n">init_b</span><span class="p">)</span>
 
 <div class="viewcode-block" id="VectorScaler.set_temperature"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.post_processing.VectorScaler.html#torch_uncertainty.post_processing.VectorScaler.set_temperature">[docs]</a>    <span class="k">def</span> <span class="nf">set_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val_w</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">val_b</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Set the temperature to a fixed value.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the temperature to a fixed value.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            val_w (float): Weight temperature value.</span>
@@ -316,8 +313,7 @@
         <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logits</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Scale the logits with the optimal temperature.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Scale the logits with the optimal temperature.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            logits (torch.Tensor): Logits to be scaled.</span>
