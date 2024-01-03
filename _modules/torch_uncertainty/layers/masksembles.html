@@ -411,30 +411,6 @@
 
 
 <div class="viewcode-block" id="MaskedLinear"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.MaskedLinear.html#torch_uncertainty.layers.MaskedLinear">[docs]</a><span class="k">class</span> <span class="nc">MaskedLinear</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Masksembles-style Linear layer.</span>
-
-<span class="sd">    This layer computes fully-connected operation for a given number of</span>
-<span class="sd">    estimators (:attr:`num_estimators`) with a given :attr:`scale`.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        in_features (int): Number of input features of the linear layer.</span>
-<span class="sd">        out_features (int): Number of channels produced by the linear layer.</span>
-<span class="sd">        num_estimators (int): The number of estimators grouped in the layer.</span>
-<span class="sd">        scale (float): The scale parameter for the masks.</span>
-<span class="sd">        bias (bool, optional): It ``True``, adds a learnable bias to the</span>
-<span class="sd">            output. Defaults to ``True``.</span>
-<span class="sd">        groups (int, optional): Number of blocked connections from input</span>
-<span class="sd">            channels to output channels. Defaults to ``1``.</span>
-
-<span class="sd">    Warning:</span>
-<span class="sd">        Be sure to apply a repeat on the batch at the start of the training</span>
-<span class="sd">        if you use `MaskedLinear`.</span>
-
-<span class="sd">    Reference:</span>
-<span class="sd">        `Masksembles for Uncertainty Estimation`, Nikita Durasov, Timur</span>
-<span class="sd">        Bagautdinov, Pierre Baque, Pascal Fua.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">in_features</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -445,9 +421,38 @@
         <span class="n">device</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">dtype</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Masksembles-style Linear layer.</span>
+
+<span class="sd">        This layer computes fully-connected operation for a given number of</span>
+<span class="sd">        estimators (:attr:`num_estimators`) with a given :attr:`scale`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            in_features (int): Number of input features of the linear layer.</span>
+<span class="sd">            out_features (int): Number of channels produced by the linear layer.</span>
+<span class="sd">            num_estimators (int): The number of estimators grouped in the layer.</span>
+<span class="sd">            scale (float): The scale parameter for the masks.</span>
+<span class="sd">            bias (bool, optional): It ``True``, adds a learnable bias to the</span>
+<span class="sd">                output. Defaults to ``True``.</span>
+<span class="sd">            groups (int, optional): Number of blocked connections from input</span>
+<span class="sd">                channels to output channels. Defaults to ``1``.</span>
+<span class="sd">            device (Any, optional): The desired device of returned tensor.</span>
+<span class="sd">                Defaults to ``None``.</span>
+<span class="sd">            dtype (Any, optional): The desired data type of returned tensor.</span>
+<span class="sd">                Defaults to ``None``.</span>
+
+<span class="sd">        Warning:</span>
+<span class="sd">            Be sure to apply a repeat on the batch at the start of the training</span>
+<span class="sd">            if you use `MaskedLinear`.</span>
+
+<span class="sd">        Reference:</span>
+<span class="sd">            `Masksembles for Uncertainty Estimation`, Nikita Durasov, Timur</span>
+<span class="sd">            Bagautdinov, Pierre Baque, Pascal Fua.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">factory_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
+        <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must specify the value of the arg. `scale`&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">scale</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Attribute `scale` should be &gt;= 1, not </span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
@@ -466,34 +471,6 @@
 
 
 <div class="viewcode-block" id="MaskedConv2d"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.MaskedConv2d.html#torch_uncertainty.layers.MaskedConv2d">[docs]</a><span class="k">class</span> <span class="nc">MaskedConv2d</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Masksembles-style Conv2d layer.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        in_channels (int): Number of channels in the input image.</span>
-<span class="sd">        out_channels (int): Number of channels produced by the convolution.</span>
-<span class="sd">        kernel_size (int or tuple): Size of the convolving kernel.</span>
-<span class="sd">        num_estimators (int): Number of estimators in the ensemble.</span>
-<span class="sd">        scale (float): The scale parameter for the masks.</span>
-<span class="sd">        stride (int or tuple, optional): Stride of the convolution.</span>
-<span class="sd">            Defaults to ``1``.</span>
-<span class="sd">        padding (int, tuple or str, optional): Padding added to all four sides</span>
-<span class="sd">            of the input. Defaults to ``0``.</span>
-<span class="sd">        dilation (int or tuple, optional): Spacing between kernel elements.</span>
-<span class="sd">            Defaults to ``1``.</span>
-<span class="sd">        groups (int, optional): Number of blocked connexions from input</span>
-<span class="sd">            channels to output channels for each estimator. Defaults to ``1``.</span>
-<span class="sd">        bias (bool, optional): If ``True``, adds a learnable bias to the</span>
-<span class="sd">            output. Defaults to ``True``.</span>
-
-<span class="sd">    Warning:</span>
-<span class="sd">        Be sure to apply a repeat on the batch at the start of the training</span>
-<span class="sd">        if you use `MaskedConv2d`.</span>
-
-<span class="sd">    Reference:</span>
-<span class="sd">        `Masksembles for Uncertainty Estimation`, Nikita Durasov, Timur</span>
-<span class="sd">        Bagautdinov, Pierre Baque, Pascal Fua.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -509,9 +486,42 @@
         <span class="n">device</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">dtype</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Masksembles-style Conv2d layer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            in_channels (int): Number of channels in the input image.</span>
+<span class="sd">            out_channels (int): Number of channels produced by the convolution.</span>
+<span class="sd">            kernel_size (int or tuple): Size of the convolving kernel.</span>
+<span class="sd">            num_estimators (int): Number of estimators in the ensemble.</span>
+<span class="sd">            scale (float): The scale parameter for the masks.</span>
+<span class="sd">            stride (int or tuple, optional): Stride of the convolution.</span>
+<span class="sd">                Defaults to ``1``.</span>
+<span class="sd">            padding (int, tuple or str, optional): Padding added to all four sides</span>
+<span class="sd">                of the input. Defaults to ``0``.</span>
+<span class="sd">            dilation (int or tuple, optional): Spacing between kernel elements.</span>
+<span class="sd">                Defaults to ``1``.</span>
+<span class="sd">            groups (int, optional): Number of blocked connexions from input</span>
+<span class="sd">                channels to output channels for each estimator. Defaults to ``1``.</span>
+<span class="sd">            bias (bool, optional): If ``True``, adds a learnable bias to the</span>
+<span class="sd">                output. Defaults to ``True``.</span>
+<span class="sd">            device (Any, optional): The desired device of returned tensor.</span>
+<span class="sd">                Defaults to ``None``.</span>
+<span class="sd">            dtype (Any, optional): The desired data type of returned tensor.</span>
+<span class="sd">                Defaults to ``None``.</span>
+
+<span class="sd">        Warning:</span>
+<span class="sd">            Be sure to apply a repeat on the batch at the start of the training</span>
+<span class="sd">            if you use `MaskedConv2d`.</span>
+
+<span class="sd">        Reference:</span>
+<span class="sd">            `Masksembles for Uncertainty Estimation`, Nikita Durasov, Timur</span>
+<span class="sd">            Bagautdinov, Pierre Baque, Pascal Fua.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">factory_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
+        <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must specify the value of the arg. `scale`&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">scale</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Attribute `scale` should be &gt;= 1, not </span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 

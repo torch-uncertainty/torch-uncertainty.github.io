@@ -269,12 +269,12 @@ planes using BatchEnsemble method to the incoming data.</p>
 <span class="math notranslate nohighlight">\((N, C_{in}, H_{in}, W_{in})\)</span> and output
 <span class="math notranslate nohighlight">\((N, C_{out}, H_{out}, W_{out})\)</span> can be precisely described as:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}\text{out}(N_i, C_{\text{out}_j})=\
-&amp;\hat{b}(N_i,C_{\text{out}_j})
-+\hat{s_group}(N_{i},C_{\text{out}_j}) \\
-&amp;\times \sum_{k = 0}^{C_{\text{in}} - 1}
-\text{weight}(C_{\text{out}_j}, k)\star (\text{input}(N_i, k)
-\times \hat{r_group}(N_i, k))\end{split}\]</div>
+\[\]</div>
+<p>text{out}(N_i, C_{text{out}_j})=&amp;hat{b}(N_i,C_{text{out}_j})
++hat{s_group}(N_{i},C_{text{out}_j}) \
+&amp;times sum_{k = 0}^{C_{text{in}} - 1}
+text{weight}(C_{text{out}_j}, k)star (text{input}(N_i, k)
+times hat{r_group}(N_i, k))</p>
 <dl class="simple">
 <dt>Reference:</dt><dd><p>Introduced by the paper <a class="reference external" href="https://arxiv.org/abs/2002.06715">BatchEnsemble: An Alternative Approach to
 Efficient Ensemble and Lifelong Learning</a>, we present here an implementation
@@ -300,6 +300,10 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">1</span
 channels to output channels. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
 <li><p><strong>bias</strong> (<em>bool</em><em>, </em><em>optional</em>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, adds a learnable bias to the
 output. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>device</strong> (<em>Any</em><em>, </em><em>optional</em>) – device to use for the parameters and
+buffers of this module. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>dtype</strong> (<em>Any</em><em>, </em><em>optional</em>) – data type to use for the parameters and
+buffers of this module. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables<span class="colon">:</span></dt>
@@ -345,7 +349,7 @@ initialized from <span class="math notranslate nohighlight">\(\mathcal{U}(-\sqrt
 </dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Make sure that <span class="math notranslate nohighlight">\(M | N\)</span> when calling <code class="xref py py-func docutils literal notranslate"><span class="pre">forward()</span></code>.</p>
+<p>Make sure that <code class="xref py py-attr docutils literal notranslate"><span class="pre">num_estimators</span></code> divides <code class="xref py py-attr docutils literal notranslate"><span class="pre">out_channels</span></code> when calling <code class="xref py py-func docutils literal notranslate"><span class="pre">forward()</span></code>.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># With square kernels, four estimators and equal stride</span>

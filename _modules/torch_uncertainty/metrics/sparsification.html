@@ -260,30 +260,6 @@
 
 
 <div class="viewcode-block" id="AUSE"><a class="viewcode-back" href="../../../generated/torch_uncertainty.metrics.AUSE.html#torch_uncertainty.metrics.AUSE">[docs]</a><span class="k">class</span> <span class="nc">AUSE</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The Area Under the Sparsification Error curve (AUSE) metric to estimate</span>
-<span class="sd">    the quality of the uncertainty estimates, i.e., how much they coincide with</span>
-<span class="sd">    the true errors.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        kwargs: Additional keyword arguments, see `Advanced metric settings</span>
-<span class="sd">            &lt;https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs&gt;`_.</span>
-
-<span class="sd">    Reference:</span>
-<span class="sd">        From the paper</span>
-<span class="sd">        `Uncertainty estimates and multi-hypotheses for optical flow &lt;https://arxiv.org/abs/1802.07095&gt;`_.</span>
-<span class="sd">        In ECCV, 2018.</span>
-
-<span class="sd">    Inputs:</span>
-<span class="sd">        - :attr:`scores`: Uncertainty scores of shape :math:`(B,)`. A higher</span>
-<span class="sd">          score means a higher uncertainty.</span>
-<span class="sd">        - :attr:`errors`: Errors of shape :math:`(B,)`.</span>
-
-<span class="sd">        where :math:`B` is the batch size.</span>
-
-<span class="sd">    Note:</span>
-<span class="sd">        A higher AUSE means a lower quality of the uncertainty estimates.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">is_differentiable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">higher_is_better</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">full_state_update</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -295,6 +271,29 @@
     <span class="n">errors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The Area Under the Sparsification Error curve (AUSE) metric to estimate</span>
+<span class="sd">        the quality of the uncertainty estimates, i.e., how much they coincide with</span>
+<span class="sd">        the true errors.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            kwargs: Additional keyword arguments, see `Advanced metric settings</span>
+<span class="sd">                &lt;https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs&gt;`_.</span>
+
+<span class="sd">        Reference:</span>
+<span class="sd">            From the paper</span>
+<span class="sd">            `Uncertainty estimates and multi-hypotheses for optical flow &lt;https://arxiv.org/abs/1802.07095&gt;`_.</span>
+<span class="sd">            In ECCV, 2018.</span>
+
+<span class="sd">        Inputs:</span>
+<span class="sd">            - :attr:`scores`: Uncertainty scores of shape :math:`(B,)`. A higher</span>
+<span class="sd">            score means a higher uncertainty.</span>
+<span class="sd">            - :attr:`errors`: Binary errors of shape :math:`(B,)`,</span>
+
+<span class="sd">        where :math:`B` is the batch size.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            A higher AUSE means a lower quality of the uncertainty estimates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;scores&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;cat&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;errors&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;cat&quot;</span><span class="p">)</span>
@@ -304,7 +303,7 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            scores (Tensor): uncertainty scores of shape :math:`(B,)`</span>
-<span class="sd">            errors (Tensor): errors of shape :math:`(B,)`</span>
+<span class="sd">            errors (Tensor): binary errors of shape :math:`(B,)`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span></div>
@@ -329,14 +328,21 @@
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">auc</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)])</span></div>
 
 <div class="viewcode-block" id="AUSE.plot"><a class="viewcode-back" href="../../../generated/torch_uncertainty.metrics.AUSE.html#torch_uncertainty.metrics.AUSE.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n">_AX_TYPE</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[[</span><span class="n">plt</span><span class="o">.</span><span class="n">Figure</span> <span class="o">|</span> <span class="kc">None</span><span class="p">],</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">ax</span><span class="p">:</span> <span class="n">_AX_TYPE</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">plot_oracle</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">plot_value</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Figure</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the sparsification curve corresponding to the inputs passed to</span>
 <span class="sd">        ``update``, and the oracle sparsification curve.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            ax (Axes | None, optional): An matplotlib axis object. If provided</span>
-<span class="sd">                will add plot to that axis. Defaults to None.</span>
+<span class="sd">                will add plot to this axis. Defaults to None.</span>
+<span class="sd">            plot_oracle (bool, optional): Whether to plot the oracle</span>
+<span class="sd">                sparsification curve. Defaults to True.</span>
+<span class="sd">            plot_value (bool, optional): Whether to plot the AUSE value.</span>
+<span class="sd">                Defaults to True.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple[[Figure | None], Axes]: Figure object and Axes object</span>
@@ -366,11 +372,12 @@
             <span class="n">computed_error_rates</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Model&quot;</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-            <span class="n">rejection_rates</span><span class="p">,</span>
-            <span class="n">computed_optimal_error_rates</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Optimal&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">plot_oracle</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="n">rejection_rates</span><span class="p">,</span>
+                <span class="n">computed_optimal_error_rates</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Oracle&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Rejection Rate (%)&quot;</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Error Rate (%)&quot;</span><span class="p">)</span>
@@ -378,26 +385,33 @@
         <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_lower_bound</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_upper_bound</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">)</span>
 
-        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
-            <span class="mf">0.02</span><span class="p">,</span>
-            <span class="mf">0.02</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;AUSEC=</span><span class="si">{</span><span class="n">ausec</span><span class="si">:</span><span class="s2">.03</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
-            <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span>
-            <span class="n">va</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
-            <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">plot_value</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                <span class="mf">0.02</span><span class="p">,</span>
+                <span class="mf">0.02</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;AUSEC=</span><span class="si">{</span><span class="n">ausec</span><span class="si">:</span><span class="s2">.03</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+                <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span>
+                <span class="n">va</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
+                <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div></div>
 
 
 <span class="k">def</span> <span class="nf">_rejection_rate_compute</span><span class="p">(</span>
+    <span class="n">scores</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">errors</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">uncertainty_score</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the cumulative error rates for a given set of scores and errors.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        scores (Tensor): uncertainty scores of shape :math:`(B,)`</span>
+<span class="sd">        errors (Tensor): binary errors of shape :math:`(B,)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">num_samples</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="n">order</span> <span class="o">=</span> <span class="n">uncertainty_score</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
     <span class="n">errors</span> <span class="o">=</span> <span class="n">errors</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
 
     <span class="n">error_rates</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_samples</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>

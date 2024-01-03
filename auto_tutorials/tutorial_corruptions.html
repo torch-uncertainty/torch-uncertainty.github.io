@@ -1,0 +1,695 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Image Corruptions &mdash; TorchUncertainty 0.1.5 documentation</title>
+  
+
+  <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
+  
+  
+
+  
+
+  
+  
+  
+
+  
+
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx-codeautolink.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="index" title="Index" href="../genindex.html" />
+  <link rel="search" title="Search" href="../search.html" />
+  <link rel="next" title="Improve Top-label Calibration with Temperature Scaling" href="tutorial_scaler.html" />
+  <link rel="prev" title="Tutorials" href="index.html" />
+  <!-- Google Analytics -->
+  <script type="text/javascript">
+    var collapsedSections = [];
+  </script>
+  
+  <!-- End Google Analytics -->
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+  <script>
+    MathJax = {
+        chtml: {
+            scale: 1,
+            minScale: 1,
+        },
+        svg: {
+            scale: 1,
+            minScale: 1,
+        }
+    }
+</script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css"
+    integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://torch-uncertainty.github.io/"
+        aria-label="OpenMMLab"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+  
+
+  <div class="table-of-contents-link-wrapper">
+    <span>Table of Contents</span>
+    <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+  </div>
+
+  <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+    <div class="pytorch-side-scroll">
+      <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <div class="pytorch-left-menu-search">
+          
+
+          
+          
+          
+          
+
+          
+
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        
+        
+        
+        
+        
+        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction_uncertainty.html">Introduction to Classification Uncertainty</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+        
+        
+      </div>
+    </div>
+  </nav>
+
+  <div class="pytorch-container">
+    <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+      <div class="pytorch-breadcrumbs-wrapper">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+    <li>
+      <a href="../index.html">
+        Docs
+      </a> &gt;
+    </li>
+
+    
+    <li><a href="index.html">Tutorials</a> &gt;</li>
+    
+    <li>Image Corruptions</li>
+    
+    <!-- 
+    <li class="pytorch-breadcrumbs-aside">
+      
+      
+      
+      
+      
+      <a href="/zh_CN//auto_tutorials/tutorial_corruptions.html" class="fa fa-language"> 以中文阅读</a>
+      
+      
+    </li>
+    
+     -->
+  </ul>
+
+  
+</div>
+      </div>
+
+      <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+        Shortcuts
+      </div>
+    </div>
+
+    <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+      <div class="pytorch-content-left">
+
+        
+
+        <div class="pytorch-call-to-action-links">
+          <div id="tutorial-type">auto_tutorials/tutorial_corruptions</div>
+
+          <!-- <div id="google-colab-link">
+            <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg" />
+            <div class="call-to-action-desktop-view">Run in Google Colab</div>
+            <div class="call-to-action-mobile-view">Colab</div>
+          </div> -->
+          <div id="download-notebook-link">
+            <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg" />
+            <div class="call-to-action-desktop-view">Download Notebook</div>
+            <div class="call-to-action-mobile-view">Notebook</div>
+          </div>
+          <div id="github-view-link">
+            <img class="call-to-action-img" src="../_static/images/pytorch-github.svg" />
+            <div class="call-to-action-desktop-view">View on GitHub</div>
+            <div class="call-to-action-mobile-view">GitHub</div>
+          </div>
+        </div>
+
+        
+        
+          <div class="rst-content">
+            
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+                
+                
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-tutorials-tutorial-corruptions-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="image-corruptions">
+<span id="sphx-glr-auto-tutorials-tutorial-corruptions-py"></span><h1>Image Corruptions<a class="headerlink" href="#image-corruptions" title="Permalink to this heading">¶</a></h1>
+<p>This tutorial shows the impact of the different corruptions available in the
+TorchUncertainty library. These corruptions were first proposed in the paper
+Benchmarking Neural Network Robustness to Common Corruptions and Perturbations
+by Dan Hendrycks and Thomas Dietterich.</p>
+<p>For this tutorial, we will only load the corruption transforms available in
+torch_uncertainty.transforms.corruptions. We also need to load utilities from
+torchvision and matplotlib.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torchvision.datasets</span> <span class="kn">import</span> <span class="n">CIFAR10</span>
+<span class="kn">from</span> <span class="nn">torchvision.transforms</span> <span class="kn">import</span> <span class="n">Compose</span><span class="p">,</span> <span class="n">ToTensor</span><span class="p">,</span> <span class="n">Resize</span>
+
+<span class="kn">from</span> <span class="nn">torchvision.utils</span> <span class="kn">import</span> <span class="n">make_grid</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">CIFAR10</span><span class="p">(</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_images</span><span class="p">(</span><span class="n">main_transform</span><span class="p">,</span> <span class="n">severity</span><span class="p">):</span>
+    <span class="n">ds_transforms</span> <span class="o">=</span> <span class="n">Compose</span><span class="p">([</span><span class="n">ToTensor</span><span class="p">(),</span> <span class="n">main_transform</span><span class="p">(</span><span class="n">severity</span><span class="p">),</span> <span class="n">Resize</span><span class="p">(</span><span class="mi">256</span><span class="p">)])</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">CIFAR10</span><span class="p">(</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ds_transforms</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">make_grid</span><span class="p">([</span><span class="n">ds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">)])</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">show_images</span><span class="p">(</span><span class="n">transform</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original Images&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">get_images</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">severity</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Severity </span><span class="si">{</span><span class="n">severity</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">get_images</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">severity</span><span class="p">))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_tutorial_corruptions_001.png" srcset="../_images/sphx_glr_tutorial_corruptions_001.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ./data/cifar-10-python.tar.gz
+
+  0%|          | 0/170498071 [00:00&lt;?, ?it/s]
+  0%|          | 32768/170498071 [00:00&lt;10:20, 274528.16it/s]
+  0%|          | 229376/170498071 [00:00&lt;02:39, 1067672.80it/s]
+  1%|          | 917504/170498071 [00:00&lt;00:53, 3177427.72it/s]
+  2%|▏         | 3604480/170498071 [00:00&lt;00:14, 11217948.90it/s]
+  5%|▌         | 9240576/170498071 [00:00&lt;00:06, 26032629.39it/s]
+  7%|▋         | 12746752/170498071 [00:00&lt;00:05, 28823297.92it/s]
+ 11%|█         | 18907136/170498071 [00:00&lt;00:04, 37018435.89it/s]
+ 14%|█▍        | 24674304/170498071 [00:00&lt;00:03, 43130242.29it/s]
+ 17%|█▋        | 29065216/170498071 [00:00&lt;00:03, 41903976.50it/s]
+ 20%|██        | 34603008/170498071 [00:01&lt;00:02, 45754258.84it/s]
+ 23%|██▎       | 39419904/170498071 [00:01&lt;00:02, 46444807.14it/s]
+ 26%|██▌       | 44498944/170498071 [00:01&lt;00:02, 47496402.89it/s]
+ 29%|██▉       | 49807360/170498071 [00:01&lt;00:02, 49122540.64it/s]
+ 32%|███▏      | 54755328/170498071 [00:01&lt;00:02, 46971067.75it/s]
+ 35%|███▌      | 60227584/170498071 [00:01&lt;00:02, 48391453.37it/s]
+ 38%|███▊      | 65634304/170498071 [00:01&lt;00:02, 49996615.25it/s]
+ 41%|████▏     | 70680576/170498071 [00:01&lt;00:02, 47648632.50it/s]
+ 45%|████▍     | 76185600/170498071 [00:01&lt;00:01, 49101659.21it/s]
+ 48%|████▊     | 81461248/170498071 [00:02&lt;00:01, 50046585.27it/s]
+ 51%|█████     | 86507520/170498071 [00:02&lt;00:01, 47795285.38it/s]
+ 54%|█████▍    | 92110848/170498071 [00:02&lt;00:01, 50034921.55it/s]
+ 57%|█████▋    | 97157120/170498071 [00:02&lt;00:01, 49757955.85it/s]
+ 60%|█████▉    | 102170624/170498071 [00:02&lt;00:01, 47456128.70it/s]
+ 63%|██████▎   | 107937792/170498071 [00:02&lt;00:01, 50270608.86it/s]
+ 66%|██████▋   | 113016832/170498071 [00:02&lt;00:01, 47731723.30it/s]
+ 69%|██████▉   | 117866496/170498071 [00:02&lt;00:01, 46923231.53it/s]
+ 72%|███████▏  | 123109376/170498071 [00:02&lt;00:00, 48449004.15it/s]
+ 75%|███████▌  | 128122880/170498071 [00:03&lt;00:00, 48904551.41it/s]
+ 78%|███████▊  | 133070848/170498071 [00:03&lt;00:00, 48793403.28it/s]
+ 81%|████████  | 137986048/170498071 [00:03&lt;00:00, 47209112.73it/s]
+ 84%|████████▍ | 142934016/170498071 [00:03&lt;00:00, 47852691.49it/s]
+ 87%|████████▋ | 147750912/170498071 [00:03&lt;00:00, 47506297.99it/s]
+ 90%|████████▉ | 153092096/170498071 [00:03&lt;00:00, 49210757.75it/s]
+ 93%|█████████▎| 158040064/170498071 [00:03&lt;00:00, 49289797.22it/s]
+ 96%|█████████▌| 162988032/170498071 [00:03&lt;00:00, 47874536.57it/s]
+ 98%|█████████▊| 167804928/170498071 [00:03&lt;00:00, 47716840.11it/s]
+100%|██████████| 170498071/170498071 [00:03&lt;00:00, 43778001.17it/s]
+Extracting ./data/cifar-10-python.tar.gz to ./data
+</pre></div>
+</div>
+<section id="gaussian-noise">
+<h2>1. Gaussian Noise<a class="headerlink" href="#gaussian-noise" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">GaussianNoise</span>
+
+<span class="n">show_images</span><span class="p">(</span><span class="n">GaussianNoise</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_tutorial_corruptions_002.png" srcset="../_images/sphx_glr_tutorial_corruptions_002.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
+/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+Severity 1
+Severity 2
+Severity 3
+Severity 4
+Severity 5
+</pre></div>
+</div>
+</section>
+<section id="shot-noise">
+<h2>2. Shot Noise<a class="headerlink" href="#shot-noise" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">ShotNoise</span>
+
+<span class="n">show_images</span><span class="p">(</span><span class="n">ShotNoise</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_tutorial_corruptions_003.png" srcset="../_images/sphx_glr_tutorial_corruptions_003.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
+Severity 1
+Severity 2
+Severity 3
+Severity 4
+Severity 5
+</pre></div>
+</div>
+</section>
+<section id="impulse-noise">
+<h2>3. Impulse Noise<a class="headerlink" href="#impulse-noise" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">ImpulseNoise</span>
+
+<span class="n">show_images</span><span class="p">(</span><span class="n">ImpulseNoise</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_tutorial_corruptions_004.png" srcset="../_images/sphx_glr_tutorial_corruptions_004.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
+Severity 1
+Severity 2
+Severity 3
+Severity 4
+Severity 5
+</pre></div>
+</div>
+</section>
+<section id="speckle-noise">
+<h2>4. Speckle Noise<a class="headerlink" href="#speckle-noise" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">SpeckleNoise</span>
+
+<span class="n">show_images</span><span class="p">(</span><span class="n">SpeckleNoise</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_tutorial_corruptions_005.png" srcset="../_images/sphx_glr_tutorial_corruptions_005.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
+Severity 1
+Severity 2
+Severity 3
+Severity 4
+Severity 5
+</pre></div>
+</div>
+</section>
+<section id="gaussian-blur">
+<h2>5. Gaussian Blur<a class="headerlink" href="#gaussian-blur" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">GaussianBlur</span>
+
+<span class="n">show_images</span><span class="p">(</span><span class="n">GaussianBlur</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_tutorial_corruptions_006.png" srcset="../_images/sphx_glr_tutorial_corruptions_006.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
+Severity 1
+Severity 2
+Severity 3
+Severity 4
+Severity 5
+</pre></div>
+</div>
+</section>
+<section id="glass-blur">
+<h2>6. Glass Blur<a class="headerlink" href="#glass-blur" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">GlassBlur</span>
+
+<span class="n">show_images</span><span class="p">(</span><span class="n">GlassBlur</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_tutorial_corruptions_007.png" srcset="../_images/sphx_glr_tutorial_corruptions_007.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
+Severity 1
+Severity 2
+Severity 3
+Severity 4
+Severity 5
+</pre></div>
+</div>
+</section>
+<section id="defocus-blur">
+<h2>7. Defocus Blur<a class="headerlink" href="#defocus-blur" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">DefocusBlur</span>
+
+<span class="n">show_images</span><span class="p">(</span><span class="n">DefocusBlur</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_tutorial_corruptions_008.png" srcset="../_images/sphx_glr_tutorial_corruptions_008.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
+Severity 1
+Severity 2
+Severity 3
+Severity 4
+Severity 5
+</pre></div>
+</div>
+</section>
+<section id="jpeg-compression">
+<h2>8. JPEG Compression<a class="headerlink" href="#jpeg-compression" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">JPEGCompression</span>
+
+<span class="n">show_images</span><span class="p">(</span><span class="n">JPEGCompression</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_tutorial_corruptions_009.png" srcset="../_images/sphx_glr_tutorial_corruptions_009.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
+Severity 1
+Severity 2
+Severity 3
+Severity 4
+Severity 5
+</pre></div>
+</div>
+</section>
+<section id="pixelate">
+<h2>9. Pixelate<a class="headerlink" href="#pixelate" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">Pixelate</span>
+
+<span class="n">show_images</span><span class="p">(</span><span class="n">Pixelate</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_tutorial_corruptions_010.png" srcset="../_images/sphx_glr_tutorial_corruptions_010.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
+Severity 1
+Severity 2
+Severity 3
+Severity 4
+Severity 5
+</pre></div>
+</div>
+</section>
+<section id="frost">
+<h2>10. Frost<a class="headerlink" href="#frost" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">Frost</span>
+
+<span class="n">show_images</span><span class="p">(</span><span class="n">Frost</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_tutorial_corruptions_011.png" srcset="../_images/sphx_glr_tutorial_corruptions_011.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
+Downloading https://zenodo.org/records/10438904/files/frost.zip to data/frost.zip
+
+  0%|          | 0/1780178 [00:00&lt;?, ?it/s]
+  2%|▏         | 32768/1780178 [00:00&lt;00:08, 204331.60it/s]
+  4%|▎         | 65536/1780178 [00:00&lt;00:08, 203956.68it/s]
+  7%|▋         | 131072/1780178 [00:00&lt;00:05, 296143.71it/s]
+ 13%|█▎        | 229376/1780178 [00:00&lt;00:03, 421159.31it/s]
+ 26%|██▌       | 458752/1780178 [00:00&lt;00:01, 783493.83it/s]
+ 50%|████▉     | 884736/1780178 [00:00&lt;00:00, 1417714.48it/s]
+ 98%|█████████▊| 1736704/1780178 [00:01&lt;00:00, 2685719.76it/s]
+100%|██████████| 1780178/1780178 [00:01&lt;00:00, 1580305.67it/s]
+Extracting data/frost.zip to data
+Downloaded frost.zip to data
+Severity 1
+Files already downloaded and verified
+Severity 2
+Files already downloaded and verified
+Severity 3
+Files already downloaded and verified
+Severity 4
+Files already downloaded and verified
+Severity 5
+Files already downloaded and verified
+</pre></div>
+</div>
+<section id="reference">
+<h3>Reference<a class="headerlink" href="#reference" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Benchmarking Neural Network Robustness to Common Corruptions and Perturbations</strong>, Dan Hendrycks and Thomas Dietterich. <a class="reference external" href="https://arxiv.org/pdf/1903.12261">ICLR 2019</a>.</p></li>
+</ul>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 30.677 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-corruptions-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/3232f235afd71e96000345e9c6f6b324/tutorial_corruptions.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_corruptions.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/b886e79dc433587b54862156cd71500f/tutorial_corruptions.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_corruptions.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+</section>
+
+
+              </article>
+              
+            </div>
+            <footer>
+  
+  <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+    
+    <a href="tutorial_scaler.html" class="btn btn-neutral float-right" title="Improve Top-label Calibration with Temperature Scaling" accesskey="n"
+      rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
+        class="next-page"></a>
+    
+    
+    <a href="index.html" class="btn btn-neutral" title="Tutorials" accesskey="p"
+      rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
+    
+  </div>
+  
+
+  <hr>
+
+  <div role="contentinfo">
+    <p>
+      &copy; Copyright 2024, Adrien Lafage and Olivier Laurent.
+
+    </p>
+  </div>
+  
+  <div>
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a
+      href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the
+      Docs</a>.
+  </div>
+   
+
+</footer>
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">Image Corruptions</a><ul>
+<li><a class="reference internal" href="#gaussian-noise">1. Gaussian Noise</a></li>
+<li><a class="reference internal" href="#shot-noise">2. Shot Noise</a></li>
+<li><a class="reference internal" href="#impulse-noise">3. Impulse Noise</a></li>
+<li><a class="reference internal" href="#speckle-noise">4. Speckle Noise</a></li>
+<li><a class="reference internal" href="#gaussian-blur">5. Gaussian Blur</a></li>
+<li><a class="reference internal" href="#glass-blur">6. Glass Blur</a></li>
+<li><a class="reference internal" href="#defocus-blur">7. Defocus Blur</a></li>
+<li><a class="reference internal" href="#jpeg-compression">8. JPEG Compression</a></li>
+<li><a class="reference internal" href="#pixelate">9. Pixelate</a></li>
+<li><a class="reference internal" href="#frost">10. Frost</a><ul>
+<li><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+    </section>
+  </div>
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" id="documentation_options" data-url_root="../"
+    src="../_static/documentation_options.js"></script>
+  <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+  <script src="../_static/jquery.js"></script>
+  <script src="../_static/underscore.js"></script>
+  <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+  <script src="../_static/doctools.js"></script>
+  <script src="../_static/sphinx_highlight.js"></script>
+  <script src="../_static/clipboard.min.js"></script>
+  <script src="../_static/copybutton.js"></script>
+  
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+  </div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://torch-uncertainty.github.io/" aria-label="OpenMMLab"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+          </li>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function (e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+
+</html>
