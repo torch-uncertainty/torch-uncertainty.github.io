@@ -1,0 +1,638 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Training a LeNet with Monte Carlo Batch Normalization &mdash; TorchUncertainty 0.1.6 documentation</title>
+  
+
+  <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
+  
+  
+
+  
+
+  
+  
+  
+
+  
+
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx-codeautolink.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="index" title="Index" href="../genindex.html" />
+  <link rel="search" title="Search" href="../search.html" />
+  <link rel="next" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
+  <link rel="prev" title="Training a LeNet with Monte-Carlo Dropout" href="tutorial_mc_dropout.html" />
+  <!-- Google Analytics -->
+  <script type="text/javascript">
+    var collapsedSections = [];
+  </script>
+  
+  <!-- End Google Analytics -->
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+  <script>
+    MathJax = {
+        chtml: {
+            scale: 1,
+            minScale: 1,
+        },
+        svg: {
+            scale: 1,
+            minScale: 1,
+        }
+    }
+</script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css"
+    integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://torch-uncertainty.github.io/"
+        aria-label="OpenMMLab"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+  
+
+  <div class="table-of-contents-link-wrapper">
+    <span>Table of Contents</span>
+    <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+  </div>
+
+  <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+    <div class="pytorch-side-scroll">
+      <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <div class="pytorch-left-menu-search">
+          
+
+          
+          
+          
+          
+
+          
+
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        
+        
+        
+        
+        
+        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction_uncertainty.html">Introduction to Classification Uncertainty</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+        
+        
+      </div>
+    </div>
+  </nav>
+
+  <div class="pytorch-container">
+    <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+      <div class="pytorch-breadcrumbs-wrapper">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+    <li>
+      <a href="../index.html">
+        Docs
+      </a> &gt;
+    </li>
+
+    
+    <li><a href="index.html">Tutorials</a> &gt;</li>
+    
+    <li>Training a LeNet with Monte Carlo Batch Normalization</li>
+    
+    <!-- 
+    <li class="pytorch-breadcrumbs-aside">
+      
+      
+      
+      
+      
+      <a href="/zh_CN//auto_tutorials/tutorial_mc_batch_norm.html" class="fa fa-language"> 以中文阅读</a>
+      
+      
+    </li>
+    
+     -->
+  </ul>
+
+  
+</div>
+      </div>
+
+      <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+        Shortcuts
+      </div>
+    </div>
+
+    <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+      <div class="pytorch-content-left">
+
+        
+
+        <div class="pytorch-call-to-action-links">
+          <div id="tutorial-type">auto_tutorials/tutorial_mc_batch_norm</div>
+
+          <!-- <div id="google-colab-link">
+            <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg" />
+            <div class="call-to-action-desktop-view">Run in Google Colab</div>
+            <div class="call-to-action-mobile-view">Colab</div>
+          </div> -->
+          <div id="download-notebook-link">
+            <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg" />
+            <div class="call-to-action-desktop-view">Download Notebook</div>
+            <div class="call-to-action-mobile-view">Notebook</div>
+          </div>
+          <div id="github-view-link">
+            <img class="call-to-action-img" src="../_static/images/pytorch-github.svg" />
+            <div class="call-to-action-desktop-view">View on GitHub</div>
+            <div class="call-to-action-mobile-view">GitHub</div>
+          </div>
+        </div>
+
+        
+        
+          <div class="rst-content">
+            
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+                
+                
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-tutorials-tutorial-mc-batch-norm-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="training-a-lenet-with-monte-carlo-batch-normalization">
+<span id="sphx-glr-auto-tutorials-tutorial-mc-batch-norm-py"></span><h1>Training a LeNet with Monte Carlo Batch Normalization<a class="headerlink" href="#training-a-lenet-with-monte-carlo-batch-normalization" title="Permalink to this heading">¶</a></h1>
+<p>In this tutorial, we will train a LeNet classifier on the MNIST dataset using Monte-Carlo Batch Normalization (MCBN), a post-hoc Bayesian approximation method.</p>
+<section id="training-a-lenet-with-mcbn-using-torchuncertainty-models-and-pytorch-lightning">
+<h2>Training a LeNet with MCBN using TorchUncertainty models and PyTorch Lightning<a class="headerlink" href="#training-a-lenet-with-mcbn-using-torchuncertainty-models-and-pytorch-lightning" title="Permalink to this heading">¶</a></h2>
+<p>In this part, we train a LeNet with batch normalization layers, based on the model and routines already implemented in TU.</p>
+<section id="loading-the-utilities">
+<h3>1. Loading the utilities<a class="headerlink" href="#loading-the-utilities" title="Permalink to this heading">¶</a></h3>
+<p>First, we have to load the following utilities from TorchUncertainty:</p>
+<ul class="simple">
+<li><p>the cli handler: cli_main and argument parser: init_args</p></li>
+<li><p>the datamodule that handles dataloaders: MNISTDataModule, which lies in the torch_uncertainty.datamodule</p></li>
+<li><p>the model: LeNet, which lies in torch_uncertainty.models</p></li>
+<li><p>the mc-batch-norm wrapper: mc_dropout, which lies in torch_uncertainty.models</p></li>
+<li><p>a resnet baseline to get the command line arguments: ResNet, which lies in torch_uncertainty.baselines</p></li>
+<li><p>the classification training routine in the torch_uncertainty.training.classification module</p></li>
+<li><p>the optimizer wrapper in the torch_uncertainty.optimization_procedures module.</p></li>
+</ul>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty</span> <span class="kn">import</span> <span class="n">cli_main</span><span class="p">,</span> <span class="n">init_args</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <span class="n">MNISTDataModule</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.models.lenet</span> <span class="kn">import</span> <span class="n">lenet</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.post_processing.mc_batch_norm</span> <span class="kn">import</span> <span class="n">MCBatchNorm</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.baselines.classification</span> <span class="kn">import</span> <span class="n">ResNet</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.routines.classification</span> <span class="kn">import</span> <span class="n">ClassificationSingle</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.optimization_procedures</span> <span class="kn">import</span> <span class="n">optim_cifar10_resnet18</span>
+</pre></div>
+</div>
+<p>We will also need import the neural network utils withing <cite>torch.nn</cite>.</p>
+<p>We also import ArgvContext to avoid using the jupyter arguments as cli
+arguments, and therefore avoid errors.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">cli_test_helpers</span> <span class="kn">import</span> <span class="n">ArgvContext</span>
+</pre></div>
+</div>
+</section>
+<section id="creating-the-necessary-variables">
+<h3>2. Creating the necessary variables<a class="headerlink" href="#creating-the-necessary-variables" title="Permalink to this heading">¶</a></h3>
+<p>In the following, we will need to define the root of the datasets and the
+logs, and to fake-parse the arguments needed for using the PyTorch Lightning
+Trainer. We also create the datamodule that handles the MNIST dataset,
+dataloaders and transforms. We create the model using the
+blueprint from torch_uncertainty.models and we wrap it into mc-dropout.</p>
+<p>It is important to specify the arguments <code class="docutils literal notranslate"><span class="pre">version</span></code> as <code class="docutils literal notranslate"><span class="pre">mc-dropout</span></code>,
+<code class="docutils literal notranslate"><span class="pre">num_estimators</span></code> and the <code class="docutils literal notranslate"><span class="pre">dropout_rate</span></code> to use Monte Carlo dropout.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+
+<span class="c1"># We mock the arguments for the trainer</span>
+<span class="k">with</span> <span class="n">ArgvContext</span><span class="p">(</span>
+    <span class="s2">&quot;file.py&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--max_epochs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--enable_progress_bar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;False&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--num_estimators&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--max_epochs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;2&quot;</span>
+<span class="p">):</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">init_args</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">ResNet</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">MNISTDataModule</span><span class="p">)</span>
+
+<span class="n">net_name</span> <span class="o">=</span> <span class="s2">&quot;logs/lenet-mnist&quot;</span>
+
+<span class="c1"># datamodule</span>
+<span class="n">args</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
+<span class="n">dm</span> <span class="o">=</span> <span class="n">MNISTDataModule</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">lenet</span><span class="p">(</span>
+    <span class="n">in_channels</span><span class="o">=</span><span class="n">dm</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span>
+    <span class="n">num_classes</span><span class="o">=</span><span class="n">dm</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="the-loss-and-the-training-routine">
+<h3>3. The Loss and the Training Routine<a class="headerlink" href="#the-loss-and-the-training-routine" title="Permalink to this heading">¶</a></h3>
+<p>This is a classification problem, and we use CrossEntropyLoss as the likelihood.
+We define the training routine using the classification training routine from
+torch_uncertainty.training.classification. We provide the number of classes
+and channels, the optimizer wrapper, the dropout rate, and the number of
+forward passes to perform through the network, as well as all the default
+arguments.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">baseline</span> <span class="o">=</span> <span class="n">ClassificationSingle</span><span class="p">(</span>
+    <span class="n">num_classes</span><span class="o">=</span><span class="n">dm</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">loss</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">,</span>
+    <span class="n">optimization_procedure</span><span class="o">=</span><span class="n">optim_cifar10_resnet18</span><span class="p">,</span>
+    <span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="gathering-everything-and-training-the-model">
+<h3>5. Gathering Everything and Training the Model<a class="headerlink" href="#gathering-everything-and-training-the-model" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">cli_main</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">net_name</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+      cls_test/acc          0.9815000295639038
+     cls_test/brier        0.027768993750214577
+      cls_test/ece         0.004209526814520359
+    cls_test/entropy        0.07393931597471237
+      cls_test/nll          0.05651455745100975
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+</pre></div>
+</div>
+</section>
+<section id="wrapping-the-model-in-a-mcbatchnorm">
+<h3>6. Wrapping the Model in a MCBatchNorm<a class="headerlink" href="#wrapping-the-model-in-a-mcbatchnorm" title="Permalink to this heading">¶</a></h3>
+<p>We can now wrap the model in a MCBatchNorm to add stochasticity to the
+predictions. We specify that the BatchNorm layers are to be converted to
+MCBatchNorm layers, and that we want to use 8 stochastic estimators.
+The amount of stochasticity is controlled by the <code class="docutils literal notranslate"><span class="pre">mc_batch_size</span></code> argument.
+The larger the <code class="docutils literal notranslate"><span class="pre">mc_batch_size</span></code>, the more stochastic the predictions will be.
+The authors suggest 32 as a good value for <code class="docutils literal notranslate"><span class="pre">mc_batch_size</span></code> but we use 4 here
+to highlight the effect of stochasticity on the predictions.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">baseline</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">MCBatchNorm</span><span class="p">(</span><span class="n">baseline</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mc_batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">baseline</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">train</span><span class="p">)</span>
+<span class="n">baseline</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ClassificationSingle(
+  (model): MCBatchNorm(
+    (model): _LeNet(
+      (conv1): Conv2d(1, 6, kernel_size=(5, 5), stride=(1, 1))
+      (norm1): MCBatchNorm2d(6, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(6, 16, kernel_size=(5, 5), stride=(1, 1))
+      (norm2): MCBatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (pooling): AdaptiveAvgPool2d(output_size=(4, 4))
+      (fc1): Linear(in_features=256, out_features=120, bias=True)
+      (fc2): Linear(in_features=120, out_features=84, bias=True)
+      (fc3): Linear(in_features=84, out_features=10, bias=True)
+    )
+  )
+  (format_batch_fn): Identity()
+  (val_cls_metrics): MetricCollection(
+    (acc): MulticlassAccuracy()
+    (brier): BrierScore()
+    (ece): MulticlassCE()
+    (nll): NegativeLogLikelihood(),
+    prefix=cls_val/
+  )
+  (test_cls_metrics): MetricCollection(
+    (acc): MulticlassAccuracy()
+    (brier): BrierScore()
+    (ece): MulticlassCE()
+    (nll): NegativeLogLikelihood(),
+    prefix=cls_test/
+  )
+  (test_entropy_id): Entropy()
+)
+</pre></div>
+</div>
+</section>
+<section id="testing-the-model">
+<h3>7. Testing the Model<a class="headerlink" href="#testing-the-model" title="Permalink to this heading">¶</a></h3>
+<p>Now that the model is trained, let’s test it on MNIST. Don’t forget to call
+.eval() to enable Monte Carlo batch normalization at inference.
+In this tutorial, we plot the most uncertain images, i.e. the images for which
+the variance of the predictions is the highest.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchvision</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="k">def</span> <span class="nf">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+    <span class="n">npimg</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">npimg</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">())</span>
+<span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">dataiter</span><span class="p">)</span>
+
+<span class="c1"># print images</span>
+<span class="n">imshow</span><span class="p">(</span><span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span><span class="n">images</span><span class="p">[:</span><span class="mi">4</span><span class="p">,</span> <span class="o">...</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ground truth: &quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
+
+<span class="n">baseline</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">logits</span> <span class="o">=</span> <span class="n">baseline</span><span class="p">(</span><span class="n">images</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+<span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">indices</span><span class="p">):</span>
+    <span class="n">values</span><span class="p">,</span> <span class="n">predicted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">probs</span><span class="p">[:,</span> <span class="n">j</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Predicted digits for the image </span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">: &quot;</span><span class="p">,</span>
+        <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">image_id</span><span class="o">.</span><span class="n">item</span><span class="p">())</span> <span class="k">for</span> <span class="n">image_id</span> <span class="ow">in</span> <span class="n">predicted</span><span class="p">]),</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_tutorial_mc_batch_norm_001.png" srcset="../_images/sphx_glr_tutorial_mc_batch_norm_001.png" alt="tutorial mc batch norm" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+Ground truth:  7 2 1 0
+Predicted digits for the image 8:  6 5 5 5 5 5 6 5
+Predicted digits for the image 73:  9 9 8 9 9 9 9 9
+Predicted digits for the image 78:  4 9 8 9 9 9 9 9
+Predicted digits for the image 111:  1 7 7 7 7 7 7 7
+</pre></div>
+</div>
+<p>The predictions are mostly erroneous, which is expected since we selected
+the most uncertain images. We also see that there stochasticity in the
+predictions, as the predictions for the same image differ depending on the
+stochastic estimator used.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 22.997 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-mc-batch-norm-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/631ac265c1ce7636bf5c4db0e5a4f3c3/tutorial_mc_batch_norm.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_batch_norm.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/72f83cd4a9f6aa3d907d9632c201f70d/tutorial_mc_batch_norm.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_mc_batch_norm.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+</section>
+
+
+              </article>
+              
+            </div>
+            <footer>
+  
+  <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+    
+    <a href="tutorial_der_cubic.html" class="btn btn-neutral float-right" title="Deep Evidential Regression on a Toy Example" accesskey="n"
+      rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
+        class="next-page"></a>
+    
+    
+    <a href="tutorial_mc_dropout.html" class="btn btn-neutral" title="Training a LeNet with Monte-Carlo Dropout" accesskey="p"
+      rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
+    
+  </div>
+  
+
+  <hr>
+
+  <div role="contentinfo">
+    <p>
+      &copy; Copyright 2024, Adrien Lafage and Olivier Laurent.
+
+    </p>
+  </div>
+  
+  <div>
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a
+      href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the
+      Docs</a>.
+  </div>
+   
+
+</footer>
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">Training a LeNet with Monte Carlo Batch Normalization</a><ul>
+<li><a class="reference internal" href="#training-a-lenet-with-mcbn-using-torchuncertainty-models-and-pytorch-lightning">Training a LeNet with MCBN using TorchUncertainty models and PyTorch Lightning</a><ul>
+<li><a class="reference internal" href="#loading-the-utilities">1. Loading the utilities</a></li>
+<li><a class="reference internal" href="#creating-the-necessary-variables">2. Creating the necessary variables</a></li>
+<li><a class="reference internal" href="#the-loss-and-the-training-routine">3. The Loss and the Training Routine</a></li>
+<li><a class="reference internal" href="#gathering-everything-and-training-the-model">5. Gathering Everything and Training the Model</a></li>
+<li><a class="reference internal" href="#wrapping-the-model-in-a-mcbatchnorm">6. Wrapping the Model in a MCBatchNorm</a></li>
+<li><a class="reference internal" href="#testing-the-model">7. Testing the Model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+    </section>
+  </div>
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" id="documentation_options" data-url_root="../"
+    src="../_static/documentation_options.js"></script>
+  <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+  <script src="../_static/jquery.js"></script>
+  <script src="../_static/underscore.js"></script>
+  <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+  <script src="../_static/doctools.js"></script>
+  <script src="../_static/sphinx_highlight.js"></script>
+  <script src="../_static/clipboard.min.js"></script>
+  <script src="../_static/copybutton.js"></script>
+  
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+  </div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://torch-uncertainty.github.io/" aria-label="OpenMMLab"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
+          </li>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function (e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+
+</html>

@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.post_processing.calibration.vector_scaler &mdash; TorchUncertainty 0.1.5 documentation</title>
+  <title>torch_uncertainty.post_processing.calibration.vector_scaler &mdash; TorchUncertainty 0.1.6 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -94,7 +94,7 @@
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
           </li>
         </ul>
       </div>
@@ -260,6 +260,7 @@
 <div class="viewcode-block" id="VectorScaler"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.post_processing.VectorScaler.html#torch_uncertainty.post_processing.VectorScaler">[docs]</a><span class="k">class</span> <span class="nc">VectorScaler</span><span class="p">(</span><span class="n">Scaler</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
         <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">init_w</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">init_b</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -270,6 +271,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Vector scaling post-processing for calibrated probabilities.</span>
 
 <span class="sd">        Args:</span>
+<span class="sd">            model (nn.Module): Model to calibrate.</span>
 <span class="sd">            num_classes (int): Number of classes.</span>
 <span class="sd">            init_w (float, optional): Initial value for the weights.</span>
 <span class="sd">                Defaults to 1.</span>
@@ -286,7 +288,7 @@
 <span class="sd">            of modern neural networks. In ICML 2017.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_classes</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;num_classes must be an integer.&quot;</span><span class="p">)</span>
@@ -313,10 +315,10 @@
         <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logits</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Scale the logits with the optimal temperature.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Scale the predictions with the optimal temperature.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            logits (torch.Tensor): Logits to be scaled.</span>
+<span class="sd">            logits (torch.Tensor): logits to be scaled.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.Tensor: Scaled logits.</span>
@@ -418,7 +420,7 @@
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
           </li>
       </div>
     </div>

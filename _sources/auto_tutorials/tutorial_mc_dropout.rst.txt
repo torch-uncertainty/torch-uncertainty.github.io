@@ -19,9 +19,9 @@
 
 
 Training a LeNet with Monte-Carlo Dropout
-==========================================
+=========================================
 
-In this tutorial, we'll train a LeNet classifier on the MNIST dataset using Monte-Carlo Dropout (MC Dropout), a computationally efficient Bayesian approximation method. To estimate the predictive mean and uncertainty (variance), we perform multiple forward passes through the network with dropout layers enabled in ``train`` mode.
+In this tutorial, we will train a LeNet classifier on the MNIST dataset using Monte-Carlo Dropout (MC Dropout), a computationally efficient Bayesian approximation method. To estimate the predictive mean and uncertainty (variance), we perform multiple forward passes through the network with dropout layers enabled in ``train`` mode.
 
 For more information on Monte-Carlo Dropout, we refer the reader to the following resources:
 
@@ -104,7 +104,7 @@ blueprint from torch_uncertainty.models and we wrap it into mc-dropout.
 It is important to specify the arguments ``version`` as ``mc-dropout``,
 ``num_estimators`` and the ``dropout_rate`` to use Monte Carlo dropout.
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-98
+.. GENERATED FROM PYTHON SOURCE LINES 63-97
 
 .. code-block:: Python
 
@@ -138,7 +138,6 @@ It is important to specify the arguments ``version`` as ``mc-dropout``,
         in_channels=dm.num_channels,
         num_classes=dm.num_classes,
         dropout_rate=args.dropout_rate,
-        num_estimators=args.num_estimators,
     )
 
     mc_model = mc_dropout(model, num_estimators=args.num_estimators, last_layer=0.0)
@@ -150,7 +149,7 @@ It is important to specify the arguments ``version`` as ``mc-dropout``,
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-107
+.. GENERATED FROM PYTHON SOURCE LINES 98-106
 
 3. The Loss and the Training Routine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -161,7 +160,7 @@ and channels, the optimizer wrapper, the dropout rate, and the number of
 forward passes to perform through the network, as well as all the default
 arguments.
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-116
+.. GENERATED FROM PYTHON SOURCE LINES 106-115
 
 .. code-block:: Python
 
@@ -181,12 +180,12 @@ arguments.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-119
+.. GENERATED FROM PYTHON SOURCE LINES 116-118
 
 5. Gathering Everything and Training the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-122
+.. GENERATED FROM PYTHON SOURCE LINES 118-121
 
 .. code-block:: Python
 
@@ -202,29 +201,29 @@ arguments.
  .. code-block:: none
 
     ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-            Test metric               DataLoader 0
+           Test metric             DataLoader 0
     ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-            hp/test_acc            0.9334999918937683
-           hp/test_brier           0.18798477947711945
-            hp/test_ece            0.2293543815612793
-        hp/test_entropy_id         1.0115351676940918
-    hp/test_id_ens_disagreement    0.28583580255508423
-      hp/test_id_ens_entropy       0.6933050155639648
-         hp/test_id_ens_mi         0.3182300925254822
-            hp/test_nll            0.4601491689682007
+          cls_test/acc          0.8084999918937683
+         cls_test/brier         0.4044095575809479
+          cls_test/ece          0.30234798789024353
+        cls_test/entropy        1.5077310800552368
+          cls_test/nll          0.8965831995010376
+    ens_id/test_disagreement    0.4747541844844818
+       ens_id/test_entropy      1.1701124906539917
+         ens_id/test_mi         0.33761876821517944
     ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-127
+.. GENERATED FROM PYTHON SOURCE LINES 122-126
 
 6. Testing the Model
 ~~~~~~~~~~~~~~~~~~~~
 Now that the model is trained, let's test it on MNIST. Don't forget to call
 .eval() to enable dropout at inference.
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-161
+.. GENERATED FROM PYTHON SOURCE LINES 126-160
 
 .. code-block:: Python
 
@@ -278,21 +277,21 @@ Now that the model is trained, let's test it on MNIST. Don't forget to call
     Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
     Ground truth:  7 2 1 0
     Predicted digits for the image 0:  7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7
-    Predicted digits for the image 1:  2 0 2 2 2 2 4 2 2 2 2 0 2 0 2 2
+    Predicted digits for the image 1:  2 2 7 2 6 3 6 7 9 2 7 5 6 2 6 2
     Predicted digits for the image 2:  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-    Predicted digits for the image 3:  0 0 0 0 0 0 0 8 0 0 0 5 0 0 0 0
+    Predicted digits for the image 3:  6 0 0 8 0 8 6 8 8 0 0 0 0 5 0 0
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-163
+.. GENERATED FROM PYTHON SOURCE LINES 161-162
 
 approximation of the posterior distribution.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 34.470 seconds)
+   **Total running time of the script:** (0 minutes 33.783 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_mc_dropout.py:

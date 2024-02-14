@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.datamodules.mnist &mdash; TorchUncertainty 0.1.5 documentation</title>
+  <title>torch_uncertainty.datamodules.mnist &mdash; TorchUncertainty 0.1.6 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -94,7 +94,7 @@
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
           </li>
         </ul>
       </div>
@@ -273,7 +273,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
-        <span class="n">evaluate_ood</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">eval_ood</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">ood_ds</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;fashion&quot;</span><span class="p">,</span> <span class="s2">&quot;not&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;fashion&quot;</span><span class="p">,</span>
         <span class="n">val_split</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -288,7 +288,7 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            root (str): Root directory of the datasets.</span>
-<span class="sd">            evaluate_ood (bool): Whether to evaluate on out-of-distribution data.</span>
+<span class="sd">            eval_ood (bool): Whether to evaluate on out-of-distribution data.</span>
 <span class="sd">            batch_size (int): Number of samples per batch.</span>
 <span class="sd">            ood_ds (str): Which out-of-distribution dataset to use. Defaults to</span>
 <span class="sd">                ``&quot;fashion&quot;``; `fashion` stands for FashionMNIST and `not` for</span>
@@ -312,16 +312,9 @@
             <span class="n">persistent_workers</span><span class="o">=</span><span class="n">persistent_workers</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">root</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_ood</span> <span class="o">=</span> <span class="n">evaluate_ood</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="o">=</span> <span class="n">eval_ood</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span> <span class="o">=</span> <span class="n">val_split</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pin_memory</span> <span class="o">=</span> <span class="n">pin_memory</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">persistent_workers</span> <span class="o">=</span> <span class="n">persistent_workers</span>
 
         <span class="k">if</span> <span class="n">test_alt</span> <span class="o">==</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">MNISTC</span>
@@ -339,7 +332,7 @@
 
         <span class="n">main_transform</span> <span class="o">=</span> <span class="n">Cutout</span><span class="p">(</span><span class="n">cutout</span><span class="p">)</span> <span class="k">if</span> <span class="n">cutout</span> <span class="k">else</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">transform_train</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="n">main_transform</span><span class="p">,</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
@@ -347,7 +340,7 @@
                 <span class="n">T</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.1307</span><span class="p">,),</span> <span class="p">(</span><span class="mf">0.3081</span><span class="p">,)),</span>
             <span class="p">]</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transform_test</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="mi">28</span><span class="p">),</span>
@@ -360,16 +353,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_ood</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;fit&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;fit&quot;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">full</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                 <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform_train</span><span class="p">,</span>
+                <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span>
@@ -385,21 +378,23 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                     <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                    <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform_test</span><span class="p">,</span>
+                    <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
                 <span class="p">)</span>
         <span class="k">elif</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;test&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                 <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform_test</span><span class="p">,</span>
+                <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
             <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stage </span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2"> is not supported.&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_ood</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                 <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform_test</span><span class="p">,</span>
+                <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
             <span class="p">)</span>
 
 <div class="viewcode-block" id="MNISTDataModule.test_dataloader"><a class="viewcode-back" href="../../../generated/torch_uncertainty.datamodules.MNISTDataModule.html#torch_uncertainty.datamodules.MNISTDataModule.test_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">]:</span>
@@ -411,7 +406,7 @@
 <span class="sd">                (out-of-distribution data).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dataloader</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_loader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">)]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_ood</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
             <span class="n">dataloader</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_loader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ood</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">dataloader</span></div>
 
@@ -424,7 +419,7 @@
         <span class="n">p</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_argparse_args</span><span class="p">(</span><span class="n">parent_parser</span><span class="p">)</span>
 
         <span class="c1"># Arguments for MNIST</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--evaluate_ood&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--eval-ood&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
         <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--ood_ds&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">ood_datasets</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;fashion&quot;</span><span class="p">)</span>
         <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--test_alt&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">parent_parser</span></div>
@@ -520,7 +515,7 @@
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
           </li>
       </div>
     </div>

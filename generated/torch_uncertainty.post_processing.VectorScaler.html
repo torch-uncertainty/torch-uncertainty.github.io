@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>VectorScaler &mdash; TorchUncertainty 0.1.5 documentation</title>
+  <title>VectorScaler &mdash; TorchUncertainty 0.1.6 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -97,7 +97,7 @@
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
           </li>
         </ul>
       </div>
@@ -262,11 +262,12 @@
 <h1>VectorScaler<a class="headerlink" href="#vectorscaler" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.post_processing.VectorScaler">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.post_processing.</span></span><span class="sig-name descname"><span class="pre">VectorScaler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/post_processing/calibration/vector_scaler.html#VectorScaler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.post_processing.VectorScaler" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.post_processing.</span></span><span class="sig-name descname"><span class="pre">VectorScaler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/post_processing/calibration/vector_scaler.html#VectorScaler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.post_processing.VectorScaler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Vector scaling post-processing for calibrated probabilities.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>nn.Module</em>) – Model to calibrate.</p></li>
 <li><p><strong>num_classes</strong> (<em>int</em>) – Number of classes.</p></li>
 <li><p><strong>init_w</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial value for the weights.
 Defaults to 1.</p></li>
@@ -287,12 +288,11 @@ of modern neural networks. In ICML 2017.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.post_processing.VectorScaler.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibration_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_logits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.post_processing.VectorScaler.fit" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calibration_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_logits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.post_processing.VectorScaler.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit the temperature parameters to the calibration data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<em>nn.Module</em>) – Model to calibrate.</p></li>
 <li><p><strong>calibration_set</strong> (<em>Dataset</em>) – Calibration dataset.</p></li>
 <li><p><strong>save_logits</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save the logits and
 labels. Defaults to False.</p></li>
@@ -440,7 +440,7 @@ Defaults to True.</p></li>
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
           </li>
       </div>
     </div>

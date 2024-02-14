@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Training a LeNet with Monte-Carlo Dropout &mdash; TorchUncertainty 0.1.5 documentation</title>
+  <title>Training a LeNet with Monte-Carlo Dropout &mdash; TorchUncertainty 0.1.6 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -40,7 +40,7 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
+  <link rel="next" title="Training a LeNet with Monte Carlo Batch Normalization" href="tutorial_mc_batch_norm.html" />
   <link rel="prev" title="Train a Bayesian Neural Network in Three Minutes" href="tutorial_bayesian.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
@@ -97,7 +97,7 @@
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
           </li>
         </ul>
       </div>
@@ -265,7 +265,7 @@ to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="training-a-lenet-with-monte-carlo-dropout">
 <span id="sphx-glr-auto-tutorials-tutorial-mc-dropout-py"></span><h1>Training a LeNet with Monte-Carlo Dropout<a class="headerlink" href="#training-a-lenet-with-monte-carlo-dropout" title="Permalink to this heading">¶</a></h1>
-<p>In this tutorial, we’ll train a LeNet classifier on the MNIST dataset using Monte-Carlo Dropout (MC Dropout), a computationally efficient Bayesian approximation method. To estimate the predictive mean and uncertainty (variance), we perform multiple forward passes through the network with dropout layers enabled in <code class="docutils literal notranslate"><span class="pre">train</span></code> mode.</p>
+<p>In this tutorial, we will train a LeNet classifier on the MNIST dataset using Monte-Carlo Dropout (MC Dropout), a computationally efficient Bayesian approximation method. To estimate the predictive mean and uncertainty (variance), we perform multiple forward passes through the network with dropout layers enabled in <code class="docutils literal notranslate"><span class="pre">train</span></code> mode.</p>
 <p>For more information on Monte-Carlo Dropout, we refer the reader to the following resources:</p>
 <ul class="simple">
 <li><p>What Uncertainties Do We Need in Bayesian Deep Learning for Computer Vision? <a class="reference external" href="https://browse.arxiv.org/pdf/1703.04977.pdf">NeurIPS 2017</a></p></li>
@@ -344,7 +344,6 @@ blueprint from torch_uncertainty.models and we wrap it into mc-dropout.</p>
     <span class="n">in_channels</span><span class="o">=</span><span class="n">dm</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span>
     <span class="n">num_classes</span><span class="o">=</span><span class="n">dm</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
     <span class="n">dropout_rate</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">dropout_rate</span><span class="p">,</span>
-    <span class="n">num_estimators</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">mc_model</span> <span class="o">=</span> <span class="n">mc_dropout</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">,</span> <span class="n">last_layer</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
@@ -375,16 +374,16 @@ arguments.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        Test metric               DataLoader 0
+       Test metric             DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        hp/test_acc            0.9334999918937683
-       hp/test_brier           0.18798477947711945
-        hp/test_ece            0.2293543815612793
-    hp/test_entropy_id         1.0115351676940918
-hp/test_id_ens_disagreement    0.28583580255508423
-  hp/test_id_ens_entropy       0.6933050155639648
-     hp/test_id_ens_mi         0.3182300925254822
-        hp/test_nll            0.4601491689682007
+      cls_test/acc          0.8084999918937683
+     cls_test/brier         0.4044095575809479
+      cls_test/ece          0.30234798789024353
+    cls_test/entropy        1.5077310800552368
+      cls_test/nll          0.8965831995010376
+ens_id/test_disagreement    0.4747541844844818
+   ens_id/test_entropy      1.1701124906539917
+     ens_id/test_mi         0.33761876821517944
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 </pre></div>
 </div>
@@ -430,13 +429,13 @@ hp/test_id_ens_disagreement    0.28583580255508423
 <img src="../_images/sphx_glr_tutorial_mc_dropout_001.png" srcset="../_images/sphx_glr_tutorial_mc_dropout_001.png" alt="tutorial mc dropout" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
 Ground truth:  7 2 1 0
 Predicted digits for the image 0:  7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7
-Predicted digits for the image 1:  2 0 2 2 2 2 4 2 2 2 2 0 2 0 2 2
+Predicted digits for the image 1:  2 2 7 2 6 3 6 7 9 2 7 5 6 2 6 2
 Predicted digits for the image 2:  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-Predicted digits for the image 3:  0 0 0 0 0 0 0 8 0 0 0 5 0 0 0 0
+Predicted digits for the image 3:  6 0 0 8 0 8 6 8 8 0 0 0 0 5 0 0
 </pre></div>
 </div>
 <p>approximation of the posterior distribution.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 34.470 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 33.783 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-mc-dropout-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/4890df143fe34f5aa2106d4980500a99/tutorial_mc_dropout.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_dropout.ipynb</span></code></a></p>
@@ -458,7 +457,7 @@ Predicted digits for the image 3:  0 0 0 0 0 0 0 8 0 0 0 5 0 0 0 0
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="tutorial_der_cubic.html" class="btn btn-neutral float-right" title="Deep Evidential Regression on a Toy Example" accesskey="n"
+    <a href="tutorial_mc_batch_norm.html" class="btn btn-neutral float-right" title="Training a LeNet with Monte Carlo Batch Normalization" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     
@@ -566,7 +565,7 @@ Predicted digits for the image 3:  0 0 0 0 0 0 0 8 0 0 0 5 0 0 0 0
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
           </li>
       </div>
     </div>

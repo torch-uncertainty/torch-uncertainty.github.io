@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>From a Vanilla Classifier to a Packed-Ensemble &mdash; TorchUncertainty 0.1.5 documentation</title>
+  <title>From a Standard Classifier to a Packed-Ensemble &mdash; TorchUncertainty 0.1.6 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -97,7 +97,7 @@
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
           </li>
         </ul>
       </div>
@@ -199,7 +199,7 @@
     
     <li><a href="index.html">Tutorials</a> &gt;</li>
     
-    <li>From a Vanilla Classifier to a Packed-Ensemble</li>
+    <li>From a Standard Classifier to a Packed-Ensemble</li>
     
     <!-- 
     <li class="pytorch-breadcrumbs-aside">
@@ -263,11 +263,11 @@
 <p><a class="reference internal" href="#sphx-glr-download-auto-tutorials-tutorial-pe-cifar10-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="from-a-vanilla-classifier-to-a-packed-ensemble">
-<span id="sphx-glr-auto-tutorials-tutorial-pe-cifar10-py"></span><h1>From a Vanilla Classifier to a Packed-Ensemble<a class="headerlink" href="#from-a-vanilla-classifier-to-a-packed-ensemble" title="Permalink to this heading">¶</a></h1>
+<section class="sphx-glr-example-title" id="from-a-standard-classifier-to-a-packed-ensemble">
+<span id="sphx-glr-auto-tutorials-tutorial-pe-cifar10-py"></span><h1>From a Standard Classifier to a Packed-Ensemble<a class="headerlink" href="#from-a-standard-classifier-to-a-packed-ensemble" title="Permalink to this heading">¶</a></h1>
 <p>This tutorial is heavily inspired by PyTorch’s <a class="reference external" href="https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html#test-the-network-on-the-test-data">Training a Classifier</a>
 tutorial.</p>
-<p>Let’s dive step by step into the process to modify a vanilla classifier into a
+<p>Let’s dive step by step into the process to modify a standard classifier into a
 packed-ensemble classifier.</p>
 <section id="dataset">
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this heading">¶</a></h2>
@@ -289,7 +289,7 @@ test images.</p>
 <ol class="arabic simple">
 <li><p>Load and normalizing the CIFAR10 training and test datasets using
 <code class="docutils literal notranslate"><span class="pre">torchvision</span></code></p></li>
-<li><p>Define a Packed-Ensemble from a vanilla classifier</p></li>
+<li><p>Define a Packed-Ensemble from a standard classifier</p></li>
 <li><p>Define a loss function</p></li>
 <li><p>Train the Packed-Ensemble on the training data</p></li>
 <li><p>Test the Packed-Ensemble on the test data and evaluate its performance
@@ -377,13 +377,13 @@ Files already downloaded and verified
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">classes</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s2">5s</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)))</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_tutorial_pe_cifar10_001.png" srcset="../_images/sphx_glr_tutorial_pe_cifar10_001.png" alt="tutorial pe cifar10" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>cat   bird  car   frog
+<img src="../_images/sphx_glr_tutorial_pe_cifar10_001.png" srcset="../_images/sphx_glr_tutorial_pe_cifar10_001.png" alt="tutorial pe cifar10" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>cat   truck bird  cat
 </pre></div>
 </div>
 </section>
-<section id="define-a-packed-ensemble-from-a-vanilla-classifier">
-<h3>2. Define a Packed-Ensemble from a vanilla classifier<a class="headerlink" href="#define-a-packed-ensemble-from-a-vanilla-classifier" title="Permalink to this heading">¶</a></h3>
-<p>First we define a vanilla classifier for CIFAR10 for reference. We will use a
+<section id="define-a-packed-ensemble-from-a-standard-classifier">
+<h3>2. Define a Packed-Ensemble from a standard classifier<a class="headerlink" href="#define-a-packed-ensemble-from-a-standard-classifier" title="Permalink to this heading">¶</a></h3>
+<p>First we define a standard classifier for CIFAR10 for reference. We will use a
 convolutional neural network.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
@@ -412,7 +412,7 @@ convolutional neural network.</p>
 <span class="n">net</span> <span class="o">=</span> <span class="n">Net</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Let’s modify the vanilla classifier into a Packed-Ensemble classifier of
+<p>Let’s modify the standard classifier into a Packed-Ensemble classifier of
 parameters <span class="math notranslate nohighlight">\(M=4,\ \alpha=2\text{ and }\gamma=1\)</span>.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">einops</span> <span class="kn">import</span> <span class="n">rearrange</span>
 
@@ -491,18 +491,18 @@ parameters <span class="math notranslate nohighlight">\(M=4,\ \alpha=2\text{ and
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finished Training&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1,  2000] loss: 2.958
-[1,  4000] loss: 2.208
-[1,  6000] loss: 2.072
-[1,  8000] loss: 1.935
-[1, 10000] loss: 1.854
-[1, 12000] loss: 1.793
-[2,  2000] loss: 1.729
-[2,  4000] loss: 1.719
-[2,  6000] loss: 1.674
-[2,  8000] loss: 1.651
-[2, 10000] loss: 1.613
-[2, 12000] loss: 1.613
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1,  2000] loss: 3.006
+[1,  4000] loss: 2.212
+[1,  6000] loss: 2.094
+[1,  8000] loss: 1.981
+[1, 10000] loss: 1.892
+[1, 12000] loss: 1.803
+[2,  2000] loss: 1.753
+[2,  4000] loss: 1.717
+[2,  6000] loss: 1.662
+[2,  8000] loss: 1.635
+[2, 10000] loss: 1.612
+[2, 12000] loss: 1.609
 Finished Training
 </pre></div>
 </div>
@@ -552,11 +552,11 @@ model wasn’t necessary here, we only did it to illustrate how to do so):</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Predicted:  cat   ship  ship  plane
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Predicted:  cat   ship  ship  ship
 </pre></div>
 </div>
 <p>The results seem pretty good.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 42.665 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 42.791 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-pe-cifar10-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a5d0cf4fb5a2fdc5cbdf1a013f9c996c/tutorial_pe_cifar10.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_pe_cifar10.ipynb</span></code></a></p>
@@ -613,11 +613,11 @@ model wasn’t necessary here, we only did it to illustrate how to do so):</p>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">From a Vanilla Classifier to a Packed-Ensemble</a><ul>
+<li><a class="reference internal" href="#">From a Standard Classifier to a Packed-Ensemble</a><ul>
 <li><a class="reference internal" href="#dataset">Dataset</a></li>
 <li><a class="reference internal" href="#training-an-image-packed-ensemble-classifier">Training an image Packed-Ensemble classifier</a><ul>
 <li><a class="reference internal" href="#load-and-normalize-cifar10">1. Load and normalize CIFAR10</a></li>
-<li><a class="reference internal" href="#define-a-packed-ensemble-from-a-vanilla-classifier">2. Define a Packed-Ensemble from a vanilla classifier</a></li>
+<li><a class="reference internal" href="#define-a-packed-ensemble-from-a-standard-classifier">2. Define a Packed-Ensemble from a standard classifier</a></li>
 <li><a class="reference internal" href="#define-a-loss-function-and-optimizer">3. Define a Loss function and optimizer</a></li>
 <li><a class="reference internal" href="#train-the-packed-ensemble-on-the-training-data">4. Train the Packed-Ensemble on the training data</a></li>
 <li><a class="reference internal" href="#test-the-packed-ensemble-on-the-test-data">5. Test the Packed-Ensemble on the test data</a></li>
@@ -688,7 +688,7 @@ model wasn’t necessary here, we only did it to illustrate how to do so):</p>
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
           </li>
       </div>
     </div>

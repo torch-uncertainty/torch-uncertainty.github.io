@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.datamodules.imagenet &mdash; TorchUncertainty 0.1.5 documentation</title>
+  <title>torch_uncertainty.datamodules.imagenet &mdash; TorchUncertainty 0.1.6 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -94,7 +94,7 @@
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
           </li>
         </ul>
       </div>
@@ -249,15 +249,17 @@
                 
                 
   <h1>Source code for torch_uncertainty.datamodules.imagenet</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span>
 
 <span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">T</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
 <span class="kn">from</span> <span class="nn">timm.data.auto_augment</span> <span class="kn">import</span> <span class="n">rand_augment_transform</span>
 <span class="kn">from</span> <span class="nn">timm.data.mixup</span> <span class="kn">import</span> <span class="n">Mixup</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Subset</span><span class="p">,</span> <span class="n">random_split</span>
 <span class="kn">from</span> <span class="nn">torchvision.datasets</span> <span class="kn">import</span> <span class="n">DTD</span><span class="p">,</span> <span class="n">SVHN</span><span class="p">,</span> <span class="n">ImageNet</span><span class="p">,</span> <span class="n">INaturalist</span>
 
 <span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules.abstract</span> <span class="kn">import</span> <span class="n">AbstractDataModule</span>
@@ -265,6 +267,7 @@
     <span class="n">ImageNetA</span><span class="p">,</span>
     <span class="n">ImageNetO</span><span class="p">,</span>
     <span class="n">ImageNetR</span><span class="p">,</span>
+    <span class="n">OpenImageO</span><span class="p">,</span>
 <span class="p">)</span>
 
 
@@ -272,17 +275,26 @@
     <span class="n">num_classes</span> <span class="o">=</span> <span class="mi">1000</span>
     <span class="n">num_channels</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="n">test_datasets</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">]</span>
-    <span class="n">ood_datasets</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;inaturalist&quot;</span><span class="p">,</span> <span class="s2">&quot;imagenet-o&quot;</span><span class="p">,</span> <span class="s2">&quot;svhn&quot;</span><span class="p">,</span> <span class="s2">&quot;textures&quot;</span><span class="p">]</span>
+    <span class="n">ood_datasets</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;inaturalist&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;imagenet-o&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;svhn&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;textures&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;openimage-o&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
     <span class="n">training_task</span> <span class="o">=</span> <span class="s2">&quot;classification&quot;</span>
+    <span class="n">train_indices</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">val_indices</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
-        <span class="n">evaluate_ood</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">eval_ood</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">ood_ds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;svhn&quot;</span><span class="p">,</span>
+        <span class="n">val_split</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ood_ds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;openimage-o&quot;</span><span class="p">,</span>
         <span class="n">test_alt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">procedure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;A3&quot;</span><span class="p">,</span>
+        <span class="n">procedure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">train_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">224</span><span class="p">,</span>
         <span class="n">rand_augment_opt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -290,15 +302,42 @@
         <span class="n">persistent_workers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;DataModule for ImageNet.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            root (str): Root directory of the datasets.</span>
+<span class="sd">            eval_ood (bool): Whether to evaluate out-of-distribution</span>
+<span class="sd">                performance.</span>
+<span class="sd">            batch_size (int): Number of samples per batch.</span>
+<span class="sd">            val_split (float or Path): Share of samples to use for validation</span>
+<span class="sd">                or path to a yaml file containing a list of validation images</span>
+<span class="sd">                ids. Defaults to ``0.0``.</span>
+<span class="sd">            ood_ds (str): Which out-of-distribution dataset to use. Defaults to</span>
+<span class="sd">                ``&quot;openimage-o&quot;``.</span>
+<span class="sd">            test_alt (str): Which test set to use. Defaults to ``None``.</span>
+<span class="sd">            procedure (str): Which procedure to use. Defaults to ``None``.</span>
+<span class="sd">            train_size (int): Size of training images. Defaults to ``224``.</span>
+<span class="sd">            rand_augment_opt (str): Which RandAugment to use. Defaults to ``None``.</span>
+<span class="sd">            num_workers (int): Number of workers to use for data loading. Defaults</span>
+<span class="sd">                to ``1``.</span>
+<span class="sd">            pin_memory (bool): Whether to pin memory. Defaults to ``True``.</span>
+<span class="sd">            persistent_workers (bool): Whether to use persistent workers. Defaults</span>
+<span class="sd">                to ``True``.</span>
+<span class="sd">            kwargs: Additional arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span>
+            <span class="n">root</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">),</span>
             <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
             <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
             <span class="n">pin_memory</span><span class="o">=</span><span class="n">pin_memory</span><span class="p">,</span>
             <span class="n">persistent_workers</span><span class="o">=</span><span class="n">persistent_workers</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_ood</span> <span class="o">=</span> <span class="n">evaluate_ood</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="o">=</span> <span class="n">eval_ood</span>
+        <span class="k">if</span> <span class="n">val_split</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val_split</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="n">val_split</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">val_split</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_indices</span> <span class="o">=</span> <span class="n">read_indices</span><span class="p">(</span><span class="n">val_split</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span> <span class="o">=</span> <span class="n">val_split</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ood_ds</span> <span class="o">=</span> <span class="n">ood_ds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_alt</span> <span class="o">=</span> <span class="n">test_alt</span>
 
@@ -321,13 +360,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span> <span class="o">=</span> <span class="n">SVHN</span>
         <span class="k">elif</span> <span class="n">ood_ds</span> <span class="o">==</span> <span class="s2">&quot;textures&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span> <span class="o">=</span> <span class="n">DTD</span>
+        <span class="k">elif</span> <span class="n">ood_ds</span> <span class="o">==</span> <span class="s2">&quot;openimage-o&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span> <span class="o">=</span> <span class="n">OpenImageO</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The dataset </span><span class="si">{</span><span class="n">ood_ds</span><span class="si">}</span><span class="s2"> is not supported.&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">procedure</span> <span class="o">=</span> <span class="n">procedure</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">procedure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Custom Procedure&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">rand_augment_opt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">main_transform</span> <span class="o">=</span> <span class="n">rand_augment_transform</span><span class="p">(</span><span class="n">rand_augment_opt</span><span class="p">,</span> <span class="p">{})</span>
             <span class="k">else</span><span class="p">:</span>
@@ -340,15 +380,13 @@
                     <span class="n">rand_augment_transform</span><span class="p">(</span><span class="s2">&quot;rand-m9-n2-mstd0.5&quot;</span><span class="p">,</span> <span class="p">{}),</span>
                 <span class="p">]</span>
             <span class="p">)</span>
-
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">procedure</span> <span class="o">==</span> <span class="s2">&quot;A3&quot;</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Procedure A3&quot;</span><span class="p">)</span>
             <span class="n">train_size</span> <span class="o">=</span> <span class="mi">160</span>
             <span class="n">main_transform</span> <span class="o">=</span> <span class="n">rand_augment_transform</span><span class="p">(</span><span class="s2">&quot;rand-m6-mstd0.5-inc1&quot;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The procedure is unknown&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">transform_train</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">RandomResizedCrop</span><span class="p">(</span><span class="n">train_size</span><span class="p">),</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
@@ -358,7 +396,7 @@
             <span class="p">]</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">transform_test</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
@@ -381,63 +419,80 @@
                 <span class="n">split</span><span class="o">=</span><span class="s2">&quot;val&quot;</span><span class="p">,</span>
                 <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_ood</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_ds</span> <span class="o">==</span> <span class="s2">&quot;inaturalist&quot;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                     <span class="n">version</span><span class="o">=</span><span class="s2">&quot;2021_valid&quot;</span><span class="p">,</span>
                     <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform_test</span><span class="p">,</span>
+                    <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_ds</span> <span class="o">!=</span> <span class="s2">&quot;textures&quot;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                     <span class="n">split</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
                     <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform_test</span><span class="p">,</span>
+                    <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                     <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
                     <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform_test</span><span class="p">,</span>
+                    <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
                 <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;fit&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;fit&quot;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_alt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;The test_alt argument is not supported for training.&quot;</span>
                 <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
+            <span class="n">full</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                 <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
-                <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform_train</span><span class="p">,</span>
+                <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
-                <span class="n">split</span><span class="o">=</span><span class="s2">&quot;val&quot;</span><span class="p">,</span>
-                <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform_test</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;test&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_split</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span>
+                    <span class="n">full</span><span class="p">,</span>
+                    <span class="p">[</span>
+                        <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span><span class="p">,</span>
+                    <span class="p">],</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_split</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">train</span> <span class="o">=</span> <span class="n">Subset</span><span class="p">(</span><span class="n">full</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_indices</span><span class="p">)</span>
+                <span class="c1"># TODO: improve the performance</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Subset</span><span class="p">(</span><span class="n">full</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_indices</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">train</span> <span class="o">=</span> <span class="n">full</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
+                    <span class="n">split</span><span class="o">=</span><span class="s2">&quot;val&quot;</span><span class="p">,</span>
+                    <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;test&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                 <span class="n">split</span><span class="o">=</span><span class="s2">&quot;val&quot;</span><span class="p">,</span>
-                <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform_test</span><span class="p">,</span>
+                <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
             <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stage </span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2"> is not supported.&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_ood</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_ds</span> <span class="o">==</span> <span class="s2">&quot;inaturalist&quot;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                     <span class="n">version</span><span class="o">=</span><span class="s2">&quot;2021_valid&quot;</span><span class="p">,</span>
-                    <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform_test</span><span class="p">,</span>
+                    <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
-                    <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform_test</span><span class="p">,</span>
+                    <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
                     <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="p">)</span>
 
@@ -449,7 +504,7 @@
 <span class="sd">            Textures test split (out-of-distribution data).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dataloader</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_loader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">)]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_ood</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
             <span class="n">dataloader</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_loader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ood</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">dataloader</span></div>
 
@@ -462,7 +517,7 @@
         <span class="n">p</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_argparse_args</span><span class="p">(</span><span class="n">parent_parser</span><span class="p">)</span>
 
         <span class="c1"># Arguments for ImageNet</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--evaluate_ood&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--eval-ood&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
         <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--ood_ds&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">ood_datasets</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;svhn&quot;</span><span class="p">)</span>
         <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--test_alt&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">test_datasets</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--procedure&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ViT&quot;</span><span class="p">,</span> <span class="s2">&quot;A3&quot;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
@@ -471,6 +526,22 @@
             <span class="s2">&quot;--rand_augment&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;rand_augment_opt&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">parent_parser</span></div>
+
+
+<span class="k">def</span> <span class="nf">read_indices</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>  <span class="c1"># coverage: ignore</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a file and return its lines as a list.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (Path): Path to the file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list[str]: List of filenames.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> is not a file.&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">],</span> <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;val&quot;</span><span class="p">]</span>
 </pre></div>
 
               </article>
@@ -563,7 +634,7 @@
       <div class="main-menu">
         <ul>
           <li>
-            <a href="https://github.com/ENSTA-U2IS/torch-uncertainty" target="_blank">GitHub</a>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
           </li>
       </div>
     </div>
