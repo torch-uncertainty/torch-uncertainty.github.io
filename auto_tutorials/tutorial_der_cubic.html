@@ -291,14 +291,13 @@ to download the full example code</p>
 <p>We also need to define an optimizer using torch.optim as well as the
 neural network utils withing torch.nn, as well as the partial util to provide
 the modified default arguments for the NIG loss.</p>
-<p>We also import ArgvContext to avoid using the jupyter arguments as cli
-arguments, and therefore avoid errors.</p>
+<p>We also import sys to override the command line arguments.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">cli_test_helpers</span> <span class="kn">import</span> <span class="n">ArgvContext</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
 </pre></div>
 </div>
@@ -330,15 +329,8 @@ original DER paper.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
 
 <span class="c1"># We mock the arguments for the trainer</span>
-<span class="k">with</span> <span class="n">ArgvContext</span><span class="p">(</span>
-    <span class="s2">&quot;file.py&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;--max_epochs&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;50&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;--enable_progress_bar&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;False&quot;</span><span class="p">,</span>
-<span class="p">):</span>
-    <span class="n">args</span> <span class="o">=</span> <span class="n">init_args</span><span class="p">()</span>
-    <span class="n">args</span><span class="o">.</span><span class="n">use_cv</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">argv</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;file.py&quot;</span><span class="p">,</span> <span class="s2">&quot;--max_epochs&quot;</span><span class="p">,</span> <span class="s2">&quot;50&quot;</span><span class="p">,</span> <span class="s2">&quot;--enable_progress_bar&quot;</span><span class="p">,</span> <span class="s2">&quot;False&quot;</span><span class="p">]</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">init_args</span><span class="p">()</span>
 
 <span class="n">net_name</span> <span class="o">=</span> <span class="s2">&quot;logs/der-mlp-cubic&quot;</span>
 
@@ -348,7 +340,6 @@ original DER paper.</p>
 <span class="n">test_ds</span> <span class="o">=</span> <span class="n">train_ds</span>
 
 <span class="c1"># datamodule</span>
-
 <span class="n">datamodule</span> <span class="o">=</span> <span class="n">LightningDataModule</span><span class="o">.</span><span class="n">from_datasets</span><span class="p">(</span>
     <span class="n">train_ds</span><span class="p">,</span> <span class="n">val_dataset</span><span class="o">=</span><span class="n">val_ds</span><span class="p">,</span> <span class="n">test_dataset</span><span class="o">=</span><span class="n">test_ds</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span>
 <span class="p">)</span>
@@ -399,8 +390,8 @@ distribution parameters, and all the default arguments.</p>
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        Test metric             DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-      reg_test/gnll          882.7022705078125
-      reg_test/mse          18.353973388671875
+      reg_test/gnll         1371.0406494140625
+      reg_test/mse          22.258073806762695
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 </pre></div>
 </div>
@@ -454,7 +445,7 @@ distribution parameters, and all the default arguments.</p>
 <ul class="simple">
 <li><p><strong>Deep Evidential Regression:</strong> Alexander Amini, Wilko Schwarting, Ava Soleimany, &amp; Daniela Rus. <a class="reference external" href="https://arxiv.org/pdf/1910.02600">NeurIPS 2020</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 4.917 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 5.008 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-der-cubic-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/589e936b2a6b0013916b7170ea840799/tutorial_der_cubic.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_der_cubic.ipynb</span></code></a></p>

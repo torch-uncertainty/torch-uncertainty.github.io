@@ -60,26 +60,25 @@ To train a MLP with the NIG loss function using TorchUncertainty, we have to loa
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-40
+.. GENERATED FROM PYTHON SOURCE LINES 34-39
 
 We also need to define an optimizer using torch.optim as well as the
 neural network utils withing torch.nn, as well as the partial util to provide
 the modified default arguments for the NIG loss.
 
-We also import ArgvContext to avoid using the jupyter arguments as cli
-arguments, and therefore avoid errors.
+We also import sys to override the command line arguments.
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-49
+.. GENERATED FROM PYTHON SOURCE LINES 39-48
 
 .. code-block:: Python
 
 
     import os
+    import sys
     from functools import partial
     from pathlib import Path
 
     import torch
-    from cli_test_helpers import ArgvContext
     from torch import nn, optim
 
 
@@ -89,13 +88,13 @@ arguments, and therefore avoid errors.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-53
+.. GENERATED FROM PYTHON SOURCE LINES 49-52
 
 2. Creating the Optimizer Wrapper
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We use the Adam optimizer with the default learning rate of 0.001.
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-69
+.. GENERATED FROM PYTHON SOURCE LINES 52-68
 
 .. code-block:: Python
 
@@ -122,7 +121,7 @@ We use the Adam optimizer with the default learning rate of 0.001.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-77
+.. GENERATED FROM PYTHON SOURCE LINES 69-76
 
 3. Creating the necessary variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -132,7 +131,7 @@ fake-parse the arguments needed for using the PyTorch Lightning Trainer. We
 also use the same synthetic regression task example as that used in the
 original DER paper.
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-108
+.. GENERATED FROM PYTHON SOURCE LINES 76-99
 
 .. code-block:: Python
 
@@ -140,15 +139,8 @@ original DER paper.
     root = Path(os.path.abspath(""))
 
     # We mock the arguments for the trainer
-    with ArgvContext(
-        "file.py",
-        "--max_epochs",
-        "50",
-        "--enable_progress_bar",
-        "False",
-    ):
-        args = init_args()
-        args.use_cv = False
+    sys.argv = ["file.py", "--max_epochs", "50", "--enable_progress_bar", "False"]
+    args = init_args()
 
     net_name = "logs/der-mlp-cubic"
 
@@ -158,7 +150,6 @@ original DER paper.
     test_ds = train_ds
 
     # datamodule
-
     datamodule = LightningDataModule.from_datasets(
         train_ds, val_dataset=val_ds, test_dataset=test_ds, batch_size=32
     )
@@ -174,7 +165,7 @@ original DER paper.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-118
+.. GENERATED FROM PYTHON SOURCE LINES 100-109
 
 4. The Loss and the Training Routine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -186,7 +177,7 @@ this routine, we provide the model, the NIG loss, and the optimizer,
 along with the dist_estimation parameter, which refers to the number of
 distribution parameters, and all the default arguments.
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-132
+.. GENERATED FROM PYTHON SOURCE LINES 109-123
 
 .. code-block:: Python
 
@@ -211,12 +202,12 @@ distribution parameters, and all the default arguments.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-135
+.. GENERATED FROM PYTHON SOURCE LINES 124-126
 
 5. Gathering Everything and Training the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-138
+.. GENERATED FROM PYTHON SOURCE LINES 126-129
 
 .. code-block:: Python
 
@@ -242,19 +233,19 @@ distribution parameters, and all the default arguments.
     ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
            Test metric             DataLoader 0
     ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-          reg_test/gnll          882.7022705078125
-          reg_test/mse          18.353973388671875
+          reg_test/gnll         1371.0406494140625
+          reg_test/mse          22.258073806762695
     ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 139-141
+.. GENERATED FROM PYTHON SOURCE LINES 130-132
 
 6. Testing the Model
 ~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 141-181
+.. GENERATED FROM PYTHON SOURCE LINES 132-172
 
 .. code-block:: Python
 
@@ -310,7 +301,7 @@ distribution parameters, and all the default arguments.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 182-186
+.. GENERATED FROM PYTHON SOURCE LINES 173-177
 
 Reference
 ---------
@@ -320,7 +311,7 @@ Reference
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.917 seconds)
+   **Total running time of the script:** (0 minutes 5.008 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_der_cubic.py:

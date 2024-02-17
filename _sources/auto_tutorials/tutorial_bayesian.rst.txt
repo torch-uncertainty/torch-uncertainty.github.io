@@ -67,16 +67,15 @@ To train a BNN using TorchUncertainty, we have to load the following utilities f
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-47
+.. GENERATED FROM PYTHON SOURCE LINES 41-46
 
 We will also need to define an optimizer using torch.optim as well as the
 neural network utils withing torch.nn, as well as the partial util to provide
 the modified default arguments for the ELBO loss.
 
-We also import ArgvContext to avoid using the jupyter arguments as cli
-arguments, and therefore avoid errors.
+We also import sys to override the command line arguments.
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-55
+.. GENERATED FROM PYTHON SOURCE LINES 46-54
 
 .. code-block:: Python
 
@@ -84,9 +83,9 @@ arguments, and therefore avoid errors.
     import os
     from functools import partial
     from pathlib import Path
+    import sys
 
     from torch import nn, optim
-    from cli_test_helpers import ArgvContext
 
 
 
@@ -95,13 +94,13 @@ arguments, and therefore avoid errors.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-59
+.. GENERATED FROM PYTHON SOURCE LINES 55-58
 
 2. Creating the Optimizer Wrapper
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We will use the Adam optimizer with the default learning rate of 0.001.
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-69
+.. GENERATED FROM PYTHON SOURCE LINES 58-68
 
 .. code-block:: Python
 
@@ -122,7 +121,7 @@ We will use the Adam optimizer with the default learning rate of 0.001.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-78
+.. GENERATED FROM PYTHON SOURCE LINES 69-77
 
 3. Creating the necessary variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -133,7 +132,7 @@ Trainer. We also create the datamodule that handles the MNIST dataset,
 dataloaders and transforms. Finally, we create the model using the
 blueprint from torch_uncertainty.models.
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-100
+.. GENERATED FROM PYTHON SOURCE LINES 77-93
 
 .. code-block:: Python
 
@@ -141,14 +140,8 @@ blueprint from torch_uncertainty.models.
     root = Path(os.path.abspath(""))
 
     # We mock the arguments for the trainer
-    with ArgvContext(
-        "file.py",
-        "--max_epochs",
-        "1",
-        "--enable_progress_bar",
-        "False",
-    ):
-        args = init_args(datamodule=MNISTDataModule)
+    sys.argv = ["file.py", "--max_epochs", "1", "--enable_progress_bar", "False"]
+    args = init_args(datamodule=MNISTDataModule)
 
     net_name = "logs/bayesian-lenet-mnist"
 
@@ -166,7 +159,7 @@ blueprint from torch_uncertainty.models.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-111
+.. GENERATED FROM PYTHON SOURCE LINES 94-104
 
 4. The Loss and the Training Routine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -179,7 +172,7 @@ We then define the training routine using the classification training routine
 from torch_uncertainty.training.classification. We provide the model, the ELBO
 loss and the optimizer, as well as all the default arguments.
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-129
+.. GENERATED FROM PYTHON SOURCE LINES 104-122
 
 .. code-block:: Python
 
@@ -208,7 +201,7 @@ loss and the optimizer, as well as all the default arguments.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-140
+.. GENERATED FROM PYTHON SOURCE LINES 123-133
 
 5. Gathering Everything and Training the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -221,7 +214,7 @@ name of the model for the logs and all the training arguments.
 The dataset will be downloaded automatically in the root/data folder, and the
 logs will be saved in the root/logs folder.
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-143
+.. GENERATED FROM PYTHON SOURCE LINES 133-136
 
 .. code-block:: Python
 
@@ -238,45 +231,45 @@ logs will be saved in the root/logs folder.
 
     Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz
     Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-images-idx3-ubyte.gz
-      0%|          | 0/9912422 [00:00<?, ?it/s]    100%|██████████| 9912422/9912422 [00:00<00:00, 129390765.08it/s]
+      0%|          | 0/9912422 [00:00<?, ?it/s]    100%|██████████| 9912422/9912422 [00:00<00:00, 181750154.07it/s]
     Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
 
     Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz
     Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-labels-idx1-ubyte.gz
-      0%|          | 0/28881 [00:00<?, ?it/s]    100%|██████████| 28881/28881 [00:00<00:00, 227271470.59it/s]
+      0%|          | 0/28881 [00:00<?, ?it/s]    100%|██████████| 28881/28881 [00:00<00:00, 219448720.70it/s]
     Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
 
     Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz
     Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-images-idx3-ubyte.gz
-      0%|          | 0/1648877 [00:00<?, ?it/s]    100%|██████████| 1648877/1648877 [00:00<00:00, 40535310.10it/s]
+      0%|          | 0/1648877 [00:00<?, ?it/s]    100%|██████████| 1648877/1648877 [00:00<00:00, 149055808.37it/s]
     Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
 
     Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz
     Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-labels-idx1-ubyte.gz
-      0%|          | 0/4542 [00:00<?, ?it/s]    100%|██████████| 4542/4542 [00:00<00:00, 54586042.32it/s]
+      0%|          | 0/4542 [00:00<?, ?it/s]    100%|██████████| 4542/4542 [00:00<00:00, 40361289.76it/s]
     Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
 
     ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
            Test metric             DataLoader 0
     ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-          cls_test/acc          0.9603000283241272
-         cls_test/brier        0.060467176139354706
-          cls_test/ece         0.016286319121718407
-        cls_test/entropy        0.17907290160655975
-          cls_test/nll          0.13065354526042938
+          cls_test/acc           0.955299973487854
+         cls_test/brier         0.06807499378919601
+          cls_test/ece          0.02068784087896347
+        cls_test/entropy         0.207261323928833
+          cls_test/nll          0.14513757824897766
     ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-148
+.. GENERATED FROM PYTHON SOURCE LINES 137-141
 
 6. Testing the Model
 ~~~~~~~~~~~~~~~~~~~~
 
 Now that the model is trained, let's test it on MNIST
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-176
+.. GENERATED FROM PYTHON SOURCE LINES 141-169
 
 .. code-block:: Python
 
@@ -328,7 +321,7 @@ Now that the model is trained, let's test it on MNIST
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 177-184
+.. GENERATED FROM PYTHON SOURCE LINES 170-177
 
 References
 ----------
@@ -341,7 +334,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 34.994 seconds)
+   **Total running time of the script:** (0 minutes 36.067 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_bayesian.py:

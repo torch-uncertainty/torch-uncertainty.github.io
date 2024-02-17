@@ -298,14 +298,13 @@ to download the full example code</p>
 <p>We will also need to define an optimizer using torch.optim as well as the
 neural network utils withing torch.nn, as well as the partial util to provide
 the modified default arguments for the ELBO loss.</p>
-<p>We also import ArgvContext to avoid using the jupyter arguments as cli
-arguments, and therefore avoid errors.</p>
+<p>We also import sys to override the command line arguments.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
-<span class="kn">from</span> <span class="nn">cli_test_helpers</span> <span class="kn">import</span> <span class="n">ArgvContext</span>
 </pre></div>
 </div>
 </section>
@@ -331,14 +330,8 @@ blueprint from torch_uncertainty.models.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
 
 <span class="c1"># We mock the arguments for the trainer</span>
-<span class="k">with</span> <span class="n">ArgvContext</span><span class="p">(</span>
-    <span class="s2">&quot;file.py&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;--max_epochs&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;1&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;--enable_progress_bar&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;False&quot;</span><span class="p">,</span>
-<span class="p">):</span>
-    <span class="n">args</span> <span class="o">=</span> <span class="n">init_args</span><span class="p">(</span><span class="n">datamodule</span><span class="o">=</span><span class="n">MNISTDataModule</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">argv</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;file.py&quot;</span><span class="p">,</span> <span class="s2">&quot;--max_epochs&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;--enable_progress_bar&quot;</span><span class="p">,</span> <span class="s2">&quot;False&quot;</span><span class="p">]</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">init_args</span><span class="p">(</span><span class="n">datamodule</span><span class="o">=</span><span class="n">MNISTDataModule</span><span class="p">)</span>
 
 <span class="n">net_name</span> <span class="o">=</span> <span class="s2">&quot;logs/bayesian-lenet-mnist&quot;</span>
 
@@ -396,38 +389,38 @@ logs will be saved in the root/logs folder.</p>
 Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-images-idx3-ubyte.gz
 
   0%|          | 0/9912422 [00:00&lt;?, ?it/s]
-100%|██████████| 9912422/9912422 [00:00&lt;00:00, 129390765.08it/s]
+100%|██████████| 9912422/9912422 [00:00&lt;00:00, 181750154.07it/s]
 Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
 
 Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz
 Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-labels-idx1-ubyte.gz
 
   0%|          | 0/28881 [00:00&lt;?, ?it/s]
-100%|██████████| 28881/28881 [00:00&lt;00:00, 227271470.59it/s]
+100%|██████████| 28881/28881 [00:00&lt;00:00, 219448720.70it/s]
 Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
 
 Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz
 Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-images-idx3-ubyte.gz
 
   0%|          | 0/1648877 [00:00&lt;?, ?it/s]
-100%|██████████| 1648877/1648877 [00:00&lt;00:00, 40535310.10it/s]
+100%|██████████| 1648877/1648877 [00:00&lt;00:00, 149055808.37it/s]
 Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
 
 Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz
 Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-labels-idx1-ubyte.gz
 
   0%|          | 0/4542 [00:00&lt;?, ?it/s]
-100%|██████████| 4542/4542 [00:00&lt;00:00, 54586042.32it/s]
+100%|██████████| 4542/4542 [00:00&lt;00:00, 40361289.76it/s]
 Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        Test metric             DataLoader 0
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-      cls_test/acc          0.9603000283241272
-     cls_test/brier        0.060467176139354706
-      cls_test/ece         0.016286319121718407
-    cls_test/entropy        0.17907290160655975
-      cls_test/nll          0.13065354526042938
+      cls_test/acc           0.955299973487854
+     cls_test/brier         0.06807499378919601
+      cls_test/ece          0.02068784087896347
+    cls_test/entropy         0.207261323928833
+      cls_test/nll          0.14513757824897766
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 </pre></div>
 </div>
@@ -478,7 +471,7 @@ Predicted digits:  7 2 1 0
 <li><p><strong>The Adam optimizer:</strong> Kingma, D. P., &amp; Ba, J. (2014). “Adam: A method for stochastic optimization.” <a class="reference external" href="https://arxiv.org/pdf/1412.6980.pdf">ICLR 2015</a>.</p></li>
 <li><p><strong>The Blitz</strong> <a class="reference external" href="https://github.com/piEsposito/blitz-bayesian-deep-learning">library</a> (for the hyperparameters).</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 34.994 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 36.067 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-bayesian-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/f43d536d36d9261bef3ab9c0808ea674/tutorial_bayesian.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_bayesian.ipynb</span></code></a></p>

@@ -59,14 +59,13 @@ First, we have to load the following utilities from TorchUncertainty:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-38
+.. GENERATED FROM PYTHON SOURCE LINES 34-37
 
 We will also need import the neural network utils withing `torch.nn`.
 
-We also import ArgvContext to avoid using the jupyter arguments as cli
-arguments, and therefore avoid errors.
+We also import sys to override the command line arguments.
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-45
+.. GENERATED FROM PYTHON SOURCE LINES 37-44
 
 .. code-block:: Python
 
@@ -84,7 +83,7 @@ arguments, and therefore avoid errors.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-57
+.. GENERATED FROM PYTHON SOURCE LINES 45-56
 
 2. Creating the necessary variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -98,7 +97,7 @@ blueprint from torch_uncertainty.models and we wrap it into mc-dropout.
 It is important to specify the arguments ``version`` as ``mc-dropout``,
 ``num_estimators`` and the ``dropout_rate`` to use Monte Carlo dropout.
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-87
+.. GENERATED FROM PYTHON SOURCE LINES 56-86
 
 .. code-block:: Python
 
@@ -139,7 +138,7 @@ It is important to specify the arguments ``version`` as ``mc-dropout``,
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-96
+.. GENERATED FROM PYTHON SOURCE LINES 87-95
 
 3. The Loss and the Training Routine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -150,7 +149,7 @@ and channels, the optimizer wrapper, the dropout rate, and the number of
 forward passes to perform through the network, as well as all the default
 arguments.
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-105
+.. GENERATED FROM PYTHON SOURCE LINES 95-104
 
 .. code-block:: Python
 
@@ -170,12 +169,12 @@ arguments.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-108
+.. GENERATED FROM PYTHON SOURCE LINES 105-107
 
 5. Gathering Everything and Training the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-112
+.. GENERATED FROM PYTHON SOURCE LINES 107-111
 
 .. code-block:: Python
 
@@ -194,17 +193,17 @@ arguments.
     ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
            Test metric             DataLoader 0
     ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-          cls_test/acc          0.9815000295639038
-         cls_test/brier        0.027768993750214577
-          cls_test/ece         0.004209526814520359
-        cls_test/entropy        0.07393931597471237
-          cls_test/nll          0.05651455745100975
+          cls_test/acc          0.9797000288963318
+         cls_test/brier        0.030017493292689323
+          cls_test/ece         0.0029329857788980007
+        cls_test/entropy        0.06211390346288681
+          cls_test/nll          0.06109638139605522
     ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-122
+.. GENERATED FROM PYTHON SOURCE LINES 112-121
 
 6. Wrapping the Model in a MCBatchNorm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -216,7 +215,7 @@ The larger the ``mc_batch_size``, the more stochastic the predictions will be.
 The authors suggest 32 as a good value for ``mc_batch_size`` but we use 4 here
 to highlight the effect of stochasticity on the predictions.
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-127
+.. GENERATED FROM PYTHON SOURCE LINES 121-126
 
 .. code-block:: Python
 
@@ -267,7 +266,7 @@ to highlight the effect of stochasticity on the predictions.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-134
+.. GENERATED FROM PYTHON SOURCE LINES 127-133
 
 7. Testing the Model
 ~~~~~~~~~~~~~~~~~~~~
@@ -276,7 +275,7 @@ Now that the model is trained, let's test it on MNIST. Don't forget to call
 In this tutorial, we plot the most uncertain images, i.e. the images for which
 the variance of the predictions is the highest.
 
-.. GENERATED FROM PYTHON SOURCE LINES 134-168
+.. GENERATED FROM PYTHON SOURCE LINES 133-167
 
 .. code-block:: Python
 
@@ -329,15 +328,15 @@ the variance of the predictions is the highest.
 
     Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
     Ground truth:  7 2 1 0
-    Predicted digits for the image 8:  6 5 5 5 5 5 6 5
-    Predicted digits for the image 73:  9 9 8 9 9 9 9 9
-    Predicted digits for the image 78:  4 9 8 9 9 9 9 9
-    Predicted digits for the image 111:  1 7 7 7 7 7 7 7
+    Predicted digits for the image 7:  9 9 9 9 9 9 9 4
+    Predicted digits for the image 62:  9 5 5 9 5 5 9 9
+    Predicted digits for the image 80:  7 9 7 7 7 7 7 7
+    Predicted digits for the image 115:  4 4 4 4 4 4 4 4
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 169-173
+.. GENERATED FROM PYTHON SOURCE LINES 168-172
 
 The predictions are mostly erroneous, which is expected since we selected
 the most uncertain images. We also see that there stochasticity in the
@@ -347,7 +346,7 @@ stochastic estimator used.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 22.997 seconds)
+   **Total running time of the script:** (0 minutes 23.018 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_mc_batch_norm.py:
