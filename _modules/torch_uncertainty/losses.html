@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.losses &mdash; TorchUncertainty 0.1.6 documentation</title>
+  <title>torch_uncertainty.losses &mdash; TorchUncertainty 0.2.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../_static/images/logo_torch_uncertainty.png" />
@@ -153,7 +153,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../introduction_uncertainty.html">Introduction to Classification Uncertainty</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_tutorials/index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli_guide.html">CLI Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
 </ul>
@@ -249,11 +250,43 @@
                 
                 
   <h1>Source code for torch_uncertainty.losses</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch.distributions</span> <span class="kn">import</span> <span class="n">Distribution</span>
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 
-<span class="kn">from</span> <span class="nn">.layers.bayesian</span> <span class="kn">import</span> <span class="n">bayesian_modules</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.layers.bayesian</span> <span class="kn">import</span> <span class="n">bayesian_modules</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.utils.distributions</span> <span class="kn">import</span> <span class="n">NormalInverseGamma</span>
+
+
+<div class="viewcode-block" id="DistributionNLLLoss"><a class="viewcode-back" href="../../generated/torch_uncertainty.losses.DistributionNLLLoss.html#torch_uncertainty.losses.DistributionNLLLoss">[docs]</a><span class="k">class</span> <span class="nc">DistributionNLLLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">reduction</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Negative Log-Likelihood loss using given distributions as inputs.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reduction (str, optional): specifies the reduction to apply to the</span>
+<span class="sd">            output:``&#39;none&#39;`` | ``&#39;mean&#39;`` | ``&#39;sum&#39;``. Defaults to &quot;mean&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">=</span> <span class="n">reduction</span>
+
+<div class="viewcode-block" id="DistributionNLLLoss.forward"><a class="viewcode-back" href="../../generated/torch_uncertainty.losses.DistributionNLLLoss.html#torch_uncertainty.losses.DistributionNLLLoss.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">:</span> <span class="n">Distribution</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the NLL of the targets given predicted distributions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dist (Distribution): The predicted distributions</span>
+<span class="sd">            targets (Tensor): The target values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">loss</span></div></div>
 
 
 <div class="viewcode-block" id="KLDiv"><a class="viewcode-back" href="../../generated/torch_uncertainty.losses.KLDiv.html#torch_uncertainty.losses.KLDiv">[docs]</a><span class="k">class</span> <span class="nc">KLDiv</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -285,57 +318,40 @@
 <div class="viewcode-block" id="ELBOLoss"><a class="viewcode-back" href="../../generated/torch_uncertainty.losses.ELBOLoss.html#torch_uncertainty.losses.ELBOLoss">[docs]</a><span class="k">class</span> <span class="nc">ELBOLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
-        <span class="n">criterion</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">inner_loss</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
         <span class="n">kl_weight</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The Evidence Lower Bound (ELBO) loss for Bayesian Neural Networks.</span>
 
 <span class="sd">        ELBO loss for Bayesian Neural Networks. Use this loss function with the</span>
-<span class="sd">        objective that you seek to minimize as :attr:`criterion`.</span>
+<span class="sd">        objective that you seek to minimize as :attr:`inner_loss`.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            model (nn.Module): The Bayesian Neural Network to compute the loss for</span>
-<span class="sd">            criterion (nn.Module): The loss function to use during training</span>
+<span class="sd">            inner_loss (nn.Module): The loss function to use during training</span>
 <span class="sd">            kl_weight (float): The weight of the KL divergence term</span>
 <span class="sd">            num_samples (int): The number of samples to use for the ELBO loss</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            Set the model to None if you use the ELBOLoss within</span>
+<span class="sd">            the ClassificationRoutine. It will get filled automatically.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_kl_div</span> <span class="o">=</span> <span class="n">KLDiv</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="n">_elbo_loss_checks</span><span class="p">(</span><span class="n">inner_loss</span><span class="p">,</span> <span class="n">kl_weight</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;The criterion should be an instance of a class.&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">criterion</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">criterion</span>
-
-        <span class="k">if</span> <span class="n">kl_weight</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;The KL weight should be non-negative. Got </span><span class="si">{</span><span class="n">kl_weight</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inner_loss</span> <span class="o">=</span> <span class="n">inner_loss</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kl_weight</span> <span class="o">=</span> <span class="n">kl_weight</span>
-
-        <span class="k">if</span> <span class="n">num_samples</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;The number of samples should not be lower than 1.&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">num_samples</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;The number of samples should be an integer. &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span> <span class="o">=</span> <span class="n">num_samples</span>
 
 <div class="viewcode-block" id="ELBOLoss.forward"><a class="viewcode-back" href="../../generated/torch_uncertainty.losses.ELBOLoss.html#torch_uncertainty.losses.ELBOLoss.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gather the kl divergence from the bayesian modules and aggregate</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gather the KL divergence from the bayesian modules and aggregate</span>
 <span class="sd">        the ELBO loss for a given network.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            inputs (Tensor): The *inputs* of the Bayesian Neural Network</span>
+<span class="sd">            inputs (Tensor): The inputs of the Bayesian Neural Network</span>
 <span class="sd">            targets (Tensor): The target values</span>
 
 <span class="sd">        Returns:</span>
@@ -344,16 +360,50 @@
         <span class="n">aggregated_elbo</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">inputs</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span><span class="p">):</span>
             <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
-            <span class="n">aggregated_elbo</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+            <span class="n">aggregated_elbo</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner_loss</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
             <span class="n">aggregated_elbo</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kl_weight</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kl_div</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">aggregated_elbo</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span></div></div>
+        <span class="k">return</span> <span class="n">aggregated_elbo</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span></div>
+
+    <span class="k">def</span> <span class="nf">set_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_kl_div</span> <span class="o">=</span> <span class="n">KLDiv</span><span class="p">(</span><span class="n">model</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="NIGLoss"><a class="viewcode-back" href="../../generated/torch_uncertainty.losses.NIGLoss.html#torch_uncertainty.losses.NIGLoss">[docs]</a><span class="k">class</span> <span class="nc">NIGLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_elbo_loss_checks</span><span class="p">(</span>
+    <span class="n">inner_loss</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">kl_weight</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_loss</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;The inner_loss should be an instance of a class.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">inner_loss</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">kl_weight</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The KL weight should be non-negative. Got </span><span class="si">{</span><span class="n">kl_weight</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">num_samples</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The number of samples should not be lower than 1.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">num_samples</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;The number of samples should be an integer. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">DERLoss</span><span class="p">(</span><span class="n">DistributionNLLLoss</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">reg_weight</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">reduction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The Normal Inverse-Gamma loss.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The Deep Evidential loss.</span>
+
+<span class="sd">        This loss combines the negative log-likelihood loss of the normal</span>
+<span class="sd">        inverse gamma distribution and a weighted regularization term.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            reg_weight (float): The weight of the regularization term.</span>
@@ -364,7 +414,11 @@
 <span class="sd">            Amini, A., Schwarting, W., Soleimany, A., &amp; Rus, D. (2019). Deep</span>
 <span class="sd">            evidential regression. https://arxiv.org/abs/1910.02600.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">reduction</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">reduction</span><span class="si">}</span><span class="s2"> is not a valid value for reduction.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_reduction</span> <span class="o">=</span> <span class="n">reduction</span>
 
         <span class="k">if</span> <span class="n">reg_weight</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -372,51 +426,26 @@
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">reg_weight</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reg_weight</span> <span class="o">=</span> <span class="n">reg_weight</span>
-        <span class="k">if</span> <span class="n">reduction</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">reduction</span><span class="si">}</span><span class="s2"> is not a valid value for reduction.&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">=</span> <span class="n">reduction</span>
 
-    <span class="k">def</span> <span class="nf">_nig_nll</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">gamma</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">v</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">beta</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="n">gam</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">v</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="mf">0.5</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">v</span><span class="p">)</span>
-            <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">gam</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
-            <span class="o">+</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">gam</span> <span class="o">+</span> <span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="n">targets</span> <span class="o">-</span> <span class="n">gamma</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-            <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">lgamma</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
-            <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">lgamma</span><span class="p">(</span><span class="n">alpha</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_nig_reg</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">targets</span> <span class="o">-</span> <span class="n">gamma</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
-            <span class="mi">2</span> <span class="o">*</span> <span class="n">v</span> <span class="o">+</span> <span class="n">alpha</span>
+    <span class="k">def</span> <span class="nf">_reg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">:</span> <span class="n">NormalInverseGamma</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">targets</span> <span class="o">-</span> <span class="n">dist</span><span class="o">.</span><span class="n">loc</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="mi">2</span> <span class="o">*</span> <span class="n">dist</span><span class="o">.</span><span class="n">lmbda</span> <span class="o">+</span> <span class="n">dist</span><span class="o">.</span><span class="n">alpha</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">gamma</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">v</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">beta</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">dist</span><span class="p">:</span> <span class="n">NormalInverseGamma</span><span class="p">,</span>
         <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="n">loss_nll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nig_nll</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
-        <span class="n">loss_reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nig_reg</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+        <span class="n">loss_nll</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+        <span class="n">loss_reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reg</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_nll</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_weight</span> <span class="o">*</span> <span class="n">loss_reg</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_reduction</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">loss</span></div>
+        <span class="k">return</span> <span class="n">loss</span>
 
 
 <div class="viewcode-block" id="BetaNLL"><a class="viewcode-back" href="../../generated/torch_uncertainty.losses.BetaNLL.html#torch_uncertainty.losses.BetaNLL">[docs]</a><span class="k">class</span> <span class="nc">BetaNLL</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -598,7 +627,7 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                 <span class="s2">&quot;DECLoss does not yet support mixup/cutmix.&quot;</span>
             <span class="p">)</span>
-        <span class="c1"># else:  # TODO: handle binary</span>
+        <span class="c1"># TODO: handle binary</span>
         <span class="n">targets</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_type</span> <span class="o">==</span> <span class="s2">&quot;mse&quot;</span><span class="p">:</span>

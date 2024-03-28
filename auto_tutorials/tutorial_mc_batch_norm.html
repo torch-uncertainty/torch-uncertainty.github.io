@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Training a LeNet with Monte Carlo Batch Normalization &mdash; TorchUncertainty 0.1.6 documentation</title>
+  <title>Training a LeNet with Monte Carlo Batch Normalization &mdash; TorchUncertainty 0.2.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -156,7 +156,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../introduction_uncertainty.html">Introduction to Classification Uncertainty</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli_guide.html">CLI Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
@@ -273,110 +274,87 @@ to download the full example code</p>
 <h3>1. Loading the utilities<a class="headerlink" href="#loading-the-utilities" title="Permalink to this heading">¶</a></h3>
 <p>First, we have to load the following utilities from TorchUncertainty:</p>
 <ul class="simple">
-<li><p>the cli handler: cli_main and argument parser: init_args</p></li>
+<li><p>the Trainer from Lightning</p></li>
 <li><p>the datamodule that handles dataloaders: MNISTDataModule, which lies in the torch_uncertainty.datamodule</p></li>
 <li><p>the model: LeNet, which lies in torch_uncertainty.models</p></li>
 <li><p>the mc-batch-norm wrapper: mc_dropout, which lies in torch_uncertainty.models</p></li>
-<li><p>a resnet baseline to get the command line arguments: ResNet, which lies in torch_uncertainty.baselines</p></li>
 <li><p>the classification training routine in the torch_uncertainty.training.classification module</p></li>
-<li><p>the optimizer wrapper in the torch_uncertainty.optimization_procedures module.</p></li>
+<li><p>an optimization recipe in the torch_uncertainty.optim_recipes module.</p></li>
 </ul>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty</span> <span class="kn">import</span> <span class="n">cli_main</span><span class="p">,</span> <span class="n">init_args</span>
+<p>We also need import the neural network utils within <cite>torch.nn</cite>.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">lightning</span> <span class="kn">import</span> <span class="n">Trainer</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+
 <span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <span class="n">MNISTDataModule</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.models.lenet</span> <span class="kn">import</span> <span class="n">lenet</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.optim_recipes</span> <span class="kn">import</span> <span class="n">optim_cifar10_resnet18</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.post_processing.mc_batch_norm</span> <span class="kn">import</span> <span class="n">MCBatchNorm</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.baselines.classification</span> <span class="kn">import</span> <span class="n">ResNet</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.routines.classification</span> <span class="kn">import</span> <span class="n">ClassificationSingle</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.optimization_procedures</span> <span class="kn">import</span> <span class="n">optim_cifar10_resnet18</span>
-</pre></div>
-</div>
-<p>We will also need import the neural network utils withing <cite>torch.nn</cite>.</p>
-<p>We also import sys to override the command line arguments.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
-<span class="kn">from</span> <span class="nn">cli_test_helpers</span> <span class="kn">import</span> <span class="n">ArgvContext</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.routines</span> <span class="kn">import</span> <span class="n">ClassificationRoutine</span>
 </pre></div>
 </div>
 </section>
 <section id="creating-the-necessary-variables">
 <h3>2. Creating the necessary variables<a class="headerlink" href="#creating-the-necessary-variables" title="Permalink to this heading">¶</a></h3>
-<p>In the following, we will need to define the root of the datasets and the
-logs, and to fake-parse the arguments needed for using the PyTorch Lightning
-Trainer. We also create the datamodule that handles the MNIST dataset,
-dataloaders and transforms. We create the model using the
-blueprint from torch_uncertainty.models and we wrap it into mc-dropout.</p>
-<p>It is important to specify the arguments <code class="docutils literal notranslate"><span class="pre">version</span></code> as <code class="docutils literal notranslate"><span class="pre">mc-dropout</span></code>,
-<code class="docutils literal notranslate"><span class="pre">num_estimators</span></code> and the <code class="docutils literal notranslate"><span class="pre">dropout_rate</span></code> to use Monte Carlo dropout.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
-
-<span class="c1"># We mock the arguments for the trainer</span>
-<span class="k">with</span> <span class="n">ArgvContext</span><span class="p">(</span>
-    <span class="s2">&quot;file.py&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;--max_epochs&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;1&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;--enable_progress_bar&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;False&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;--num_estimators&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;8&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;--max_epochs&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;2&quot;</span>
-<span class="p">):</span>
-    <span class="n">args</span> <span class="o">=</span> <span class="n">init_args</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">ResNet</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">MNISTDataModule</span><span class="p">)</span>
-
-<span class="n">net_name</span> <span class="o">=</span> <span class="s2">&quot;logs/lenet-mnist&quot;</span>
+<p>In the following, we define the root of the datasets and the
+logs. We also create the datamodule that handles the MNIST dataset
+dataloaders and transforms.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># datamodule</span>
-<span class="n">args</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
-<span class="n">dm</span> <span class="o">=</span> <span class="n">MNISTDataModule</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+<span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
+<span class="n">datamodule</span> <span class="o">=</span> <span class="n">MNISTDataModule</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
 
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">lenet</span><span class="p">(</span>
-    <span class="n">in_channels</span><span class="o">=</span><span class="n">dm</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span>
-    <span class="n">num_classes</span><span class="o">=</span><span class="n">dm</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
-    <span class="n">norm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">,</span>
+    <span class="n">in_channels</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span>
+    <span class="n">num_classes</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+    <span class="n">norm</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="the-loss-and-the-training-routine">
 <h3>3. The Loss and the Training Routine<a class="headerlink" href="#the-loss-and-the-training-routine" title="Permalink to this heading">¶</a></h3>
-<p>This is a classification problem, and we use CrossEntropyLoss as the likelihood.
+<p>This is a classification problem, and we use CrossEntropyLoss as likelihood.
 We define the training routine using the classification training routine from
-torch_uncertainty.training.classification. We provide the number of classes
-and channels, the optimizer wrapper, the dropout rate, and the number of
-forward passes to perform through the network, as well as all the default
-arguments.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">baseline</span> <span class="o">=</span> <span class="n">ClassificationSingle</span><span class="p">(</span>
-    <span class="n">num_classes</span><span class="o">=</span><span class="n">dm</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+torch_uncertainty.training.classification. We provide the number of classes,
+and the optimization recipe.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">routine</span> <span class="o">=</span> <span class="n">ClassificationRoutine</span><span class="p">(</span>
+    <span class="n">num_classes</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
     <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-    <span class="n">loss</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">,</span>
-    <span class="n">optimization_procedure</span><span class="o">=</span><span class="n">optim_cifar10_resnet18</span><span class="p">,</span>
-    <span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">),</span>
+    <span class="n">loss</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">(),</span>
+    <span class="n">optim_recipe</span><span class="o">=</span><span class="n">optim_cifar10_resnet18</span><span class="p">(</span><span class="n">model</span><span class="p">),</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="gathering-everything-and-training-the-model">
-<h3>5. Gathering Everything and Training the Model<a class="headerlink" href="#gathering-everything-and-training-the-model" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">cli_main</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">net_name</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+<h3>4. Gathering Everything and Training the Model<a class="headerlink" href="#gathering-everything-and-training-the-model" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-       Test metric             DataLoader 0
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-      cls_test/acc           0.982200026512146
-     cls_test/brier         0.02837557904422283
-      cls_test/ece         0.0057438514195382595
-    cls_test/entropy        0.08077980577945709
-      cls_test/nll          0.06114054098725319
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:441: The &#39;val_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:441: The &#39;train_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:441: The &#39;test_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃        Test metric        ┃       DataLoader 0        ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│       cls_test/Acc        │    0.9824000000953674     │
+│      cls_test/Brier       │   0.025693457573652267    │
+│       cls_test/ECE        │   0.0010016887681558728   │
+│       cls_test/NLL        │    0.05316827446222305    │
+│     cls_test/entropy      │   0.058367710560560226    │
+└───────────────────────────┴───────────────────────────┘
+
+[{&#39;cls_test/Acc&#39;: 0.9824000000953674, &#39;cls_test/Brier&#39;: 0.025693457573652267, &#39;cls_test/ECE&#39;: 0.0010016887681558728, &#39;cls_test/NLL&#39;: 0.05316827446222305, &#39;cls_test/entropy&#39;: 0.058367710560560226}]
 </pre></div>
 </div>
 </section>
 <section id="wrapping-the-model-in-a-mcbatchnorm">
-<h3>6. Wrapping the Model in a MCBatchNorm<a class="headerlink" href="#wrapping-the-model-in-a-mcbatchnorm" title="Permalink to this heading">¶</a></h3>
+<h3>5. Wrapping the Model in a MCBatchNorm<a class="headerlink" href="#wrapping-the-model-in-a-mcbatchnorm" title="Permalink to this heading">¶</a></h3>
 <p>We can now wrap the model in a MCBatchNorm to add stochasticity to the
 predictions. We specify that the BatchNorm layers are to be converted to
 MCBatchNorm layers, and that we want to use 8 stochastic estimators.
@@ -384,12 +362,14 @@ The amount of stochasticity is controlled by the <code class="docutils literal n
 The larger the <code class="docutils literal notranslate"><span class="pre">mc_batch_size</span></code>, the more stochastic the predictions will be.
 The authors suggest 32 as a good value for <code class="docutils literal notranslate"><span class="pre">mc_batch_size</span></code> but we use 4 here
 to highlight the effect of stochasticity on the predictions.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">baseline</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">MCBatchNorm</span><span class="p">(</span><span class="n">baseline</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mc_batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
-<span class="n">baseline</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">train</span><span class="p">)</span>
-<span class="n">baseline</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">routine</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">MCBatchNorm</span><span class="p">(</span>
+    <span class="n">routine</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mc_batch_size</span><span class="o">=</span><span class="mi">4</span>
+<span class="p">)</span>
+<span class="n">routine</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">train</span><span class="p">)</span>
+<span class="n">routine</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ClassificationSingle(
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ClassificationRoutine(
   (model): MCBatchNorm(
     (model): _LeNet(
       (conv1): Conv2d(1, 6, kernel_size=(5, 5), stride=(1, 1))
@@ -402,54 +382,57 @@ to highlight the effect of stochasticity on the predictions.</p>
       (fc3): Linear(in_features=84, out_features=10, bias=True)
     )
   )
+  (loss): CrossEntropyLoss()
   (format_batch_fn): Identity()
   (val_cls_metrics): MetricCollection(
-    (acc): MulticlassAccuracy()
-    (brier): BrierScore()
-    (ece): MulticlassCE()
-    (nll): NegativeLogLikelihood(),
+    (Acc): MulticlassAccuracy()
+    (Brier): BrierScore()
+    (ECE): MulticlassCE()
+    (NLL): CategoricalNLL(),
     prefix=cls_val/
   )
   (test_cls_metrics): MetricCollection(
-    (acc): MulticlassAccuracy()
-    (brier): BrierScore()
-    (ece): MulticlassCE()
-    (nll): NegativeLogLikelihood(),
+    (Acc): MulticlassAccuracy()
+    (Brier): BrierScore()
+    (ECE): MulticlassCE()
+    (NLL): CategoricalNLL(),
     prefix=cls_test/
   )
   (test_entropy_id): Entropy()
+  (mixup): Identity()
 )
 </pre></div>
 </div>
 </section>
 <section id="testing-the-model">
-<h3>7. Testing the Model<a class="headerlink" href="#testing-the-model" title="Permalink to this heading">¶</a></h3>
+<h3>6. Testing the Model<a class="headerlink" href="#testing-the-model" title="Permalink to this heading">¶</a></h3>
 <p>Now that the model is trained, let’s test it on MNIST. Don’t forget to call
 .eval() to enable Monte Carlo batch normalization at inference.
 In this tutorial, we plot the most uncertain images, i.e. the images for which
 the variance of the predictions is the highest.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchvision</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
 <span class="k">def</span> <span class="nf">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
     <span class="n">npimg</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">npimg</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 
-<span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">())</span>
+<span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">())</span>
 <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">dataiter</span><span class="p">)</span>
 
 <span class="c1"># print images</span>
 <span class="n">imshow</span><span class="p">(</span><span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span><span class="n">images</span><span class="p">[:</span><span class="mi">4</span><span class="p">,</span> <span class="o">...</span><span class="p">]))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ground truth: &quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
 
-<span class="n">baseline</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
-<span class="n">logits</span> <span class="o">=</span> <span class="n">baseline</span><span class="p">(</span><span class="n">images</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">routine</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">logits</span> <span class="o">=</span> <span class="n">routine</span><span class="p">(</span><span class="n">images</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
 <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
@@ -464,17 +447,17 @@ the variance of the predictions is the highest.</p>
 </div>
 <img src="../_images/sphx_glr_tutorial_mc_batch_norm_001.png" srcset="../_images/sphx_glr_tutorial_mc_batch_norm_001.png" alt="tutorial mc batch norm" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
 Ground truth:  7 2 1 0
-Predicted digits for the image 61:  8 8 3 8 8 8 8 3
-Predicted digits for the image 95:  8 8 8 8 8 8 8 8
-Predicted digits for the image 115:  4 4 4 4 4 4 4 4
-Predicted digits for the image 125:  4 9 9 9 9 9 9 9
+Predicted digits for the image 94:  8 1 1 1 1 1 6 1
+Predicted digits for the image 95:  6 4 4 6 6 4 6 6
+Predicted digits for the image 104:  5 9 9 5 5 9 5 5
+Predicted digits for the image 107:  6 1 1 1 6 1 1 1
 </pre></div>
 </div>
 <p>The predictions are mostly erroneous, which is expected since we selected
 the most uncertain images. We also see that there stochasticity in the
 predictions, as the predictions for the same image differ depending on the
 stochastic estimator used.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 22.912 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 36.339 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-mc-batch-norm-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/631ac265c1ce7636bf5c4db0e5a4f3c3/tutorial_mc_batch_norm.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_batch_norm.ipynb</span></code></a></p>
@@ -536,9 +519,9 @@ stochastic estimator used.</p>
 <li><a class="reference internal" href="#loading-the-utilities">1. Loading the utilities</a></li>
 <li><a class="reference internal" href="#creating-the-necessary-variables">2. Creating the necessary variables</a></li>
 <li><a class="reference internal" href="#the-loss-and-the-training-routine">3. The Loss and the Training Routine</a></li>
-<li><a class="reference internal" href="#gathering-everything-and-training-the-model">5. Gathering Everything and Training the Model</a></li>
-<li><a class="reference internal" href="#wrapping-the-model-in-a-mcbatchnorm">6. Wrapping the Model in a MCBatchNorm</a></li>
-<li><a class="reference internal" href="#testing-the-model">7. Testing the Model</a></li>
+<li><a class="reference internal" href="#gathering-everything-and-training-the-model">4. Gathering Everything and Training the Model</a></li>
+<li><a class="reference internal" href="#wrapping-the-model-in-a-mcbatchnorm">5. Wrapping the Model in a MCBatchNorm</a></li>
+<li><a class="reference internal" href="#testing-the-model">6. Testing the Model</a></li>
 </ul>
 </li>
 </ul>

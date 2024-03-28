@@ -32,49 +32,29 @@ In this part, we train a LeNet with batch normalization layers, based on the mod
 
 First, we have to load the following utilities from TorchUncertainty:
 
-- the cli handler: cli_main and argument parser: init_args
+- the Trainer from Lightning
 - the datamodule that handles dataloaders: MNISTDataModule, which lies in the torch_uncertainty.datamodule
 - the model: LeNet, which lies in torch_uncertainty.models
 - the mc-batch-norm wrapper: mc_dropout, which lies in torch_uncertainty.models
-- a resnet baseline to get the command line arguments: ResNet, which lies in torch_uncertainty.baselines
 - the classification training routine in the torch_uncertainty.training.classification module
-- the optimizer wrapper in the torch_uncertainty.optimization_procedures module.
+- an optimization recipe in the torch_uncertainty.optim_recipes module.
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-33
+We also need import the neural network utils within `torch.nn`.
 
-.. code-block:: Python
-
-    from torch_uncertainty import cli_main, init_args
-    from torch_uncertainty.datamodules import MNISTDataModule
-    from torch_uncertainty.models.lenet import lenet
-    from torch_uncertainty.post_processing.mc_batch_norm import MCBatchNorm
-    from torch_uncertainty.baselines.classification import ResNet
-    from torch_uncertainty.routines.classification import ClassificationSingle
-    from torch_uncertainty.optimization_procedures import optim_cifar10_resnet18
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 34-37
-
-We will also need import the neural network utils withing `torch.nn`.
-
-We also import sys to override the command line arguments.
-
-.. GENERATED FROM PYTHON SOURCE LINES 37-44
+.. GENERATED FROM PYTHON SOURCE LINES 26-37
 
 .. code-block:: Python
 
-
-    import os
     from pathlib import Path
 
+    from lightning import Trainer
     from torch import nn
-    from cli_test_helpers import ArgvContext
+
+    from torch_uncertainty.datamodules import MNISTDataModule
+    from torch_uncertainty.models.lenet import lenet
+    from torch_uncertainty.optim_recipes import optim_cifar10_resnet18
+    from torch_uncertainty.post_processing.mc_batch_norm import MCBatchNorm
+    from torch_uncertainty.routines import ClassificationRoutine
 
 
 
@@ -83,52 +63,30 @@ We also import sys to override the command line arguments.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-56
+.. GENERATED FROM PYTHON SOURCE LINES 38-43
 
 2. Creating the necessary variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In the following, we define the root of the datasets and the
+logs. We also create the datamodule that handles the MNIST dataset
+dataloaders and transforms.
 
-In the following, we will need to define the root of the datasets and the
-logs, and to fake-parse the arguments needed for using the PyTorch Lightning
-Trainer. We also create the datamodule that handles the MNIST dataset,
-dataloaders and transforms. We create the model using the
-blueprint from torch_uncertainty.models and we wrap it into mc-dropout.
-
-It is important to specify the arguments ``version`` as ``mc-dropout``,
-``num_estimators`` and the ``dropout_rate`` to use Monte Carlo dropout.
-
-.. GENERATED FROM PYTHON SOURCE LINES 56-86
+.. GENERATED FROM PYTHON SOURCE LINES 43-57
 
 .. code-block:: Python
 
 
-    root = Path(os.path.abspath(""))
-
-    # We mock the arguments for the trainer
-    with ArgvContext(
-        "file.py",
-        "--max_epochs",
-        "1",
-        "--enable_progress_bar",
-        "False",
-        "--num_estimators",
-        "8",
-        "--max_epochs",
-        "2"
-    ):
-        args = init_args(network=ResNet, datamodule=MNISTDataModule)
-
-    net_name = "logs/lenet-mnist"
+    trainer = Trainer(accelerator="cpu", max_epochs=2, enable_progress_bar=False)
 
     # datamodule
-    args.root = str(root / "data")
-    dm = MNISTDataModule(**vars(args))
+    root = Path("") / "data"
+    datamodule = MNISTDataModule(root, batch_size=128)
 
 
     model = lenet(
-        in_channels=dm.num_channels,
-        num_classes=dm.num_classes,
-        norm = nn.BatchNorm2d,
+        in_channels=datamodule.num_channels,
+        num_classes=datamodule.num_classes,
+        norm=nn.BatchNorm2d,
     )
 
 
@@ -138,28 +96,25 @@ It is important to specify the arguments ``version`` as ``mc-dropout``,
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-95
+.. GENERATED FROM PYTHON SOURCE LINES 58-64
 
 3. The Loss and the Training Routine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This is a classification problem, and we use CrossEntropyLoss as the likelihood.
+This is a classification problem, and we use CrossEntropyLoss as likelihood.
 We define the training routine using the classification training routine from
-torch_uncertainty.training.classification. We provide the number of classes
-and channels, the optimizer wrapper, the dropout rate, and the number of
-forward passes to perform through the network, as well as all the default
-arguments.
+torch_uncertainty.training.classification. We provide the number of classes,
+and the optimization recipe.
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-104
+.. GENERATED FROM PYTHON SOURCE LINES 64-72
 
 .. code-block:: Python
 
 
-    baseline = ClassificationSingle(
-        num_classes=dm.num_classes,
+    routine = ClassificationRoutine(
+        num_classes=datamodule.num_classes,
         model=model,
-        loss=nn.CrossEntropyLoss,
-        optimization_procedure=optim_cifar10_resnet18,
-        **vars(args),
+        loss=nn.CrossEntropyLoss(),
+        optim_recipe=optim_cifar10_resnet18(model),
     )
 
 
@@ -169,18 +124,18 @@ arguments.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-107
+.. GENERATED FROM PYTHON SOURCE LINES 73-75
 
-5. Gathering Everything and Training the Model
+4. Gathering Everything and Training the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-111
+.. GENERATED FROM PYTHON SOURCE LINES 75-79
 
 .. code-block:: Python
 
 
-    results = cli_main(baseline, dm, root, net_name, args)
-
+    trainer.fit(model=routine, datamodule=datamodule)
+    trainer.test(model=routine, datamodule=datamodule)
 
 
 
@@ -190,22 +145,26 @@ arguments.
 
  .. code-block:: none
 
-    ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-           Test metric             DataLoader 0
-    ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-          cls_test/acc           0.982200026512146
-         cls_test/brier         0.02837557904422283
-          cls_test/ece         0.0057438514195382595
-        cls_test/entropy        0.08077980577945709
-          cls_test/nll          0.06114054098725319
-    ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:441: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
+    /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:441: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
+    /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:441: The 'test_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
+    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+    ┃        Test metric        ┃       DataLoader 0        ┃
+    ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+    │       cls_test/Acc        │    0.9824000000953674     │
+    │      cls_test/Brier       │   0.025693457573652267    │
+    │       cls_test/ECE        │   0.0010016887681558728   │
+    │       cls_test/NLL        │    0.05316827446222305    │
+    │     cls_test/entropy      │   0.058367710560560226    │
+    └───────────────────────────┴───────────────────────────┘
+
+    [{'cls_test/Acc': 0.9824000000953674, 'cls_test/Brier': 0.025693457573652267, 'cls_test/ECE': 0.0010016887681558728, 'cls_test/NLL': 0.05316827446222305, 'cls_test/entropy': 0.058367710560560226}]
 
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 80-89
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-121
-
-6. Wrapping the Model in a MCBatchNorm
+5. Wrapping the Model in a MCBatchNorm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We can now wrap the model in a MCBatchNorm to add stochasticity to the
 predictions. We specify that the BatchNorm layers are to be converted to
@@ -215,14 +174,16 @@ The larger the ``mc_batch_size``, the more stochastic the predictions will be.
 The authors suggest 32 as a good value for ``mc_batch_size`` but we use 4 here
 to highlight the effect of stochasticity on the predictions.
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-126
+.. GENERATED FROM PYTHON SOURCE LINES 89-96
 
 .. code-block:: Python
 
 
-    baseline.model = MCBatchNorm(baseline.model, num_estimators=8, convert=True, mc_batch_size=32)
-    baseline.model.fit(dm.train)
-    baseline.eval()
+    routine.model = MCBatchNorm(
+        routine.model, num_estimators=8, convert=True, mc_batch_size=4
+    )
+    routine.model.fit(datamodule.train)
+    routine.eval()
 
 
 
@@ -233,7 +194,7 @@ to highlight the effect of stochasticity on the predictions.
  .. code-block:: none
 
 
-    ClassificationSingle(
+    ClassificationRoutine(
       (model): MCBatchNorm(
         (model): _LeNet(
           (conv1): Conv2d(1, 6, kernel_size=(5, 5), stride=(1, 1))
@@ -246,62 +207,65 @@ to highlight the effect of stochasticity on the predictions.
           (fc3): Linear(in_features=84, out_features=10, bias=True)
         )
       )
+      (loss): CrossEntropyLoss()
       (format_batch_fn): Identity()
       (val_cls_metrics): MetricCollection(
-        (acc): MulticlassAccuracy()
-        (brier): BrierScore()
-        (ece): MulticlassCE()
-        (nll): NegativeLogLikelihood(),
+        (Acc): MulticlassAccuracy()
+        (Brier): BrierScore()
+        (ECE): MulticlassCE()
+        (NLL): CategoricalNLL(),
         prefix=cls_val/
       )
       (test_cls_metrics): MetricCollection(
-        (acc): MulticlassAccuracy()
-        (brier): BrierScore()
-        (ece): MulticlassCE()
-        (nll): NegativeLogLikelihood(),
+        (Acc): MulticlassAccuracy()
+        (Brier): BrierScore()
+        (ECE): MulticlassCE()
+        (NLL): CategoricalNLL(),
         prefix=cls_test/
       )
       (test_entropy_id): Entropy()
+      (mixup): Identity()
     )
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-133
+.. GENERATED FROM PYTHON SOURCE LINES 97-103
 
-7. Testing the Model
+6. Testing the Model
 ~~~~~~~~~~~~~~~~~~~~
 Now that the model is trained, let's test it on MNIST. Don't forget to call
 .eval() to enable Monte Carlo batch normalization at inference.
 In this tutorial, we plot the most uncertain images, i.e. the images for which
 the variance of the predictions is the highest.
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-167
+.. GENERATED FROM PYTHON SOURCE LINES 103-138
 
 .. code-block:: Python
 
 
     import matplotlib.pyplot as plt
+    import numpy as np
     import torch
     import torchvision
-
-    import numpy as np
 
 
     def imshow(img):
         npimg = img.numpy()
         plt.imshow(np.transpose(npimg, (1, 2, 0)))
+        plt.axis("off")
+        plt.tight_layout()
         plt.show()
 
 
-    dataiter = iter(dm.val_dataloader())
+    dataiter = iter(datamodule.val_dataloader())
     images, labels = next(dataiter)
 
     # print images
     imshow(torchvision.utils.make_grid(images[:4, ...]))
     print("Ground truth: ", " ".join(f"{labels[j]}" for j in range(4)))
 
-    baseline.eval()
-    logits = baseline(images).reshape(8, 128, 10)
+    routine.eval()
+    logits = routine(images).reshape(8, 128, 10)
 
     probs = torch.nn.functional.softmax(logits, dim=-1)
 
@@ -328,15 +292,15 @@ the variance of the predictions is the highest.
 
     Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
     Ground truth:  7 2 1 0
-    Predicted digits for the image 61:  8 8 3 8 8 8 8 3
-    Predicted digits for the image 95:  8 8 8 8 8 8 8 8
-    Predicted digits for the image 115:  4 4 4 4 4 4 4 4
-    Predicted digits for the image 125:  4 9 9 9 9 9 9 9
+    Predicted digits for the image 94:  8 1 1 1 1 1 6 1
+    Predicted digits for the image 95:  6 4 4 6 6 4 6 6
+    Predicted digits for the image 104:  5 9 9 5 5 9 5 5
+    Predicted digits for the image 107:  6 1 1 1 6 1 1 1
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-172
+.. GENERATED FROM PYTHON SOURCE LINES 139-143
 
 The predictions are mostly erroneous, which is expected since we selected
 the most uncertain images. We also see that there stochasticity in the
@@ -346,7 +310,7 @@ stochastic estimator used.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 22.912 seconds)
+   **Total running time of the script:** (0 minutes 36.339 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_mc_batch_norm.py:

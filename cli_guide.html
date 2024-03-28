@@ -1,0 +1,481 @@
+
+<!DOCTYPE html>
+
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+<meta charset="utf-8"/>
+<meta content="Docutils 0.19: https://docutils.sourceforge.io/" name="generator">
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CLI Guide — TorchUncertainty 0.2.0 documentation</title>
+<link href="_static/images/logo_torch_uncertainty.png" rel="shortcut icon"/>
+<link href="_static/css/custom.css" rel="stylesheet" type="text/css"/>
+<!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
+<link href="_static/pygments.css" rel="stylesheet" type="text/css"/>
+<link href="_static/css/custom.css" rel="stylesheet" type="text/css"/>
+<link href="_static/copybutton.css" rel="stylesheet" type="text/css"/>
+<link href="_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
+<link href="_static/sg_gallery.css" rel="stylesheet" type="text/css"/>
+<link href="_static/sg_gallery-binder.css" rel="stylesheet" type="text/css"/>
+<link href="_static/sg_gallery-dataframe.css" rel="stylesheet" type="text/css"/>
+<link href="_static/sg_gallery-rendered-html.css" rel="stylesheet" type="text/css"/>
+<link href="genindex.html" rel="index" title="Index"/>
+<link href="search.html" rel="search" title="Search"/>
+<link href="api.html" rel="next" title="API Reference"/>
+<link href="auto_tutorials/tutorial_pe_cifar10.html" rel="prev" title="From a Standard Classifier to a Packed-Ensemble"/>
+<!-- Google Analytics -->
+<script type="text/javascript">
+    var collapsedSections = [];
+  </script>
+<!-- End Google Analytics -->
+<script src="_static/js/modernizr.min.js"></script>
+<script>
+    MathJax = {
+        chtml: {
+            scale: 1,
+            minScale: 1,
+        },
+        svg: {
+            scale: 1,
+            minScale: 1,
+        }
+    }
+</script>
+<!-- Preload the theme fonts -->
+<link as="font" crossorigin="anonymous" href="_static/fonts/FreightSans/freight-sans-book.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="anonymous" href="_static/fonts/FreightSans/freight-sans-medium.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="anonymous" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="anonymous" href="_static/fonts/FreightSans/freight-sans-bold.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="anonymous" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="anonymous" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" rel="preload" type="font/woff2"/>
+<!-- Preload the katex fonts -->
+<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" rel="preload" type="font/woff2"/>
+<link crossorigin="anonymous" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" rel="stylesheet"/>
+</meta></head>
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+<div class="container">
+<div class="header-container">
+<a aria-label="OpenMMLab" class="header-logo" href="https://torch-uncertainty.github.io/"></a>
+<div class="main-menu">
+<ul>
+<li>
+<a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
+</li>
+</ul>
+</div>
+<a class="main-menu-open-button" data-behavior="open-mobile-menu" href="#"></a>
+</div>
+</div>
+</div>
+<body class="pytorch-body">
+<div class="table-of-contents-link-wrapper">
+<span>Table of Contents</span>
+<a class="toggle-table-of-contents" data-behavior="toggle-table-of-contents" href="#"></a>
+</div>
+<nav class="pytorch-left-menu" data-toggle="wy-nav-shift" id="pytorch-left-menu">
+<div class="pytorch-side-scroll">
+<div aria-label="main navigation" class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation">
+<div class="pytorch-left-menu-search">
+<div role="search">
+<form action="search.html" class="wy-form" id="rtd-search-form" method="get">
+<input name="q" placeholder="Search Docs" type="text"/>
+<input name="check_keywords" type="hidden" value="yes"/>
+<input name="area" type="hidden" value="default"/>
+</form>
+</div>
+</div>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction_uncertainty.html">Introduction to Classification Uncertainty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">CLI Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+</div>
+</div>
+</nav>
+<div class="pytorch-container">
+<div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+<div class="pytorch-breadcrumbs-wrapper">
+<div aria-label="breadcrumbs navigation" role="navigation">
+<ul class="pytorch-breadcrumbs">
+<li>
+<a href="index.html">
+        Docs
+      </a> &gt;
+    </li>
+<li>CLI Guide</li>
+<!-- 
+    <li class="pytorch-breadcrumbs-aside">
+      
+      
+      
+      
+      
+      <a href="/zh_CN//cli_guide.html" class="fa fa-language"> 以中文阅读</a>
+      
+      
+    </li>
+    
+     -->
+</ul>
+</div>
+</div>
+<div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+        Shortcuts
+      </div>
+</div>
+<section class="pytorch-content-wrap" data-toggle="wy-nav-shift" id="pytorch-content-wrap">
+<div class="pytorch-content-left">
+<div class="pytorch-call-to-action-links">
+<div id="tutorial-type">cli_guide</div>
+<!-- <div id="google-colab-link">
+            <img class="call-to-action-img" src="_static/images/pytorch-colab.svg" />
+            <div class="call-to-action-desktop-view">Run in Google Colab</div>
+            <div class="call-to-action-mobile-view">Colab</div>
+          </div> -->
+<div id="download-notebook-link">
+<img class="call-to-action-notebook-img" src="_static/images/pytorch-download.svg"/>
+<div class="call-to-action-desktop-view">Download Notebook</div>
+<div class="call-to-action-mobile-view">Notebook</div>
+</div>
+<div id="github-view-link">
+<img class="call-to-action-img" src="_static/images/pytorch-github.svg"/>
+<div class="call-to-action-desktop-view">View on GitHub</div>
+<div class="call-to-action-mobile-view">GitHub</div>
+</div>
+</div>
+<div class="rst-content">
+<div class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+<article class="pytorch-article" id="pytorch-article" itemprop="articleBody">
+<section id="cli-guide">
+<h1>CLI Guide<a class="headerlink" href="#cli-guide" title="Permalink to this heading">¶</a></h1>
+<section id="introduction-to-the-lightning-cli">
+<h2>Introduction to the Lightning CLI<a class="headerlink" href="#introduction-to-the-lightning-cli" title="Permalink to this heading">¶</a></h2>
+<p>The Lightning CLI tool eases the implementation of a CLI to instanciate models to train and evaluate them on
+some data. The CLI tool is a wrapper around the <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> class and provides a set of subcommands to train
+and test a <code class="docutils literal notranslate"><span class="pre">LightningModule</span></code> on a <code class="docutils literal notranslate"><span class="pre">LightningDataModule</span></code>. To better match our needs, we created an inherited
+class from the <code class="docutils literal notranslate"><span class="pre">LightningCLI</span></code> class, namely <code class="docutils literal notranslate"><span class="pre">TULightningCLI</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">TULightningCLI</span></code> adds a new argument to the <code class="docutils literal notranslate"><span class="pre">LightningCLI</span></code> class: <code class="xref py py-attr docutils literal notranslate"><span class="pre">eval_after_fit</span></code> to know whether
+an evaluation on the test set should be performed after the training phase.</p>
+</div>
+<p>Let’s see how to implement the CLI, by checking out the <code class="docutils literal notranslate"><span class="pre">experiments/classification/cifar10/resnet.py</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">lightning.pytorch.cli</span> <span class="kn">import</span> <span class="n">LightningArgumentParser</span>
+
+<span class="kn">from</span> <span class="nn">torch_uncertainty.baselines.classification</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.baselines.classification.ResNetBaseline.html#torch_uncertainty.baselines.classification.ResNetBaseline" title="torch_uncertainty.baselines.classification.resnet.ResNetBaseline"><span class="n">ResNetBaseline</span></a>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.classification.cifar10.CIFAR10DataModule"><span class="n">CIFAR10DataModule</span></a>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.utils</span> <span class="kn">import</span> <span class="n">TULightningCLI</span>
+
+
+<span class="k">class</span> <span class="nc">ResNetCLI</span><span class="p">(</span><span class="n">TULightningCLI</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">add_arguments_to_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">:</span> <span class="n">LightningArgumentParser</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_optimizer_args</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_lr_scheduler_args</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">MultiStepLR</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">cli_main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ResNetCLI</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">ResNetCLI</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.baselines.classification.ResNetBaseline.html#torch_uncertainty.baselines.classification.ResNetBaseline" title="torch_uncertainty.baselines.classification.resnet.ResNetBaseline"><span class="n">ResNetBaseline</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.classification.cifar10.CIFAR10DataModule"><span class="n">CIFAR10DataModule</span></a><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">cli</span> <span class="o">=</span> <span class="n">cli_main</span><span class="p">()</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="p">(</span><span class="ow">not</span> <span class="n">cli</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">fast_dev_run</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">cli</span><span class="o">.</span><span class="n">subcommand</span> <span class="o">==</span> <span class="s2">"fit"</span>
+        <span class="ow">and</span> <span class="n">cli</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">cli</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="s2">"eval_after_fit"</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="n">cli</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">datamodule</span><span class="o">=</span><span class="n">cli</span><span class="o">.</span><span class="n">datamodule</span><span class="p">,</span> <span class="n">ckpt_path</span><span class="o">=</span><span class="s2">"best"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This file enables both training and testing ResNet architectures on the CIFAR-10 dataset.
+The <code class="docutils literal notranslate"><span class="pre">ResNetCLI</span></code> class inherits from the <code class="docutils literal notranslate"><span class="pre">TULightningCLI</span></code> class and implements the
+<code class="docutils literal notranslate"><span class="pre">add_arguments_to_parser</span></code> method to add the optimizer and learning rate scheduler arguments
+into the parser. In this case, we use the <code class="docutils literal notranslate"><span class="pre">torch.optim.SGD</span></code> optimizer and the
+<code class="docutils literal notranslate"><span class="pre">torch.optim.lr_scheduler.MultiStepLR</span></code> learning rate scheduler.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ResNetCLI</span><span class="p">(</span><span class="n">TULightningCLI</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">add_arguments_to_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">:</span> <span class="n">LightningArgumentParser</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_optimizer_args</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_lr_scheduler_args</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">MultiStepLR</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">LightningCLI</span></code> takes a <code class="docutils literal notranslate"><span class="pre">LightningModule</span></code> and a <code class="docutils literal notranslate"><span class="pre">LightningDataModule</span></code> as arguments.
+Here the <code class="docutils literal notranslate"><span class="pre">cli_main</span></code> function creates an instance of the <code class="docutils literal notranslate"><span class="pre">ResNetCLI</span></code> class by taking the <code class="docutils literal notranslate"><span class="pre">ResNetBaseline</span></code>
+model and the <code class="docutils literal notranslate"><span class="pre">CIFAR10DataModule</span></code> as arguments.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">cli_main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ResNetCLI</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">ResNetCLI</span><span class="p">(</span><span class="n">ResNetBaseline</span><span class="p">,</span> <span class="n">CIFAR10DataModule</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ResNetBaseline</span></code> is a subclass of the <code class="docutils literal notranslate"><span class="pre">ClassificationRoutine</span></code> seemlessly instanciating a
+ResNet model based on a <code class="xref py py-attr docutils literal notranslate"><span class="pre">version</span></code> and an <code class="xref py py-attr docutils literal notranslate"><span class="pre">arch</span></code> to be passed to the routine.</p>
+</div>
+<p>Depending on the CLI subcommand calling <code class="docutils literal notranslate"><span class="pre">cli_main()</span></code> will either train or test the model on the using
+the CIFAR-10 dataset. But what are these subcommands?</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>resnet.py<span class="w"> </span>--help
+</pre></div>
+</div>
+<p>This command will display the available subcommands of the CLI tool.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>subcommands:
+For<span class="w"> </span>more<span class="w"> </span>details<span class="w"> </span>of<span class="w"> </span>each<span class="w"> </span>subcommand,<span class="w"> </span>add<span class="w"> </span>it<span class="w"> </span>as<span class="w"> </span>an<span class="w"> </span>argument<span class="w"> </span>followed<span class="w"> </span>by<span class="w"> </span>--help.
+
+Available<span class="w"> </span>subcommands:
+<span class="w">    </span>fit<span class="w">                 </span>Runs<span class="w"> </span>the<span class="w"> </span>full<span class="w"> </span>optimization<span class="w"> </span>routine.
+<span class="w">    </span>validate<span class="w">            </span>Perform<span class="w"> </span>one<span class="w"> </span>evaluation<span class="w"> </span>epoch<span class="w"> </span>over<span class="w"> </span>the<span class="w"> </span>validation<span class="w"> </span>set.
+<span class="w">    </span><span class="nb">test</span><span class="w">                </span>Perform<span class="w"> </span>one<span class="w"> </span>evaluation<span class="w"> </span>epoch<span class="w"> </span>over<span class="w"> </span>the<span class="w"> </span><span class="nb">test</span><span class="w"> </span>set.
+<span class="w">    </span>predict<span class="w">             </span>Run<span class="w"> </span>inference<span class="w"> </span>on<span class="w"> </span>your<span class="w"> </span>data.
+</pre></div>
+</div>
+<p>You can execute whichever subcommand you like and set up all your hyperparameters directly using the command line</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>resnet.py<span class="w"> </span>fit<span class="w"> </span>--trainer.max_epochs<span class="w"> </span><span class="m">75</span><span class="w"> </span>--trainer.accelerators<span class="w"> </span>gpu<span class="w"> </span>--trainer.devices<span class="w"> </span><span class="m">1</span><span class="w"> </span>--model.version<span class="w"> </span>std<span class="w"> </span>--model.arch<span class="w"> </span><span class="m">18</span><span class="w"> </span>--model.in_channels<span class="w"> </span><span class="m">3</span><span class="w"> </span>--model.num_classes<span class="w"> </span><span class="m">10</span><span class="w"> </span>--model.loss<span class="w"> </span>CrossEntropyLoss<span class="w"> </span>--model.style<span class="w"> </span>cifar<span class="w"> </span>--data.root<span class="w"> </span>./data<span class="w"> </span>--data.batch_size<span class="w"> </span><span class="m">128</span><span class="w"> </span>--optimizer.lr<span class="w"> </span><span class="m">0</span>.05<span class="w"> </span>--lr_scheduler.milestones<span class="w"> </span><span class="o">[</span><span class="m">25</span>,50<span class="o">]</span>
+</pre></div>
+</div>
+<p>All arguments in the <code class="docutils literal notranslate"><span class="pre">__init__()</span></code> methods of the <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>, <code class="docutils literal notranslate"><span class="pre">LightningModule</span></code> (here <code class="docutils literal notranslate"><span class="pre">ResNetBaseline</span></code>),
+<code class="docutils literal notranslate"><span class="pre">LightningDataModule</span></code> (here <code class="docutils literal notranslate"><span class="pre">CIFAR10DataModule</span></code>), <code class="docutils literal notranslate"><span class="pre">torch.optim.SGD</span></code>, and <code class="docutils literal notranslate"><span class="pre">torch.optim.lr_scheduler.MultiStepLR</span></code>
+classes are configurable using the CLI tool using the <code class="docutils literal notranslate"><span class="pre">--trainer</span></code>, <code class="docutils literal notranslate"><span class="pre">--model</span></code>, <code class="docutils literal notranslate"><span class="pre">--data</span></code>, <code class="docutils literal notranslate"><span class="pre">--optimizer</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">--lr_scheduler</span></code> prefixes, respectively.</p>
+<p>However for a large number of hyperparameters, it is not practical to pass them all in the command line.
+It is more convenient to use configuration files to store these hyperparameters and ease the burden of
+repeating them each time you want to train or test a model. Let’s see how to do that.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">Pytorch</span></code> classes are supported by the CLI tool, so you can use them directly: <code class="docutils literal notranslate"><span class="pre">--model.loss</span> <span class="pre">CrossEntropyLoss</span></code>
+and they would be automatically instanciated by the CLI tool with their default arguments (i.e., <code class="docutils literal notranslate"><span class="pre">CrossEntropyLoss()</span></code>).</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Add the following after calling <code class="docutils literal notranslate"><span class="pre">cli=cli_main()</span></code> to eventually evaluate the model on the test set
+after training, if the <code class="docutils literal notranslate"><span class="pre">eval_after_fit</span></code> argument is set to <code class="docutils literal notranslate"><span class="pre">True</span></code> and <code class="docutils literal notranslate"><span class="pre">trainer.fast_dev_run</span></code>
+is set to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span>
+    <span class="p">(</span><span class="ow">not</span> <span class="n">cli</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">fast_dev_run</span><span class="p">)</span>
+    <span class="ow">and</span> <span class="n">cli</span><span class="o">.</span><span class="n">subcommand</span> <span class="o">==</span> <span class="s2">"fit"</span>
+    <span class="ow">and</span> <span class="n">cli</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">cli</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="s2">"eval_after_fit"</span><span class="p">)</span>
+<span class="p">):</span>
+    <span class="n">cli</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">datamodule</span><span class="o">=</span><span class="n">cli</span><span class="o">.</span><span class="n">datamodule</span><span class="p">,</span> <span class="n">ckpt_path</span><span class="o">=</span><span class="s2">"best"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="configuration-files">
+<h2>Configuration files<a class="headerlink" href="#configuration-files" title="Permalink to this heading">¶</a></h2>
+<p>By default the <code class="docutils literal notranslate"><span class="pre">LightningCLI</span></code> support configuration files in the YAML format (learn more about this format
+<a class="reference external" href="https://lightning.ai/docs/pytorch/stable/cli/lightning_cli_faq.html#what-is-a-yaml-config-file">here</a>).
+Taking the previous example, we can create a configuration file named <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code> with the following content:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># config.yaml</span>
+<span class="nt">eval_after_fit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">trainer</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">max_epochs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">75</span>
+<span class="w">  </span><span class="nt">accelerators</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gpu</span>
+<span class="w">  </span><span class="nt">devices</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="nt">model</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">std</span>
+<span class="w">  </span><span class="nt">arch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">18</span>
+<span class="w">  </span><span class="nt">in_channels</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">  </span><span class="nt">num_classes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
+<span class="w">  </span><span class="nt">loss</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CrossEntropyLoss</span>
+<span class="w">  </span><span class="nt">style</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cifar</span>
+<span class="nt">data</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">root</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./data</span>
+<span class="w">  </span><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">128</span>
+<span class="nt">optimizer</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">lr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
+<span class="nt">lr_scheduler</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">milestones</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">25</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+</pre></div>
+</div>
+<p>Then, we can run the following command to train the model:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>resnet.py<span class="w"> </span>fit<span class="w"> </span>--config<span class="w"> </span>config.yaml
+</pre></div>
+</div>
+<p>By default, executing the command above will store the experiment results in a directory named <code class="docutils literal notranslate"><span class="pre">lightning_logs</span></code>,
+and the last state of the model will be saved in a directory named <code class="docutils literal notranslate"><span class="pre">lightning_logs/version_{int}/checkpoints</span></code>.
+In addition, all arguments passed to instanciate the <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>, <code class="docutils literal notranslate"><span class="pre">ResNetBaseline</span></code>, <code class="docutils literal notranslate"><span class="pre">CIFAR10DataModule</span></code>,
+<code class="docutils literal notranslate"><span class="pre">torch.optim.SGD</span></code>, and <code class="docutils literal notranslate"><span class="pre">torch.optim.lr_scheduler.MultiStepLR</span></code> classes will be saved in a file named
+<code class="docutils literal notranslate"><span class="pre">lightning_logs/version_{int}/config.yaml</span></code>. When testing the model, we advise to use this configuration file
+to ensure that the same hyperparameters are used for training and testing.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>resnet.py<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--config<span class="w"> </span>lightning_logs/version_<span class="o">{</span>int<span class="o">}</span>/config.yaml<span class="w"> </span>--ckpt_path<span class="w"> </span>lightning_logs/version_<span class="o">{</span>int<span class="o">}</span>/checkpoints/<span class="o">{</span>filename<span class="o">}</span>.ckpt
+</pre></div>
+</div>
+</section>
+<section id="experiment-folder-usage">
+<h2>Experiment folder usage<a class="headerlink" href="#experiment-folder-usage" title="Permalink to this heading">¶</a></h2>
+<p>Now that we have seen how to implement the CLI tool and how to use configuration files, let explore the
+configurations available in the <code class="docutils literal notranslate"><span class="pre">experiments</span></code> directory. The <code class="docutils literal notranslate"><span class="pre">experiments</span></code> directory is
+mainly organized as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>experiments
+├──<span class="w"> </span>classification
+│<span class="w">   </span>├──<span class="w"> </span>cifar10
+│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>configs
+│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>resnet.py
+│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>vgg.py
+│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>wideresnet.py
+│<span class="w">   </span>└──<span class="w"> </span>cifar100
+│<span class="w">       </span>├──<span class="w"> </span>configs
+│<span class="w">       </span>├──<span class="w"> </span>resnet.py
+│<span class="w">       </span>├──<span class="w"> </span>vgg.py
+│<span class="w">       </span>└──<span class="w"> </span>wideresnet.py
+├──<span class="w"> </span>regression
+│<span class="w">   </span>└──<span class="w"> </span>uci_datasets
+│<span class="w">       </span>├──<span class="w"> </span>configs
+│<span class="w">       </span>└──<span class="w"> </span>mlp.py
+└──<span class="w"> </span>segmentation
+<span class="w">    </span>├──<span class="w"> </span>cityscapes
+<span class="w">    </span>│<span class="w">   </span>├──<span class="w"> </span>configs
+<span class="w">    </span>│<span class="w">   </span>└──<span class="w"> </span>segformer.py
+<span class="w">    </span>└──<span class="w"> </span>muad
+<span class="w">        </span>├──<span class="w"> </span>configs
+<span class="w">        </span>└──<span class="w"> </span>segformer.py
+</pre></div>
+</div>
+<p>For each task (<strong>classification</strong>, <strong>regression</strong>, and <strong>segmentation</strong>), we have a directory containing the datasets
+(e.g., CIFAR10, CIFAR100, UCI datasets, Cityscapes, and Muad) and for each dataset, we have a directory containing
+the configuration files and the CLI files for different backbones.</p>
+<p>You can directly use the CLI files with the command line or use the predefined configuration files to train and test
+the models. The configuration files are stored in the <code class="docutils literal notranslate"><span class="pre">configs</span></code>. For example, the configuration file for the classic
+ResNet-18 model on the CIFAR-10 dataset is stored in the <code class="docutils literal notranslate"><span class="pre">experiments/classification/cifar10/configs/resnet18/standard.yaml</span></code>
+file. For the Packed ResNet-18 model on the CIFAR-10 dataset, the configuration file is stored in the
+<code class="docutils literal notranslate"><span class="pre">experiments/classification/cifar10/configs/resnet18/packed.yaml</span></code> file.</p>
+<p>If you are interested in using a ResNet model but want to choose some of the hyperparameters using the command line,
+you can use the configuration file and override the hyperparameters using the command line. For example, to train
+a ResNet-18 model on the CIFAR-10 dataset with a batch size of <span class="math notranslate nohighlight">\(256\)</span>, you can use the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>resnet.py<span class="w"> </span>fit<span class="w"> </span>--config<span class="w"> </span>configs/resnet18/standard.yaml<span class="w"> </span>--data.batch_size<span class="w"> </span><span class="m">256</span>
+</pre></div>
+</div>
+<p>To use the weights argument of the <code class="docutils literal notranslate"><span class="pre">torch.nn.CrossEntropyLoss</span></code> class, you can use the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>resnet.py<span class="w"> </span>fit<span class="w"> </span>--config<span class="w"> </span>configs/resnet18/standard.yaml<span class="w"> </span>--model.loss<span class="w"> </span>CrossEntropyLoss<span class="w"> </span>--model.loss.weight<span class="w"> </span>Tensor<span class="w"> </span>--model.loss.weight.dict_kwargs.data<span class="w"> </span><span class="o">[</span><span class="m">1</span>,2,3,4,5,6,7,8,9,10<span class="o">]</span>
+</pre></div>
+</div>
+<p>In addition, we provide a default configuration file for some backbones in the <code class="docutils literal notranslate"><span class="pre">configs</span></code> directory. For example,
+<code class="docutils literal notranslate"><span class="pre">experiments/classification/cifar10/configs/resnet.yaml</span></code> contains the default hyperparameters to train a ResNet model
+on the CIFAR-10 dataset. Yet, some hyperparameters are purposely missing to be set by the user using the command line.</p>
+<p>For instance, to train a Packed ResNet-34 model on the CIFAR-10 dataset with <span class="math notranslate nohighlight">\(4\)</span> estimators and a <span class="math notranslate nohighlight">\(\alpha\)</span> value of <span class="math notranslate nohighlight">\(2\)</span>,
+you can use the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>resnet.py<span class="w"> </span>fit<span class="w"> </span>--config<span class="w"> </span>configs/resnet.yaml<span class="w"> </span>--trainer.max_epochs<span class="w"> </span><span class="m">75</span><span class="w"> </span>--model.version<span class="w"> </span>packed<span class="w"> </span>--model.arch<span class="w"> </span><span class="m">34</span><span class="w"> </span>--model.num_estimators<span class="w"> </span><span class="m">4</span><span class="w"> </span>--model.alpha<span class="w"> </span><span class="m">2</span><span class="w"> </span>--optimizer.lr<span class="w"> </span><span class="m">0</span>.05<span class="w"> </span>--lr_scheduler.milestones<span class="w"> </span><span class="o">[</span><span class="m">25</span>,50<span class="o">]</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Explore the <a class="reference external" href="https://lightning.ai/docs/pytorch/stable/cli/lightning_cli.html">Lightning CLI docs</a> to learn more about the CLI tool,
+the available arguments, and how to use them with configuration files.</p>
+</div>
+</section>
+</section>
+</article>
+</div>
+<footer>
+<div aria-label="footer navigation" class="rst-footer-buttons" role="navigation">
+<a accesskey="n" class="btn btn-neutral float-right" href="api.html" rel="next" title="API Reference">Next <img class="next-page" src="_static/images/chevron-right-teal.svg"/></a>
+<a accesskey="p" class="btn btn-neutral" href="auto_tutorials/tutorial_pe_cifar10.html" rel="prev" title="From a Standard Classifier to a Packed-Ensemble"><img class="previous-page" src="_static/images/chevron-right-teal.svg"/> Previous</a>
+</div>
+<hr/>
+<div role="contentinfo">
+<p>
+      © Copyright 2024, Adrien Lafage and Olivier Laurent.
+
+    </p>
+</div>
+<div>
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the
+      Docs</a>.
+  </div>
+</footer>
+</div>
+</div>
+<div class="pytorch-content-right" id="pytorch-content-right">
+<div class="pytorch-right-menu" id="pytorch-right-menu">
+<div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+<ul>
+<li><a class="reference internal" href="#">CLI Guide</a><ul>
+<li><a class="reference internal" href="#introduction-to-the-lightning-cli">Introduction to the Lightning CLI</a></li>
+<li><a class="reference internal" href="#configuration-files">Configuration files</a></li>
+<li><a class="reference internal" href="#experiment-folder-usage">Experiment folder usage</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+</div>
+<script data-url_root="./" id="documentation_options" src="_static/documentation_options.js" type="text/javascript"></script>
+<script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+<script src="_static/jquery.js"></script>
+<script src="_static/underscore.js"></script>
+<script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+<script src="_static/doctools.js"></script>
+<script src="_static/sphinx_highlight.js"></script>
+<script src="_static/clipboard.min.js"></script>
+<script src="_static/copybutton.js"></script>
+<script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="_static/js/vendor/popper.min.js" type="text/javascript"></script>
+<script src="_static/js/vendor/bootstrap.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+<script src="_static/js/theme.js" type="text/javascript"></script>
+<script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+<!-- Begin Footer -->
+<div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+</div>
+<!-- End Footer -->
+<!-- Begin Mobile Menu -->
+<div class="mobile-main-menu">
+<div class="container-fluid">
+<div class="container">
+<div class="mobile-main-menu-header-container">
+<a aria-label="OpenMMLab" class="header-logo" href="https://torch-uncertainty.github.io/"></a>
+<a class="main-menu-close-button" data-behavior="close-mobile-menu" href="#"></a>
+</div>
+</div>
+</div>
+<div class="mobile-main-menu-links-container">
+<div class="main-menu">
+<ul>
+<li>
+<a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
+</li>
+</ul></div>
+</div>
+</div>
+<!-- End Mobile Menu -->
+<script src="_static/js/vendor/anchor.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function (e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

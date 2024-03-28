@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.layers.bayesian.bayes_conv &mdash; TorchUncertainty 0.1.6 documentation</title>
+  <title>torch_uncertainty.layers.bayesian.bayes_conv &mdash; TorchUncertainty 0.2.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -153,7 +153,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../introduction_uncertainty.html">Introduction to Classification Uncertainty</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../auto_tutorials/index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli_guide.html">CLI Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../references.html">References</a></li>
 </ul>
@@ -335,9 +336,7 @@
         <span class="n">valid_padding_modes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;zeros&quot;</span><span class="p">,</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span> <span class="s2">&quot;replicate&quot;</span><span class="p">,</span> <span class="s2">&quot;circular&quot;</span><span class="p">}</span>
         <span class="k">if</span> <span class="n">padding_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_padding_modes</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;padding_mode must be one of </span><span class="si">{}</span><span class="s2">, but got &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">valid_padding_modes</span><span class="p">,</span> <span class="n">padding_mode</span>
-                <span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;padding_mode must be one of </span><span class="si">{</span><span class="n">valid_padding_modes</span><span class="si">}</span><span class="s2">, but got &#39;</span><span class="si">{</span><span class="n">padding_mode</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">transposed</span><span class="p">:</span>
@@ -431,7 +430,7 @@
         <span class="n">bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_sampler</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_mu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">weight</span><span class="p">,</span> <span class="n">bias</span>
 
-    <span class="k">def</span> <span class="nf">extra_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># coverage: ignore</span>
+    <span class="k">def</span> <span class="nf">extra_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">(</span>
             <span class="s2">&quot;</span><span class="si">{in_channels}</span><span class="s2">, </span><span class="si">{out_channels}</span><span class="s2">, kernel_size=</span><span class="si">{kernel_size}</span><span class="s2">&quot;</span>
             <span class="s2">&quot;, stride=</span><span class="si">{stride}</span><span class="s2">&quot;</span>
@@ -450,7 +449,7 @@
             <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;, padding_mode=</span><span class="si">{padding_mode}</span><span class="s2">&quot;</span>
         <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__setstate__</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;padding_mode&quot;</span><span class="p">):</span>  <span class="c1"># coverage: ignore</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">padding_mode</span> <span class="o">=</span> <span class="s2">&quot;zeros&quot;</span>

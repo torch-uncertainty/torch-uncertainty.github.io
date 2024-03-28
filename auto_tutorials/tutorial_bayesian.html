@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Train a Bayesian Neural Network in Three Minutes &mdash; TorchUncertainty 0.1.6 documentation</title>
+  <title>Train a Bayesian Neural Network in Three Minutes &mdash; TorchUncertainty 0.2.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -40,8 +40,8 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Training a LeNet with Monte-Carlo Dropout" href="tutorial_mc_dropout.html" />
-  <link rel="prev" title="Improve Top-label Calibration with Temperature Scaling" href="tutorial_scaler.html" />
+  <link rel="next" title="Improve Top-label Calibration with Temperature Scaling" href="tutorial_scaler.html" />
+  <link rel="prev" title="Tutorials" href="index.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -156,7 +156,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../introduction_uncertainty.html">Introduction to Classification Uncertainty</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli_guide.html">CLI Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
@@ -265,51 +266,49 @@ to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="train-a-bayesian-neural-network-in-three-minutes">
 <span id="sphx-glr-auto-tutorials-tutorial-bayesian-py"></span><h1>Train a Bayesian Neural Network in Three Minutes<a class="headerlink" href="#train-a-bayesian-neural-network-in-three-minutes" title="Permalink to this heading">¶</a></h1>
-<p>In this tutorial, we will train a Bayesian Neural Network (BNN) LeNet classifier on the MNIST dataset.</p>
+<p>In this tutorial, we will train a variational inference Bayesian Neural Network (BNN) LeNet classifier on the MNIST dataset.</p>
 <section id="foreword-on-bayesian-neural-networks">
 <h2>Foreword on Bayesian Neural Networks<a class="headerlink" href="#foreword-on-bayesian-neural-networks" title="Permalink to this heading">¶</a></h2>
-<p>Bayesian Neural Networks (BNNs) are a class of neural networks that can estimate the uncertainty of their predictions via uncertainty on their weights. This is achieved by considering the weights of the neural network as random variables, and by learning their posterior distribution. This is in contrast to standard neural networks, which only learn a single set of weights, which can be seen as Dirac distributions on the weights.</p>
+<p>Bayesian Neural Networks (BNNs) are a class of neural networks that estimate the uncertainty on their predictions via uncertainty
+on their weights. This is achieved by considering the weights of the neural network as random variables, and by learning their
+posterior distribution. This is in contrast to standard neural networks, which only learn a single set of weights, which can be
+seen as Dirac distributions on the weights.</p>
 <p>For more information on Bayesian Neural Networks, we refer the reader to the following resources:</p>
 <ul class="simple">
 <li><p>Weight Uncertainty in Neural Networks <a class="reference external" href="https://arxiv.org/pdf/1505.05424.pdf">ICML2015</a></p></li>
 <li><p>Hands-on Bayesian Neural Networks - a Tutorial for Deep Learning Users <a class="reference external" href="https://arxiv.org/pdf/2007.06823.pdf">IEEE Computational Intelligence Magazine</a></p></li>
 </ul>
 </section>
-<section id="training-a-bayesian-lenet-using-torchuncertainty-models-and-pytorch-lightning">
-<h2>Training a Bayesian LeNet using TorchUncertainty models and PyTorch Lightning<a class="headerlink" href="#training-a-bayesian-lenet-using-torchuncertainty-models-and-pytorch-lightning" title="Permalink to this heading">¶</a></h2>
+<section id="training-a-bayesian-lenet-using-torchuncertainty-models-and-lightning">
+<h2>Training a Bayesian LeNet using TorchUncertainty models and Lightning<a class="headerlink" href="#training-a-bayesian-lenet-using-torchuncertainty-models-and-lightning" title="Permalink to this heading">¶</a></h2>
 <p>In this part, we train a bayesian LeNet, based on the model and routines already implemented in TU.</p>
 <section id="loading-the-utilities">
 <h3>1. Loading the utilities<a class="headerlink" href="#loading-the-utilities" title="Permalink to this heading">¶</a></h3>
-<p>To train a BNN using TorchUncertainty, we have to load the following utilities from TorchUncertainty:</p>
+<p>To train a BNN using TorchUncertainty, we have to load the following modules:</p>
 <ul class="simple">
-<li><p>the cli handler: cli_main and argument parser: init_args</p></li>
-<li><p>the model: bayesian_lenet, which lies in the torch_uncertainty.model module</p></li>
-<li><p>the classification training routine in the torch_uncertainty.training.classification module</p></li>
+<li><p>the Trainer from Lightning</p></li>
+<li><p>the model: bayesian_lenet, which lies in the torch_uncertainty.model</p></li>
+<li><p>the classification training routine from torch_uncertainty.routines</p></li>
 <li><p>the bayesian objective: the ELBOLoss, which lies in the torch_uncertainty.losses file</p></li>
-<li><p>the datamodule that handles dataloaders: MNISTDataModule, which lies in the torch_uncertainty.datamodule</p></li>
+<li><p>the datamodule that handles dataloaders: MNISTDataModule from torch_uncertainty.datamodules</p></li>
 </ul>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty</span> <span class="kn">import</span> <span class="n">cli_main</span><span class="p">,</span> <span class="n">init_args</span>
+<p>We will also need to define an optimizer using torch.optim, the
+neural network utils from torch.nn, as well as the partial util to provide
+the modified default arguments for the ELBO loss.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">lightning.pytorch</span> <span class="kn">import</span> <span class="n">Trainer</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
+
 <span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <span class="n">MNISTDataModule</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.losses</span> <span class="kn">import</span> <span class="n">ELBOLoss</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.models.lenet</span> <span class="kn">import</span> <span class="n">bayesian_lenet</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.routines.classification</span> <span class="kn">import</span> <span class="n">ClassificationSingle</span>
-</pre></div>
-</div>
-<p>We will also need to define an optimizer using torch.optim as well as the
-neural network utils withing torch.nn, as well as the partial util to provide
-the modified default arguments for the ELBO loss.</p>
-<p>We also import sys to override the command line arguments.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.routines</span> <span class="kn">import</span> <span class="n">ClassificationRoutine</span>
 </pre></div>
 </div>
 </section>
-<section id="creating-the-optimizer-wrapper">
-<h3>2. Creating the Optimizer Wrapper<a class="headerlink" href="#creating-the-optimizer-wrapper" title="Permalink to this heading">¶</a></h3>
+<section id="the-optimization-recipe">
+<h3>2. The Optimization Recipe<a class="headerlink" href="#the-optimization-recipe" title="Permalink to this heading">¶</a></h3>
 <p>We will use the Adam optimizer with the default learning rate of 0.001.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">optim_lenet</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
     <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span>
@@ -322,25 +321,18 @@ the modified default arguments for the ELBO loss.</p>
 </section>
 <section id="creating-the-necessary-variables">
 <h3>3. Creating the necessary variables<a class="headerlink" href="#creating-the-necessary-variables" title="Permalink to this heading">¶</a></h3>
-<p>In the following, we will need to define the root of the datasets and the
-logs, and to fake-parse the arguments needed for using the PyTorch Lightning
-Trainer. We also create the datamodule that handles the MNIST dataset,
-dataloaders and transforms. Finally, we create the model using the
-blueprint from torch_uncertainty.models.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
-
-<span class="c1"># We mock the arguments for the trainer</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">argv</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;file.py&quot;</span><span class="p">,</span> <span class="s2">&quot;--max_epochs&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;--enable_progress_bar&quot;</span><span class="p">,</span> <span class="s2">&quot;False&quot;</span><span class="p">]</span>
-<span class="n">args</span> <span class="o">=</span> <span class="n">init_args</span><span class="p">(</span><span class="n">datamodule</span><span class="o">=</span><span class="n">MNISTDataModule</span><span class="p">)</span>
-
-<span class="n">net_name</span> <span class="o">=</span> <span class="s2">&quot;logs/bayesian-lenet-mnist&quot;</span>
+<p>In the following, we define the Lightning trainer, the root of the datasets and the logs.
+We also create the datamodule that handles the MNIST dataset, dataloaders and transforms.
+Please note that the datamodules can also handle OOD detection by setting the eval_ood
+parameter to True. Finally, we create the model using the blueprint from torch_uncertainty.models.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="c1"># datamodule</span>
-<span class="n">args</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
-<span class="n">dm</span> <span class="o">=</span> <span class="n">MNISTDataModule</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+<span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
+<span class="n">datamodule</span> <span class="o">=</span> <span class="n">MNISTDataModule</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">eval_ood</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># model</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">bayesian_lenet</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span> <span class="n">dm</span><span class="o">.</span><span class="n">num_classes</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">bayesian_lenet</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -352,23 +344,20 @@ function from functools. We use the hyperparameters proposed in the blitz
 library. As we are train a classification model, we use the CrossEntropyLoss
 as the likelihood.
 We then define the training routine using the classification training routine
-from torch_uncertainty.training.classification. We provide the model, the ELBO
-loss and the optimizer, as well as all the default arguments.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">loss</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
-    <span class="n">ELBOLoss</span><span class="p">,</span>
+from torch_uncertainty.classification. We provide the model, the ELBO
+loss and the optimizer to the routine.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">loss</span> <span class="o">=</span> <span class="n">ELBOLoss</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-    <span class="n">criterion</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">(),</span>
+    <span class="n">inner_loss</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">(),</span>
     <span class="n">kl_weight</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">50000</span><span class="p">,</span>
     <span class="n">num_samples</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">baseline</span> <span class="o">=</span> <span class="n">ClassificationSingle</span><span class="p">(</span>
+<span class="n">routine</span> <span class="o">=</span> <span class="n">ClassificationRoutine</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-    <span class="n">num_classes</span><span class="o">=</span><span class="n">dm</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
-    <span class="n">in_channels</span><span class="o">=</span><span class="n">dm</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span>
+    <span class="n">num_classes</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
     <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
-    <span class="n">optimization_procedure</span><span class="o">=</span><span class="n">optim_lenet</span><span class="p">,</span>
-    <span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">),</span>
+    <span class="n">optim_recipe</span><span class="o">=</span><span class="n">optim_lenet</span><span class="p">(</span><span class="n">model</span><span class="p">),</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -376,52 +365,57 @@ loss and the optimizer, as well as all the default arguments.</p>
 <section id="gathering-everything-and-training-the-model">
 <h3>5. Gathering Everything and Training the Model<a class="headerlink" href="#gathering-everything-and-training-the-model" title="Permalink to this heading">¶</a></h3>
 <p>Now that we have prepared all of this, we just have to gather everything in
-the main function and to train the model using the PyTorch Lightning Trainer.
-Specifically, it needs the baseline, that includes the model as well as the
-training routine, the datamodule, the root for the datasets and the logs, the
-name of the model for the logs and all the training arguments.
+the main function and to train the model using the Lightning Trainer.
+Specifically, it needs the routine, that includes the model as well as the
+training/eval logic and the datamodule
 The dataset will be downloaded automatically in the root/data folder, and the
 logs will be saved in the root/logs folder.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">cli_main</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">net_name</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz
-Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-images-idx3-ubyte.gz
+Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz to data/MNIST/raw/train-images-idx3-ubyte.gz
 
   0%|          | 0/9912422 [00:00&lt;?, ?it/s]
-100%|██████████| 9912422/9912422 [00:00&lt;00:00, 291816716.58it/s]
-Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
+100%|██████████| 9912422/9912422 [00:00&lt;00:00, 286111437.00it/s]
+Extracting data/MNIST/raw/train-images-idx3-ubyte.gz to data/MNIST/raw
 
 Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz
-Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-labels-idx1-ubyte.gz
+Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz to data/MNIST/raw/train-labels-idx1-ubyte.gz
 
   0%|          | 0/28881 [00:00&lt;?, ?it/s]
-100%|██████████| 28881/28881 [00:00&lt;00:00, 208854644.52it/s]
-Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/train-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
+100%|██████████| 28881/28881 [00:00&lt;00:00, 196330135.86it/s]
+Extracting data/MNIST/raw/train-labels-idx1-ubyte.gz to data/MNIST/raw
 
 Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz
-Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-images-idx3-ubyte.gz
+Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz to data/MNIST/raw/t10k-images-idx3-ubyte.gz
 
   0%|          | 0/1648877 [00:00&lt;?, ?it/s]
-100%|██████████| 1648877/1648877 [00:00&lt;00:00, 150791282.85it/s]
-Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-images-idx3-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
+100%|██████████| 1648877/1648877 [00:00&lt;00:00, 166857059.37it/s]
+Extracting data/MNIST/raw/t10k-images-idx3-ubyte.gz to data/MNIST/raw
 
 Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz
-Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-labels-idx1-ubyte.gz
+Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz to data/MNIST/raw/t10k-labels-idx1-ubyte.gz
 
   0%|          | 0/4542 [00:00&lt;?, ?it/s]
-100%|██████████| 4542/4542 [00:00&lt;00:00, 48107395.88it/s]
-Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw/t10k-labels-idx1-ubyte.gz to /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_source/data/MNIST/raw
+100%|██████████| 4542/4542 [00:00&lt;00:00, 46578309.95it/s]
+Extracting data/MNIST/raw/t10k-labels-idx1-ubyte.gz to data/MNIST/raw
 
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-       Test metric             DataLoader 0
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-      cls_test/acc          0.9555000066757202
-     cls_test/brier         0.06671212613582611
-      cls_test/ece          0.01476871408522129
-    cls_test/entropy        0.18803176283836365
-      cls_test/nll          0.14082562923431396
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:441: The &#39;val_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:441: The &#39;train_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
+/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:441: The &#39;test_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃        Test metric        ┃       DataLoader 0        ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│       cls_test/Acc        │    0.9452999830245972     │
+│      cls_test/Brier       │    0.08166433870792389    │
+│       cls_test/ECE        │   0.016287334263324738    │
+│       cls_test/NLL        │    0.1732017993927002     │
+│     cls_test/entropy      │    0.2208372801542282     │
+└───────────────────────────┴───────────────────────────┘
+
+[{&#39;cls_test/Acc&#39;: 0.9452999830245972, &#39;cls_test/Brier&#39;: 0.08166433870792389, &#39;cls_test/ECE&#39;: 0.016287334263324738, &#39;cls_test/NLL&#39;: 0.1732017993927002, &#39;cls_test/entropy&#39;: 0.2208372801542282}]
 </pre></div>
 </div>
 </section>
@@ -429,19 +423,20 @@ Extracting /home/runner/work/torch-uncertainty/torch-uncertainty/auto_tutorials_
 <h3>6. Testing the Model<a class="headerlink" href="#testing-the-model" title="Permalink to this heading">¶</a></h3>
 <p>Now that the model is trained, let’s test it on MNIST</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchvision</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
 <span class="k">def</span> <span class="nf">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
     <span class="n">npimg</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">npimg</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 
-<span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">())</span>
+<span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">())</span>
 <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">dataiter</span><span class="p">)</span>
 
 <span class="c1"># print images</span>
@@ -471,7 +466,7 @@ Predicted digits:  7 2 1 0
 <li><p><strong>The Adam optimizer:</strong> Kingma, D. P., &amp; Ba, J. (2014). “Adam: A method for stochastic optimization.” <a class="reference external" href="https://arxiv.org/pdf/1412.6980.pdf">ICLR 2015</a>.</p></li>
 <li><p><strong>The Blitz</strong> <a class="reference external" href="https://github.com/piEsposito/blitz-bayesian-deep-learning">library</a> (for the hyperparameters).</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 35.356 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 33.472 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-bayesian-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/f43d536d36d9261bef3ab9c0808ea674/tutorial_bayesian.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_bayesian.ipynb</span></code></a></p>
@@ -492,12 +487,12 @@ Predicted digits:  7 2 1 0
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="tutorial_mc_dropout.html" class="btn btn-neutral float-right" title="Training a LeNet with Monte-Carlo Dropout" accesskey="n"
+    <a href="tutorial_scaler.html" class="btn btn-neutral float-right" title="Improve Top-label Calibration with Temperature Scaling" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     
     
-    <a href="tutorial_scaler.html" class="btn btn-neutral" title="Improve Top-label Calibration with Temperature Scaling" accesskey="p"
+    <a href="index.html" class="btn btn-neutral" title="Tutorials" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>
@@ -529,9 +524,9 @@ Predicted digits:  7 2 1 0
               <ul>
 <li><a class="reference internal" href="#">Train a Bayesian Neural Network in Three Minutes</a><ul>
 <li><a class="reference internal" href="#foreword-on-bayesian-neural-networks">Foreword on Bayesian Neural Networks</a></li>
-<li><a class="reference internal" href="#training-a-bayesian-lenet-using-torchuncertainty-models-and-pytorch-lightning">Training a Bayesian LeNet using TorchUncertainty models and PyTorch Lightning</a><ul>
+<li><a class="reference internal" href="#training-a-bayesian-lenet-using-torchuncertainty-models-and-lightning">Training a Bayesian LeNet using TorchUncertainty models and Lightning</a><ul>
 <li><a class="reference internal" href="#loading-the-utilities">1. Loading the utilities</a></li>
-<li><a class="reference internal" href="#creating-the-optimizer-wrapper">2. Creating the Optimizer Wrapper</a></li>
+<li><a class="reference internal" href="#the-optimization-recipe">2. The Optimization Recipe</a></li>
 <li><a class="reference internal" href="#creating-the-necessary-variables">3. Creating the necessary variables</a></li>
 <li><a class="reference internal" href="#the-loss-and-the-training-routine">4. The Loss and the Training Routine</a></li>
 <li><a class="reference internal" href="#gathering-everything-and-training-the-model">5. Gathering Everything and Training the Model</a></li>

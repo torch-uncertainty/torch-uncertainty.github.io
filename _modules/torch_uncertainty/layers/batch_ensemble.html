@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.layers.batch_ensemble &mdash; TorchUncertainty 0.1.6 documentation</title>
+  <title>torch_uncertainty.layers.batch_ensemble &mdash; TorchUncertainty 0.2.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -153,7 +153,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../introduction_uncertainty.html">Introduction to Classification Uncertainty</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../auto_tutorials/index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli_guide.html">CLI Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
 </ul>
@@ -276,8 +277,13 @@
         <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Applies a linear transformation using BatchEnsemble method to the</span>
-<span class="sd">        incoming data: :math:`y=(x\circ \hat{r_{group}})W^{T}\circ \hat{s_{group}} + \hat{b}`.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;BatchEnsemble-style Linear layer.</span>
+
+<span class="sd">        Applies a linear transformation using BatchEnsemble method to the incoming</span>
+<span class="sd">        data.</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            y=(x\circ \widehat{r_{group}})W^{T}\circ \widehat{s_{group}} + \widehat{b}</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            in_features (int): size of each input sample.</span>
@@ -321,9 +327,9 @@
 
 <span class="sd">        Shape:</span>
 <span class="sd">            - Input: :math:`(N, H_{in})` where :math:`N` is the batch size and</span>
-<span class="sd">            :math:`H_{in} = \text{in_features}`.</span>
+<span class="sd">              :math:`H_{in} = \text{in_features}`.</span>
 <span class="sd">            - Output: :math:`(N, H_{out})` where</span>
-<span class="sd">            :math:`H_{out} = \text{out_features}`.</span>
+<span class="sd">              :math:`H_{out} = \text{out_features}`.</span>
 
 <span class="sd">        Warning:</span>
 <span class="sd">            Make sure that :attr:`num_estimators` divides :attr:`out_features` when calling :func:`forward()`.</span>
@@ -361,10 +367,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_parameters</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># Setting a=sqrt(5) in kaiming_uniform is the same as initializing with</span>
-        <span class="c1"># uniform(-1/sqrt(in_features), 1/sqrt(in_features)). For details, see</span>
-        <span class="c1"># https://github.com/pytorch/pytorch/issues/57109</span>
-        <span class="c1"># nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))</span>
         <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r_group</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
         <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_group</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -455,7 +457,9 @@
         <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Applies a 2d convolution over an input signal composed of several input</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;BatchEnsemble-style Conv2d layer.</span>
+<span class="sd">        </span>
+<span class="sd">        Applies a 2d convolution over an input signal composed of several input</span>
 <span class="sd">        planes using BatchEnsemble method to the incoming data.</span>
 
 <span class="sd">        In the simplest case, the output value of the layer with input size</span>
@@ -463,12 +467,12 @@
 <span class="sd">        :math:`(N, C_{out}, H_{out}, W_{out})` can be precisely described as:</span>
 
 <span class="sd">        .. math::</span>
-<span class="sd">        \text{out}(N_i, C_{\text{out}_j})=\</span>
-<span class="sd">        &amp;\hat{b}(N_i,C_{\text{out}_j})</span>
-<span class="sd">        +\hat{s_group}(N_{i},C_{\text{out}_j}) \\</span>
-<span class="sd">        &amp;\times \sum_{k = 0}^{C_{\text{in}} - 1}</span>
-<span class="sd">        \text{weight}(C_{\text{out}_j}, k)\star (\text{input}(N_i, k)</span>
-<span class="sd">        \times \hat{r_group}(N_i, k))</span>
+<span class="sd">            \text{out}(N_i, C_{\text{out}_j})=\</span>
+<span class="sd">            &amp;\widehat{b}(N_i,C_{\text{out}_j})</span>
+<span class="sd">            +\widehat{s_{group}}(N_{i},C_{\text{out}_j}) \\</span>
+<span class="sd">            &amp;\times \sum_{k = 0}^{C_{\text{in}} - 1}</span>
+<span class="sd">            \text{weight}(C_{\text{out}_j}, k)\star (\text{input}(N_i, k)</span>
+<span class="sd">            \times \widehat{r_{group}}(N_i, k))</span>
 
 <span class="sd">        Reference:</span>
 <span class="sd">            Introduced by the paper `BatchEnsemble: An Alternative Approach to</span>
@@ -586,12 +590,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_parameters</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># Setting a=sqrt(5) in kaiming_uniform is the same as initializing with</span>
-        <span class="c1"># uniform(-1/sqrt(k), 1/sqrt(k)), where</span>
-        <span class="c1"># k = weight.size(1) * prod(*kernel_size)</span>
-        <span class="c1"># For more details see:</span>
-        <span class="c1"># https://github.com/pytorch/pytorch/issues/15314#issuecomment-477448573</span>
-        <span class="c1"># nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))</span>
         <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r_group</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
         <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_group</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -659,7 +657,7 @@
             <span class="n">bias</span> <span class="k">if</span> <span class="n">bias</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">extra_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">extra_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">(</span>
             <span class="s2">&quot;</span><span class="si">{in_channels}</span><span class="s2">, </span><span class="si">{out_channels}</span><span class="s2">, kernel_size=</span><span class="si">{kernel_size}</span><span class="s2">&quot;</span>
             <span class="s2">&quot;, num_estimators=</span><span class="si">{num_estimators}</span><span class="s2">, stride=</span><span class="si">{stride}</span><span class="s2">&quot;</span>

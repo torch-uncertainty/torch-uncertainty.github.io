@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.datamodules.uci_regression &mdash; TorchUncertainty 0.1.6 documentation</title>
+  <title>torch_uncertainty.datamodules.uci_regression &mdash; TorchUncertainty 0.2.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -153,7 +153,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../introduction_uncertainty.html">Introduction to Classification Uncertainty</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../auto_tutorials/index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli_guide.html">CLI Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
 </ul>
@@ -249,10 +250,8 @@
                 
                 
   <h1>Source code for torch_uncertainty.datamodules.uci_regression</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Generator</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">random_split</span>
@@ -276,7 +275,6 @@
         <span class="n">persistent_workers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">input_shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">split_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The UCI regression datasets.</span>
 
@@ -299,17 +297,15 @@
 <span class="sd">                ``None``.</span>
 <span class="sd">            split_seed (int, optional): The seed to use for splitting the dataset.</span>
 <span class="sd">                Defaults to ``42``.</span>
-<span class="sd">            **kwargs: Additional arguments.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span>
             <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">val_split</span><span class="o">=</span><span class="n">val_split</span><span class="p">,</span>
             <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
             <span class="n">pin_memory</span><span class="o">=</span><span class="n">pin_memory</span><span class="p">,</span>
             <span class="n">persistent_workers</span><span class="o">=</span><span class="n">persistent_workers</span><span class="p">,</span>
         <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span> <span class="o">=</span> <span class="n">val_split</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
             <span class="n">UCIRegression</span><span class="p">,</span> <span class="n">dataset_name</span><span class="o">=</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">split_seed</span>
@@ -321,6 +317,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Download the dataset.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
+    <span class="c1"># ruff: noqa: ARG002</span>
 <div class="viewcode-block" id="UCIDataModule.setup"><a class="viewcode-back" href="../../../generated/torch_uncertainty.datamodules.UCIDataModule.html#torch_uncertainty.datamodules.UCIDataModule.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Split the datasets into train, val, and test.&quot;&quot;&quot;</span>
         <span class="n">full</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
@@ -337,26 +334,7 @@
             <span class="n">generator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gen</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test</span></div>
-
-    <span class="c1"># Change by default test_dataloader -&gt; List[DataLoader]</span>
-    <span class="c1"># def test_dataloader(self) -&gt; DataLoader:</span>
-    <span class="c1">#     &quot;&quot;&quot;Get the test dataloader for UCI Regression.</span>
-
-    <span class="c1">#     Return:</span>
-    <span class="c1">#         DataLoader: UCI Regression test dataloader.</span>
-    <span class="c1">#     &quot;&quot;&quot;</span>
-    <span class="c1">#     return self._data_loader(self.test)</span>
-
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">add_argparse_args</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">parent_parser</span><span class="p">:</span> <span class="n">ArgumentParser</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArgumentParser</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_argparse_args</span><span class="p">(</span><span class="n">parent_parser</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">parent_parser</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test</span></div></div>
 </pre></div>
 
               </article>

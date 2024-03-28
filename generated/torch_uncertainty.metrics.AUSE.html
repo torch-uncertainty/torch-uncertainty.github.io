@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>AUSE &mdash; TorchUncertainty 0.1.6 documentation</title>
+  <title>AUSE &mdash; TorchUncertainty 0.2.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -41,7 +41,7 @@
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
   <link rel="next" title="BrierScore" href="torch_uncertainty.metrics.BrierScore.html" />
-  <link rel="prev" title="BayesConv3d" href="torch_uncertainty.layers.bayesian.BayesConv3d.html" />
+  <link rel="prev" title="mc_dropout" href="torch_uncertainty.models.mc_dropout.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -156,7 +156,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../introduction_uncertainty.html">Introduction to Classification Uncertainty</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_tutorials/index.html">Tutorials</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli_guide.html">CLI Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
@@ -197,7 +198,7 @@
     </li>
 
     
-    <li><a href="../api.html">API reference</a> &gt;</li>
+    <li><a href="../api.html">API Reference</a> &gt;</li>
     
     <li>AUSE</li>
     
@@ -262,7 +263,7 @@
 <h1>AUSE<a class="headerlink" href="#ause" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.AUSE">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.</span></span><span class="sig-name descname"><span class="pre">AUSE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/sparsification.html#AUSE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.AUSE" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.</span></span><span class="sig-name descname"><span class="pre">AUSE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/sparsification.html#AUSE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.AUSE" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Area Under the Sparsification Error curve (AUSE) metric to estimate
 the quality of the uncertainty estimates, i.e., how much they coincide with
 the true errors.</p>
@@ -271,16 +272,16 @@ the true errors.</p>
 <dd class="field-odd"><p><strong>kwargs</strong> – Additional keyword arguments, see <a class="reference external" href="https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs">Advanced metric settings</a>.</p>
 </dd>
 </dl>
-<dl>
+<dl class="simple">
 <dt>Reference:</dt><dd><p>From the paper
 <a class="reference external" href="https://arxiv.org/abs/1802.07095">Uncertainty estimates and multi-hypotheses for optical flow</a>.
 In ECCV, 2018.</p>
 </dd>
 <dt>Inputs:</dt><dd><ul class="simple">
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">scores</span></code>: Uncertainty scores of shape <span class="math notranslate nohighlight">\((B,)\)</span>. A higher</p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">scores</span></code>: Uncertainty scores of shape <span class="math notranslate nohighlight">\((B,)\)</span>. A higher
+score means a higher uncertainty.</p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">errors</span></code>: Binary errors of shape <span class="math notranslate nohighlight">\((B,)\)</span>,</p></li>
 </ul>
-<p>score means a higher uncertainty.
-- <code class="xref py py-attr docutils literal notranslate"><span class="pre">errors</span></code>: Binary errors of shape <span class="math notranslate nohighlight">\((B,)\)</span>,</p>
 </dd>
 </dl>
 <p>where <span class="math notranslate nohighlight">\(B\)</span> is the batch size.</p>
@@ -290,7 +291,7 @@ In ECCV, 2018.</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.AUSE.compute">
-<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/sparsification.html#AUSE.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.AUSE.compute" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/sparsification.html#AUSE.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.AUSE.compute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the Area Under the Sparsification Error curve (AUSE) based
 on inputs passed to <code class="docutils literal notranslate"><span class="pre">update</span></code>.</p>
 <dl class="field-list simple">
@@ -305,7 +306,7 @@ on inputs passed to <code class="docutils literal notranslate"><span class="pre"
 
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.AUSE.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_oracle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/sparsification.html#AUSE.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.AUSE.plot" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_oracle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/sparsification.html#AUSE.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.AUSE.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the sparsification curve corresponding to the inputs passed to
 <code class="docutils literal notranslate"><span class="pre">update</span></code>, and the oracle sparsification curve.</p>
 <dl class="field-list simple">
@@ -330,7 +331,7 @@ Defaults to True.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.AUSE.update">
-<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/sparsification.html#AUSE.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.AUSE.update" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/sparsification.html#AUSE.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.AUSE.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store the scores and their associated errors for later computation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -359,7 +360,7 @@ Defaults to True.</p></li>
         class="next-page"></a>
     
     
-    <a href="torch_uncertainty.layers.bayesian.BayesConv3d.html" class="btn btn-neutral" title="BayesConv3d" accesskey="p"
+    <a href="torch_uncertainty.models.mc_dropout.html" class="btn btn-neutral" title="mc_dropout" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>

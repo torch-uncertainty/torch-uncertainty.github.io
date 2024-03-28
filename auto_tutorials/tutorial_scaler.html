@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Improve Top-label Calibration with Temperature Scaling &mdash; TorchUncertainty 0.1.6 documentation</title>
+  <title>Improve Top-label Calibration with Temperature Scaling &mdash; TorchUncertainty 0.2.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -40,8 +40,8 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Train a Bayesian Neural Network in Three Minutes" href="tutorial_bayesian.html" />
-  <link rel="prev" title="Image Corruptions" href="tutorial_corruptions.html" />
+  <link rel="next" title="Image Corruptions" href="tutorial_corruptions.html" />
+  <link rel="prev" title="Train a Bayesian Neural Network in Three Minutes" href="tutorial_bayesian.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -156,7 +156,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../introduction_uncertainty.html">Introduction to Classification Uncertainty</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli_guide.html">CLI Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
@@ -266,9 +267,11 @@ to download the full example code</p>
 <section class="sphx-glr-example-title" id="improve-top-label-calibration-with-temperature-scaling">
 <span id="sphx-glr-auto-tutorials-tutorial-scaler-py"></span><h1>Improve Top-label Calibration with Temperature Scaling<a class="headerlink" href="#improve-top-label-calibration-with-temperature-scaling" title="Permalink to this heading">¶</a></h1>
 <p>In this tutorial, we use <em>TorchUncertainty</em> to improve the calibration
-of the top-label predictions
-and the reliability of the underlying neural network.</p>
-<p>We also see how to use the datamodules outside any Lightning trainers,
+of the top-label predictions and the reliability of the underlying neural network.</p>
+<p>This tutorial provides extensive details on how to use the TemperatureScaler
+class, however, this is done automatically in the classification routine when setting
+the <cite>calibration_set</cite> to val or test.</p>
+<p>Through this tutorial, we also see how to use the datamodules outside any Lightning trainers,
 and how to use TorchUncertainty’s models.</p>
 <section id="loading-the-utilities">
 <h2>1. Loading the Utilities<a class="headerlink" href="#loading-the-utilities" title="Permalink to this heading">¶</a></h2>
@@ -280,12 +283,9 @@ and how to use TorchUncertainty’s models.</p>
 <li><p>a ResNet 18 as starting model</p></li>
 <li><p>the temperature scaler to improve the top-label calibration</p></li>
 <li><p>a utility to download hf models easily</p></li>
-<li><dl class="simple">
-<dt>the calibration plot to visualize the calibration. If you use the classification routine,</dt><dd><p>the plots will be automatically available in the tensorboard logs.</p>
-</dd>
-</dl>
-</li>
+<li><p>the calibration plot to visualize the calibration.</p></li>
 </ul>
+<p>If you use the classification routine, the plots will be automatically available in the tensorboard logs.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <span class="n">CIFAR100DataModule</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.metrics</span> <span class="kn">import</span> <span class="n">CE</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.models.resnet</span> <span class="kn">import</span> <span class="n">resnet18</span>
@@ -316,7 +316,8 @@ This can be done in a one liner:</p>
 <h2>3. Setting up the Datamodule and Dataloaders<a class="headerlink" href="#setting-up-the-datamodule-and-dataloaders" title="Permalink to this heading">¶</a></h2>
 <p>To get the dataloader from the datamodule, just call prepare_data, setup, and
 extract the first element of the test dataloader list. There are more than one
-element if <cite>:attr:eval_ood</cite> is True.</p>
+element if eval_ood is True: the dataloader of in-distribution data and the dataloader
+of out-of-distribution data. Otherwise, it is a list of 1 element.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dm</span> <span class="o">=</span> <span class="n">CIFAR100DataModule</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">eval_ood</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
 <span class="n">dm</span><span class="o">.</span><span class="n">prepare_data</span><span class="p">()</span>
 <span class="n">dm</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
@@ -328,23 +329,46 @@ element if <cite>:attr:eval_ood</cite> is True.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz to data/cifar-100-python.tar.gz
 
   0%|          | 0/169001437 [00:00&lt;?, ?it/s]
-  1%|▏         | 2129920/169001437 [00:00&lt;00:07, 21246083.58it/s]
-  8%|▊         | 12845056/169001437 [00:00&lt;00:02, 71554544.63it/s]
- 14%|█▍        | 23920640/169001437 [00:00&lt;00:01, 89416784.76it/s]
- 20%|██        | 34439168/169001437 [00:00&lt;00:01, 95538448.73it/s]
- 26%|██▋       | 44728320/169001437 [00:00&lt;00:01, 98088941.10it/s]
- 33%|███▎      | 55607296/169001437 [00:00&lt;00:01, 101599437.87it/s]
- 39%|███▉      | 66191360/169001437 [00:00&lt;00:00, 102900655.28it/s]
- 45%|████▌     | 76742656/169001437 [00:00&lt;00:00, 103651492.28it/s]
- 52%|█████▏    | 87523328/169001437 [00:00&lt;00:00, 104941254.19it/s]
- 58%|█████▊    | 98336768/169001437 [00:01&lt;00:00, 105737327.41it/s]
- 64%|██████▍   | 108920832/169001437 [00:01&lt;00:00, 105237499.20it/s]
- 71%|███████   | 119668736/169001437 [00:01&lt;00:00, 105840266.35it/s]
- 77%|███████▋  | 130383872/169001437 [00:01&lt;00:00, 106200752.80it/s]
- 83%|████████▎ | 141033472/169001437 [00:01&lt;00:00, 105738606.80it/s]
- 90%|████████▉ | 151912448/169001437 [00:01&lt;00:00, 106572745.09it/s]
- 96%|█████████▌| 162594816/169001437 [00:01&lt;00:00, 105983805.53it/s]
-100%|██████████| 169001437/169001437 [00:01&lt;00:00, 101196177.97it/s]
+  0%|          | 32768/169001437 [00:00&lt;11:28, 245444.23it/s]
+  0%|          | 229376/169001437 [00:00&lt;02:55, 960618.27it/s]
+  1%|          | 917504/169001437 [00:00&lt;00:58, 2859259.80it/s]
+  2%|▏         | 3637248/169001437 [00:00&lt;00:17, 9726118.54it/s]
+  6%|▌         | 9633792/169001437 [00:00&lt;00:07, 22176437.34it/s]
+  9%|▉         | 15532032/169001437 [00:00&lt;00:04, 32330042.92it/s]
+ 11%|█▏        | 19038208/169001437 [00:00&lt;00:04, 32889396.19it/s]
+ 14%|█▍        | 23920640/169001437 [00:00&lt;00:03, 37442476.27it/s]
+ 17%|█▋        | 28311552/169001437 [00:01&lt;00:03, 39255338.19it/s]
+ 19%|█▉        | 32374784/169001437 [00:01&lt;00:03, 39173729.54it/s]
+ 22%|██▏       | 36831232/169001437 [00:01&lt;00:03, 40685165.41it/s]
+ 24%|██▍       | 41353216/169001437 [00:01&lt;00:03, 40403581.30it/s]
+ 27%|██▋       | 46170112/169001437 [00:01&lt;00:02, 42476302.34it/s]
+ 30%|██▉       | 50659328/169001437 [00:01&lt;00:02, 43081981.72it/s]
+ 33%|███▎      | 55443456/169001437 [00:01&lt;00:02, 43759770.48it/s]
+ 36%|███▌      | 60096512/169001437 [00:01&lt;00:02, 44538479.06it/s]
+ 38%|███▊      | 64585728/169001437 [00:01&lt;00:02, 44602165.26it/s]
+ 41%|████      | 69074944/169001437 [00:02&lt;00:02, 44527208.08it/s]
+ 44%|████▎     | 73564160/169001437 [00:02&lt;00:02, 44110198.55it/s]
+ 46%|████▋     | 78249984/169001437 [00:02&lt;00:02, 44881654.34it/s]
+ 49%|████▉     | 82870272/169001437 [00:02&lt;00:01, 45255396.92it/s]
+ 52%|█████▏    | 87490560/169001437 [00:02&lt;00:01, 45485454.25it/s]
+ 54%|█████▍    | 92045312/169001437 [00:02&lt;00:01, 44730729.05it/s]
+ 57%|█████▋    | 96534528/169001437 [00:02&lt;00:01, 44273178.52it/s]
+ 60%|█████▉    | 100990976/169001437 [00:02&lt;00:01, 44001660.53it/s]
+ 62%|██████▏   | 105414656/169001437 [00:02&lt;00:01, 43439809.43it/s]
+ 65%|██████▌   | 110067712/169001437 [00:02&lt;00:01, 44036045.41it/s]
+ 68%|██████▊   | 114720768/169001437 [00:03&lt;00:01, 44725586.83it/s]
+ 71%|███████   | 119341056/169001437 [00:03&lt;00:01, 44979004.61it/s]
+ 73%|███████▎  | 123961344/169001437 [00:03&lt;00:00, 45290545.54it/s]
+ 76%|███████▌  | 128516096/169001437 [00:03&lt;00:00, 44973238.73it/s]
+ 79%|███████▊  | 133038080/169001437 [00:03&lt;00:00, 44693383.89it/s]
+ 81%|████████▏ | 137527296/169001437 [00:03&lt;00:00, 42928023.63it/s]
+ 84%|████████▍ | 142442496/169001437 [00:03&lt;00:00, 44689032.03it/s]
+ 87%|████████▋ | 146931712/169001437 [00:03&lt;00:00, 43186119.13it/s]
+ 90%|████████▉ | 151879680/169001437 [00:03&lt;00:00, 44955349.43it/s]
+ 93%|█████████▎| 156401664/169001437 [00:03&lt;00:00, 43396653.54it/s]
+ 95%|█████████▌| 161349632/169001437 [00:04&lt;00:00, 45114182.58it/s]
+ 98%|█████████▊| 165904384/169001437 [00:04&lt;00:00, 43536612.98it/s]
+100%|██████████| 169001437/169001437 [00:04&lt;00:00, 39657314.38it/s]
 Extracting data/cifar-100-python.tar.gz to data
 Files already downloaded and verified
 </pre></div>
@@ -376,11 +400,10 @@ of the test set.</p>
     <span class="n">ece</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
 
 <span class="c1"># Compute &amp; print the calibration error</span>
-<span class="n">cal</span> <span class="o">=</span> <span class="n">ece</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ECE before scaling - </span><span class="si">{</span><span class="n">cal</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.3</span><span class="si">}</span><span class="s2">%.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ECE before scaling - </span><span class="si">{</span><span class="n">ece</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span><span class="si">:</span><span class="s2">.3%</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE before scaling - 8.6%.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE before scaling - 7.660%.
 </pre></div>
 </div>
 <p>We also compute and plot the top-label calibration figure. We see that the
@@ -402,38 +425,38 @@ a subset of the test set and containing 1000 data. Look at the code run by Tempe
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/32 [00:00&lt;?, ?it/s]
-  3%|▎         | 1/32 [00:00&lt;00:08,  3.60it/s]
-  6%|▋         | 2/32 [00:00&lt;00:07,  3.87it/s]
-  9%|▉         | 3/32 [00:00&lt;00:07,  3.84it/s]
- 12%|█▎        | 4/32 [00:01&lt;00:07,  3.87it/s]
- 16%|█▌        | 5/32 [00:01&lt;00:06,  3.92it/s]
- 19%|█▉        | 6/32 [00:01&lt;00:06,  3.98it/s]
- 22%|██▏       | 7/32 [00:01&lt;00:06,  4.02it/s]
- 25%|██▌       | 8/32 [00:02&lt;00:05,  4.04it/s]
- 28%|██▊       | 9/32 [00:02&lt;00:05,  4.04it/s]
- 31%|███▏      | 10/32 [00:02&lt;00:05,  4.06it/s]
- 34%|███▍      | 11/32 [00:02&lt;00:05,  4.07it/s]
- 38%|███▊      | 12/32 [00:03&lt;00:04,  4.07it/s]
- 41%|████      | 13/32 [00:03&lt;00:04,  4.07it/s]
- 44%|████▍     | 14/32 [00:03&lt;00:04,  4.07it/s]
- 47%|████▋     | 15/32 [00:03&lt;00:04,  4.08it/s]
- 50%|█████     | 16/32 [00:03&lt;00:03,  4.09it/s]
- 53%|█████▎    | 17/32 [00:04&lt;00:03,  4.09it/s]
- 56%|█████▋    | 18/32 [00:04&lt;00:03,  4.09it/s]
- 59%|█████▉    | 19/32 [00:04&lt;00:03,  4.09it/s]
- 62%|██████▎   | 20/32 [00:04&lt;00:02,  4.10it/s]
- 66%|██████▌   | 21/32 [00:05&lt;00:02,  4.10it/s]
+  3%|▎         | 1/32 [00:00&lt;00:08,  3.62it/s]
+  6%|▋         | 2/32 [00:00&lt;00:07,  3.89it/s]
+  9%|▉         | 3/32 [00:00&lt;00:07,  4.00it/s]
+ 12%|█▎        | 4/32 [00:01&lt;00:06,  4.03it/s]
+ 16%|█▌        | 5/32 [00:01&lt;00:06,  4.04it/s]
+ 19%|█▉        | 6/32 [00:01&lt;00:06,  4.06it/s]
+ 22%|██▏       | 7/32 [00:01&lt;00:06,  4.07it/s]
+ 25%|██▌       | 8/32 [00:01&lt;00:05,  4.08it/s]
+ 28%|██▊       | 9/32 [00:02&lt;00:05,  4.09it/s]
+ 31%|███▏      | 10/32 [00:02&lt;00:05,  4.10it/s]
+ 34%|███▍      | 11/32 [00:02&lt;00:05,  4.11it/s]
+ 38%|███▊      | 12/32 [00:02&lt;00:04,  4.11it/s]
+ 41%|████      | 13/32 [00:03&lt;00:04,  4.12it/s]
+ 44%|████▍     | 14/32 [00:03&lt;00:04,  4.11it/s]
+ 47%|████▋     | 15/32 [00:03&lt;00:04,  4.11it/s]
+ 50%|█████     | 16/32 [00:03&lt;00:03,  4.11it/s]
+ 53%|█████▎    | 17/32 [00:04&lt;00:03,  4.12it/s]
+ 56%|█████▋    | 18/32 [00:04&lt;00:03,  4.10it/s]
+ 59%|█████▉    | 19/32 [00:04&lt;00:03,  4.11it/s]
+ 62%|██████▎   | 20/32 [00:04&lt;00:02,  4.11it/s]
+ 66%|██████▌   | 21/32 [00:05&lt;00:02,  4.12it/s]
  69%|██████▉   | 22/32 [00:05&lt;00:02,  4.09it/s]
- 72%|███████▏  | 23/32 [00:05&lt;00:02,  4.07it/s]
- 75%|███████▌  | 24/32 [00:05&lt;00:01,  4.06it/s]
- 78%|███████▊  | 25/32 [00:06&lt;00:01,  4.07it/s]
- 81%|████████▏ | 26/32 [00:06&lt;00:01,  4.07it/s]
- 84%|████████▍ | 27/32 [00:06&lt;00:01,  3.94it/s]
- 88%|████████▊ | 28/32 [00:06&lt;00:01,  3.99it/s]
- 91%|█████████ | 29/32 [00:07&lt;00:00,  4.01it/s]
- 94%|█████████▍| 30/32 [00:07&lt;00:00,  4.03it/s]
- 97%|█████████▋| 31/32 [00:07&lt;00:00,  4.05it/s]
-100%|██████████| 32/32 [00:07&lt;00:00,  4.13it/s]
+ 72%|███████▏  | 23/32 [00:05&lt;00:02,  4.10it/s]
+ 75%|███████▌  | 24/32 [00:05&lt;00:01,  4.11it/s]
+ 78%|███████▊  | 25/32 [00:06&lt;00:01,  4.12it/s]
+ 81%|████████▏ | 26/32 [00:06&lt;00:01,  4.10it/s]
+ 84%|████████▍ | 27/32 [00:06&lt;00:01,  4.11it/s]
+ 88%|████████▊ | 28/32 [00:06&lt;00:00,  4.11it/s]
+ 91%|█████████ | 29/32 [00:07&lt;00:00,  4.11it/s]
+ 94%|█████████▍| 30/32 [00:07&lt;00:00,  4.10it/s]
+ 97%|█████████▋| 31/32 [00:07&lt;00:00,  4.11it/s]
+100%|██████████| 32/32 [00:07&lt;00:00,  4.18it/s]
 </pre></div>
 </div>
 </section>
@@ -451,11 +474,10 @@ the previous and current iterations.</p>
     <span class="n">probs</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">ece</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
 
-<span class="n">cal</span> <span class="o">=</span> <span class="n">ece</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ECE after scaling - </span><span class="si">{</span><span class="n">cal</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.3</span><span class="si">}</span><span class="s2">%.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ECE after scaling - </span><span class="si">{</span><span class="n">ece</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span><span class="si">:</span><span class="s2">.3%</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE after scaling - 3.6%.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE after scaling - 2.710%.
 </pre></div>
 </div>
 <p>We finally compute and plot the scaled top-label calibration figure. We see
@@ -478,7 +500,7 @@ However, this may not hold true in real-world cases where dataset shift could ha
 <li><p><strong>Expected Calibration Error:</strong> Naeini, M. P., Cooper, G. F., &amp; Hauskrecht, M. (2015). Obtaining Well Calibrated Probabilities Using Bayesian Binning. In <a class="reference external" href="https://arxiv.org/pdf/1411.0160.pdf">AAAI 2015</a>.</p></li>
 <li><p><strong>Temperature Scaling:</strong> Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. (2017). On calibration of modern neural networks. In <a class="reference external" href="https://arxiv.org/pdf/1706.04599.pdf">ICML 2017</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 28.863 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 32.838 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-scaler-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/35097fc86b1c61efee915836b2ab44fc/tutorial_scaler.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_scaler.ipynb</span></code></a></p>
@@ -499,12 +521,12 @@ However, this may not hold true in real-world cases where dataset shift could ha
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="tutorial_bayesian.html" class="btn btn-neutral float-right" title="Train a Bayesian Neural Network in Three Minutes" accesskey="n"
+    <a href="tutorial_corruptions.html" class="btn btn-neutral float-right" title="Image Corruptions" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     
     
-    <a href="tutorial_corruptions.html" class="btn btn-neutral" title="Image Corruptions" accesskey="p"
+    <a href="tutorial_bayesian.html" class="btn btn-neutral" title="Train a Bayesian Neural Network in Three Minutes" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>

@@ -9,7 +9,7 @@
 <meta charset="utf-8"/>
 <meta content="Docutils 0.19: https://docutils.sourceforge.io/" name="generator">
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Quickstart — TorchUncertainty 0.1.6 documentation</title>
+<title>Quickstart — TorchUncertainty 0.2.0 documentation</title>
 <link href="_static/images/logo_torch_uncertainty.png" rel="shortcut icon"/>
 <link href="_static/css/custom.css" rel="stylesheet" type="text/css"/>
 <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
@@ -99,7 +99,8 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="introduction_uncertainty.html">Introduction to Classification Uncertainty</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_tutorials/index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli_guide.html">CLI Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
@@ -162,82 +163,119 @@
 <article class="pytorch-article" id="pytorch-article" itemprop="articleBody">
 <section id="quickstart">
 <h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this heading">¶</a></h1>
-<p>Torch Uncertainty comes with different usage levels ranging from specific
-PyTorch layers to ready to train Lightning-based models. The following
-presents a short introduction to each one of them. Let’s start with the
-highest-level usage.</p>
-<section id="using-the-lightning-based-cli-tool">
-<h2>Using the Lightning-based CLI tool<a class="headerlink" href="#using-the-lightning-based-cli-tool" title="Permalink to this heading">¶</a></h2>
+<p>TorchUncertainty is centered around <strong>uncertainty-aware</strong> training and evaluation routines.
+These routines make it very easy to:</p>
+<ul class="simple">
+<li><p>train ensembles-like methods (Deep Ensembles, Packed-Ensembles, MIMO, Masksembles, etc)</p></li>
+<li><p>compute and monitor uncertainty metrics: calibration, out-of-distribution detection, proper scores, grouping loss, etc.</p></li>
+<li><p>leverage calibration methods automatically during evaluation</p></li>
+</ul>
+<p>Yet, we take account that their will be as many different uses of TorchUncertainty as there are of users.
+This page provides ideas on how to benefit from TorchUncertainty at all levels: from ready-to-train lightning-based models to using only specific
+PyTorch layers.</p>
+<section id="training-with-torchuncertainty-s-uncertainty-aware-routines">
+<h2>Training with TorchUncertainty’s Uncertainty-aware Routines<a class="headerlink" href="#training-with-torchuncertainty-s-uncertainty-aware-routines" title="Permalink to this heading">¶</a></h2>
+<p>Let’s have a look at the <a class="reference external" href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty/blob/main/torch_uncertainty/routines/classification.py">Classification routine</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lightning.pytorch</span> <span class="kn">import</span> <span class="n">LightningModule</span>
+
+<span class="k">class</span> <span class="nc">ClassificationRoutine</span><span class="p">(</span><span class="n">LightningModule</span><span class="p">):</span>
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span>
+                <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+                <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                <span class="n">loss</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+                <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="n">format_batch_fn</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">optim_recipe</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">Optimizer</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">mixtype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"erm"</span><span class="p">,</span>
+                <span class="n">mixmode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"elem"</span><span class="p">,</span>
+                <span class="n">dist_sim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"emb"</span><span class="p">,</span>
+                <span class="n">kernel_tau_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+                <span class="n">kernel_tau_std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+                <span class="n">mixup_alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="n">cutmix_alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="n">eval_ood</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="n">eval_grouping_loss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="n">ood_criterion</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+                        <span class="s2">"msp"</span><span class="p">,</span> <span class="s2">"logit"</span><span class="p">,</span> <span class="s2">"energy"</span><span class="p">,</span> <span class="s2">"entropy"</span><span class="p">,</span> <span class="s2">"mi"</span><span class="p">,</span> <span class="s2">"vr"</span>
+                <span class="p">]</span> <span class="o">=</span> <span class="s2">"msp"</span><span class="p">,</span>
+                <span class="n">log_plots</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="n">save_in_csv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="n">calibration_set</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"val"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="o">...</span>
+</pre></div>
+</div>
+<section id="building-your-first-routine">
+<h3>Building your First Routine<a class="headerlink" href="#building-your-first-routine" title="Permalink to this heading">¶</a></h3>
+<p>This routine is a wrapper of any custom or TorchUncertainty classification model. To use it,
+just build your model and pass it to the routine as argument along with an optimization recipe
+and the loss as well as the number of classes that we use for torch metrics.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">MyModel</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">routine</span> <span class="o">=</span> <span class="n">ClassificationRoutine</span><span class="p">(</span>
+  <span class="n">model</span><span class="p">,</span>
+  <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+  <span class="n">loss</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">(),</span>
+  <span class="n">optim_recipe</span><span class="o">=</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="training-with-the-routine">
+<h3>Training with the Routine<a class="headerlink" href="#training-with-the-routine" title="Permalink to this heading">¶</a></h3>
+<p>To train with this routine, you will first need to create a lightning Trainer and have either a lightning datamodule
+or PyTorch dataloaders. When benchmarking models, we advise to use lightning datamodules that will automatically handle
+train/val/test splits, out-of-distribution detection and dataset shift. For this example, let us use TorchUncertainty’s
+CIFAR10 datamodule. Please keep in mind that you could use your own datamodule or dataloaders.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.classification.cifar10.CIFAR10DataModule"><span class="n">CIFAR10DataModule</span></a>
+<span class="kn">from</span> <span class="nn">pytorch_lightning</span> <span class="kn">import</span> <span class="n">Trainer</span>
+
+<a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.classification.cifar10.CIFAR10DataModule"><span class="n">dm</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.classification.cifar10.CIFAR10DataModule"><span class="n">CIFAR10DataModule</span></a><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s2">"data"</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span><span class="n">gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">routine</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.classification.cifar10.CIFAR10DataModule"><span class="n">dm</span></a><span class="p">)</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">routine</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.classification.cifar10.CIFAR10DataModule"><span class="n">dm</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here it is, you have trained your first model with TorchUncertainty! As a result, you will get access to various metrics
+measuring the ability of your model to handle uncertainty.</p>
+</section>
+<section id="more-metrics">
+<h3>More metrics<a class="headerlink" href="#more-metrics" title="Permalink to this heading">¶</a></h3>
+<p>With TorchUncertainty datamodules, you can easily test models on out-of-distribution datasets, by
+setting the <code class="docutils literal notranslate"><span class="pre">eval_ood</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">True</span></code>. You can also evaluate the grouping loss by setting <code class="docutils literal notranslate"><span class="pre">eval_grouping_loss</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>.
+Finally, you can calibrate your model using the <code class="docutils literal notranslate"><span class="pre">calibration_set</span></code> parameter. In this case, you will get
+metrics for but the uncalibrated and calibrated models: the metrics corresponding to the temperature scaled
+model will begin with <code class="docutils literal notranslate"><span class="pre">ts_</span></code>.</p>
+</section>
+</section>
+<hr class="docutils"/>
+<section id="using-the-lightning-cli-tool">
+<h2>Using the Lightning CLI tool<a class="headerlink" href="#using-the-lightning-cli-tool" title="Permalink to this heading">¶</a></h2>
 <section id="procedure">
 <h3>Procedure<a class="headerlink" href="#procedure" title="Permalink to this heading">¶</a></h3>
-<p>The library provides a full-fledged trainer which can be used directly, via
-CLI. To do so, create a file in the experiments folder and use the <cite>cli_main</cite>
-routine, which takes as arguments:</p>
-<ul class="simple">
-<li><p>a Lightning Module corresponding to the model, its own arguments, and
-forward/validation/test logic. For instance, you might use already available
-modules, such as the Packed-Ensembles-style ResNet available at
-<a class="reference external" href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty/blob/main/torch_uncertainty/baselines/classification/resnet.py">torch_uncertainty/baselines/packed/resnet.py</a></p></li>
-<li><p>a Lightning DataModule corresponding to the training, validation, and test
-sets with again its arguments and logic. CIFAR-10/100, ImageNet, and
-ImageNet-200 are available, for instance.</p></li>
-<li><p>a PyTorch loss such as the torch.nn.CrossEntropyLoss</p></li>
-<li><p>a dictionary containing the optimization procedure, namely a scheduler and
-an optimizer. Many procedures are available at
-<a class="reference external" href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty/blob/main/torch_uncertainty/optimization_procedures.py">torch_uncertainty/optimization_procedures.py</a></p></li>
-<li><p>the path to the data and logs folder, in the example below, the root of the library</p></li>
-<li><p>and finally, the name of your model (used for logs)</p></li>
-</ul>
-<p>Move to the directory containing your file and execute the code with <code class="code highlight bash docutils literal highlight-bash">python3<span class="w"> </span>experiment.py</code>.
-Add lightning arguments such as <code class="code highlight bash docutils literal highlight-bash">--accelerator<span class="w"> </span>gpu<span class="w"> </span>--devices<span class="w"> </span><span class="s2">"0, 1"</span><span class="w"> </span>--benchmark<span class="w"> </span>True</code>
-for multi-gpu training and cuDNN benchmark, etc.</p>
+<p>The library leverages the <a class="reference external" href="https://lightning.ai/docs/pytorch/stable/cli/lightning_cli.html">Lightning CLI tool</a>
+to provide a simple way to train models and evaluate them, while insuring reproducibility via configuration files.
+Under the <code class="docutils literal notranslate"><span class="pre">experiment</span></code> folder, you will find scripts for the three application tasks covered by the library:
+classification, regression and segmentation. Take the most out of the CLI by checking our <a class="reference external" href="cli_guide.html">CLI Guide</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In particular, the <code class="docutils literal notranslate"><span class="pre">experiments/classification</span></code> folder contains scripts to reproduce the experiments covered
+in the paper: <em>Packed-Ensembles for Efficient Uncertainty Estimation</em>, O. Laurent &amp; A. Lafage, et al., in ICLR 2023.</p>
+</div>
 </section>
 <section id="example">
 <h3>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h3>
-<p>The following code - <a class="reference external" href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty/blob/main/experiments/classification/cifar10/resnet.py">available in the experiments folder</a> -
-trains any ResNet architecture on CIFAR10:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
-
-<span class="kn">from</span> <span class="nn">torch_uncertainty</span> <span class="kn">import</span> <span class="n">cli_main</span><span class="p">,</span> <span class="n">init_args</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.baselines</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.baselines.classification.ResNet.html#torch_uncertainty.baselines.classification.ResNet" title="torch_uncertainty.baselines.classification.resnet.ResNet"><span class="n">ResNet</span></a>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.cifar10.CIFAR10DataModule"><span class="n">CIFAR10DataModule</span></a>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.optimization_procedures</span> <span class="kn">import</span> <span class="n">get_procedure</span>
-
-<span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-
-<span class="n">args</span> <span class="o">=</span> <span class="n">init_args</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.baselines.classification.ResNet.html#torch_uncertainty.baselines.classification.ResNet" title="torch_uncertainty.baselines.classification.resnet.ResNet"><span class="n">ResNet</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.cifar10.CIFAR10DataModule"><span class="n">CIFAR10DataModule</span></a><span class="p">)</span>
-
-<span class="n">net_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">-resnet</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">arch</span><span class="si">}</span><span class="s2">-cifar10"</span>
-
-<span class="c1"># datamodule</span>
-<span class="n">args</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">root</span> <span class="o">/</span> <span class="s2">"data"</span><span class="p">)</span>
-<a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.cifar10.CIFAR10DataModule"><span class="n">dm</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.cifar10.CIFAR10DataModule"><span class="n">CIFAR10DataModule</span></a><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
-
-<span class="c1"># model</span>
-<a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.baselines.classification.ResNet.html#torch_uncertainty.baselines.classification.ResNet" title="torch_uncertainty.baselines.classification.resnet.ResNet"><span class="n">model</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.baselines.classification.ResNet.html#torch_uncertainty.baselines.classification.ResNet" title="torch_uncertainty.baselines.classification.resnet.ResNet"><span class="n">ResNet</span></a><span class="p">(</span>
-    <span class="n">num_classes</span><span class="o">=</span><span class="n">dm</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
-    <span class="n">in_channels</span><span class="o">=</span><span class="n">dm</span><span class="o">.</span><span class="n">in_channels</span><span class="p">,</span>
-    <span class="n">loss</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">(),</span>
-    <span class="n">optimization_procedure</span><span class="o">=</span><span class="n">get_procedure</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">"resnet</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">arch</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"cifar10"</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">version</span>
-    <span class="p">),</span>
-    <span class="n">imagenet_structure</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">),</span>
-<span class="p">)</span>
-
-<span class="n">cli_main</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.baselines.classification.ResNet.html#torch_uncertainty.baselines.classification.ResNet" title="torch_uncertainty.baselines.classification.resnet.ResNet"><span class="n">model</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.cifar10.CIFAR10DataModule"><span class="n">dm</span></a><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">net_name</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+<p>Training a model with the Lightning CLI tool is as simple as running the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># in pyjam/experiments/classification/cifar10</span>
+python<span class="w"> </span>resnet.py<span class="w"> </span>fit<span class="w"> </span>--config<span class="w"> </span>configs/resnet18/standard.yaml
 </pre></div>
 </div>
-<p>Run this model with, for instance:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>resnet.py<span class="w"> </span>--version<span class="w"> </span>std<span class="w"> </span>--arch<span class="w"> </span><span class="m">18</span><span class="w"> </span>--accelerator<span class="w"> </span>gpu<span class="w"> </span>--device<span class="w"> </span><span class="m">1</span><span class="w"> </span>--benchmark<span class="w"> </span>True<span class="w"> </span>--max_epochs<span class="w"> </span><span class="m">75</span><span class="w"> </span>--precision<span class="w"> </span><span class="m">16</span>
-</pre></div>
-</div>
-<p>You may replace the architecture (which should be a Lightning Module), the
-Datamodule (a Lightning Datamodule), the loss or the optimization procedure to your likings.</p>
+<p>Which trains a classic ResNet18 model on CIFAR10 with the settings used in the Packed-Ensembles paper.</p>
 </section>
 </section>
+<hr class="docutils"/>
 <section id="using-the-pytorch-based-models">
 <h2>Using the PyTorch-based models<a class="headerlink" href="#using-the-pytorch-based-models" title="Permalink to this heading">¶</a></h2>
 <section id="id1">
@@ -266,6 +304,7 @@ backbone with the following code:</p>
 </div>
 </section>
 </section>
+<hr class="docutils"/>
 <section id="using-the-pytorch-based-layers">
 <h2>Using the PyTorch-based layers<a class="headerlink" href="#using-the-pytorch-based-layers" title="Permalink to this heading">¶</a></h2>
 <section id="id3">
@@ -280,7 +319,7 @@ In that case, you might be interested in directly using the actual layers.</p>
 issue on the GitHub repository!</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>Do not hesitate to go to the API reference to get better explanations on the
+<p>Do not hesitate to go to the <a class="reference external" href="api.html#layers">API Reference</a> to get better explanations on the
 layer usage.</p>
 </div>
 </section>
@@ -323,6 +362,7 @@ code:</p>
 </div>
 </section>
 </section>
+<hr class="docutils"/>
 <section id="other-usage">
 <h2>Other usage<a class="headerlink" href="#other-usage" title="Permalink to this heading">¶</a></h2>
 <p>Feel free to use any classes described in the API reference such as the metrics, datasets, etc.</p>
@@ -354,7 +394,13 @@ code:</p>
 <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
 <ul>
 <li><a class="reference internal" href="#">Quickstart</a><ul>
-<li><a class="reference internal" href="#using-the-lightning-based-cli-tool">Using the Lightning-based CLI tool</a><ul>
+<li><a class="reference internal" href="#training-with-torchuncertainty-s-uncertainty-aware-routines">Training with TorchUncertainty’s Uncertainty-aware Routines</a><ul>
+<li><a class="reference internal" href="#building-your-first-routine">Building your First Routine</a></li>
+<li><a class="reference internal" href="#training-with-the-routine">Training with the Routine</a></li>
+<li><a class="reference internal" href="#more-metrics">More metrics</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-the-lightning-cli-tool">Using the Lightning CLI tool</a><ul>
 <li><a class="reference internal" href="#procedure">Procedure</a></li>
 <li><a class="reference internal" href="#example">Example</a></li>
 </ul>

@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.baselines.classification.resnet &mdash; TorchUncertainty 0.1.6 documentation</title>
+  <title>torch_uncertainty.baselines.classification.resnet &mdash; TorchUncertainty 0.2.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -153,7 +153,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../introduction_uncertainty.html">Introduction to Classification Uncertainty</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../auto_tutorials/index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli_guide.html">CLI Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../references.html">References</a></li>
 </ul>
@@ -249,26 +250,11 @@
                 
                 
   <h1>Source code for torch_uncertainty.baselines.classification.resnet</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span><span class="p">,</span> <span class="n">BooleanOptionalAction</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">pytorch_lightning</span> <span class="kn">import</span> <span class="n">LightningModule</span>
-<span class="kn">from</span> <span class="nn">pytorch_lightning.core.saving</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">load_hparams_from_tags_csv</span><span class="p">,</span>
-    <span class="n">load_hparams_from_yaml</span><span class="p">,</span>
-<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 
-<span class="kn">from</span> <span class="nn">torch_uncertainty.baselines.utils.parser_addons</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">add_masked_specific_args</span><span class="p">,</span>
-    <span class="n">add_mc_dropout_specific_args</span><span class="p">,</span>
-    <span class="n">add_mimo_specific_args</span><span class="p">,</span>
-    <span class="n">add_packed_specific_args</span><span class="p">,</span>
-    <span class="n">add_resnet_specific_args</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.models.mc_dropout</span> <span class="kn">import</span> <span class="n">mc_dropout</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.models</span> <span class="kn">import</span> <span class="n">mc_dropout</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.models.resnet</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">batched_resnet18</span><span class="p">,</span>
     <span class="n">batched_resnet20</span><span class="p">,</span>
@@ -301,14 +287,11 @@
     <span class="n">resnet101</span><span class="p">,</span>
     <span class="n">resnet152</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.routines.classification</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ClassificationEnsemble</span><span class="p">,</span>
-    <span class="n">ClassificationSingle</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.routines.classification</span> <span class="kn">import</span> <span class="n">ClassificationRoutine</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.transforms</span> <span class="kn">import</span> <span class="n">MIMOBatchFormat</span><span class="p">,</span> <span class="n">RepeatTarget</span>
 
 
-<div class="viewcode-block" id="ResNet"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.baselines.classification.ResNet.html#torch_uncertainty.baselines.classification.ResNet">[docs]</a><span class="k">class</span> <span class="nc">ResNet</span><span class="p">:</span>
+<div class="viewcode-block" id="ResNetBaseline"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.baselines.classification.ResNetBaseline.html#torch_uncertainty.baselines.classification.ResNetBaseline">[docs]</a><span class="k">class</span> <span class="nc">ResNetBaseline</span><span class="p">(</span><span class="n">ClassificationRoutine</span><span class="p">):</span>
     <span class="n">single</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">]</span>
     <span class="n">ensemble</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;packed&quot;</span><span class="p">,</span> <span class="s2">&quot;batched&quot;</span><span class="p">,</span> <span class="s2">&quot;masked&quot;</span><span class="p">,</span> <span class="s2">&quot;mc-dropout&quot;</span><span class="p">,</span> <span class="s2">&quot;mimo&quot;</span><span class="p">]</span>
     <span class="n">versions</span> <span class="o">=</span> <span class="p">{</span>
@@ -363,12 +346,11 @@
     <span class="p">}</span>
     <span class="n">archs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">152</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
         <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">loss</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
-        <span class="n">optimization_procedure</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">loss</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
             <span class="s2">&quot;std&quot;</span><span class="p">,</span>
             <span class="s2">&quot;mc-dropout&quot;</span><span class="p">,</span>
@@ -379,22 +361,32 @@
         <span class="p">],</span>
         <span class="n">arch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;imagenet&quot;</span><span class="p">,</span>
-        <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">dropout_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">mixtype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;erm&quot;</span><span class="p">,</span>
+        <span class="n">mixmode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;elem&quot;</span><span class="p">,</span>
+        <span class="n">dist_sim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;emb&quot;</span><span class="p">,</span>
+        <span class="n">kernel_tau_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">kernel_tau_std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">mixup_alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">cutmix_alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">last_layer_dropout</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">gamma</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">rho</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">batch_repeat</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">use_entropy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">use_logits</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">use_mi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">use_variation_ratio</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">ood_criterion</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+            <span class="s2">&quot;msp&quot;</span><span class="p">,</span> <span class="s2">&quot;logit&quot;</span><span class="p">,</span> <span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="s2">&quot;entropy&quot;</span><span class="p">,</span> <span class="s2">&quot;mi&quot;</span><span class="p">,</span> <span class="s2">&quot;vr&quot;</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;msp&quot;</span><span class="p">,</span>
+        <span class="n">log_plots</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">save_in_csv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">calibration_set</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">eval_ood</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">eval_grouping_loss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">pretrained</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LightningModule</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;ResNet backbone baseline for classification providing support for</span>
 <span class="sd">        various versions and architectures.</span>
 
@@ -402,7 +394,7 @@
 <span class="sd">            num_classes (int): Number of classes to predict.</span>
 <span class="sd">            in_channels (int): Number of input channels.</span>
 <span class="sd">            loss (nn.Module): Training loss.</span>
-<span class="sd">            optimization_procedure (Any): Optimization procedure, corresponds to</span>
+<span class="sd">            optim_recipe (Any): optimization recipe, corresponds to</span>
 <span class="sd">                what expect the `LightningModule.configure_optimizers()</span>
 <span class="sd">                &lt;https://pytorch-lightning.readthedocs.io/en/stable/common/lightning_module.html#configure-optimizers&gt;`_</span>
 <span class="sd">                method.</span>
@@ -431,6 +423,22 @@
 <span class="sd">                Only used if :attr:`version` is either ``&quot;packed&quot;``, ``&quot;batched&quot;``,</span>
 <span class="sd">                ``&quot;masked&quot;`` or ``&quot;mc-dropout&quot;`` Defaults to ``None``.</span>
 <span class="sd">            dropout_rate (float, optional): Dropout rate. Defaults to ``0.0``.</span>
+<span class="sd">            mixtype (str, optional): Mixup type. Defaults to ``&quot;erm&quot;``.</span>
+<span class="sd">            mixmode (str, optional): Mixup mode. Defaults to ``&quot;elem&quot;``.</span>
+<span class="sd">            dist_sim (str, optional): Distance similarity. Defaults to ``&quot;emb&quot;``.</span>
+<span class="sd">            kernel_tau_max (float, optional): Maximum value for the kernel tau.</span>
+<span class="sd">                Defaults to ``1.0``.</span>
+<span class="sd">            kernel_tau_std (float, optional): Standard deviation for the kernel</span>
+<span class="sd">                tau. Defaults to ``0.5``.</span>
+<span class="sd">            mixup_alpha (float, optional): Alpha parameter for Mixup. Defaults</span>
+<span class="sd">                to ``0``.</span>
+<span class="sd">            cutmix_alpha (float, optional): Alpha parameter for CutMix.</span>
+<span class="sd">                Defaults to ``0``.</span>
+<span class="sd">            groups (int, optional): Number of groups in convolutions. Defaults</span>
+<span class="sd">                to ``1``.</span>
+<span class="sd">            scale (float, optional): Expansion factor affecting the width of</span>
+<span class="sd">                the estimators. Only used if :attr:`version` is ``&quot;masked&quot;``.</span>
+<span class="sd">                Defaults to ``None``.</span>
 <span class="sd">            last_layer_dropout (bool): whether to apply dropout to the last layer only.</span>
 <span class="sd">            groups (int, optional): Number of groups in convolutions. Defaults to</span>
 <span class="sd">                ``1``.</span>
@@ -448,18 +456,24 @@
 <span class="sd">                ``1``.</span>
 <span class="sd">            batch_repeat (int, optional): Number of times to repeat the batch. Only</span>
 <span class="sd">                used if :attr:`version` is ``&quot;mimo&quot;``. Defaults to ``1``.</span>
-<span class="sd">            use_entropy (bool, optional): Indicates whether to use the entropy</span>
-<span class="sd">                values as the OOD criterion or not. Defaults to ``False``.</span>
-<span class="sd">            use_logits (bool, optional): Indicates whether to use the logits as the</span>
-<span class="sd">                OOD criterion or not. Defaults to ``False``.</span>
-<span class="sd">            use_mi (bool, optional): Indicates whether to use the mutual</span>
-<span class="sd">                information as the OOD criterion or not. Defaults to ``False``.</span>
-<span class="sd">            use_variation_ratio (bool, optional): Indicates whether to use the</span>
-<span class="sd">                variation ratio as the OOD criterion or not. Defaults to ``False``.</span>
+<span class="sd">            ood_criterion (str, optional): OOD criterion. Defaults to ``&quot;msp&quot;``.</span>
+<span class="sd">                MSP is the maximum softmax probability, logit is the maximum</span>
+<span class="sd">                logit, entropy is the entropy of the mean prediction, mi is the</span>
+<span class="sd">                mutual information of the ensemble and vr is the variation ratio</span>
+<span class="sd">                of the ensemble.</span>
+<span class="sd">            log_plots (bool, optional): Indicates whether to log the plots or not.</span>
+<span class="sd">                Defaults to ``False``.</span>
+<span class="sd">            save_in_csv (bool, optional): Indicates whether to save the results in</span>
+<span class="sd">                a csv file or not. Defaults to ``False``.</span>
+<span class="sd">            calibration_set (Callable, optional): Calibration set. Defaults to</span>
+<span class="sd">                ``None``.</span>
+<span class="sd">            eval_ood (bool, optional): Indicates whether to evaluate the</span>
+<span class="sd">                OOD detection or not. Defaults to ``False``.</span>
+<span class="sd">            eval_grouping_loss (bool, optional): Indicates whether to evaluate the</span>
+<span class="sd">                grouping loss or not. Defaults to ``False``.</span>
 <span class="sd">            pretrained (bool, optional): Indicates whether to use the pretrained</span>
 <span class="sd">                weights or not. Only used if :attr:`version` is ``&quot;packed&quot;``.</span>
 <span class="sd">                Defaults to ``False``.</span>
-<span class="sd">            **kwargs: Additional arguments.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: If :attr:`version` is not either ``&quot;std&quot;``,</span>
@@ -479,32 +493,29 @@
 
         <span class="n">format_batch_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">version</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">versions</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">version</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">versions</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown version: </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">version</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ensemble</span><span class="p">:</span>
-            <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="s2">&quot;num_estimators&quot;</span><span class="p">:</span> <span class="n">num_estimators</span><span class="p">,</span>
-                <span class="p">}</span>
-            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">version</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">|=</span> <span class="p">{</span>
+                <span class="s2">&quot;num_estimators&quot;</span><span class="p">:</span> <span class="n">num_estimators</span><span class="p">,</span>
+            <span class="p">}</span>
+
             <span class="k">if</span> <span class="n">version</span> <span class="o">!=</span> <span class="s2">&quot;mc-dropout&quot;</span><span class="p">:</span>
                 <span class="n">format_batch_fn</span> <span class="o">=</span> <span class="n">RepeatTarget</span><span class="p">(</span><span class="n">num_repeats</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;packed&quot;</span><span class="p">:</span>
-            <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="n">alpha</span><span class="p">,</span>
-                    <span class="s2">&quot;gamma&quot;</span><span class="p">:</span> <span class="n">gamma</span><span class="p">,</span>
-                    <span class="s2">&quot;pretrained&quot;</span><span class="p">:</span> <span class="n">pretrained</span><span class="p">,</span>
-                <span class="p">}</span>
-            <span class="p">)</span>
+            <span class="n">params</span> <span class="o">|=</span> <span class="p">{</span>
+                <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="n">alpha</span><span class="p">,</span>
+                <span class="s2">&quot;gamma&quot;</span><span class="p">:</span> <span class="n">gamma</span><span class="p">,</span>
+                <span class="s2">&quot;pretrained&quot;</span><span class="p">:</span> <span class="n">pretrained</span><span class="p">,</span>
+            <span class="p">}</span>
+
         <span class="k">elif</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;masked&quot;</span><span class="p">:</span>
-            <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="n">scale</span><span class="p">,</span>
-                <span class="p">}</span>
-            <span class="p">)</span>
+            <span class="n">params</span> <span class="o">|=</span> <span class="p">{</span>
+                <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="n">scale</span><span class="p">,</span>
+            <span class="p">}</span>
+
         <span class="k">elif</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;mimo&quot;</span><span class="p">:</span>
             <span class="n">format_batch_fn</span> <span class="o">=</span> <span class="n">MIMOBatchFormat</span><span class="p">(</span>
                 <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
@@ -512,12 +523,10 @@
                 <span class="n">batch_repeat</span><span class="o">=</span><span class="n">batch_repeat</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="c1"># for lightning params</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span> <span class="o">|</span> <span class="p">{</span><span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">version</span><span class="p">,</span> <span class="s2">&quot;arch&quot;</span><span class="p">:</span> <span class="n">arch</span><span class="p">})</span>
-
         <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;mc-dropout&quot;</span><span class="p">:</span>  <span class="c1"># std ResNets don&#39;t have `num_estimators`</span>
             <span class="k">del</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;num_estimators&quot;</span><span class="p">]</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">versions</span><span class="p">[</span><span class="n">version</span><span class="p">][</span><span class="bp">cls</span><span class="o">.</span><span class="n">archs</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">arch</span><span class="p">)](</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">versions</span><span class="p">[</span><span class="n">version</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">archs</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">arch</span><span class="p">)](</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;mc-dropout&quot;</span><span class="p">:</span>
             <span class="n">model</span> <span class="o">=</span> <span class="n">mc_dropout</span><span class="p">(</span>
                 <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
@@ -525,76 +534,27 @@
                 <span class="n">last_layer</span><span class="o">=</span><span class="n">last_layer_dropout</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="c1"># routine specific parameters</span>
-        <span class="k">if</span> <span class="n">version</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">single</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">ClassificationSingle</span><span class="p">(</span>
-                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-                <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
-                <span class="n">optimization_procedure</span><span class="o">=</span><span class="n">optimization_procedure</span><span class="p">,</span>
-                <span class="n">format_batch_fn</span><span class="o">=</span><span class="n">format_batch_fn</span><span class="p">,</span>
-                <span class="n">use_entropy</span><span class="o">=</span><span class="n">use_entropy</span><span class="p">,</span>
-                <span class="n">use_logits</span><span class="o">=</span><span class="n">use_logits</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="c1"># version in cls.ensemble</span>
-        <span class="k">return</span> <span class="n">ClassificationEnsemble</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span>
             <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
             <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
-            <span class="n">optimization_procedure</span><span class="o">=</span><span class="n">optimization_procedure</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
             <span class="n">format_batch_fn</span><span class="o">=</span><span class="n">format_batch_fn</span><span class="p">,</span>
-            <span class="n">use_entropy</span><span class="o">=</span><span class="n">use_entropy</span><span class="p">,</span>
-            <span class="n">use_logits</span><span class="o">=</span><span class="n">use_logits</span><span class="p">,</span>
-            <span class="n">use_mi</span><span class="o">=</span><span class="n">use_mi</span><span class="p">,</span>
-            <span class="n">use_variation_ratio</span><span class="o">=</span><span class="n">use_variation_ratio</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="n">mixtype</span><span class="o">=</span><span class="n">mixtype</span><span class="p">,</span>
+            <span class="n">mixmode</span><span class="o">=</span><span class="n">mixmode</span><span class="p">,</span>
+            <span class="n">dist_sim</span><span class="o">=</span><span class="n">dist_sim</span><span class="p">,</span>
+            <span class="n">kernel_tau_max</span><span class="o">=</span><span class="n">kernel_tau_max</span><span class="p">,</span>
+            <span class="n">kernel_tau_std</span><span class="o">=</span><span class="n">kernel_tau_std</span><span class="p">,</span>
+            <span class="n">mixup_alpha</span><span class="o">=</span><span class="n">mixup_alpha</span><span class="p">,</span>
+            <span class="n">cutmix_alpha</span><span class="o">=</span><span class="n">cutmix_alpha</span><span class="p">,</span>
+            <span class="n">eval_ood</span><span class="o">=</span><span class="n">eval_ood</span><span class="p">,</span>
+            <span class="n">eval_grouping_loss</span><span class="o">=</span><span class="n">eval_grouping_loss</span><span class="p">,</span>
+            <span class="n">ood_criterion</span><span class="o">=</span><span class="n">ood_criterion</span><span class="p">,</span>
+            <span class="n">log_plots</span><span class="o">=</span><span class="n">log_plots</span><span class="p">,</span>
+            <span class="n">save_in_csv</span><span class="o">=</span><span class="n">save_in_csv</span><span class="p">,</span>
+            <span class="n">calibration_set</span><span class="o">=</span><span class="n">calibration_set</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">load_from_checkpoint</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
-        <span class="n">hparams_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LightningModule</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
-        <span class="k">if</span> <span class="n">hparams_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">extension</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">hparams_file</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">extension</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;csv&quot;</span><span class="p">:</span>
-                <span class="n">hparams</span> <span class="o">=</span> <span class="n">load_hparams_from_tags_csv</span><span class="p">(</span><span class="n">hparams_file</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">extension</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;yml&quot;</span><span class="p">,</span> <span class="s2">&quot;yaml&quot;</span><span class="p">):</span>
-                <span class="n">hparams</span> <span class="o">=</span> <span class="n">load_hparams_from_yaml</span><span class="p">(</span><span class="n">hparams_file</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;.csv, .yml or .yaml is required for `hparams_file`&quot;</span>
-                <span class="p">)</span>
-
-        <span class="n">hparams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">)</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">hparams</span><span class="p">)</span>
-        <span class="n">obj</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">obj</span>
-
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">add_model_specific_args</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parser</span><span class="p">:</span> <span class="n">ArgumentParser</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArgumentParser</span><span class="p">:</span>
-        <span class="n">parser</span> <span class="o">=</span> <span class="n">ClassificationEnsemble</span><span class="o">.</span><span class="n">add_model_specific_args</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
-        <span class="n">parser</span> <span class="o">=</span> <span class="n">add_resnet_specific_args</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
-        <span class="n">parser</span> <span class="o">=</span> <span class="n">add_packed_specific_args</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
-        <span class="n">parser</span> <span class="o">=</span> <span class="n">add_masked_specific_args</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
-        <span class="n">parser</span> <span class="o">=</span> <span class="n">add_mimo_specific_args</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
-        <span class="n">parser</span> <span class="o">=</span> <span class="n">add_mc_dropout_specific_args</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-            <span class="s2">&quot;--version&quot;</span><span class="p">,</span>
-            <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
-            <span class="n">choices</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
-            <span class="n">default</span><span class="o">=</span><span class="s2">&quot;std&quot;</span><span class="p">,</span>
-            <span class="n">help</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Variation of ResNet. Choose among: </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-            <span class="s2">&quot;--pretrained&quot;</span><span class="p">,</span>
-            <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;pretrained&quot;</span><span class="p">,</span>
-            <span class="n">action</span><span class="o">=</span><span class="n">BooleanOptionalAction</span><span class="p">,</span>
-            <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">parser</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">(</span><span class="n">ignore</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">])</span></div>
 </pre></div>
 
               </article>
