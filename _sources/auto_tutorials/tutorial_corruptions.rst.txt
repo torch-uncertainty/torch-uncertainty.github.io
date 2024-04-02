@@ -30,9 +30,10 @@ For this tutorial, we will only load the corruption transforms available in
 torch_uncertainty.transforms.corruptions. We also need to load utilities from
 torchvision and matplotlib.
 
-.. GENERATED FROM PYTHON SOURCE LINES 14-42
+.. GENERATED FROM PYTHON SOURCE LINES 14-63
 
 .. code-block:: Python
+
 
     import torch
     from torchvision.datasets import CIFAR10
@@ -43,24 +44,44 @@ torchvision and matplotlib.
 
     ds = CIFAR10("./data", train=False, download=True)
 
-    def get_images(main_transform, severity):
-        ds_transforms = Compose([ToTensor(), main_transform(severity), Resize(256)])
-        ds = CIFAR10("./data", train=False, download=False, transform=ds_transforms)
-        return make_grid([ds[i][0] for i in range(6)]).permute(1, 2, 0)
 
-    def show_images(transform):
-        print("Original Images")
-        with torch.no_grad():
-            plt.axis('off')
-            plt.imshow(get_images(transform, 0))
-            plt.show()
+    def get_images(main_corruption, index: int = 0):
+        """Create an image showing the 6 levels of corruption of a given transform."""
+        images = []
+        for severity in range(6):
+            ds_transforms = Compose(
+                [ToTensor(), main_corruption(severity), Resize(256, antialias=True)]
+            )
+            ds = CIFAR10("./data", train=False, download=False, transform=ds_transforms)
+            images.append(ds[index][0].permute(1, 2, 0).numpy())
+        return images
 
-        for severity in range(1, 6):
-            print(f"Severity {severity}")
-            with torch.no_grad():
-                plt.axis('off')
-                plt.imshow(get_images(transform, severity))
-                plt.show()
+
+    def show_images(transforms):
+        """Show the effect of all given transforms."""
+        num_corruptions = len(transforms)
+        _, ax = plt.subplots(num_corruptions, 6, figsize=(10, int(1.5 * num_corruptions)))
+        for i, transform in enumerate(transforms):
+            images = get_images(transform, index=i)
+            ax[i][0].text(
+                -0.1,
+                0.5,
+                transform.__name__,
+                transform=ax[i][0].transAxes,
+                rotation="vertical",
+                horizontalalignment="right",
+                verticalalignment="center",
+                fontsize=12,
+            )
+            for j in range(6):
+                ax[i][j].imshow(images[j])
+                if i == 0 and j == 0:
+                    ax[i][j].set_title("Original")
+                elif i == 0:
+                    ax[i][j].set_title(f"Severity {j}")
+                ax[i][j].axis("off")
+        plt.show()
+
 
 
 
@@ -71,102 +92,112 @@ torchvision and matplotlib.
  .. code-block:: none
 
     Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ./data/cifar-10-python.tar.gz
-      0%|          | 0/170498071 [00:00<?, ?it/s]      1%|          | 884736/170498071 [00:00<00:20, 8100403.93it/s]      6%|▋         | 10878976/170498071 [00:00<00:02, 60144161.55it/s]     13%|█▎        | 22052864/170498071 [00:00<00:01, 83209681.42it/s]     20%|█▉        | 33619968/170498071 [00:00<00:01, 95847103.37it/s]     26%|██▌       | 44728320/170498071 [00:00<00:01, 101226627.73it/s]     33%|███▎      | 56328192/170498071 [00:00<00:01, 106149452.09it/s]     40%|███▉      | 67993600/170498071 [00:00<00:00, 109456097.11it/s]     47%|████▋     | 79495168/170498071 [00:00<00:00, 111158897.74it/s]     53%|█████▎    | 91029504/170498071 [00:00<00:00, 111650677.13it/s]     60%|██████    | 102531072/170498071 [00:01<00:00, 112677902.30it/s]     67%|██████▋   | 113836032/170498071 [00:01<00:00, 110305989.37it/s]     74%|███████▍  | 126156800/170498071 [00:01<00:00, 113968006.36it/s]     81%|████████  | 137822208/170498071 [00:01<00:00, 114752675.24it/s]     88%|████████▊ | 149356544/170498071 [00:01<00:00, 114845236.27it/s]     94%|█████████▍| 160890880/170498071 [00:01<00:00, 114942629.29it/s]    100%|██████████| 170498071/170498071 [00:01<00:00, 106263327.66it/s]
+      0%|          | 0/170498071 [00:00<?, ?it/s]      0%|          | 393216/170498071 [00:00<00:43, 3920461.16it/s]      2%|▏         | 3244032/170498071 [00:00<00:09, 18321086.60it/s]      4%|▍         | 6455296/170498071 [00:00<00:06, 24586786.26it/s]      6%|▌         | 9633792/170498071 [00:00<00:05, 27390182.65it/s]      9%|▉         | 15007744/170498071 [00:00<00:04, 36870645.47it/s]     12%|█▏        | 21135360/170498071 [00:00<00:03, 45124468.49it/s]     16%|█▌        | 27328512/170498071 [00:00<00:02, 50579740.13it/s]     20%|█▉        | 33488896/170498071 [00:00<00:02, 53913058.24it/s]     23%|██▎       | 39682048/170498071 [00:00<00:02, 56166902.45it/s]     27%|██▋       | 45711360/170498071 [00:01<00:02, 57121079.08it/s]     31%|███       | 52068352/170498071 [00:01<00:02, 58980694.96it/s]     34%|███▍      | 58228736/170498071 [00:01<00:01, 59607111.69it/s]     38%|███▊      | 64585728/170498071 [00:01<00:01, 60781535.54it/s]     42%|████▏     | 70778880/170498071 [00:01<00:01, 61079611.97it/s]     45%|████▌     | 77201408/170498071 [00:01<00:01, 61964742.67it/s]     49%|████▉     | 84279296/170498071 [00:01<00:01, 64561203.86it/s]     53%|█████▎    | 91029504/170498071 [00:01<00:01, 65440735.22it/s]     57%|█████▋    | 97812480/170498071 [00:01<00:01, 66141672.67it/s]     61%|██████▏   | 104562688/170498071 [00:01<00:00, 66547400.10it/s]     66%|██████▌   | 111738880/170498071 [00:02<00:00, 67945159.69it/s]     70%|██████▉   | 118554624/170498071 [00:02<00:00, 67589830.21it/s]     74%|███████▎  | 125337600/170498071 [00:02<00:00, 66811591.42it/s]     78%|███████▊  | 132808704/170498071 [00:02<00:00, 69055044.99it/s]     82%|████████▏ | 139722752/170498071 [00:02<00:00, 67068922.19it/s]     86%|████████▌ | 146472960/170498071 [00:02<00:00, 66237818.19it/s]     90%|████████▉ | 153255936/170498071 [00:02<00:00, 66457341.31it/s]     94%|█████████▍| 159940608/170498071 [00:02<00:00, 64746232.17it/s]     98%|█████████▊| 166526976/170498071 [00:02<00:00, 65069528.15it/s]    100%|██████████| 170498071/170498071 [00:02<00:00, 58602370.41it/s]
     Extracting ./data/cifar-10-python.tar.gz to ./data
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-45
+.. GENERATED FROM PYTHON SOURCE LINES 64-66
 
-1. Gaussian Noise
-~~~~~~~~~~~~~~~~~
+1. Noise Corruptions
+~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-49
+.. GENERATED FROM PYTHON SOURCE LINES 66-82
 
 .. code-block:: Python
 
-    from torch_uncertainty.transforms.corruptions import GaussianNoise
+    from torch_uncertainty.transforms.corruptions import (
+        GaussianNoise,
+        ShotNoise,
+        ImpulseNoise,
+        SpeckleNoise,
+    )
 
-    show_images(GaussianNoise)
+    show_images(
+        [
+            GaussianNoise,
+            ShotNoise,
+            ImpulseNoise,
+            SpeckleNoise,
+        ]
+    )
 
 
 
 
 .. image-sg:: /auto_tutorials/images/sphx_glr_tutorial_corruptions_001.png
-   :alt: tutorial corruptions
+   :alt: Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5
    :srcset: /auto_tutorials/images/sphx_glr_tutorial_corruptions_001.png
    :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Original Images
-    Severity 1
-    Severity 2
-    Severity 3
-    Severity 4
-    Severity 5
 
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 83-85
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-52
+2. Blur Corruptions
+~~~~~~~~~~~~~~~~~~~~
 
-2. Shot Noise
-~~~~~~~~~~~~~
-
-.. GENERATED FROM PYTHON SOURCE LINES 52-56
+.. GENERATED FROM PYTHON SOURCE LINES 85-99
 
 .. code-block:: Python
 
-    from torch_uncertainty.transforms.corruptions import ShotNoise
+    from torch_uncertainty.transforms.corruptions import (
+        GaussianBlur,
+        GlassBlur,
+        DefocusBlur,
+    )
 
-    show_images(ShotNoise)
+    show_images(
+        [
+            GaussianBlur,
+            GlassBlur,
+            DefocusBlur,
+        ]
+    )
 
 
 
 
 .. image-sg:: /auto_tutorials/images/sphx_glr_tutorial_corruptions_002.png
-   :alt: tutorial corruptions
+   :alt: Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5
    :srcset: /auto_tutorials/images/sphx_glr_tutorial_corruptions_002.png
    :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Original Images
-    Severity 1
-    Severity 2
-    Severity 3
-    Severity 4
-    Severity 5
 
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 100-102
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-59
+3. Other Corruptions
+~~~~~~~~~~~~~~~~~~~~
 
-3. Impulse Noise
-~~~~~~~~~~~~~~~~
-
-.. GENERATED FROM PYTHON SOURCE LINES 59-63
+.. GENERATED FROM PYTHON SOURCE LINES 102-116
 
 .. code-block:: Python
 
-    from torch_uncertainty.transforms.corruptions import ImpulseNoise
+    from torch_uncertainty.transforms.corruptions import (
+        JPEGCompression,
+        Pixelate,
+        Frost,
+    )
 
-    show_images(ImpulseNoise)
+    show_images(
+        [
+            JPEGCompression,
+            Pixelate,
+            Frost,
+        ]
+    )
 
 
 
 
 .. image-sg:: /auto_tutorials/images/sphx_glr_tutorial_corruptions_003.png
-   :alt: tutorial corruptions
+   :alt: Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5
    :srcset: /auto_tutorials/images/sphx_glr_tutorial_corruptions_003.png
    :class: sphx-glr-single-img
 
@@ -175,279 +206,20 @@ torchvision and matplotlib.
 
  .. code-block:: none
 
-    Original Images
-    Severity 1
-    Severity 2
-    Severity 3
-    Severity 4
-    Severity 5
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 64-66
-
-4. Speckle Noise
-~~~~~~~~~~~~~~~~
-
-.. GENERATED FROM PYTHON SOURCE LINES 66-70
-
-.. code-block:: Python
-
-    from torch_uncertainty.transforms.corruptions import SpeckleNoise
-
-    show_images(SpeckleNoise)
-
-
-
-
-.. image-sg:: /auto_tutorials/images/sphx_glr_tutorial_corruptions_004.png
-   :alt: tutorial corruptions
-   :srcset: /auto_tutorials/images/sphx_glr_tutorial_corruptions_004.png
-   :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Original Images
-    Severity 1
-    Severity 2
-    Severity 3
-    Severity 4
-    Severity 5
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 71-73
-
-5. Gaussian Blur
-~~~~~~~~~~~~~~~~
-
-.. GENERATED FROM PYTHON SOURCE LINES 73-77
-
-.. code-block:: Python
-
-    from torch_uncertainty.transforms.corruptions import GaussianBlur
-
-    show_images(GaussianBlur)
-
-
-
-
-.. image-sg:: /auto_tutorials/images/sphx_glr_tutorial_corruptions_005.png
-   :alt: tutorial corruptions
-   :srcset: /auto_tutorials/images/sphx_glr_tutorial_corruptions_005.png
-   :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Original Images
-    Severity 1
-    Severity 2
-    Severity 3
-    Severity 4
-    Severity 5
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 78-80
-
-6. Glass Blur
-~~~~~~~~~~~~~
-
-.. GENERATED FROM PYTHON SOURCE LINES 80-84
-
-.. code-block:: Python
-
-    from torch_uncertainty.transforms.corruptions import GlassBlur
-
-    show_images(GlassBlur)
-
-
-
-
-.. image-sg:: /auto_tutorials/images/sphx_glr_tutorial_corruptions_006.png
-   :alt: tutorial corruptions
-   :srcset: /auto_tutorials/images/sphx_glr_tutorial_corruptions_006.png
-   :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Original Images
-    Severity 1
-    Severity 2
-    Severity 3
-    Severity 4
-    Severity 5
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 85-87
-
-7. Defocus Blur
-~~~~~~~~~~~~~~~
-
-.. GENERATED FROM PYTHON SOURCE LINES 87-92
-
-.. code-block:: Python
-
-
-    from torch_uncertainty.transforms.corruptions import DefocusBlur
-
-    show_images(DefocusBlur)
-
-
-
-
-.. image-sg:: /auto_tutorials/images/sphx_glr_tutorial_corruptions_007.png
-   :alt: tutorial corruptions
-   :srcset: /auto_tutorials/images/sphx_glr_tutorial_corruptions_007.png
-   :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Original Images
-    Severity 1
-    Severity 2
-    Severity 3
-    Severity 4
-    Severity 5
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 93-95
-
-8. JPEG Compression
-~~~~~~~~~~~~~~~~~~~
-
-.. GENERATED FROM PYTHON SOURCE LINES 95-99
-
-.. code-block:: Python
-
-    from torch_uncertainty.transforms.corruptions import JPEGCompression
-
-    show_images(JPEGCompression)
-
-
-
-
-.. image-sg:: /auto_tutorials/images/sphx_glr_tutorial_corruptions_008.png
-   :alt: tutorial corruptions
-   :srcset: /auto_tutorials/images/sphx_glr_tutorial_corruptions_008.png
-   :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Original Images
-    Severity 1
-    Severity 2
-    Severity 3
-    Severity 4
-    Severity 5
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 100-102
-
-9. Pixelate
-~~~~~~~~~~~
-
-.. GENERATED FROM PYTHON SOURCE LINES 102-106
-
-.. code-block:: Python
-
-    from torch_uncertainty.transforms.corruptions import Pixelate
-
-    show_images(Pixelate)
-
-
-
-
-.. image-sg:: /auto_tutorials/images/sphx_glr_tutorial_corruptions_009.png
-   :alt: tutorial corruptions
-   :srcset: /auto_tutorials/images/sphx_glr_tutorial_corruptions_009.png
-   :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Original Images
-    Severity 1
-    Severity 2
-    Severity 3
-    Severity 4
-    Severity 5
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 107-109
-
-10. Frost
-~~~~~~~~~
-
-.. GENERATED FROM PYTHON SOURCE LINES 109-113
-
-.. code-block:: Python
-
-    from torch_uncertainty.transforms.corruptions import Frost
-
-    show_images(Frost)
-
-
-
-
-.. image-sg:: /auto_tutorials/images/sphx_glr_tutorial_corruptions_010.png
-   :alt: tutorial corruptions
-   :srcset: /auto_tutorials/images/sphx_glr_tutorial_corruptions_010.png
-   :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Original Images
     Downloading https://zenodo.org/records/10438904/files/frost.zip to data/frost.zip
-      0%|          | 0/1780178 [00:00<?, ?it/s]      2%|▏         | 32768/1780178 [00:00<00:05, 298292.04it/s]      7%|▋         | 131072/1780178 [00:00<00:03, 451871.18it/s]     29%|██▉       | 524288/1780178 [00:00<00:00, 1263557.71it/s]    100%|██████████| 1780178/1780178 [00:00<00:00, 3017056.22it/s]
+      0%|          | 0/1780178 [00:00<?, ?it/s]      4%|▎         | 65536/1780178 [00:00<00:05, 335670.52it/s]     13%|█▎        | 229376/1780178 [00:00<00:02, 631541.91it/s]     26%|██▌       | 458752/1780178 [00:00<00:01, 883053.16it/s]     40%|████      | 720896/1780178 [00:00<00:00, 1067975.25it/s]     53%|█████▎    | 950272/1780178 [00:00<00:00, 1109039.69it/s]     68%|██████▊   | 1212416/1780178 [00:01<00:00, 1188585.29it/s]     81%|████████  | 1441792/1780178 [00:01<00:00, 1187002.23it/s]     94%|█████████▍| 1671168/1780178 [00:01<00:00, 1185671.69it/s]    100%|██████████| 1780178/1780178 [00:01<00:00, 1144081.86it/s]
     Extracting data/frost.zip to data
     Downloaded frost.zip to data
-    Severity 1
     Files already downloaded and verified
-    Severity 2
     Files already downloaded and verified
-    Severity 3
     Files already downloaded and verified
-    Severity 4
     Files already downloaded and verified
-    Severity 5
     Files already downloaded and verified
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-118
+.. GENERATED FROM PYTHON SOURCE LINES 117-121
 
 Reference
 ---------
@@ -457,7 +229,7 @@ Reference
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 25.621 seconds)
+   **Total running time of the script:** (0 minutes 28.080 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_corruptions.py:

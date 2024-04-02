@@ -33,10 +33,10 @@ In this part, we train a LeNet with batch normalization layers, based on the mod
 First, we have to load the following utilities from TorchUncertainty:
 
 - the Trainer from Lightning
-- the datamodule that handles dataloaders: MNISTDataModule, which lies in the torch_uncertainty.datamodule
+- the datamodule handling dataloaders: MNISTDataModule from torch_uncertainty.datamodules
 - the model: LeNet, which lies in torch_uncertainty.models
-- the mc-batch-norm wrapper: mc_dropout, which lies in torch_uncertainty.models
-- the classification training routine in the torch_uncertainty.training.classification module
+- the MC Batch Normalization wrapper: mc_batch_norm, which lies in torch_uncertainty.post_processing
+- the classification training routine in the torch_uncertainty.routines
 - an optimization recipe in the torch_uncertainty.optim_recipes module.
 
 We also need import the neural network utils within `torch.nn`.
@@ -151,14 +151,14 @@ and the optimization recipe.
     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃        Test metric        ┃       DataLoader 0        ┃
     ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │       cls_test/Acc        │    0.9800999760627747     │
-    │      cls_test/Brier       │   0.029031939804553986    │
-    │       cls_test/ECE        │   0.0067690336145460606   │
-    │       cls_test/NLL        │   0.061218634247779846    │
-    │     cls_test/entropy      │    0.09076852351427078    │
+    │       cls_test/Acc        │    0.9812999963760376     │
+    │      cls_test/Brier       │   0.028409384191036224    │
+    │       cls_test/ECE        │   0.0051252031698822975   │
+    │       cls_test/NLL        │   0.059990596026182175    │
+    │     cls_test/entropy      │    0.08191443234682083    │
     └───────────────────────────┴───────────────────────────┘
 
-    [{'cls_test/Acc': 0.9800999760627747, 'cls_test/Brier': 0.029031939804553986, 'cls_test/ECE': 0.0067690336145460606, 'cls_test/NLL': 0.061218634247779846, 'cls_test/entropy': 0.09076852351427078}]
+    [{'cls_test/Acc': 0.9812999963760376, 'cls_test/Brier': 0.028409384191036224, 'cls_test/ECE': 0.0051252031698822975, 'cls_test/NLL': 0.059990596026182175, 'cls_test/entropy': 0.08191443234682083}]
 
 
 
@@ -292,10 +292,10 @@ the variance of the predictions is the highest.
 
     Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
     Ground truth:  7 2 1 0
-    Predicted digits for the image 15:  3 3 5 3 5 3 3 3
-    Predicted digits for the image 78:  9 9 8 9 9 9 8 9
-    Predicted digits for the image 95:  4 4 6 4 6 4 4 8
-    Predicted digits for the image 96:  7 1 1 1 1 1 1 1
+    Predicted digits for the image 62:  5 9 9 9 5 5 9 5
+    Predicted digits for the image 89:  7 1 8 1 1 1 1 1
+    Predicted digits for the image 94:  8 1 8 1 8 1 1 1
+    Predicted digits for the image 95:  6 4 6 4 6 4 4 4
 
 
 
@@ -310,7 +310,7 @@ stochastic estimator used.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 36.864 seconds)
+   **Total running time of the script:** (0 minutes 36.826 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_mc_batch_norm.py:

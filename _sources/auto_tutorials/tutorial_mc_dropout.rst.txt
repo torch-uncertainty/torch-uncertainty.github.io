@@ -25,8 +25,8 @@ In this tutorial, we will train a LeNet classifier on the MNIST dataset using Mo
 
 For more information on Monte-Carlo Dropout, we refer the reader to the following resources:
 
+- Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning `ICML 2016 <https://browse.arxiv.org/pdf/1506.02142.pdf>`_
 - What Uncertainties Do We Need in Bayesian Deep Learning for Computer Vision? `NeurIPS 2017 <https://browse.arxiv.org/pdf/1703.04977.pdf>`_
-- Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning `PMLR 2016 <https://browse.arxiv.org/pdf/1506.02142.pdf>`_
 
 Training a LeNet with MC Dropout using TorchUncertainty models and PyTorch Lightning
 -------------------------------------------------------------------------------------
@@ -39,15 +39,15 @@ In this part, we train a LeNet with dropout layers, based on the model and routi
 First, we have to load the following utilities from TorchUncertainty:
 
 - the Trainer from Lightning
-- the datamodule that handles dataloaders: MNISTDataModule, which lies in the torch_uncertainty.datamodule
+- the datamodule handling dataloaders: MNISTDataModule from torch_uncertainty.datamodules
 - the model: LeNet, which lies in torch_uncertainty.models
-- the mc-dropout wrapper: mc_dropout, which lies in torch_uncertainty.models
-- the classification training routine in the torch_uncertainty.training.classification module
+- the MC Dropout wrapper: mc_dropout, which lies in torch_uncertainty.models
+- the classification training routine in the torch_uncertainty.routines
 - an optimization recipe in the torch_uncertainty.optim_recipes module.
 
 We also need import the neural network utils within `torch.nn`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-43
+.. GENERATED FROM PYTHON SOURCE LINES 33-44
 
 .. code-block:: Python
 
@@ -69,7 +69,7 @@ We also need import the neural network utils within `torch.nn`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-55
+.. GENERATED FROM PYTHON SOURCE LINES 45-56
 
 2. Creating the necessary variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,12 +78,12 @@ In the following, we will need to define the root of the datasets and the
 logs, and to fake-parse the arguments needed for using the PyTorch Lightning
 Trainer. We also create the datamodule that handles the MNIST dataset,
 dataloaders and transforms. We create the model using the
-blueprint from torch_uncertainty.models and we wrap it into mc-dropout.
+blueprint from torch_uncertainty.models and we wrap it into mc_dropout.
 
-It is important to specify the arguments ``version`` as ``mc-dropout``,
-``num_estimators`` and the ``dropout_rate`` to use Monte Carlo dropout.
+It is important to specify the arguments,``num_estimators`` and the ``dropout_rate``
+to use Monte Carlo dropout.
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-71
+.. GENERATED FROM PYTHON SOURCE LINES 56-72
 
 .. code-block:: Python
 
@@ -91,14 +91,14 @@ It is important to specify the arguments ``version`` as ``mc-dropout``,
     trainer = Trainer(accelerator="cpu", max_epochs=2, enable_progress_bar=False)
 
     # datamodule
-    root = Path("")  / "data"
+    root = Path("") / "data"
     datamodule = MNISTDataModule(root=root, batch_size=128)
 
 
     model = lenet(
         in_channels=datamodule.num_channels,
         num_classes=datamodule.num_classes,
-        dropout_rate=0.6,
+        dropout_rate=0.4,
     )
 
     mc_model = mc_dropout(model, num_estimators=16, last_layer=False)
@@ -110,7 +110,7 @@ It is important to specify the arguments ``version`` as ``mc-dropout``,
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-80
+.. GENERATED FROM PYTHON SOURCE LINES 73-81
 
 3. The Loss and the Training Routine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -121,7 +121,7 @@ and channels, the optimizer wrapper, the dropout rate, and the number of
 forward passes to perform through the network, as well as all the default
 arguments.
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-90
+.. GENERATED FROM PYTHON SOURCE LINES 81-90
 
 .. code-block:: Python
 
@@ -132,7 +132,6 @@ arguments.
         loss=nn.CrossEntropyLoss(),
         optim_recipe=optim_cifar10_resnet18(mc_model),
         num_estimators=16,
-
     )
 
 
@@ -169,17 +168,17 @@ arguments.
     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃        Test metric        ┃       DataLoader 0        ┃
     ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │       cls_test/Acc        │    0.09790000319480896    │
-    │      cls_test/Brier       │    0.9000616073608398     │
-    │       cls_test/ECE        │   0.008982867002487183    │
-    │       cls_test/NLL        │    2.3028523921966553     │
-    │ cls_test/ens_Disagreement │  0.00022499999613501132   │
-    │   cls_test/ens_Entropy    │     2.30102801322937      │
-    │      cls_test/ens_MI      │  0.00022499999613501132   │
-    │     cls_test/entropy      │     2.301323175430298     │
+    │       cls_test/Acc        │    0.9362999796867371     │
+    │      cls_test/Brier       │    0.13802306354045868    │
+    │       cls_test/ECE        │    0.15248000621795654    │
+    │       cls_test/NLL        │    0.34229347109794617    │
+    │ cls_test/ens_Disagreement │    0.18241915106773376    │
+    │   cls_test/ens_Entropy    │    0.5452611446380615     │
+    │      cls_test/ens_MI      │    0.21580387651920319    │
+    │     cls_test/entropy      │    0.7610648274421692     │
     └───────────────────────────┴───────────────────────────┘
 
-    [{'cls_test/Acc': 0.09790000319480896, 'cls_test/Brier': 0.9000616073608398, 'cls_test/ECE': 0.008982867002487183, 'cls_test/NLL': 2.3028523921966553, 'cls_test/entropy': 2.301323175430298, 'cls_test/ens_Disagreement': 0.00022499999613501132, 'cls_test/ens_Entropy': 2.30102801322937, 'cls_test/ens_MI': 0.00022499999613501132}]
+    [{'cls_test/Acc': 0.9362999796867371, 'cls_test/Brier': 0.13802306354045868, 'cls_test/ECE': 0.15248000621795654, 'cls_test/NLL': 0.34229347109794617, 'cls_test/entropy': 0.7610648274421692, 'cls_test/ens_Disagreement': 0.18241915106773376, 'cls_test/ens_Entropy': 0.5452611446380615, 'cls_test/ens_MI': 0.21580387651920319}]
 
 
 
@@ -244,22 +243,23 @@ Now that the model is trained, let's test it on MNIST. Don't forget to call
 
     Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
     Ground truth:  7 2 1 0
-    Predicted digits for the image 1:  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-    Predicted digits for the image 2:  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-    Predicted digits for the image 3:  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-    Predicted digits for the image 4:  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    Predicted digits for the image 1:  7 7 9 7 7 7 7 7 7 7 7 7 7 7 7 7
+    Predicted digits for the image 2:  2 2 2 2 2 2 2 2 2 2 2 2 2 6 2 2
+    Predicted digits for the image 3:  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+    Predicted digits for the image 4:  0 0 8 0 0 8 0 0 0 8 8 0 0 0 0 0
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-139
+.. GENERATED FROM PYTHON SOURCE LINES 138-140
 
+We see that there is some disagreement between the samples of the dropout
 approximation of the posterior distribution.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 45.869 seconds)
+   **Total running time of the script:** (0 minutes 46.875 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_mc_dropout.py:

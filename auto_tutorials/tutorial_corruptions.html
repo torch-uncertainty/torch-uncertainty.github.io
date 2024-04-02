@@ -40,8 +40,8 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Training a LeNet with Monte-Carlo Dropout" href="tutorial_mc_dropout.html" />
-  <link rel="prev" title="Improve Top-label Calibration with Temperature Scaling" href="tutorial_scaler.html" />
+  <link rel="next" title="Deep Evidential Classification on a Toy Example" href="tutorial_evidential_classification.html" />
+  <link rel="prev" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -281,218 +281,153 @@ torchvision and matplotlib.</p>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">CIFAR10</span><span class="p">(</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">get_images</span><span class="p">(</span><span class="n">main_transform</span><span class="p">,</span> <span class="n">severity</span><span class="p">):</span>
-    <span class="n">ds_transforms</span> <span class="o">=</span> <span class="n">Compose</span><span class="p">([</span><span class="n">ToTensor</span><span class="p">(),</span> <span class="n">main_transform</span><span class="p">(</span><span class="n">severity</span><span class="p">),</span> <span class="n">Resize</span><span class="p">(</span><span class="mi">256</span><span class="p">)])</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">CIFAR10</span><span class="p">(</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ds_transforms</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">make_grid</span><span class="p">([</span><span class="n">ds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">)])</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">show_images</span><span class="p">(</span><span class="n">transform</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original Images&quot;</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">get_images</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">get_images</span><span class="p">(</span><span class="n">main_corruption</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an image showing the 6 levels of corruption of a given transform.&quot;&quot;&quot;</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">severity</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+        <span class="n">ds_transforms</span> <span class="o">=</span> <span class="n">Compose</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">ToTensor</span><span class="p">(),</span> <span class="n">main_corruption</span><span class="p">(</span><span class="n">severity</span><span class="p">),</span> <span class="n">Resize</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="n">antialias</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+        <span class="p">)</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">CIFAR10</span><span class="p">(</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ds_transforms</span><span class="p">)</span>
+        <span class="n">images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">images</span>
 
-    <span class="k">for</span> <span class="n">severity</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Severity </span><span class="si">{</span><span class="n">severity</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">get_images</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">severity</span><span class="p">))</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">show_images</span><span class="p">(</span><span class="n">transforms</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Show the effect of all given transforms.&quot;&quot;&quot;</span>
+    <span class="n">num_corruptions</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">transforms</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">num_corruptions</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1.5</span> <span class="o">*</span> <span class="n">num_corruptions</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">transform</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">transforms</span><span class="p">):</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">get_images</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+            <span class="o">-</span><span class="mf">0.1</span><span class="p">,</span>
+            <span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;vertical&quot;</span><span class="p">,</span>
+            <span class="n">horizontalalignment</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="n">verticalalignment</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+            <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Severity </span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ./data/cifar-10-python.tar.gz
 
   0%|          | 0/170498071 [00:00&lt;?, ?it/s]
-  1%|          | 884736/170498071 [00:00&lt;00:20, 8100403.93it/s]
-  6%|▋         | 10878976/170498071 [00:00&lt;00:02, 60144161.55it/s]
- 13%|█▎        | 22052864/170498071 [00:00&lt;00:01, 83209681.42it/s]
- 20%|█▉        | 33619968/170498071 [00:00&lt;00:01, 95847103.37it/s]
- 26%|██▌       | 44728320/170498071 [00:00&lt;00:01, 101226627.73it/s]
- 33%|███▎      | 56328192/170498071 [00:00&lt;00:01, 106149452.09it/s]
- 40%|███▉      | 67993600/170498071 [00:00&lt;00:00, 109456097.11it/s]
- 47%|████▋     | 79495168/170498071 [00:00&lt;00:00, 111158897.74it/s]
- 53%|█████▎    | 91029504/170498071 [00:00&lt;00:00, 111650677.13it/s]
- 60%|██████    | 102531072/170498071 [00:01&lt;00:00, 112677902.30it/s]
- 67%|██████▋   | 113836032/170498071 [00:01&lt;00:00, 110305989.37it/s]
- 74%|███████▍  | 126156800/170498071 [00:01&lt;00:00, 113968006.36it/s]
- 81%|████████  | 137822208/170498071 [00:01&lt;00:00, 114752675.24it/s]
- 88%|████████▊ | 149356544/170498071 [00:01&lt;00:00, 114845236.27it/s]
- 94%|█████████▍| 160890880/170498071 [00:01&lt;00:00, 114942629.29it/s]
-100%|██████████| 170498071/170498071 [00:01&lt;00:00, 106263327.66it/s]
+  0%|          | 393216/170498071 [00:00&lt;00:43, 3920461.16it/s]
+  2%|▏         | 3244032/170498071 [00:00&lt;00:09, 18321086.60it/s]
+  4%|▍         | 6455296/170498071 [00:00&lt;00:06, 24586786.26it/s]
+  6%|▌         | 9633792/170498071 [00:00&lt;00:05, 27390182.65it/s]
+  9%|▉         | 15007744/170498071 [00:00&lt;00:04, 36870645.47it/s]
+ 12%|█▏        | 21135360/170498071 [00:00&lt;00:03, 45124468.49it/s]
+ 16%|█▌        | 27328512/170498071 [00:00&lt;00:02, 50579740.13it/s]
+ 20%|█▉        | 33488896/170498071 [00:00&lt;00:02, 53913058.24it/s]
+ 23%|██▎       | 39682048/170498071 [00:00&lt;00:02, 56166902.45it/s]
+ 27%|██▋       | 45711360/170498071 [00:01&lt;00:02, 57121079.08it/s]
+ 31%|███       | 52068352/170498071 [00:01&lt;00:02, 58980694.96it/s]
+ 34%|███▍      | 58228736/170498071 [00:01&lt;00:01, 59607111.69it/s]
+ 38%|███▊      | 64585728/170498071 [00:01&lt;00:01, 60781535.54it/s]
+ 42%|████▏     | 70778880/170498071 [00:01&lt;00:01, 61079611.97it/s]
+ 45%|████▌     | 77201408/170498071 [00:01&lt;00:01, 61964742.67it/s]
+ 49%|████▉     | 84279296/170498071 [00:01&lt;00:01, 64561203.86it/s]
+ 53%|█████▎    | 91029504/170498071 [00:01&lt;00:01, 65440735.22it/s]
+ 57%|█████▋    | 97812480/170498071 [00:01&lt;00:01, 66141672.67it/s]
+ 61%|██████▏   | 104562688/170498071 [00:01&lt;00:00, 66547400.10it/s]
+ 66%|██████▌   | 111738880/170498071 [00:02&lt;00:00, 67945159.69it/s]
+ 70%|██████▉   | 118554624/170498071 [00:02&lt;00:00, 67589830.21it/s]
+ 74%|███████▎  | 125337600/170498071 [00:02&lt;00:00, 66811591.42it/s]
+ 78%|███████▊  | 132808704/170498071 [00:02&lt;00:00, 69055044.99it/s]
+ 82%|████████▏ | 139722752/170498071 [00:02&lt;00:00, 67068922.19it/s]
+ 86%|████████▌ | 146472960/170498071 [00:02&lt;00:00, 66237818.19it/s]
+ 90%|████████▉ | 153255936/170498071 [00:02&lt;00:00, 66457341.31it/s]
+ 94%|█████████▍| 159940608/170498071 [00:02&lt;00:00, 64746232.17it/s]
+ 98%|█████████▊| 166526976/170498071 [00:02&lt;00:00, 65069528.15it/s]
+100%|██████████| 170498071/170498071 [00:02&lt;00:00, 58602370.41it/s]
 Extracting ./data/cifar-10-python.tar.gz to ./data
 </pre></div>
 </div>
-<section id="gaussian-noise">
-<h2>1. Gaussian Noise<a class="headerlink" href="#gaussian-noise" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">GaussianNoise</span>
+<section id="noise-corruptions">
+<h2>1. Noise Corruptions<a class="headerlink" href="#noise-corruptions" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GaussianNoise</span><span class="p">,</span>
+    <span class="n">ShotNoise</span><span class="p">,</span>
+    <span class="n">ImpulseNoise</span><span class="p">,</span>
+    <span class="n">SpeckleNoise</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="n">show_images</span><span class="p">(</span><span class="n">GaussianNoise</span><span class="p">)</span>
+<span class="n">show_images</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">GaussianNoise</span><span class="p">,</span>
+        <span class="n">ShotNoise</span><span class="p">,</span>
+        <span class="n">ImpulseNoise</span><span class="p">,</span>
+        <span class="n">SpeckleNoise</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_tutorial_corruptions_001.png" srcset="../_images/sphx_glr_tutorial_corruptions_001.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
-Severity 1
-Severity 2
-Severity 3
-Severity 4
-Severity 5
-</pre></div>
-</div>
-</section>
-<section id="shot-noise">
-<h2>2. Shot Noise<a class="headerlink" href="#shot-noise" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">ShotNoise</span>
+<img src="../_images/sphx_glr_tutorial_corruptions_001.png" srcset="../_images/sphx_glr_tutorial_corruptions_001.png" alt="Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5" class = "sphx-glr-single-img"/></section>
+<section id="blur-corruptions">
+<h2>2. Blur Corruptions<a class="headerlink" href="#blur-corruptions" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GaussianBlur</span><span class="p">,</span>
+    <span class="n">GlassBlur</span><span class="p">,</span>
+    <span class="n">DefocusBlur</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="n">show_images</span><span class="p">(</span><span class="n">ShotNoise</span><span class="p">)</span>
+<span class="n">show_images</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">GaussianBlur</span><span class="p">,</span>
+        <span class="n">GlassBlur</span><span class="p">,</span>
+        <span class="n">DefocusBlur</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_tutorial_corruptions_002.png" srcset="../_images/sphx_glr_tutorial_corruptions_002.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
-Severity 1
-Severity 2
-Severity 3
-Severity 4
-Severity 5
-</pre></div>
-</div>
-</section>
-<section id="impulse-noise">
-<h2>3. Impulse Noise<a class="headerlink" href="#impulse-noise" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">ImpulseNoise</span>
+<img src="../_images/sphx_glr_tutorial_corruptions_002.png" srcset="../_images/sphx_glr_tutorial_corruptions_002.png" alt="Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5" class = "sphx-glr-single-img"/></section>
+<section id="other-corruptions">
+<h2>3. Other Corruptions<a class="headerlink" href="#other-corruptions" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">JPEGCompression</span><span class="p">,</span>
+    <span class="n">Pixelate</span><span class="p">,</span>
+    <span class="n">Frost</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="n">show_images</span><span class="p">(</span><span class="n">ImpulseNoise</span><span class="p">)</span>
+<span class="n">show_images</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">JPEGCompression</span><span class="p">,</span>
+        <span class="n">Pixelate</span><span class="p">,</span>
+        <span class="n">Frost</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_tutorial_corruptions_003.png" srcset="../_images/sphx_glr_tutorial_corruptions_003.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
-Severity 1
-Severity 2
-Severity 3
-Severity 4
-Severity 5
-</pre></div>
-</div>
-</section>
-<section id="speckle-noise">
-<h2>4. Speckle Noise<a class="headerlink" href="#speckle-noise" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">SpeckleNoise</span>
-
-<span class="n">show_images</span><span class="p">(</span><span class="n">SpeckleNoise</span><span class="p">)</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_tutorial_corruptions_004.png" srcset="../_images/sphx_glr_tutorial_corruptions_004.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
-Severity 1
-Severity 2
-Severity 3
-Severity 4
-Severity 5
-</pre></div>
-</div>
-</section>
-<section id="gaussian-blur">
-<h2>5. Gaussian Blur<a class="headerlink" href="#gaussian-blur" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">GaussianBlur</span>
-
-<span class="n">show_images</span><span class="p">(</span><span class="n">GaussianBlur</span><span class="p">)</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_tutorial_corruptions_005.png" srcset="../_images/sphx_glr_tutorial_corruptions_005.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
-Severity 1
-Severity 2
-Severity 3
-Severity 4
-Severity 5
-</pre></div>
-</div>
-</section>
-<section id="glass-blur">
-<h2>6. Glass Blur<a class="headerlink" href="#glass-blur" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">GlassBlur</span>
-
-<span class="n">show_images</span><span class="p">(</span><span class="n">GlassBlur</span><span class="p">)</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_tutorial_corruptions_006.png" srcset="../_images/sphx_glr_tutorial_corruptions_006.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
-Severity 1
-Severity 2
-Severity 3
-Severity 4
-Severity 5
-</pre></div>
-</div>
-</section>
-<section id="defocus-blur">
-<h2>7. Defocus Blur<a class="headerlink" href="#defocus-blur" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">DefocusBlur</span>
-
-<span class="n">show_images</span><span class="p">(</span><span class="n">DefocusBlur</span><span class="p">)</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_tutorial_corruptions_007.png" srcset="../_images/sphx_glr_tutorial_corruptions_007.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
-Severity 1
-Severity 2
-Severity 3
-Severity 4
-Severity 5
-</pre></div>
-</div>
-</section>
-<section id="jpeg-compression">
-<h2>8. JPEG Compression<a class="headerlink" href="#jpeg-compression" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">JPEGCompression</span>
-
-<span class="n">show_images</span><span class="p">(</span><span class="n">JPEGCompression</span><span class="p">)</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_tutorial_corruptions_008.png" srcset="../_images/sphx_glr_tutorial_corruptions_008.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
-Severity 1
-Severity 2
-Severity 3
-Severity 4
-Severity 5
-</pre></div>
-</div>
-</section>
-<section id="pixelate">
-<h2>9. Pixelate<a class="headerlink" href="#pixelate" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">Pixelate</span>
-
-<span class="n">show_images</span><span class="p">(</span><span class="n">Pixelate</span><span class="p">)</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_tutorial_corruptions_009.png" srcset="../_images/sphx_glr_tutorial_corruptions_009.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
-Severity 1
-Severity 2
-Severity 3
-Severity 4
-Severity 5
-</pre></div>
-</div>
-</section>
-<section id="frost">
-<h2>10. Frost<a class="headerlink" href="#frost" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="n">Frost</span>
-
-<span class="n">show_images</span><span class="p">(</span><span class="n">Frost</span><span class="p">)</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_tutorial_corruptions_010.png" srcset="../_images/sphx_glr_tutorial_corruptions_010.png" alt="tutorial corruptions" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Original Images
-Downloading https://zenodo.org/records/10438904/files/frost.zip to data/frost.zip
+<img src="../_images/sphx_glr_tutorial_corruptions_003.png" srcset="../_images/sphx_glr_tutorial_corruptions_003.png" alt="Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://zenodo.org/records/10438904/files/frost.zip to data/frost.zip
 
   0%|          | 0/1780178 [00:00&lt;?, ?it/s]
-  2%|▏         | 32768/1780178 [00:00&lt;00:05, 298292.04it/s]
-  7%|▋         | 131072/1780178 [00:00&lt;00:03, 451871.18it/s]
- 29%|██▉       | 524288/1780178 [00:00&lt;00:00, 1263557.71it/s]
-100%|██████████| 1780178/1780178 [00:00&lt;00:00, 3017056.22it/s]
+  4%|▎         | 65536/1780178 [00:00&lt;00:05, 335670.52it/s]
+ 13%|█▎        | 229376/1780178 [00:00&lt;00:02, 631541.91it/s]
+ 26%|██▌       | 458752/1780178 [00:00&lt;00:01, 883053.16it/s]
+ 40%|████      | 720896/1780178 [00:00&lt;00:00, 1067975.25it/s]
+ 53%|█████▎    | 950272/1780178 [00:00&lt;00:00, 1109039.69it/s]
+ 68%|██████▊   | 1212416/1780178 [00:01&lt;00:00, 1188585.29it/s]
+ 81%|████████  | 1441792/1780178 [00:01&lt;00:00, 1187002.23it/s]
+ 94%|█████████▍| 1671168/1780178 [00:01&lt;00:00, 1185671.69it/s]
+100%|██████████| 1780178/1780178 [00:01&lt;00:00, 1144081.86it/s]
 Extracting data/frost.zip to data
 Downloaded frost.zip to data
-Severity 1
 Files already downloaded and verified
-Severity 2
 Files already downloaded and verified
-Severity 3
 Files already downloaded and verified
-Severity 4
 Files already downloaded and verified
-Severity 5
 Files already downloaded and verified
 </pre></div>
 </div>
@@ -501,7 +436,7 @@ Files already downloaded and verified
 <ul class="simple">
 <li><p><strong>Benchmarking Neural Network Robustness to Common Corruptions and Perturbations</strong>, Dan Hendrycks and Thomas Dietterich. <a class="reference external" href="https://arxiv.org/pdf/1903.12261">ICLR 2019</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 25.621 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 28.080 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-corruptions-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/3232f235afd71e96000345e9c6f6b324/tutorial_corruptions.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_corruptions.ipynb</span></code></a></p>
@@ -523,12 +458,12 @@ Files already downloaded and verified
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="tutorial_mc_dropout.html" class="btn btn-neutral float-right" title="Training a LeNet with Monte-Carlo Dropout" accesskey="n"
+    <a href="tutorial_evidential_classification.html" class="btn btn-neutral float-right" title="Deep Evidential Classification on a Toy Example" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     
     
-    <a href="tutorial_scaler.html" class="btn btn-neutral" title="Improve Top-label Calibration with Temperature Scaling" accesskey="p"
+    <a href="tutorial_der_cubic.html" class="btn btn-neutral" title="Deep Evidential Regression on a Toy Example" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>
@@ -559,16 +494,9 @@ Files already downloaded and verified
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">Image Corruptions</a><ul>
-<li><a class="reference internal" href="#gaussian-noise">1. Gaussian Noise</a></li>
-<li><a class="reference internal" href="#shot-noise">2. Shot Noise</a></li>
-<li><a class="reference internal" href="#impulse-noise">3. Impulse Noise</a></li>
-<li><a class="reference internal" href="#speckle-noise">4. Speckle Noise</a></li>
-<li><a class="reference internal" href="#gaussian-blur">5. Gaussian Blur</a></li>
-<li><a class="reference internal" href="#glass-blur">6. Glass Blur</a></li>
-<li><a class="reference internal" href="#defocus-blur">7. Defocus Blur</a></li>
-<li><a class="reference internal" href="#jpeg-compression">8. JPEG Compression</a></li>
-<li><a class="reference internal" href="#pixelate">9. Pixelate</a></li>
-<li><a class="reference internal" href="#frost">10. Frost</a><ul>
+<li><a class="reference internal" href="#noise-corruptions">1. Noise Corruptions</a></li>
+<li><a class="reference internal" href="#blur-corruptions">2. Blur Corruptions</a></li>
+<li><a class="reference internal" href="#other-corruptions">3. Other Corruptions</a><ul>
 <li><a class="reference internal" href="#reference">Reference</a></li>
 </ul>
 </li>

@@ -172,15 +172,17 @@ These routines make it very easy to:</p>
 <p>Yet, we take account that their will be as many different uses of TorchUncertainty as there are of users.
 This page provides ideas on how to benefit from TorchUncertainty at all levels: from ready-to-train lightning-based models to using only specific
 PyTorch layers.</p>
-<figure class="figure-caption align-default" id="id5">
-<img alt="TorchUncertainty structure" src="_images/structure_torch_uncertainty.jpg"/>
+<figure class="figure-caption align-center" id="id5">
+<a class="reference internal image-reference" href="_images/structure_torch_uncertainty.jpg"><img alt="TorchUncertainty structure" src="_images/structure_torch_uncertainty.jpg" style="width: 70%;"/></a>
 <figcaption>
-<p><span class="caption-text"><strong>TorchUncertainty structure</strong></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+<p><span class="caption-text"><strong>Structure of TorchUncertainty</strong></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <section id="training-with-torchuncertainty-s-uncertainty-aware-routines">
 <h2>Training with TorchUncertainty’s Uncertainty-aware Routines<a class="headerlink" href="#training-with-torchuncertainty-s-uncertainty-aware-routines" title="Permalink to this heading">¶</a></h2>
-<p>Let’s have a look at the <a class="reference external" href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty/blob/main/torch_uncertainty/routines/classification.py">Classification routine</a>.</p>
+<p>TorchUncertainty provides a set of Ligthning training and evaluation routines that wrap PyTorch models. Let’s have a look at the
+<a class="reference external" href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty/blob/main/torch_uncertainty/routines/classification.py">Classification routine</a>
+and its parameters.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lightning.pytorch</span> <span class="kn">import</span> <span class="n">LightningModule</span>
 
 <span class="k">class</span> <span class="nc">ClassificationRoutine</span><span class="p">(</span><span class="n">LightningModule</span><span class="p">):</span>
@@ -192,13 +194,7 @@ PyTorch layers.</p>
                 <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
                 <span class="n">format_batch_fn</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="n">optim_recipe</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">Optimizer</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">mixtype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"erm"</span><span class="p">,</span>
-                <span class="n">mixmode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"elem"</span><span class="p">,</span>
-                <span class="n">dist_sim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"emb"</span><span class="p">,</span>
-                <span class="n">kernel_tau_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
-                <span class="n">kernel_tau_std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
-                <span class="n">mixup_alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="n">cutmix_alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="c1"># ...</span>
                 <span class="n">eval_ood</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                 <span class="n">eval_grouping_loss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                 <span class="n">ood_criterion</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
@@ -273,8 +269,8 @@ in the paper: <em>Packed-Ensembles for Efficient Uncertainty Estimation</em>, O.
 <section id="example">
 <h3>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h3>
 <p>Training a model with the Lightning CLI tool is as simple as running the following command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># in pyjam/experiments/classification/cifar10</span>
-python<span class="w"> </span>resnet.py<span class="w"> </span>fit<span class="w"> </span>--config<span class="w"> </span>configs/resnet18/standard.yaml
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># in torch-uncertainty/experiments/classification/cifar10</span>
+<span class="n">python</span> <span class="n">resnet</span><span class="o">.</span><span class="n">py</span> <span class="n">fit</span> <span class="o">--</span><span class="n">config</span> <span class="n">configs</span><span class="o">/</span><span class="n">resnet18</span><span class="o">/</span><span class="n">standard</span><span class="o">.</span><span class="n">yaml</span>
 </pre></div>
 </div>
 <p>Which trains a classic ResNet18 model on CIFAR10 with the settings used in the Packed-Ensembles paper.</p>

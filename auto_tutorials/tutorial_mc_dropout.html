@@ -41,7 +41,7 @@
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
   <link rel="next" title="Training a LeNet with Monte Carlo Batch Normalization" href="tutorial_mc_batch_norm.html" />
-  <link rel="prev" title="Image Corruptions" href="tutorial_corruptions.html" />
+  <link rel="prev" title="Improve Top-label Calibration with Temperature Scaling" href="tutorial_scaler.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -268,8 +268,8 @@ to download the full example code</p>
 <p>In this tutorial, we will train a LeNet classifier on the MNIST dataset using Monte-Carlo Dropout (MC Dropout), a computationally efficient Bayesian approximation method. To estimate the predictive mean and uncertainty (variance), we perform multiple forward passes through the network with dropout layers enabled in <code class="docutils literal notranslate"><span class="pre">train</span></code> mode.</p>
 <p>For more information on Monte-Carlo Dropout, we refer the reader to the following resources:</p>
 <ul class="simple">
+<li><p>Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning <a class="reference external" href="https://browse.arxiv.org/pdf/1506.02142.pdf">ICML 2016</a></p></li>
 <li><p>What Uncertainties Do We Need in Bayesian Deep Learning for Computer Vision? <a class="reference external" href="https://browse.arxiv.org/pdf/1703.04977.pdf">NeurIPS 2017</a></p></li>
-<li><p>Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning <a class="reference external" href="https://browse.arxiv.org/pdf/1506.02142.pdf">PMLR 2016</a></p></li>
 </ul>
 <section id="training-a-lenet-with-mc-dropout-using-torchuncertainty-models-and-pytorch-lightning">
 <h2>Training a LeNet with MC Dropout using TorchUncertainty models and PyTorch Lightning<a class="headerlink" href="#training-a-lenet-with-mc-dropout-using-torchuncertainty-models-and-pytorch-lightning" title="Permalink to this heading">¶</a></h2>
@@ -279,10 +279,10 @@ to download the full example code</p>
 <p>First, we have to load the following utilities from TorchUncertainty:</p>
 <ul class="simple">
 <li><p>the Trainer from Lightning</p></li>
-<li><p>the datamodule that handles dataloaders: MNISTDataModule, which lies in the torch_uncertainty.datamodule</p></li>
+<li><p>the datamodule handling dataloaders: MNISTDataModule from torch_uncertainty.datamodules</p></li>
 <li><p>the model: LeNet, which lies in torch_uncertainty.models</p></li>
-<li><p>the mc-dropout wrapper: mc_dropout, which lies in torch_uncertainty.models</p></li>
-<li><p>the classification training routine in the torch_uncertainty.training.classification module</p></li>
+<li><p>the MC Dropout wrapper: mc_dropout, which lies in torch_uncertainty.models</p></li>
+<li><p>the classification training routine in the torch_uncertainty.routines</p></li>
 <li><p>an optimization recipe in the torch_uncertainty.optim_recipes module.</p></li>
 </ul>
 <p>We also need import the neural network utils within <cite>torch.nn</cite>.</p>
@@ -305,20 +305,20 @@ to download the full example code</p>
 logs, and to fake-parse the arguments needed for using the PyTorch Lightning
 Trainer. We also create the datamodule that handles the MNIST dataset,
 dataloaders and transforms. We create the model using the
-blueprint from torch_uncertainty.models and we wrap it into mc-dropout.</p>
-<p>It is important to specify the arguments <code class="docutils literal notranslate"><span class="pre">version</span></code> as <code class="docutils literal notranslate"><span class="pre">mc-dropout</span></code>,
-<code class="docutils literal notranslate"><span class="pre">num_estimators</span></code> and the <code class="docutils literal notranslate"><span class="pre">dropout_rate</span></code> to use Monte Carlo dropout.</p>
+blueprint from torch_uncertainty.models and we wrap it into mc_dropout.</p>
+<p>It is important to specify the arguments,``num_estimators`` and the <code class="docutils literal notranslate"><span class="pre">dropout_rate</span></code>
+to use Monte Carlo dropout.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># datamodule</span>
-<span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>  <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
+<span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
 <span class="n">datamodule</span> <span class="o">=</span> <span class="n">MNISTDataModule</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
 
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">lenet</span><span class="p">(</span>
     <span class="n">in_channels</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span>
     <span class="n">num_classes</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
-    <span class="n">dropout_rate</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+    <span class="n">dropout_rate</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">mc_model</span> <span class="o">=</span> <span class="n">mc_dropout</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">last_layer</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -339,7 +339,6 @@ arguments.</p>
     <span class="n">loss</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">(),</span>
     <span class="n">optim_recipe</span><span class="o">=</span><span class="n">optim_cifar10_resnet18</span><span class="p">(</span><span class="n">mc_model</span><span class="p">),</span>
     <span class="n">num_estimators</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -356,17 +355,17 @@ arguments.</p>
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃        Test metric        ┃       DataLoader 0        ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│       cls_test/Acc        │    0.09790000319480896    │
-│      cls_test/Brier       │    0.9000616073608398     │
-│       cls_test/ECE        │   0.008982867002487183    │
-│       cls_test/NLL        │    2.3028523921966553     │
-│ cls_test/ens_Disagreement │  0.00022499999613501132   │
-│   cls_test/ens_Entropy    │     2.30102801322937      │
-│      cls_test/ens_MI      │  0.00022499999613501132   │
-│     cls_test/entropy      │     2.301323175430298     │
+│       cls_test/Acc        │    0.9362999796867371     │
+│      cls_test/Brier       │    0.13802306354045868    │
+│       cls_test/ECE        │    0.15248000621795654    │
+│       cls_test/NLL        │    0.34229347109794617    │
+│ cls_test/ens_Disagreement │    0.18241915106773376    │
+│   cls_test/ens_Entropy    │    0.5452611446380615     │
+│      cls_test/ens_MI      │    0.21580387651920319    │
+│     cls_test/entropy      │    0.7610648274421692     │
 └───────────────────────────┴───────────────────────────┘
 
-[{&#39;cls_test/Acc&#39;: 0.09790000319480896, &#39;cls_test/Brier&#39;: 0.9000616073608398, &#39;cls_test/ECE&#39;: 0.008982867002487183, &#39;cls_test/NLL&#39;: 2.3028523921966553, &#39;cls_test/entropy&#39;: 2.301323175430298, &#39;cls_test/ens_Disagreement&#39;: 0.00022499999613501132, &#39;cls_test/ens_Entropy&#39;: 2.30102801322937, &#39;cls_test/ens_MI&#39;: 0.00022499999613501132}]
+[{&#39;cls_test/Acc&#39;: 0.9362999796867371, &#39;cls_test/Brier&#39;: 0.13802306354045868, &#39;cls_test/ECE&#39;: 0.15248000621795654, &#39;cls_test/NLL&#39;: 0.34229347109794617, &#39;cls_test/entropy&#39;: 0.7610648274421692, &#39;cls_test/ens_Disagreement&#39;: 0.18241915106773376, &#39;cls_test/ens_Entropy&#39;: 0.5452611446380615, &#39;cls_test/ens_MI&#39;: 0.21580387651920319}]
 </pre></div>
 </div>
 </section>
@@ -411,14 +410,15 @@ arguments.</p>
 </div>
 <img src="../_images/sphx_glr_tutorial_mc_dropout_001.png" srcset="../_images/sphx_glr_tutorial_mc_dropout_001.png" alt="tutorial mc dropout" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
 Ground truth:  7 2 1 0
-Predicted digits for the image 1:  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-Predicted digits for the image 2:  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-Predicted digits for the image 3:  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-Predicted digits for the image 4:  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+Predicted digits for the image 1:  7 7 9 7 7 7 7 7 7 7 7 7 7 7 7 7
+Predicted digits for the image 2:  2 2 2 2 2 2 2 2 2 2 2 2 2 6 2 2
+Predicted digits for the image 3:  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+Predicted digits for the image 4:  0 0 8 0 0 8 0 0 0 8 8 0 0 0 0 0
 </pre></div>
 </div>
-<p>approximation of the posterior distribution.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 45.869 seconds)</p>
+<p>We see that there is some disagreement between the samples of the dropout
+approximation of the posterior distribution.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 46.875 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-mc-dropout-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/4890df143fe34f5aa2106d4980500a99/tutorial_mc_dropout.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_dropout.ipynb</span></code></a></p>
@@ -445,7 +445,7 @@ Predicted digits for the image 4:  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
         class="next-page"></a>
     
     
-    <a href="tutorial_corruptions.html" class="btn btn-neutral" title="Image Corruptions" accesskey="p"
+    <a href="tutorial_scaler.html" class="btn btn-neutral" title="Improve Top-label Calibration with Temperature Scaling" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>
