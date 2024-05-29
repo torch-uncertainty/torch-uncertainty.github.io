@@ -36,24 +36,22 @@ and how to use TorchUncertainty's models.
 
 In this tutorial, we will need:
 
-- torch for its objects
-- the "calibration error" metric to compute the ECE and evaluate the top-label calibration
+- TorchUncertainty's Calibration Error metric to compute to evaluate the top-label calibration with ECE and plot the reliability diagrams
 - the CIFAR-100 datamodule to handle the data
 - a ResNet 18 as starting model
 - the temperature scaler to improve the top-label calibration
-- a utility to download hf models easily
-- the calibration plot to visualize the calibration.
+- a utility function to download HF models easily
 
-If you use the classification routine, the plots will be automatically available in the tensorboard logs.
+If you use the classification routine, the plots will be automatically available in the tensorboard logs if you use the `log_plots` flag.
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-37
+.. GENERATED FROM PYTHON SOURCE LINES 28-35
 
 .. code-block:: Python
 
 
     from torch_uncertainty.datamodules import CIFAR100DataModule
-    from torch_uncertainty.metrics import CE
-    from torch_uncertainty.models.resnet import resnet18
+    from torch_uncertainty.metrics import CalibrationError
+    from torch_uncertainty.models.resnet import resnet
     from torch_uncertainty.post_processing import TemperatureScaler
     from torch_uncertainty.utils import load_hf
 
@@ -64,7 +62,7 @@ If you use the classification routine, the plots will be automatically available
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-43
+.. GENERATED FROM PYTHON SOURCE LINES 36-41
 
 2. Loading a model from TorchUncertainty's HF
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -72,13 +70,13 @@ If you use the classification routine, the plots will be automatically available
 To avoid training a model on CIFAR-100 from scratch, we load a model from Hugging Face.
 This can be done in a one liner:
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-53
+.. GENERATED FROM PYTHON SOURCE LINES 41-51
 
 .. code-block:: Python
 
 
     # Build the model
-    model = resnet18(in_channels=3, num_classes=100, style="cifar", conv_bias=False)
+    model = resnet(in_channels=3, num_classes=100, arch=18, style="cifar", conv_bias=False)
 
     # Download the weights (the config is not used here)
     weights, config = load_hf("resnet18_c100")
@@ -99,7 +97,7 @@ This can be done in a one liner:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-61
+.. GENERATED FROM PYTHON SOURCE LINES 52-59
 
 3. Setting up the Datamodule and Dataloaders
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -109,7 +107,7 @@ extract the first element of the test dataloader list. There are more than one
 element if eval_ood is True: the dataloader of in-distribution data and the dataloader
 of out-of-distribution data. Otherwise, it is a list of 1 element.
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-69
+.. GENERATED FROM PYTHON SOURCE LINES 59-67
 
 .. code-block:: Python
 
@@ -130,14 +128,14 @@ of out-of-distribution data. Otherwise, it is a list of 1 element.
  .. code-block:: none
 
     Downloading https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz to data/cifar-100-python.tar.gz
-      0%|          | 0/169001437 [00:00<?, ?it/s]      0%|          | 32768/169001437 [00:00<11:08, 252925.96it/s]      0%|          | 229376/169001437 [00:00<02:50, 990849.24it/s]      1%|          | 851968/169001437 [00:00<00:56, 2978064.55it/s]      2%|▏         | 2883584/169001437 [00:00<00:18, 9110207.30it/s]      4%|▍         | 6553600/169001437 [00:00<00:09, 17248645.03it/s]      7%|▋         | 12648448/169001437 [00:00<00:05, 30815795.93it/s]     10%|▉         | 16220160/169001437 [00:00<00:04, 32319447.08it/s]     13%|█▎        | 21200896/169001437 [00:00<00:03, 37646360.39it/s]     15%|█▌        | 25853952/169001437 [00:00<00:03, 40308556.30it/s]     18%|█▊        | 30048256/169001437 [00:01<00:03, 40765848.34it/s]     21%|██        | 35258368/169001437 [00:01<00:03, 44160830.22it/s]     24%|██▎       | 39747584/169001437 [00:01<00:02, 43152243.90it/s]     26%|██▋       | 44695552/169001437 [00:01<00:02, 44983612.36it/s]     29%|██▉       | 49250304/169001437 [00:01<00:02, 44117683.24it/s]     32%|███▏      | 54034432/169001437 [00:01<00:02, 44909374.33it/s]     35%|███▍      | 58556416/169001437 [00:01<00:02, 44512751.10it/s]     38%|███▊      | 63471616/169001437 [00:01<00:02, 45454233.84it/s]     40%|████      | 68026368/169001437 [00:01<00:02, 44829548.18it/s]     43%|████▎     | 72876032/169001437 [00:02<00:02, 43035954.81it/s]     47%|████▋     | 78872576/169001437 [00:02<00:01, 47768674.20it/s]     50%|████▉     | 83722240/169001437 [00:02<00:01, 45259761.48it/s]     52%|█████▏    | 88375296/169001437 [00:02<00:01, 44074671.82it/s]     55%|█████▌    | 93487104/169001437 [00:02<00:01, 46010920.11it/s]     58%|█████▊    | 98140160/169001437 [00:02<00:01, 43806304.10it/s]     61%|██████▏   | 103874560/169001437 [00:02<00:01, 46660449.83it/s]     64%|██████▍   | 108593152/169001437 [00:02<00:01, 45636006.73it/s]     67%|██████▋   | 113344512/169001437 [00:02<00:01, 45292204.96it/s]     70%|██████▉   | 117899264/169001437 [00:03<00:01, 45284495.21it/s]     73%|███████▎  | 122716160/169001437 [00:03<00:01, 46002813.91it/s]     75%|███████▌  | 127336448/169001437 [00:03<00:00, 45183438.43it/s]     78%|███████▊  | 132284416/169001437 [00:03<00:00, 46050246.41it/s]     81%|████████  | 136904704/169001437 [00:03<00:00, 45281144.31it/s]     84%|████████▍ | 141787136/169001437 [00:03<00:00, 45449914.30it/s]     87%|████████▋ | 146341888/169001437 [00:03<00:00, 45378013.87it/s]     89%|████████▉ | 151191552/169001437 [00:03<00:00, 46277119.55it/s]     92%|█████████▏| 155844608/169001437 [00:03<00:00, 45286001.71it/s]     95%|█████████▌| 160694272/169001437 [00:03<00:00, 45883528.79it/s]     98%|█████████▊| 165314560/169001437 [00:04<00:00, 45366394.76it/s]    100%|██████████| 169001437/169001437 [00:04<00:00, 40887882.01it/s]
+      0%|          | 0/169001437 [00:00<?, ?it/s]      0%|          | 32768/169001437 [00:00<11:07, 253288.13it/s]      0%|          | 196608/169001437 [00:00<03:03, 918161.20it/s]      0%|          | 557056/169001437 [00:00<01:23, 2019260.30it/s]      1%|          | 1703936/169001437 [00:00<00:32, 5189254.58it/s]      3%|▎         | 4685824/169001437 [00:00<00:12, 13351866.73it/s]      5%|▌         | 8454144/169001437 [00:00<00:07, 21141529.12it/s]      7%|▋         | 12517376/169001437 [00:00<00:05, 27234419.85it/s]     10%|▉         | 16416768/169001437 [00:00<00:04, 30801990.14it/s]     12%|█▏        | 20447232/169001437 [00:00<00:04, 33697096.11it/s]     15%|█▍        | 24576000/169001437 [00:01<00:04, 35980829.63it/s]     17%|█▋        | 28540928/169001437 [00:01<00:03, 36996978.37it/s]     19%|█▉        | 32571392/169001437 [00:01<00:03, 37930328.53it/s]     22%|██▏       | 36667392/169001437 [00:01<00:03, 38786750.19it/s]     24%|██▍       | 40665088/169001437 [00:01<00:03, 39119561.27it/s]     26%|██▋       | 44695552/169001437 [00:01<00:03, 39396536.88it/s]     29%|██▉       | 48726016/169001437 [00:01<00:03, 39640072.41it/s]     31%|███       | 52723712/169001437 [00:01<00:02, 39481981.19it/s]     34%|███▎      | 56688640/169001437 [00:01<00:02, 39160024.65it/s]     36%|███▌      | 60620800/169001437 [00:01<00:02, 38040657.91it/s]     38%|███▊      | 64454656/169001437 [00:02<00:02, 35051818.55it/s]     40%|████      | 68026368/169001437 [00:02<00:03, 32465340.08it/s]     42%|████▏     | 71335936/169001437 [00:02<00:03, 31508758.19it/s]     44%|████▍     | 74612736/169001437 [00:02<00:02, 31755802.92it/s]     46%|████▌     | 77824000/169001437 [00:02<00:02, 30424886.32it/s]     48%|████▊     | 81690624/169001437 [00:02<00:02, 32575107.14it/s]     51%|█████     | 85852160/169001437 [00:02<00:02, 34979114.68it/s]     53%|█████▎    | 89948160/169001437 [00:02<00:02, 36664860.59it/s]     56%|█████▌    | 93945856/169001437 [00:02<00:01, 37605362.72it/s]     58%|█████▊    | 97845248/169001437 [00:03<00:01, 37952751.72it/s]     60%|██████    | 101744640/169001437 [00:03<00:01, 38256102.69it/s]     63%|██████▎   | 105775104/169001437 [00:03<00:01, 38828855.86it/s]     65%|██████▌   | 109903872/169001437 [00:03<00:01, 39513884.50it/s]     67%|██████▋   | 114032640/169001437 [00:03<00:01, 39927793.50it/s]     70%|██████▉   | 118063104/169001437 [00:03<00:01, 39780413.86it/s]     72%|███████▏  | 122060800/169001437 [00:03<00:01, 39612194.88it/s]     75%|███████▍  | 126091264/169001437 [00:03<00:01, 39719814.13it/s]     77%|███████▋  | 130088960/169001437 [00:03<00:00, 39168896.82it/s]     79%|███████▉  | 134348800/169001437 [00:03<00:00, 40083157.87it/s]     82%|████████▏ | 138412032/169001437 [00:04<00:00, 40098164.55it/s]     84%|████████▍ | 142508032/169001437 [00:04<00:00, 40201278.86it/s]     87%|████████▋ | 146538496/169001437 [00:04<00:00, 40063410.14it/s]     89%|████████▉ | 150568960/169001437 [00:04<00:00, 39192960.51it/s]     91%|█████████▏| 154501120/169001437 [00:04<00:00, 39095417.37it/s]     94%|█████████▍| 158695424/169001437 [00:04<00:00, 39931739.23it/s]     97%|█████████▋| 163479552/169001437 [00:04<00:00, 41909016.21it/s]    100%|█████████▉| 168165376/169001437 [00:04<00:00, 43342048.18it/s]    100%|██████████| 169001437/169001437 [00:04<00:00, 34995427.28it/s]
     Extracting data/cifar-100-python.tar.gz to data
     Files already downloaded and verified
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-80
+.. GENERATED FROM PYTHON SOURCE LINES 68-78
 
 4. Iterating on the Dataloader and Computing the ECE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -150,7 +148,7 @@ To do this, just call PyTorch's softmax.
 To avoid lengthy computations (without GPU), we restrict the calibration computation to a subset
 of the test set.
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-102
+.. GENERATED FROM PYTHON SOURCE LINES 78-100
 
 .. code-block:: Python
 
@@ -165,7 +163,7 @@ of the test set.
     test_dataloader = DataLoader(test_dataset, batch_size=32)
 
     # Initialize the ECE
-    ece = CE(task="multiclass", num_classes=100)
+    ece = CalibrationError(task="multiclass", num_classes=100)
 
     # Iterate on the calibration dataloader
     for sample, target in test_dataloader:
@@ -184,17 +182,17 @@ of the test set.
 
  .. code-block:: none
 
-    ECE before scaling - 10.847%.
+    ECE before scaling - 10.233%.
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-105
+.. GENERATED FROM PYTHON SOURCE LINES 101-103
 
 We also compute and plot the top-label calibration figure. We see that the
 model is not well calibrated.
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-108
+.. GENERATED FROM PYTHON SOURCE LINES 103-106
 
 .. code-block:: Python
 
@@ -213,7 +211,7 @@ model is not well calibrated.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-116
+.. GENERATED FROM PYTHON SOURCE LINES 107-114
 
 5. Fitting the Scaler to Improve the Calibration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -223,7 +221,7 @@ We minimize the tempered cross-entropy on a calibration set that we define here 
 a subset of the test set and containing 1000 data. Look at the code run by TemperatureScaler
 `fit` method for more details.
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-121
+.. GENERATED FROM PYTHON SOURCE LINES 114-119
 
 .. code-block:: Python
 
@@ -240,12 +238,12 @@ a subset of the test set and containing 1000 data. Look at the code run by Tempe
 
  .. code-block:: none
 
-      0%|          | 0/32 [00:00<?, ?it/s]      3%|▎         | 1/32 [00:00<00:08,  3.69it/s]      6%|▋         | 2/32 [00:00<00:07,  3.94it/s]      9%|▉         | 3/32 [00:00<00:07,  3.99it/s]     12%|█▎        | 4/32 [00:01<00:06,  4.05it/s]     16%|█▌        | 5/32 [00:01<00:06,  4.07it/s]     19%|█▉        | 6/32 [00:01<00:06,  4.09it/s]     22%|██▏       | 7/32 [00:01<00:06,  4.09it/s]     25%|██▌       | 8/32 [00:01<00:05,  4.10it/s]     28%|██▊       | 9/32 [00:02<00:05,  4.11it/s]     31%|███▏      | 10/32 [00:02<00:05,  4.11it/s]     34%|███▍      | 11/32 [00:02<00:05,  4.11it/s]     38%|███▊      | 12/32 [00:02<00:04,  4.11it/s]     41%|████      | 13/32 [00:03<00:04,  4.11it/s]     44%|████▍     | 14/32 [00:03<00:04,  4.12it/s]     47%|████▋     | 15/32 [00:03<00:04,  4.12it/s]     50%|█████     | 16/32 [00:03<00:03,  4.10it/s]     53%|█████▎    | 17/32 [00:04<00:03,  4.11it/s]     56%|█████▋    | 18/32 [00:04<00:03,  4.11it/s]     59%|█████▉    | 19/32 [00:04<00:03,  4.12it/s]     62%|██████▎   | 20/32 [00:04<00:02,  4.09it/s]     66%|██████▌   | 21/32 [00:05<00:02,  4.10it/s]     69%|██████▉   | 22/32 [00:05<00:02,  4.11it/s]     72%|███████▏  | 23/32 [00:05<00:02,  4.12it/s]     75%|███████▌  | 24/32 [00:05<00:01,  4.09it/s]     78%|███████▊  | 25/32 [00:06<00:01,  4.10it/s]     81%|████████▏ | 26/32 [00:06<00:01,  4.11it/s]     84%|████████▍ | 27/32 [00:06<00:01,  4.12it/s]     88%|████████▊ | 28/32 [00:06<00:00,  4.10it/s]     91%|█████████ | 29/32 [00:07<00:00,  4.11it/s]     94%|█████████▍| 30/32 [00:07<00:00,  4.11it/s]     97%|█████████▋| 31/32 [00:07<00:00,  4.12it/s]    100%|██████████| 32/32 [00:07<00:00,  4.19it/s]
+      0%|          | 0/32 [00:00<?, ?it/s]      3%|▎         | 1/32 [00:00<00:08,  3.67it/s]      6%|▋         | 2/32 [00:00<00:07,  3.90it/s]      9%|▉         | 3/32 [00:00<00:07,  3.99it/s]     12%|█▎        | 4/32 [00:01<00:06,  4.05it/s]     16%|█▌        | 5/32 [00:01<00:06,  4.06it/s]     19%|█▉        | 6/32 [00:01<00:06,  4.08it/s]     22%|██▏       | 7/32 [00:01<00:06,  4.09it/s]     25%|██▌       | 8/32 [00:01<00:05,  4.10it/s]     28%|██▊       | 9/32 [00:02<00:05,  4.09it/s]     31%|███▏      | 10/32 [00:02<00:05,  4.10it/s]     34%|███▍      | 11/32 [00:02<00:05,  4.10it/s]     38%|███▊      | 12/32 [00:02<00:04,  4.10it/s]     41%|████      | 13/32 [00:03<00:04,  4.07it/s]     44%|████▍     | 14/32 [00:03<00:04,  4.08it/s]     47%|████▋     | 15/32 [00:03<00:04,  4.09it/s]     50%|█████     | 16/32 [00:03<00:03,  4.09it/s]     53%|█████▎    | 17/32 [00:04<00:03,  4.07it/s]     56%|█████▋    | 18/32 [00:04<00:03,  4.08it/s]     59%|█████▉    | 19/32 [00:04<00:03,  4.09it/s]     62%|██████▎   | 20/32 [00:04<00:02,  4.09it/s]     66%|██████▌   | 21/32 [00:05<00:02,  4.07it/s]     69%|██████▉   | 22/32 [00:05<00:02,  4.08it/s]     72%|███████▏  | 23/32 [00:05<00:02,  4.09it/s]     75%|███████▌  | 24/32 [00:05<00:01,  4.09it/s]     78%|███████▊  | 25/32 [00:06<00:01,  4.10it/s]     81%|████████▏ | 26/32 [00:06<00:01,  4.09it/s]     84%|████████▍ | 27/32 [00:06<00:01,  4.09it/s]     88%|████████▊ | 28/32 [00:06<00:00,  4.10it/s]     91%|█████████ | 29/32 [00:07<00:00,  4.10it/s]     94%|█████████▍| 30/32 [00:07<00:00,  4.10it/s]     97%|█████████▋| 31/32 [00:07<00:00,  4.10it/s]    100%|██████████| 32/32 [00:07<00:00,  4.18it/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-129
+.. GENERATED FROM PYTHON SOURCE LINES 120-127
 
 6. Iterating Again to Compute the Improved ECE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -255,7 +253,7 @@ We can directly use the scaler as a calibrated model.
 Note that you will need to first reset the ECE metric to avoid mixing the scores of
 the previous and current iterations.
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-141
+.. GENERATED FROM PYTHON SOURCE LINES 127-139
 
 .. code-block:: Python
 
@@ -279,17 +277,17 @@ the previous and current iterations.
 
  .. code-block:: none
 
-    ECE after scaling - 3.959%.
+    ECE after scaling - 3.450%.
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-144
+.. GENERATED FROM PYTHON SOURCE LINES 140-142
 
 We finally compute and plot the scaled top-label calibration figure. We see
 that the model is now better calibrated.
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-147
+.. GENERATED FROM PYTHON SOURCE LINES 142-145
 
 .. code-block:: Python
 
@@ -308,7 +306,7 @@ that the model is now better calibrated.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-156
+.. GENERATED FROM PYTHON SOURCE LINES 146-154
 
 The top-label calibration should be improved.
 
@@ -319,7 +317,7 @@ Temperature scaling is very efficient when the calibration set is representative
 In this case, we say that the calibration and test set are drawn from the same distribution.
 However, this may not hold true in real-world cases where dataset shift could happen.
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-163
+.. GENERATED FROM PYTHON SOURCE LINES 156-161
 
 References
 ~~~~~~~~~~
@@ -330,7 +328,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 32.454 seconds)
+   **Total running time of the script:** (0 minutes 33.908 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_scaler.py:

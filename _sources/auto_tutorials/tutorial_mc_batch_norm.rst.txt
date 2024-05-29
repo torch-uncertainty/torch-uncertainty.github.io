@@ -124,18 +124,20 @@ and the optimization recipe.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-75
+.. GENERATED FROM PYTHON SOURCE LINES 73-77
 
 4. Gathering Everything and Training the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You can also save the results in a variable by saving the output of
+`trainer.test`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-79
+.. GENERATED FROM PYTHON SOURCE LINES 77-81
 
 .. code-block:: Python
 
 
     trainer.fit(model=routine, datamodule=datamodule)
-    trainer.test(model=routine, datamodule=datamodule)
+    trainer.test(model=routine, datamodule=datamodule);
 
 
 
@@ -151,18 +153,22 @@ and the optimization recipe.
     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃        Test metric        ┃       DataLoader 0        ┃
     ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │       cls_test/Acc        │    0.9794999957084656     │
-    │      cls_test/Brier       │    0.03101348876953125    │
-    │       cls_test/ECE        │   0.0012677183840423822   │
-    │       cls_test/NLL        │    0.06631666421890259    │
-    │     cls_test/entropy      │    0.06813092529773712    │
+    │       test/cal/ECE        │   0.004675425123423338    │
+    │       test/cal/aECE       │   0.004397667944431305    │
+    │       test/cls/Acc        │    0.9751999974250793     │
+    │      test/cls/Brier       │    0.03877147287130356    │
+    │       test/cls/NLL        │    0.08036801218986511    │
+    │     test/cls/entropy      │    0.09248960763216019    │
+    │       test/sc/AURC        │   0.0015395500771056797   │
+    │    test/sc/CovAt5Risk     │            1.0            │
+    │    test/sc/RiskAt80Cov    │   0.001500000013038516    │
     └───────────────────────────┴───────────────────────────┘
 
-    [{'cls_test/Acc': 0.9794999957084656, 'cls_test/Brier': 0.03101348876953125, 'cls_test/ECE': 0.0012677183840423822, 'cls_test/NLL': 0.06631666421890259, 'cls_test/entropy': 0.06813092529773712}]
+    [{'test/cal/ECE': 0.004675425123423338, 'test/cal/aECE': 0.004397667944431305, 'test/cls/Acc': 0.9751999974250793, 'test/cls/Brier': 0.03877147287130356, 'test/cls/NLL': 0.08036801218986511, 'test/sc/AURC': 0.0015395500771056797, 'test/sc/CovAt5Risk': 1.0, 'test/sc/RiskAt80Cov': 0.001500000013038516, 'test/cls/entropy': 0.09248960763216019}]
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-89
+.. GENERATED FROM PYTHON SOURCE LINES 82-91
 
 5. Wrapping the Model in a MCBatchNorm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -174,16 +180,16 @@ The larger the ``mc_batch_size``, the more stochastic the predictions will be.
 The authors suggest 32 as a good value for ``mc_batch_size`` but we use 4 here
 to highlight the effect of stochasticity on the predictions.
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-96
+.. GENERATED FROM PYTHON SOURCE LINES 91-98
 
 .. code-block:: Python
 
 
     routine.model = MCBatchNorm(
-        routine.model, num_estimators=8, convert=True, mc_batch_size=4
+        routine.model, num_estimators=8, convert=True, mc_batch_size=16
     )
     routine.model.fit(datamodule.train)
-    routine.eval()
+    routine.eval();
 
 
 
@@ -210,26 +216,34 @@ to highlight the effect of stochasticity on the predictions.
       (loss): CrossEntropyLoss()
       (format_batch_fn): Identity()
       (val_cls_metrics): MetricCollection(
-        (Acc): MulticlassAccuracy()
-        (Brier): BrierScore()
-        (ECE): MulticlassCE()
-        (NLL): CategoricalNLL(),
-        prefix=cls_val/
+        (cal/ECE): MulticlassCalibrationError()
+        (cal/aECE): MulticlassAdaptiveCalibrationError()
+        (cls/Acc): MulticlassAccuracy()
+        (cls/Brier): BrierScore()
+        (cls/NLL): CategoricalNLL()
+        (sc/AURC): AURC()
+        (sc/CovAt5Risk): CovAt5Risk()
+        (sc/RiskAt80Cov): RiskAt80Cov(),
+        prefix=val/
       )
       (test_cls_metrics): MetricCollection(
-        (Acc): MulticlassAccuracy()
-        (Brier): BrierScore()
-        (ECE): MulticlassCE()
-        (NLL): CategoricalNLL(),
-        prefix=cls_test/
+        (cal/ECE): MulticlassCalibrationError()
+        (cal/aECE): MulticlassAdaptiveCalibrationError()
+        (cls/Acc): MulticlassAccuracy()
+        (cls/Brier): BrierScore()
+        (cls/NLL): CategoricalNLL()
+        (sc/AURC): AURC()
+        (sc/CovAt5Risk): CovAt5Risk()
+        (sc/RiskAt80Cov): RiskAt80Cov(),
+        prefix=test/
       )
-      (test_entropy_id): Entropy()
+      (test_id_entropy): Entropy()
       (mixup): Identity()
     )
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-103
+.. GENERATED FROM PYTHON SOURCE LINES 99-105
 
 6. Testing the Model
 ~~~~~~~~~~~~~~~~~~~~
@@ -238,7 +252,7 @@ Now that the model is trained, let's test it on MNIST. Don't forget to call
 In this tutorial, we plot the most uncertain images, i.e. the images for which
 the variance of the predictions is the highest.
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-138
+.. GENERATED FROM PYTHON SOURCE LINES 105-140
 
 .. code-block:: Python
 
@@ -260,17 +274,17 @@ the variance of the predictions is the highest.
     dataiter = iter(datamodule.val_dataloader())
     images, labels = next(dataiter)
 
-    # print images
-    imshow(torchvision.utils.make_grid(images[:4, ...]))
-    print("Ground truth: ", " ".join(f"{labels[j]}" for j in range(4)))
-
     routine.eval()
     logits = routine(images).reshape(8, 128, 10)
 
     probs = torch.nn.functional.softmax(logits, dim=-1)
+    most_uncertain = sorted(probs.var(0).sum(-1).topk(4).indices)
 
+    # print images
+    imshow(torchvision.utils.make_grid(images[most_uncertain, ...]))
+    print("Ground truth: ", " ".join(f"{labels[j]}" for j in range(4)))
 
-    for j in sorted(probs.var(0).sum(-1).topk(4).indices):
+    for j in most_uncertain:
         values, predicted = torch.max(probs[:, j], 1)
         print(
             f"Predicted digits for the image {j}: ",
@@ -292,15 +306,15 @@ the variance of the predictions is the highest.
 
     Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.42421296..2.8214867].
     Ground truth:  7 2 1 0
-    Predicted digits for the image 78:  8 8 9 8 9 9 8 8
-    Predicted digits for the image 92:  9 8 9 4 9 9 8 8
-    Predicted digits for the image 95:  8 8 4 4 4 4 8 8
-    Predicted digits for the image 97:  7 8 7 4 7 7 7 7
+    Predicted digits for the image 21:  6 6 6 6 6 6 5 6
+    Predicted digits for the image 61:  8 8 8 3 3 8 3 3
+    Predicted digits for the image 92:  4 4 4 9 9 9 9 9
+    Predicted digits for the image 115:  4 4 4 4 4 4 9 4
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 139-143
+.. GENERATED FROM PYTHON SOURCE LINES 141-145
 
 The predictions are mostly erroneous, which is expected since we selected
 the most uncertain images. We also see that there stochasticity in the
@@ -310,7 +324,7 @@ stochastic estimator used.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 37.141 seconds)
+   **Total running time of the script:** (0 minutes 37.851 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_mc_batch_norm.py:

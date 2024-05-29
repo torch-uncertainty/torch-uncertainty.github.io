@@ -268,7 +268,10 @@
     <span class="n">ImageNetR</span><span class="p">,</span>
     <span class="n">OpenImageO</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.utils.misc</span> <span class="kn">import</span> <span class="n">create_train_val_split</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">create_train_val_split</span><span class="p">,</span>
+    <span class="n">interpolation_modes_from_str</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="ImageNetDataModule"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.datamodules.ImageNetDataModule.html#torch_uncertainty.datamodules.ImageNetDataModule">[docs]</a><span class="k">class</span> <span class="nc">ImageNetDataModule</span><span class="p">(</span><span class="n">AbstractDataModule</span><span class="p">):</span>
@@ -296,6 +299,7 @@
         <span class="n">test_alt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">procedure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">train_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">224</span><span class="p">,</span>
+        <span class="n">interpolation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bilinear&quot;</span><span class="p">,</span>
         <span class="n">rand_augment_opt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">pin_memory</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -316,6 +320,8 @@
 <span class="sd">            test_alt (str): Which test set to use. Defaults to ``None``.</span>
 <span class="sd">            procedure (str): Which procedure to use. Defaults to ``None``.</span>
 <span class="sd">            train_size (int): Size of training images. Defaults to ``224``.</span>
+<span class="sd">            interpolation (str): Interpolation method for the Resize Crops.</span>
+<span class="sd">                Defaults to ``&quot;bilinear&quot;``.</span>
 <span class="sd">            rand_augment_opt (str): Which RandAugment to use. Defaults to ``None``.</span>
 <span class="sd">            num_workers (int): Number of workers to use for data loading. Defaults</span>
 <span class="sd">                to ``1``.</span>
@@ -340,6 +346,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span> <span class="o">=</span> <span class="n">val_split</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ood_ds</span> <span class="o">=</span> <span class="n">ood_ds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_alt</span> <span class="o">=</span> <span class="n">test_alt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">=</span> <span class="n">interpolation_modes_from_str</span><span class="p">(</span><span class="n">interpolation</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">test_alt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">ImageNet</span>
@@ -388,7 +395,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="n">T</span><span class="o">.</span><span class="n">RandomResizedCrop</span><span class="p">(</span><span class="n">train_size</span><span class="p">),</span>
+                <span class="n">T</span><span class="o">.</span><span class="n">RandomResizedCrop</span><span class="p">(</span>
+                    <span class="n">train_size</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span>
+                <span class="p">),</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
                 <span class="n">main_transform</span><span class="p">,</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
@@ -398,7 +407,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="n">T</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span>
+                <span class="n">T</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="p">),</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">)),</span>

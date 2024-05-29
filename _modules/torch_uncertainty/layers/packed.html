@@ -257,20 +257,27 @@
 
 
 <span class="k">def</span> <span class="nf">check_packed_parameters_consistency</span><span class="p">(</span>
-    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">gamma</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">gamma</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check the consistency of the parameters of the Packed-Ensembles layers.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        alpha (float): The width multiplier of the layer.</span>
-<span class="sd">        num_estimators (int): The number of estimators in the ensemble.</span>
 <span class="sd">        gamma (int): The number of groups in the ensemble.</span>
+<span class="sd">        num_estimators (int): The number of estimators in the ensemble.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">alpha</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must specify the value of the arg. `alpha`&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">alpha</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Attribute `alpha` should be &gt; 0, not </span><span class="si">{</span><span class="n">alpha</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Attribute `gamma` should be an int, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">gamma</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Attribute `gamma` should be &gt;= 1, not </span><span class="si">{</span><span class="n">gamma</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">num_estimators</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -286,13 +293,6 @@
             <span class="s2">&quot;Attribute `num_estimators` should be &gt;= 1, not &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Attribute `gamma` should be an int, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-    <span class="k">if</span> <span class="n">gamma</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Attribute `gamma` should be &gt;= 1, not </span><span class="si">{</span><span class="n">gamma</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="PackedLinear"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.PackedLinear.html#torch_uncertainty.layers.PackedLinear">[docs]</a><span class="k">class</span> <span class="nc">PackedLinear</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -354,10 +354,9 @@
 <span class="sd">            1). The (often) necessary rearrange operation is executed by</span>
 <span class="sd">            default.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">check_packed_parameters_consistency</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">)</span>
         <span class="n">factory_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-
-        <span class="n">check_packed_parameters_consistency</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">first</span> <span class="o">=</span> <span class="n">first</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="n">num_estimators</span>
@@ -488,10 +487,9 @@
 <span class="sd">            :attr:`groups`. However, the number of input and output channels will</span>
 <span class="sd">            be changed to comply with this constraint.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">check_packed_parameters_consistency</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">)</span>
         <span class="n">factory_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-
-        <span class="n">check_packed_parameters_consistency</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="n">num_estimators</span>
 
@@ -617,10 +615,9 @@
 <span class="sd">            :attr:`groups`. However, the number of input and output channels will</span>
 <span class="sd">            be changed to comply with this constraint.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">check_packed_parameters_consistency</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">)</span>
         <span class="n">factory_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-
-        <span class="n">check_packed_parameters_consistency</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="n">num_estimators</span>
 
@@ -748,8 +745,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">factory_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-
-        <span class="n">check_packed_parameters_consistency</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span>
+        <span class="n">check_packed_parameters_consistency</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="n">num_estimators</span>
 

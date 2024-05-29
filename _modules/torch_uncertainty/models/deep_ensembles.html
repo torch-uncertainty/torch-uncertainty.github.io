@@ -311,7 +311,7 @@
     <span class="n">models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">|</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
     <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">task</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
-        <span class="s2">&quot;classification&quot;</span><span class="p">,</span> <span class="s2">&quot;regression&quot;</span><span class="p">,</span> <span class="s2">&quot;segmentation&quot;</span>
+        <span class="s2">&quot;classification&quot;</span><span class="p">,</span> <span class="s2">&quot;regression&quot;</span><span class="p">,</span> <span class="s2">&quot;segmentation&quot;</span><span class="p">,</span> <span class="s2">&quot;pixel_regression&quot;</span>
     <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;classification&quot;</span><span class="p">,</span>
     <span class="n">probabilistic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">reset_model_parameters</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -321,7 +321,8 @@
 <span class="sd">    Args:</span>
 <span class="sd">        models (list[nn.Module] | nn.Module): The model to be ensembled.</span>
 <span class="sd">        num_estimators (int | None): The number of estimators in the ensemble.</span>
-<span class="sd">        task (Literal[&quot;classification&quot;, &quot;regression&quot;]): The model task.</span>
+<span class="sd">        task (Literal[&quot;classification&quot;, &quot;regression&quot;, &quot;segmentation&quot;, &quot;pixel_regression&quot;]): The model task.</span>
+<span class="sd">            Defaults to &quot;classification&quot;.</span>
 <span class="sd">        probabilistic (bool): Whether the regression model is probabilistic.</span>
 <span class="sd">        reset_model_parameters (bool): Whether to reset the model parameters</span>
 <span class="sd">            when :attr:models is a module or a list of length 1.</span>
@@ -376,7 +377,7 @@
 
     <span class="k">if</span> <span class="n">task</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;classification&quot;</span><span class="p">,</span> <span class="s2">&quot;segmentation&quot;</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_DeepEnsembles</span><span class="p">(</span><span class="n">models</span><span class="o">=</span><span class="n">models</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">task</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;regression&quot;</span><span class="p">,</span> <span class="s2">&quot;pixel_regression&quot;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">probabilistic</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;probabilistic must be specified for regression models.&quot;</span>

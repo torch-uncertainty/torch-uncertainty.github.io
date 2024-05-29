@@ -249,8 +249,10 @@
                 
                 
   <h1>Source code for torch_uncertainty.routines.segmentation</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">einops</span> <span class="kn">import</span> <span class="n">rearrange</span>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">einops</span> <span class="kn">import</span> <span class="n">rearrange</span>
 <span class="kn">from</span> <span class="nn">lightning.pytorch</span> <span class="kn">import</span> <span class="n">LightningModule</span>
+<span class="kn">from</span> <span class="nn">lightning.pytorch.loggers</span> <span class="kn">import</span> <span class="n">Logger</span>
 <span class="kn">from</span> <span class="nn">lightning.pytorch.utilities.types</span> <span class="kn">import</span> <span class="n">STEP_OUTPUT</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Optimizer</span>
@@ -258,8 +260,9 @@
 <span class="kn">from</span> <span class="nn">torchvision.transforms.v2</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 
 <span class="kn">from</span> <span class="nn">torch_uncertainty.metrics</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CE</span><span class="p">,</span>
+    <span class="n">AURC</span><span class="p">,</span>
     <span class="n">BrierScore</span><span class="p">,</span>
+    <span class="n">CalibrationError</span><span class="p">,</span>
     <span class="n">CategoricalNLL</span><span class="p">,</span>
     <span class="n">MeanIntersectionOverUnion</span><span class="p">,</span>
 <span class="p">)</span>
@@ -274,24 +277,31 @@
         <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">optim_recipe</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">Optimizer</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">format_batch_fn</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metric_subsampling_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-2</span><span class="p">,</span>
+        <span class="n">log_plots</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">num_calibration_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Routine for efficient training and testing on **segmentation tasks**</span>
-<span class="sd">        using LightningModule.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Routine for training &amp; testing on segmentation tasks.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            model (torch.nn.Module): Model to train.</span>
 <span class="sd">            num_classes (int): Number of classes in the segmentation task.</span>
 <span class="sd">            loss (torch.nn.Module): Loss function to optimize the :attr:`model`.</span>
 <span class="sd">            num_estimators (int, optional): The number of estimators for the</span>
-<span class="sd">                ensemble. Defaults to ̀`1̀` (single model).</span>
+<span class="sd">                ensemble. Defaults to ̀`1` (single model).</span>
 <span class="sd">            optim_recipe (dict or Optimizer, optional): The optimizer and</span>
 <span class="sd">                optionally the scheduler to use. Defaults to ``None``.</span>
 <span class="sd">            format_batch_fn (torch.nn.Module, optional): The function to format the</span>
 <span class="sd">                batch. Defaults to ``None``.</span>
+<span class="sd">            metric_subsampling_rate (float, optional): The rate of subsampling for the</span>
+<span class="sd">                memory consuming metrics. Defaults to ``1e-2``.</span>
+<span class="sd">            log_plots (bool, optional): Indicates whether to log plots from</span>
+<span class="sd">                metrics. Defaults to ``False`</span>
+<span class="sd">            num_calibration_bins (int, optional): Number of bins to compute calibration</span>
+<span class="sd">                metrics. Defaults to ``15``.</span>
 
 <span class="sd">        Warning:</span>
-<span class="sd">            You must define :attr:`optim_recipe` if you do not use</span>
-<span class="sd">            the CLI.</span>
+<span class="sd">            You must define :attr:`optim_recipe` if you do not use the CLI.</span>
 
 <span class="sd">        Note:</span>
 <span class="sd">            :attr:`optim_recipe` can be anything that can be returned by</span>
@@ -299,7 +309,12 @@
 <span class="sd">            `here &lt;https://lightning.ai/docs/pytorch/stable/common/lightning_module.html#configure-optimizers&gt;`_.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="n">_segmentation_routine_checks</span><span class="p">(</span><span class="n">num_estimators</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+        <span class="n">_segmentation_routine_checks</span><span class="p">(</span>
+            <span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">num_classes</span><span class="p">,</span>
+            <span class="n">metric_subsampling_rate</span><span class="p">,</span>
+            <span class="n">num_calibration_bins</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="n">num_classes</span>
@@ -311,33 +326,61 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">optim_recipe</span> <span class="o">=</span> <span class="n">optim_recipe</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">format_batch_fn</span> <span class="o">=</span> <span class="n">format_batch_fn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metric_subsampling_rate</span> <span class="o">=</span> <span class="n">metric_subsampling_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_plots</span> <span class="o">=</span> <span class="n">log_plots</span>
 
         <span class="c1"># metrics</span>
         <span class="n">seg_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
             <span class="p">{</span>
-                <span class="s2">&quot;Acc&quot;</span><span class="p">:</span> <span class="n">Accuracy</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="s2">&quot;multiclass&quot;</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">),</span>
-                <span class="s2">&quot;ECE&quot;</span><span class="p">:</span> <span class="n">CE</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="s2">&quot;multiclass&quot;</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">),</span>
-                <span class="s2">&quot;mIoU&quot;</span><span class="p">:</span> <span class="n">MeanIntersectionOverUnion</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">),</span>
-                <span class="s2">&quot;Brier&quot;</span><span class="p">:</span> <span class="n">BrierScore</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">),</span>
-                <span class="s2">&quot;NLL&quot;</span><span class="p">:</span> <span class="n">CategoricalNLL</span><span class="p">(),</span>
+                <span class="s2">&quot;seg/mIoU&quot;</span><span class="p">:</span> <span class="n">MeanIntersectionOverUnion</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">),</span>
             <span class="p">},</span>
-            <span class="n">compute_groups</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;Acc&quot;</span><span class="p">,</span> <span class="s2">&quot;mIoU&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;ECE&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;Brier&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;NLL&quot;</span><span class="p">]],</span>
+            <span class="n">compute_groups</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">sbsmpl_seg_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;seg/mAcc&quot;</span><span class="p">:</span> <span class="n">Accuracy</span><span class="p">(</span>
+                    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;multiclass&quot;</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s2">&quot;macro&quot;</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;seg/Brier&quot;</span><span class="p">:</span> <span class="n">BrierScore</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">),</span>
+                <span class="s2">&quot;seg/NLL&quot;</span><span class="p">:</span> <span class="n">CategoricalNLL</span><span class="p">(),</span>
+                <span class="s2">&quot;seg/pixAcc&quot;</span><span class="p">:</span> <span class="n">Accuracy</span><span class="p">(</span>
+                    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;multiclass&quot;</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;cal/ECE&quot;</span><span class="p">:</span> <span class="n">CalibrationError</span><span class="p">(</span>
+                    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;multiclass&quot;</span><span class="p">,</span>
+                    <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span>
+                    <span class="n">num_bins</span><span class="o">=</span><span class="n">num_calibration_bins</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;cal/aECE&quot;</span><span class="p">:</span> <span class="n">CalibrationError</span><span class="p">(</span>
+                    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;multiclass&quot;</span><span class="p">,</span>
+                    <span class="n">adaptive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">num_bins</span><span class="o">=</span><span class="n">num_calibration_bins</span><span class="p">,</span>
+                    <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;sc/AURC&quot;</span><span class="p">:</span> <span class="n">AURC</span><span class="p">(),</span>
+            <span class="p">},</span>
+            <span class="n">compute_groups</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">val_seg_metrics</span> <span class="o">=</span> <span class="n">seg_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;seg_val/&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">test_seg_metrics</span> <span class="o">=</span> <span class="n">seg_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;seg_test/&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_seg_metrics</span> <span class="o">=</span> <span class="n">seg_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;val/&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_sbsmpl_seg_metrics</span> <span class="o">=</span> <span class="n">sbsmpl_seg_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;val/&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_seg_metrics</span> <span class="o">=</span> <span class="n">seg_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test/&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_sbsmpl_seg_metrics</span> <span class="o">=</span> <span class="n">sbsmpl_seg_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test/&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optimizer</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_recipe</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+<div class="viewcode-block" id="SegmentationRoutine.forward"><a class="viewcode-back" href="../../../generated/torch_uncertainty.routines.SegmentationRoutine.html#torch_uncertainty.routines.SegmentationRoutine.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass of the model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputs (torch.Tensor): Input tensor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">on_train_start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">init_metrics</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_seg_metrics</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="n">init_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_seg_metrics</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log_hyperparams</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="p">,</span> <span class="n">init_metrics</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log_hyperparams</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span>
@@ -370,7 +413,9 @@
         <span class="n">probs</span> <span class="o">=</span> <span class="n">probs_per_est</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
         <span class="n">valid_mask</span> <span class="o">=</span> <span class="n">target</span> <span class="o">!=</span> <span class="mi">255</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">val_seg_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">],</span> <span class="n">target</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">])</span>
+        <span class="n">probs</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">probs</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">],</span> <span class="n">target</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_seg_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_sbsmpl_seg_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">subsample</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">target</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">img</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">batch</span>
@@ -385,18 +430,42 @@
         <span class="n">probs</span> <span class="o">=</span> <span class="n">probs_per_est</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
         <span class="n">valid_mask</span> <span class="o">=</span> <span class="n">target</span> <span class="o">!=</span> <span class="mi">255</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">test_seg_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">],</span> <span class="n">target</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">])</span>
+        <span class="n">probs</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">probs</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">],</span> <span class="n">target</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_seg_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_sbsmpl_seg_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">subsample</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">target</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">on_validation_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_seg_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_seg_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_sbsmpl_seg_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_seg_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_sbsmpl_seg_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">on_test_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_seg_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">test_seg_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_seg_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_sbsmpl_seg_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">Logger</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_plots</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
+                <span class="s2">&quot;Reliabity diagram&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">test_sbsmpl_seg_metrics</span><span class="p">[</span><span class="s2">&quot;cal/ECE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
+                <span class="s2">&quot;Risk-Coverage curve&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">test_sbsmpl_seg_metrics</span><span class="p">[</span><span class="s2">&quot;sc/AURC&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">subsample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pred</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+        <span class="n">total_size</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">total_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">metric_subsampling_rate</span><span class="p">))</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">total_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">pred</span><span class="o">.</span><span class="n">device</span><span class="p">)[:</span><span class="n">num_samples</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">pred</span><span class="p">[</span><span class="n">indices</span><span class="p">],</span> <span class="n">target</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span></div>
 
 
-<span class="k">def</span> <span class="nf">_segmentation_routine_checks</span><span class="p">(</span><span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_segmentation_routine_checks</span><span class="p">(</span>
+    <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">metric_subsampling_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">num_calibration_bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">num_estimators</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;num_estimators must be positive, got </span><span class="si">{</span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">.&quot;</span>
@@ -404,6 +473,16 @@
 
     <span class="k">if</span> <span class="n">num_classes</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;num_classes must be at least 2, got </span><span class="si">{</span><span class="n">num_classes</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">metric_subsampling_rate</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;metric_subsampling_rate must be in the range (0, 1], got </span><span class="si">{</span><span class="n">metric_subsampling_rate</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">num_calibration_bins</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;num_calibration_bins must be at least 2, got </span><span class="si">{</span><span class="n">num_calibration_bins</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
 </pre></div>
 
               </article>

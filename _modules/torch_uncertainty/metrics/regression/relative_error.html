@@ -254,39 +254,44 @@
 <span class="kn">from</span> <span class="nn">torchmetrics</span> <span class="kn">import</span> <span class="n">MeanAbsoluteError</span><span class="p">,</span> <span class="n">MeanSquaredError</span>
 
 
-<div class="viewcode-block" id="MeanGTRelativeAbsoluteError"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.MeanGTRelativeAbsoluteError.html#torch_uncertainty.metrics.MeanGTRelativeAbsoluteError">[docs]</a><span class="k">class</span> <span class="nc">MeanGTRelativeAbsoluteError</span><span class="p">(</span><span class="n">MeanAbsoluteError</span><span class="p">):</span>
+<div class="viewcode-block" id="MeanGTRelativeAbsoluteError"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.MeanGTRelativeAbsoluteError.html#torch_uncertainty.metrics.regression.MeanGTRelativeAbsoluteError">[docs]</a><span class="k">class</span> <span class="nc">MeanGTRelativeAbsoluteError</span><span class="p">(</span><span class="n">MeanAbsoluteError</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute Mean Absolute Error relative to the Ground Truth (MAErel or ARE).</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute Mean Absolute Error relative to the Ground Truth (MAErel</span>
+<span class="sd">            or ARErel).</span>
 
 <span class="sd">        .. math:: \text{MAErel} = \frac{1}{N}\sum_i^N \frac{| y_i - \hat{y_i} |}{y_i}</span>
 
-<span class="sd">        where :math:`y` is a tensor of target values, and :math:`\hat{y}` is a tensor of predictions.</span>
+<span class="sd">        where :math:`y` is a tensor of target values, and :math:`\hat{y}` is a</span>
+<span class="sd">            tensor of predictions.</span>
 
-<span class="sd">        As input to ``forward`` and ``update`` the metric accepts the following input:</span>
+<span class="sd">        As input to ``forward`` and ``update`` the metric accepts the following</span>
+<span class="sd">            input:</span>
 
 <span class="sd">        - ``preds`` (:class:`~torch.Tensor`): Predictions from model</span>
 <span class="sd">        - ``target`` (:class:`~torch.Tensor`): Ground truth values</span>
 
-<span class="sd">        As output of ``forward`` and ``compute`` the metric returns the following output:</span>
+<span class="sd">        As output of ``forward`` and ``compute`` the metric returns the</span>
+<span class="sd">            following output:</span>
 
-<span class="sd">        - ``rel_mean_absolute_error`` (:class:`~torch.Tensor`): A tensor with the</span>
-<span class="sd">            relative mean absolute error over the state</span>
+<span class="sd">        - ``rel_mean_absolute_error`` (:class:`~torch.Tensor`): A tensor with</span>
+<span class="sd">            the relative mean absolute error over the state</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            kwargs: Additional keyword arguments, see `Advanced metric settings</span>
 <span class="sd">                &lt;https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs&gt;`_.</span>
 
 <span class="sd">        Reference:</span>
-<span class="sd">            As in e.g. From big to small: Multi-scale local planar guidance for monocular depth estimation</span>
+<span class="sd">            As in e.g. From big to small: Multi-scale local planar guidance for</span>
+<span class="sd">            monocular depth estimation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MeanGTRelativeAbsoluteError.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.MeanGTRelativeAbsoluteError.html#torch_uncertainty.metrics.MeanGTRelativeAbsoluteError.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pred</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MeanGTRelativeAbsoluteError.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.MeanGTRelativeAbsoluteError.html#torch_uncertainty.metrics.regression.MeanGTRelativeAbsoluteError.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pred</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update state with predictions and targets.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pred</span> <span class="o">/</span> <span class="n">target</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">target</span><span class="p">))</span></div></div>
 
 
-<div class="viewcode-block" id="MeanGTRelativeSquaredError"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.MeanGTRelativeSquaredError.html#torch_uncertainty.metrics.MeanGTRelativeSquaredError">[docs]</a><span class="k">class</span> <span class="nc">MeanGTRelativeSquaredError</span><span class="p">(</span><span class="n">MeanSquaredError</span><span class="p">):</span>
+<div class="viewcode-block" id="MeanGTRelativeSquaredError"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.MeanGTRelativeSquaredError.html#torch_uncertainty.metrics.regression.MeanGTRelativeSquaredError">[docs]</a><span class="k">class</span> <span class="nc">MeanGTRelativeSquaredError</span><span class="p">(</span><span class="n">MeanSquaredError</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">squared</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">num_outputs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -294,29 +299,35 @@
 
 <span class="sd">        .. math:: \text{MSErel} = \frac{1}{N}\sum_i^N \frac{(y_i - \hat{y_i})^2}{y_i}</span>
 
-<span class="sd">        Where :math:`y` is a tensor of target values, and :math:`\hat{y}` is a tensor of predictions.</span>
+<span class="sd">        Where :math:`y` is a tensor of target values, and :math:`\hat{y}` is a</span>
+<span class="sd">            tensor of predictions.</span>
 
-<span class="sd">        As input to ``forward`` and ``update`` the metric accepts the following input:</span>
+<span class="sd">        As input to ``forward`` and ``update`` the metric accepts the following</span>
+<span class="sd">            input:</span>
 
 <span class="sd">        - ``preds`` (:class:`~torch.Tensor`): Predictions from model</span>
 <span class="sd">        - ``target`` (:class:`~torch.Tensor`): Ground truth values</span>
 
-<span class="sd">        As output of ``forward`` and ``compute`` the metric returns the following output:</span>
+<span class="sd">        As output of ``forward`` and ``compute`` the metric returns the</span>
+<span class="sd">            following output:</span>
 
-<span class="sd">        - ``rel_mean_squared_error`` (:class:`~torch.Tensor`): A tensor with the relative mean squared error</span>
+<span class="sd">        - ``rel_mean_squared_error`` (:class:`~torch.Tensor`): A tensor with</span>
+<span class="sd">            the relative mean squared error</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            squared: If True returns MSErel value, if False returns RMSErel value.</span>
+<span class="sd">            squared: If True returns MSErel value, if False returns RMSErel</span>
+<span class="sd">                value.</span>
 <span class="sd">            num_outputs: Number of outputs in multioutput setting</span>
 <span class="sd">            kwargs: Additional keyword arguments, see `Advanced metric settings</span>
 <span class="sd">                &lt;https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs&gt;`_.</span>
 
 <span class="sd">        Reference:</span>
-<span class="sd">            As in e.g. From big to small: Multi-scale local planar guidance for monocular depth estimation</span>
+<span class="sd">            As in e.g. From big to small: Multi-scale local planar guidance for</span>
+<span class="sd">                monocular depth estimation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">squared</span><span class="p">,</span> <span class="n">num_outputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MeanGTRelativeSquaredError.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.MeanGTRelativeSquaredError.html#torch_uncertainty.metrics.MeanGTRelativeSquaredError.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pred</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MeanGTRelativeSquaredError.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.MeanGTRelativeSquaredError.html#torch_uncertainty.metrics.regression.MeanGTRelativeSquaredError.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pred</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update state with predictions and targets.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pred</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">target</span><span class="p">))</span></div></div>
 </pre></div>

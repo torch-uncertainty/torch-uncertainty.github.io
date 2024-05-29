@@ -305,13 +305,15 @@
     <span class="k">def</span> <span class="nf">_kl_div</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gathers pre-computed KL-Divergences from :attr:`model`.&quot;&quot;&quot;</span>
         <span class="n">kl_divergence</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">bayesian_modules</span><span class="p">):</span>
                 <span class="n">kl_divergence</span> <span class="o">=</span> <span class="n">kl_divergence</span><span class="o">.</span><span class="n">to</span><span class="p">(</span>
                     <span class="n">device</span><span class="o">=</span><span class="n">module</span><span class="o">.</span><span class="n">lvposterior</span><span class="o">.</span><span class="n">device</span>
                 <span class="p">)</span>
                 <span class="n">kl_divergence</span> <span class="o">+=</span> <span class="n">module</span><span class="o">.</span><span class="n">lvposterior</span> <span class="o">-</span> <span class="n">module</span><span class="o">.</span><span class="n">lprior</span>
-        <span class="k">return</span> <span class="n">kl_divergence</span></div>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">kl_divergence</span> <span class="o">/</span> <span class="n">count</span></div>
 
 
 <div class="viewcode-block" id="ELBOLoss"><a class="viewcode-back" href="../../generated/torch_uncertainty.losses.ELBOLoss.html#torch_uncertainty.losses.ELBOLoss">[docs]</a><span class="k">class</span> <span class="nc">ELBOLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -363,7 +365,7 @@
             <span class="n">aggregated_elbo</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kl_weight</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kl_div</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">aggregated_elbo</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span></div>
 
-    <span class="k">def</span> <span class="nf">set_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">set_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_kl_div</span> <span class="o">=</span> <span class="n">KLDiv</span><span class="p">(</span><span class="n">model</span><span class="p">)</span></div>

@@ -40,8 +40,8 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Deep Evidential Classification on a Toy Example" href="tutorial_evidential_classification.html" />
-  <link rel="prev" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
+  <link rel="next" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
+  <link rel="prev" title="Training a LeNet with Monte Carlo Batch Normalization" href="tutorial_mc_batch_norm.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -272,11 +272,9 @@ by Dan Hendrycks and Thomas Dietterich.</p>
 <p>For this tutorial, we will only load the corruption transforms available in
 torch_uncertainty.transforms.corruptions. We also need to load utilities from
 torchvision and matplotlib.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torchvision.datasets</span> <span class="kn">import</span> <span class="n">CIFAR10</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchvision.datasets</span> <span class="kn">import</span> <span class="n">CIFAR10</span>
 <span class="kn">from</span> <span class="nn">torchvision.transforms</span> <span class="kn">import</span> <span class="n">Compose</span><span class="p">,</span> <span class="n">ToTensor</span><span class="p">,</span> <span class="n">Resize</span>
 
-<span class="kn">from</span> <span class="nn">torchvision.utils</span> <span class="kn">import</span> <span class="n">make_grid</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">CIFAR10</span><span class="p">(</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -323,47 +321,68 @@ torchvision and matplotlib.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ./data/cifar-10-python.tar.gz
 
   0%|          | 0/170498071 [00:00&lt;?, ?it/s]
-  0%|          | 32768/170498071 [00:00&lt;11:15, 252178.33it/s]
-  0%|          | 229376/170498071 [00:00&lt;02:52, 987558.57it/s]
-  1%|          | 884736/170498071 [00:00&lt;00:57, 2938633.78it/s]
-  2%|▏         | 3604480/170498071 [00:00&lt;00:16, 9871091.07it/s]
-  5%|▌         | 9142272/170498071 [00:00&lt;00:06, 23438480.21it/s]
-  8%|▊         | 13041664/170498071 [00:00&lt;00:05, 27576374.92it/s]
- 11%|█         | 18219008/170498071 [00:00&lt;00:04, 34684576.93it/s]
- 13%|█▎        | 22282240/170498071 [00:00&lt;00:04, 36186108.54it/s]
- 16%|█▌        | 26935296/170498071 [00:01&lt;00:03, 39222433.75it/s]
- 18%|█▊        | 31522816/170498071 [00:01&lt;00:03, 39660739.99it/s]
- 21%|██▏       | 36503552/170498071 [00:01&lt;00:03, 42531993.08it/s]
- 24%|██▍       | 40828928/170498071 [00:01&lt;00:03, 41995028.96it/s]
- 27%|██▋       | 45711360/170498071 [00:01&lt;00:02, 43941825.12it/s]
- 29%|██▉       | 50200576/170498071 [00:01&lt;00:02, 43495675.97it/s]
- 32%|███▏      | 55017472/170498071 [00:01&lt;00:02, 44132013.78it/s]
- 35%|███▍      | 59572224/170498071 [00:01&lt;00:02, 44212435.71it/s]
- 38%|███▊      | 64094208/170498071 [00:01&lt;00:02, 44481297.60it/s]
- 40%|████      | 68780032/170498071 [00:01&lt;00:02, 45154163.78it/s]
- 43%|████▎     | 73334784/170498071 [00:02&lt;00:02, 44576029.76it/s]
- 46%|████▌     | 78282752/170498071 [00:02&lt;00:02, 45948266.61it/s]
- 49%|████▊     | 82903040/170498071 [00:02&lt;00:01, 45040647.44it/s]
- 51%|█████▏    | 87425024/170498071 [00:02&lt;00:01, 44357378.19it/s]
- 54%|█████▍    | 91881472/170498071 [00:02&lt;00:01, 43441669.98it/s]
- 56%|█████▋    | 96239616/170498071 [00:02&lt;00:01, 42202007.18it/s]
- 59%|█████▉    | 100564992/170498071 [00:02&lt;00:01, 42358386.35it/s]
- 62%|██████▏   | 105054208/170498071 [00:02&lt;00:01, 43090914.75it/s]
- 64%|██████▍   | 109379584/170498071 [00:02&lt;00:01, 42587092.58it/s]
- 67%|██████▋   | 113868800/170498071 [00:03&lt;00:01, 42974013.73it/s]
- 69%|██████▉   | 118456320/170498071 [00:03&lt;00:01, 42744024.28it/s]
- 72%|███████▏  | 122978304/170498071 [00:03&lt;00:01, 43181265.90it/s]
- 75%|███████▍  | 127598592/170498071 [00:03&lt;00:00, 43875308.71it/s]
- 78%|███████▊  | 132284416/170498071 [00:03&lt;00:00, 43749156.73it/s]
- 80%|████████  | 136773632/170498071 [00:03&lt;00:00, 43425108.80it/s]
- 83%|████████▎ | 141459456/170498071 [00:03&lt;00:00, 44095554.91it/s]
- 86%|████████▌ | 146046976/170498071 [00:03&lt;00:00, 44062896.56it/s]
- 89%|████████▊ | 150896640/170498071 [00:03&lt;00:00, 45321668.08it/s]
- 91%|█████████ | 155451392/170498071 [00:03&lt;00:00, 45275828.70it/s]
- 94%|█████████▍| 160071680/170498071 [00:04&lt;00:00, 45530823.12it/s]
- 97%|█████████▋| 164823040/170498071 [00:04&lt;00:00, 44941224.68it/s]
-100%|█████████▉| 169672704/170498071 [00:04&lt;00:00, 45646404.37it/s]
-100%|██████████| 170498071/170498071 [00:04&lt;00:00, 39868191.88it/s]
+  0%|          | 32768/170498071 [00:00&lt;11:10, 254199.77it/s]
+  0%|          | 229376/170498071 [00:00&lt;02:53, 978854.67it/s]
+  0%|          | 786432/170498071 [00:00&lt;01:07, 2500635.82it/s]
+  2%|▏         | 2785280/170498071 [00:00&lt;00:20, 8336321.60it/s]
+  4%|▎         | 6062080/170498071 [00:00&lt;00:10, 16213603.51it/s]
+  6%|▌         | 9502720/170498071 [00:00&lt;00:07, 21871858.58it/s]
+  8%|▊         | 13336576/170498071 [00:00&lt;00:05, 26921847.83it/s]
+ 10%|█         | 17104896/170498071 [00:00&lt;00:05, 30198915.07it/s]
+ 12%|█▏        | 20807680/170498071 [00:00&lt;00:04, 32204726.50it/s]
+ 14%|█▍        | 24117248/170498071 [00:01&lt;00:04, 30883002.96it/s]
+ 16%|█▌        | 27459584/170498071 [00:01&lt;00:04, 31585068.99it/s]
+ 18%|█▊        | 30670848/170498071 [00:01&lt;00:04, 30198953.09it/s]
+ 20%|█▉        | 33947648/170498071 [00:01&lt;00:04, 30921584.20it/s]
+ 22%|██▏       | 37093376/170498071 [00:01&lt;00:04, 29996737.92it/s]
+ 24%|██▎       | 40239104/170498071 [00:01&lt;00:04, 30238947.81it/s]
+ 25%|██▌       | 43286528/170498071 [00:01&lt;00:04, 29801122.52it/s]
+ 27%|██▋       | 46563328/170498071 [00:01&lt;00:04, 30640623.55it/s]
+ 29%|██▉       | 49643520/170498071 [00:01&lt;00:04, 29873573.75it/s]
+ 31%|███       | 52985856/170498071 [00:02&lt;00:03, 30783916.86it/s]
+ 33%|███▎      | 56098816/170498071 [00:02&lt;00:03, 29789999.25it/s]
+ 35%|███▍      | 59375616/170498071 [00:02&lt;00:03, 30599364.19it/s]
+ 37%|███▋      | 62455808/170498071 [00:02&lt;00:03, 30327891.10it/s]
+ 38%|███▊      | 65601536/170498071 [00:02&lt;00:03, 30515761.82it/s]
+ 40%|████      | 68681728/170498071 [00:02&lt;00:03, 30432163.67it/s]
+ 42%|████▏     | 71761920/170498071 [00:02&lt;00:03, 30293903.90it/s]
+ 44%|████▍     | 74809344/170498071 [00:02&lt;00:03, 29853454.63it/s]
+ 46%|████▌     | 77824000/170498071 [00:02&lt;00:03, 27626149.40it/s]
+ 47%|████▋     | 80642048/170498071 [00:03&lt;00:03, 27237123.07it/s]
+ 49%|████▉     | 83394560/170498071 [00:03&lt;00:03, 25798041.85it/s]
+ 50%|█████     | 86048768/170498071 [00:03&lt;00:03, 25915590.59it/s]
+ 52%|█████▏    | 88670208/170498071 [00:03&lt;00:03, 25173420.25it/s]
+ 54%|█████▎    | 91226112/170498071 [00:03&lt;00:03, 25184688.01it/s]
+ 55%|█████▌    | 93782016/170498071 [00:03&lt;00:03, 24848488.15it/s]
+ 56%|█████▋    | 96305152/170498071 [00:03&lt;00:03, 24590582.35it/s]
+ 58%|█████▊    | 98795520/170498071 [00:03&lt;00:02, 24278958.53it/s]
+ 59%|█████▉    | 101253120/170498071 [00:03&lt;00:02, 24035060.21it/s]
+ 61%|██████    | 103776256/170498071 [00:03&lt;00:02, 24333408.58it/s]
+ 62%|██████▏   | 106233856/170498071 [00:04&lt;00:02, 23726642.42it/s]
+ 64%|██████▍   | 108789760/170498071 [00:04&lt;00:02, 24200407.82it/s]
+ 65%|██████▌   | 111214592/170498071 [00:04&lt;00:02, 23451842.67it/s]
+ 67%|██████▋   | 113770496/170498071 [00:04&lt;00:02, 23959056.87it/s]
+ 68%|██████▊   | 116195328/170498071 [00:04&lt;00:02, 23655380.19it/s]
+ 70%|██████▉   | 118784000/170498071 [00:04&lt;00:02, 24218362.39it/s]
+ 71%|███████   | 121241600/170498071 [00:04&lt;00:02, 23779130.07it/s]
+ 73%|███████▎  | 123863040/170498071 [00:04&lt;00:01, 24462816.45it/s]
+ 74%|███████▍  | 126320640/170498071 [00:04&lt;00:01, 24002216.41it/s]
+ 76%|███████▌  | 128909312/170498071 [00:05&lt;00:01, 24512621.79it/s]
+ 77%|███████▋  | 131366912/170498071 [00:05&lt;00:01, 24177444.06it/s]
+ 79%|███████▊  | 133988352/170498071 [00:05&lt;00:01, 24606486.78it/s]
+ 80%|████████  | 136478720/170498071 [00:05&lt;00:01, 24221903.35it/s]
+ 82%|████████▏ | 139034624/170498071 [00:05&lt;00:01, 24519465.93it/s]
+ 83%|████████▎ | 141492224/170498071 [00:05&lt;00:01, 24367816.56it/s]
+ 84%|████████▍ | 144048128/170498071 [00:05&lt;00:01, 24549416.09it/s]
+ 86%|████████▌ | 146505728/170498071 [00:05&lt;00:00, 24480146.30it/s]
+ 87%|████████▋ | 148963328/170498071 [00:05&lt;00:00, 24423695.00it/s]
+ 89%|████████▉ | 151977984/170498071 [00:05&lt;00:00, 26075824.77it/s]
+ 91%|█████████ | 155254784/170498071 [00:06&lt;00:00, 27962465.71it/s]
+ 93%|█████████▎| 158498816/170498071 [00:06&lt;00:00, 29275892.05it/s]
+ 95%|█████████▍| 161710080/170498071 [00:06&lt;00:00, 30116811.96it/s]
+ 97%|█████████▋| 164921344/170498071 [00:06&lt;00:00, 30684231.42it/s]
+ 99%|█████████▊| 168132608/170498071 [00:06&lt;00:00, 31013077.62it/s]
+100%|██████████| 170498071/170498071 [00:06&lt;00:00, 26106783.29it/s]
 Extracting ./data/cifar-10-python.tar.gz to ./data
 </pre></div>
 </div>
@@ -425,13 +444,13 @@ Extracting ./data/cifar-10-python.tar.gz to ./data
 <img src="../_images/sphx_glr_tutorial_corruptions_003.png" srcset="../_images/sphx_glr_tutorial_corruptions_003.png" alt="Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://zenodo.org/records/10438904/files/frost.zip to data/frost.zip
 
   0%|          | 0/1780178 [00:00&lt;?, ?it/s]
-  2%|▏         | 32768/1780178 [00:00&lt;00:07, 222752.49it/s]
-  4%|▎         | 65536/1780178 [00:00&lt;00:07, 225314.08it/s]
-  7%|▋         | 131072/1780178 [00:00&lt;00:05, 329390.47it/s]
- 18%|█▊        | 327680/1780178 [00:00&lt;00:01, 736002.87it/s]
- 35%|███▍      | 622592/1780178 [00:00&lt;00:00, 1206145.59it/s]
- 72%|███████▏  | 1277952/1780178 [00:00&lt;00:00, 2338784.43it/s]
-100%|██████████| 1780178/1780178 [00:00&lt;00:00, 2044936.66it/s]
+  2%|▏         | 32768/1780178 [00:00&lt;00:08, 200502.07it/s]
+  4%|▎         | 65536/1780178 [00:00&lt;00:08, 201981.43it/s]
+  7%|▋         | 131072/1780178 [00:00&lt;00:05, 294518.00it/s]
+ 17%|█▋        | 294912/1780178 [00:00&lt;00:02, 577461.65it/s]
+ 35%|███▍      | 622592/1780178 [00:00&lt;00:01, 1098928.39it/s]
+ 72%|███████▏  | 1277952/1780178 [00:00&lt;00:00, 2100655.94it/s]
+100%|██████████| 1780178/1780178 [00:00&lt;00:00, 1824944.64it/s]
 Extracting data/frost.zip to data
 Downloaded frost.zip to data
 Files already downloaded and verified
@@ -446,7 +465,7 @@ Files already downloaded and verified
 <ul class="simple">
 <li><p><strong>Benchmarking Neural Network Robustness to Common Corruptions and Perturbations</strong>, Dan Hendrycks and Thomas Dietterich. <a class="reference external" href="https://arxiv.org/pdf/1903.12261">ICLR 2019</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 28.014 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 30.896 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-corruptions-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/3232f235afd71e96000345e9c6f6b324/tutorial_corruptions.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_corruptions.ipynb</span></code></a></p>
@@ -468,12 +487,12 @@ Files already downloaded and verified
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="tutorial_evidential_classification.html" class="btn btn-neutral float-right" title="Deep Evidential Classification on a Toy Example" accesskey="n"
+    <a href="tutorial_der_cubic.html" class="btn btn-neutral float-right" title="Deep Evidential Regression on a Toy Example" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     
     
-    <a href="tutorial_der_cubic.html" class="btn btn-neutral" title="Deep Evidential Regression on a Toy Example" accesskey="p"
+    <a href="tutorial_mc_batch_norm.html" class="btn btn-neutral" title="Training a LeNet with Monte Carlo Batch Normalization" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>

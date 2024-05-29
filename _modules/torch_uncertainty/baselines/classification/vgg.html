@@ -255,14 +255,8 @@
 
 <span class="kn">from</span> <span class="nn">torch_uncertainty.models</span> <span class="kn">import</span> <span class="n">mc_dropout</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.models.vgg</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">packed_vgg11</span><span class="p">,</span>
-    <span class="n">packed_vgg13</span><span class="p">,</span>
-    <span class="n">packed_vgg16</span><span class="p">,</span>
-    <span class="n">packed_vgg19</span><span class="p">,</span>
-    <span class="n">vgg11</span><span class="p">,</span>
-    <span class="n">vgg13</span><span class="p">,</span>
-    <span class="n">vgg16</span><span class="p">,</span>
-    <span class="n">vgg19</span><span class="p">,</span>
+    <span class="n">packed_vgg</span><span class="p">,</span>
+    <span class="n">vgg</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.routines.classification</span> <span class="kn">import</span> <span class="n">ClassificationRoutine</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.transforms</span> <span class="kn">import</span> <span class="n">RepeatTarget</span>
@@ -272,14 +266,9 @@
     <span class="n">single</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">]</span>
     <span class="n">ensemble</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mc-dropout&quot;</span><span class="p">,</span> <span class="s2">&quot;packed&quot;</span><span class="p">]</span>
     <span class="n">versions</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">vgg11</span><span class="p">,</span> <span class="n">vgg13</span><span class="p">,</span> <span class="n">vgg16</span><span class="p">,</span> <span class="n">vgg19</span><span class="p">],</span>
-        <span class="s2">&quot;mc-dropout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">vgg11</span><span class="p">,</span> <span class="n">vgg13</span><span class="p">,</span> <span class="n">vgg16</span><span class="p">,</span> <span class="n">vgg19</span><span class="p">],</span>
-        <span class="s2">&quot;packed&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="n">packed_vgg11</span><span class="p">,</span>
-            <span class="n">packed_vgg13</span><span class="p">,</span>
-            <span class="n">packed_vgg16</span><span class="p">,</span>
-            <span class="n">packed_vgg19</span><span class="p">,</span>
-        <span class="p">],</span>
+        <span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="n">vgg</span><span class="p">,</span>
+        <span class="s2">&quot;mc-dropout&quot;</span><span class="p">:</span> <span class="n">vgg</span><span class="p">,</span>
+        <span class="s2">&quot;packed&quot;</span><span class="p">:</span> <span class="n">packed_vgg</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">archs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">19</span><span class="p">]</span>
 
@@ -390,6 +379,7 @@
             <span class="s2">&quot;num_classes&quot;</span><span class="p">:</span> <span class="n">num_classes</span><span class="p">,</span>
             <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="n">style</span><span class="p">,</span>
             <span class="s2">&quot;groups&quot;</span><span class="p">:</span> <span class="n">groups</span><span class="p">,</span>
+            <span class="s2">&quot;arch&quot;</span><span class="p">:</span> <span class="n">arch</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="k">if</span> <span class="n">version</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">versions</span><span class="p">:</span>
@@ -425,7 +415,7 @@
 
         <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;mc-dropout&quot;</span><span class="p">:</span>  <span class="c1"># std VGGs don&#39;t have `num_estimators`</span>
             <span class="k">del</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;num_estimators&quot;</span><span class="p">]</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">versions</span><span class="p">[</span><span class="n">version</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">archs</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">arch</span><span class="p">)](</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">versions</span><span class="p">[</span><span class="n">version</span><span class="p">](</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">&quot;mc-dropout&quot;</span><span class="p">:</span>
             <span class="n">model</span> <span class="o">=</span> <span class="n">mc_dropout</span><span class="p">(</span>
                 <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>

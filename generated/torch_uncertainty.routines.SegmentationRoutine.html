@@ -40,7 +40,7 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="ResNetBaseline" href="torch_uncertainty.baselines.classification.ResNetBaseline.html" />
+  <link rel="next" title="PixelRegressionRoutine" href="torch_uncertainty.routines.PixelRegressionRoutine.html" />
   <link rel="prev" title="RegressionRoutine" href="torch_uncertainty.routines.RegressionRoutine.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
@@ -262,9 +262,8 @@
 <h1>SegmentationRoutine<a class="headerlink" href="#segmentationroutine" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.routines.SegmentationRoutine">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.routines.</span></span><span class="sig-name descname"><span class="pre">SegmentationRoutine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_recipe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_batch_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/segmentation.html#SegmentationRoutine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.SegmentationRoutine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine for efficient training and testing on <strong>segmentation tasks</strong>
-using LightningModule.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.routines.</span></span><span class="sig-name descname"><span class="pre">SegmentationRoutine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_recipe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_batch_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_subsampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_plots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_calibration_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/segmentation.html#SegmentationRoutine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.SegmentationRoutine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine for training &amp; testing on segmentation tasks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -272,18 +271,23 @@ using LightningModule.</p>
 <li><p><strong>num_classes</strong> (<em>int</em>) – Number of classes in the segmentation task.</p></li>
 <li><p><strong>loss</strong> (<em>torch.nn.Module</em>) – Loss function to optimize the <code class="xref py py-attr docutils literal notranslate"><span class="pre">model</span></code>.</p></li>
 <li><p><strong>num_estimators</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of estimators for the
-ensemble. Defaults to ̀`1̀` (single model).</p></li>
+ensemble. Defaults to ̀`1` (single model).</p></li>
 <li><p><strong>optim_recipe</strong> (<em>dict</em><em> or </em><em>Optimizer</em><em>, </em><em>optional</em>) – The optimizer and
 optionally the scheduler to use. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 <li><p><strong>format_batch_fn</strong> (<em>torch.nn.Module</em><em>, </em><em>optional</em>) – The function to format the
 batch. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>metric_subsampling_rate</strong> (<em>float</em><em>, </em><em>optional</em>) – The rate of subsampling for the
+memory consuming metrics. Defaults to <code class="docutils literal notranslate"><span class="pre">1e-2</span></code>.</p></li>
+<li><p><strong>log_plots</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to log plots from
+metrics. Defaults to <a href="#id1"><span class="problematic" id="id2">``</span></a>False`</p></li>
+<li><p><strong>num_calibration_bins</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of bins to compute calibration
+metrics. Defaults to <code class="docutils literal notranslate"><span class="pre">15</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>You must define <code class="xref py py-attr docutils literal notranslate"><span class="pre">optim_recipe</span></code> if you do not use
-the CLI.</p>
+<p>You must define <code class="xref py py-attr docutils literal notranslate"><span class="pre">optim_recipe</span></code> if you do not use the CLI.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -291,6 +295,17 @@ the CLI.</p>
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">LightningModule.configure_optimizers()</span></code>. Find more details
 <a class="reference external" href="https://lightning.ai/docs/pytorch/stable/common/lightning_module.html#configure-optimizers">here</a>.</p>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.SegmentationRoutine.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/segmentation.html#SegmentationRoutine.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.SegmentationRoutine.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass of the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>inputs</strong> (<em>torch.Tensor</em>) – Input tensor.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -303,7 +318,7 @@ the CLI.</p>
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="torch_uncertainty.baselines.classification.ResNetBaseline.html" class="btn btn-neutral float-right" title="ResNetBaseline" accesskey="n"
+    <a href="torch_uncertainty.routines.PixelRegressionRoutine.html" class="btn btn-neutral float-right" title="PixelRegressionRoutine" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     
@@ -339,7 +354,10 @@ the CLI.</p>
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">SegmentationRoutine</a><ul>
-<li><a class="reference internal" href="#torch_uncertainty.routines.SegmentationRoutine"><code class="docutils literal notranslate"><span class="pre">SegmentationRoutine</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.SegmentationRoutine"><code class="docutils literal notranslate"><span class="pre">SegmentationRoutine</span></code></a><ul>
+<li><a class="reference internal" href="#torch_uncertainty.routines.SegmentationRoutine.forward"><code class="docutils literal notranslate"><span class="pre">SegmentationRoutine.forward()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

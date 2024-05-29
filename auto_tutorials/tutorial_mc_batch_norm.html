@@ -40,8 +40,8 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
-  <link rel="prev" title="Training a LeNet with Monte-Carlo Dropout" href="tutorial_mc_dropout.html" />
+  <link rel="next" title="Image Corruptions" href="tutorial_corruptions.html" />
+  <link rel="prev" title="Improve Top-label Calibration with Temperature Scaling" href="tutorial_scaler.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -331,8 +331,10 @@ and the optimization recipe.</p>
 </section>
 <section id="gathering-everything-and-training-the-model">
 <h3>4. Gathering Everything and Training the Model<a class="headerlink" href="#gathering-everything-and-training-the-model" title="Permalink to this heading">¶</a></h3>
+<p>You can also save the results in a variable by saving the output of
+<cite>trainer.test</cite>.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
-<span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">);</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:441: The &#39;val_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
@@ -341,14 +343,18 @@ and the optimization recipe.</p>
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃        Test metric        ┃       DataLoader 0        ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│       cls_test/Acc        │    0.9794999957084656     │
-│      cls_test/Brier       │    0.03101348876953125    │
-│       cls_test/ECE        │   0.0012677183840423822   │
-│       cls_test/NLL        │    0.06631666421890259    │
-│     cls_test/entropy      │    0.06813092529773712    │
+│       test/cal/ECE        │   0.004675425123423338    │
+│       test/cal/aECE       │   0.004397667944431305    │
+│       test/cls/Acc        │    0.9751999974250793     │
+│      test/cls/Brier       │    0.03877147287130356    │
+│       test/cls/NLL        │    0.08036801218986511    │
+│     test/cls/entropy      │    0.09248960763216019    │
+│       test/sc/AURC        │   0.0015395500771056797   │
+│    test/sc/CovAt5Risk     │            1.0            │
+│    test/sc/RiskAt80Cov    │   0.001500000013038516    │
 └───────────────────────────┴───────────────────────────┘
 
-[{&#39;cls_test/Acc&#39;: 0.9794999957084656, &#39;cls_test/Brier&#39;: 0.03101348876953125, &#39;cls_test/ECE&#39;: 0.0012677183840423822, &#39;cls_test/NLL&#39;: 0.06631666421890259, &#39;cls_test/entropy&#39;: 0.06813092529773712}]
+[{&#39;test/cal/ECE&#39;: 0.004675425123423338, &#39;test/cal/aECE&#39;: 0.004397667944431305, &#39;test/cls/Acc&#39;: 0.9751999974250793, &#39;test/cls/Brier&#39;: 0.03877147287130356, &#39;test/cls/NLL&#39;: 0.08036801218986511, &#39;test/sc/AURC&#39;: 0.0015395500771056797, &#39;test/sc/CovAt5Risk&#39;: 1.0, &#39;test/sc/RiskAt80Cov&#39;: 0.001500000013038516, &#39;test/cls/entropy&#39;: 0.09248960763216019}]
 </pre></div>
 </div>
 </section>
@@ -362,10 +368,10 @@ The larger the <code class="docutils literal notranslate"><span class="pre">mc_b
 The authors suggest 32 as a good value for <code class="docutils literal notranslate"><span class="pre">mc_batch_size</span></code> but we use 4 here
 to highlight the effect of stochasticity on the predictions.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">routine</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">MCBatchNorm</span><span class="p">(</span>
-    <span class="n">routine</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mc_batch_size</span><span class="o">=</span><span class="mi">4</span>
+    <span class="n">routine</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mc_batch_size</span><span class="o">=</span><span class="mi">16</span>
 <span class="p">)</span>
 <span class="n">routine</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">train</span><span class="p">)</span>
-<span class="n">routine</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">routine</span><span class="o">.</span><span class="n">eval</span><span class="p">();</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ClassificationRoutine(
@@ -384,20 +390,28 @@ to highlight the effect of stochasticity on the predictions.</p>
   (loss): CrossEntropyLoss()
   (format_batch_fn): Identity()
   (val_cls_metrics): MetricCollection(
-    (Acc): MulticlassAccuracy()
-    (Brier): BrierScore()
-    (ECE): MulticlassCE()
-    (NLL): CategoricalNLL(),
-    prefix=cls_val/
+    (cal/ECE): MulticlassCalibrationError()
+    (cal/aECE): MulticlassAdaptiveCalibrationError()
+    (cls/Acc): MulticlassAccuracy()
+    (cls/Brier): BrierScore()
+    (cls/NLL): CategoricalNLL()
+    (sc/AURC): AURC()
+    (sc/CovAt5Risk): CovAt5Risk()
+    (sc/RiskAt80Cov): RiskAt80Cov(),
+    prefix=val/
   )
   (test_cls_metrics): MetricCollection(
-    (Acc): MulticlassAccuracy()
-    (Brier): BrierScore()
-    (ECE): MulticlassCE()
-    (NLL): CategoricalNLL(),
-    prefix=cls_test/
+    (cal/ECE): MulticlassCalibrationError()
+    (cal/aECE): MulticlassAdaptiveCalibrationError()
+    (cls/Acc): MulticlassAccuracy()
+    (cls/Brier): BrierScore()
+    (cls/NLL): CategoricalNLL()
+    (sc/AURC): AURC()
+    (sc/CovAt5Risk): CovAt5Risk()
+    (sc/RiskAt80Cov): RiskAt80Cov(),
+    prefix=test/
   )
-  (test_entropy_id): Entropy()
+  (test_id_entropy): Entropy()
   (mixup): Identity()
 )
 </pre></div>
@@ -426,17 +440,17 @@ the variance of the predictions is the highest.</p>
 <span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">())</span>
 <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">dataiter</span><span class="p">)</span>
 
-<span class="c1"># print images</span>
-<span class="n">imshow</span><span class="p">(</span><span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span><span class="n">images</span><span class="p">[:</span><span class="mi">4</span><span class="p">,</span> <span class="o">...</span><span class="p">]))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ground truth: &quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
-
 <span class="n">routine</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 <span class="n">logits</span> <span class="o">=</span> <span class="n">routine</span><span class="p">(</span><span class="n">images</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
 <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">most_uncertain</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span>
 
+<span class="c1"># print images</span>
+<span class="n">imshow</span><span class="p">(</span><span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="n">most_uncertain</span><span class="p">,</span> <span class="o">...</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ground truth: &quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
 
-<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">indices</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">most_uncertain</span><span class="p">:</span>
     <span class="n">values</span><span class="p">,</span> <span class="n">predicted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">probs</span><span class="p">[:,</span> <span class="n">j</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">&quot;Predicted digits for the image </span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">: &quot;</span><span class="p">,</span>
@@ -446,17 +460,17 @@ the variance of the predictions is the highest.</p>
 </div>
 <img src="../_images/sphx_glr_tutorial_mc_batch_norm_001.png" srcset="../_images/sphx_glr_tutorial_mc_batch_norm_001.png" alt="tutorial mc batch norm" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.42421296..2.8214867].
 Ground truth:  7 2 1 0
-Predicted digits for the image 78:  8 8 9 8 9 9 8 8
-Predicted digits for the image 92:  9 8 9 4 9 9 8 8
-Predicted digits for the image 95:  8 8 4 4 4 4 8 8
-Predicted digits for the image 97:  7 8 7 4 7 7 7 7
+Predicted digits for the image 21:  6 6 6 6 6 6 5 6
+Predicted digits for the image 61:  8 8 8 3 3 8 3 3
+Predicted digits for the image 92:  4 4 4 9 9 9 9 9
+Predicted digits for the image 115:  4 4 4 4 4 4 9 4
 </pre></div>
 </div>
 <p>The predictions are mostly erroneous, which is expected since we selected
 the most uncertain images. We also see that there stochasticity in the
 predictions, as the predictions for the same image differ depending on the
 stochastic estimator used.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 37.141 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 37.851 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-mc-batch-norm-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/631ac265c1ce7636bf5c4db0e5a4f3c3/tutorial_mc_batch_norm.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_batch_norm.ipynb</span></code></a></p>
@@ -478,12 +492,12 @@ stochastic estimator used.</p>
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="tutorial_der_cubic.html" class="btn btn-neutral float-right" title="Deep Evidential Regression on a Toy Example" accesskey="n"
+    <a href="tutorial_corruptions.html" class="btn btn-neutral float-right" title="Image Corruptions" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     
     
-    <a href="tutorial_mc_dropout.html" class="btn btn-neutral" title="Training a LeNet with Monte-Carlo Dropout" accesskey="p"
+    <a href="tutorial_scaler.html" class="btn btn-neutral" title="Improve Top-label Calibration with Temperature Scaling" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>
