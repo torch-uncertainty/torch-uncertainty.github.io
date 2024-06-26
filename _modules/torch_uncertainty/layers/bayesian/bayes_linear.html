@@ -254,7 +254,7 @@
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">init</span>
 
-<span class="kn">from</span> <span class="nn">.sampler</span> <span class="kn">import</span> <span class="n">PriorDistribution</span><span class="p">,</span> <span class="n">TrainableDistribution</span>
+<span class="kn">from</span> <span class="nn">.sampler</span> <span class="kn">import</span> <span class="n">CenteredGaussianMixture</span><span class="p">,</span> <span class="n">TrainableDistribution</span>
 
 
 <div class="viewcode-block" id="BayesLinear"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.layers.bayesian.BayesLinear.html#torch_uncertainty.layers.bayesian.BayesLinear">[docs]</a><span class="k">class</span> <span class="nc">BayesLinear</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -342,11 +342,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">bias_mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_sigma</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">weight_prior_dist</span> <span class="o">=</span> <span class="n">PriorDistribution</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight_prior_dist</span> <span class="o">=</span> <span class="n">CenteredGaussianMixture</span><span class="p">(</span>
             <span class="n">prior_sigma_1</span><span class="p">,</span> <span class="n">prior_sigma_2</span><span class="p">,</span> <span class="n">prior_pi</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">bias</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bias_prior_dist</span> <span class="o">=</span> <span class="n">PriorDistribution</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bias_prior_dist</span> <span class="o">=</span> <span class="n">CenteredGaussianMixture</span><span class="p">(</span>
                 <span class="n">prior_sigma_1</span><span class="p">,</span> <span class="n">prior_sigma_2</span><span class="p">,</span> <span class="n">prior_pi</span>
             <span class="p">)</span>
 
@@ -373,12 +373,12 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_mu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_sampler</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
             <span class="n">bias_lposterior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_sampler</span><span class="o">.</span><span class="n">log_posterior</span><span class="p">()</span>
-            <span class="n">bias_lprior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_prior_dist</span><span class="o">.</span><span class="n">log_prior</span><span class="p">(</span><span class="n">bias</span><span class="p">)</span>
+            <span class="n">bias_lprior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_prior_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">bias</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">bias</span><span class="p">,</span> <span class="n">bias_lposterior</span><span class="p">,</span> <span class="n">bias_lprior</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">lvposterior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_sampler</span><span class="o">.</span><span class="n">log_posterior</span><span class="p">()</span> <span class="o">+</span> <span class="n">bias_lposterior</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lprior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_prior_dist</span><span class="o">.</span><span class="n">log_prior</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="o">+</span> <span class="n">bias_lprior</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lprior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_prior_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="o">+</span> <span class="n">bias_lprior</span>
 
         <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">bias</span><span class="p">)</span>
 

@@ -40,7 +40,7 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="RegressionRoutine" href="torch_uncertainty.routines.RegressionRoutine.html" />
+  <link rel="next" title="SegmentationRoutine" href="torch_uncertainty.routines.SegmentationRoutine.html" />
   <link rel="prev" title="API Reference" href="../api.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
@@ -262,60 +262,52 @@
 <h1>ClassificationRoutine<a class="headerlink" href="#classificationroutine" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.routines.ClassificationRoutine">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.routines.</span></span><span class="sig-name descname"><span class="pre">ClassificationRoutine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_batch_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_recipe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'erm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixmode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'elem'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_sim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'emb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_tau_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_tau_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixup_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutmix_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_ood</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_grouping_loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ood_criterion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'msp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_plots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_in_csv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibration_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_calibration_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/classification.html#ClassificationRoutine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.ClassificationRoutine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine for training &amp; testing on <strong>classification tasks</strong>.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.routines.</span></span><span class="sig-name descname"><span class="pre">ClassificationRoutine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_ensemble</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_batch_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_recipe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixup_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_ood</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_grouping_loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ood_criterion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'msp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_processing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibration_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'val'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_calibration_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_plots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_in_csv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/classification.html#ClassificationRoutine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.ClassificationRoutine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine for training &amp; testing on <strong>classification</strong> tasks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<em>torch.nn.Module</em>) – Model to train.</p></li>
 <li><p><strong>num_classes</strong> (<em>int</em>) – Number of classes.</p></li>
 <li><p><strong>loss</strong> (<em>torch.nn.Module</em>) – Loss function to optimize the <code class="xref py py-attr docutils literal notranslate"><span class="pre">model</span></code>.</p></li>
-<li><p><strong>num_estimators</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of estimators for the
-ensemble. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code> (single model).</p></li>
+<li><p><strong>is_ensemble</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether the model is an
+ensemble at test time or not. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>format_batch_fn</strong> (<em>torch.nn.Module</em><em>, </em><em>optional</em>) – Function to format the batch.
 Defaults to <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Identity()</span></code>.</p></li>
 <li><p><strong>optim_recipe</strong> (<em>dict</em><em> or </em><em>torch.optim.Optimizer</em><em>, </em><em>optional</em>) – The optimizer and
 optionally the scheduler to use. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-<li><p><strong>mixtype</strong> (<em>str</em><em>, </em><em>optional</em>) – Mixup type. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;erm&quot;</span></code>.</p></li>
-<li><p><strong>mixmode</strong> (<em>str</em><em>, </em><em>optional</em>) – Mixup mode. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;elem&quot;</span></code>.</p></li>
-<li><p><strong>dist_sim</strong> (<em>str</em><em>, </em><em>optional</em>) – Distance similarity. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;emb&quot;</span></code>.</p></li>
-<li><p><strong>kernel_tau_max</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum value for the kernel tau.
-Defaults to <code class="docutils literal notranslate"><span class="pre">1.0</span></code>.</p></li>
-<li><p><strong>kernel_tau_std</strong> (<em>float</em><em>, </em><em>optional</em>) – Standard deviation for the kernel tau.
-Defaults to <code class="docutils literal notranslate"><span class="pre">0.5</span></code>.</p></li>
-<li><p><strong>mixup_alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – Alpha parameter for Mixup. Defaults to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
-<li><p><strong>cutmix_alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – Alpha parameter for Cutmix.
-Defaults to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p><strong>mixup_params</strong> (<em>dict</em><em>, </em><em>optional</em>) – Mixup parameters. Can include mixup type,
+mixup mode, distance similarity, kernel tau max, kernel tau std,
+mixup alpha, and cutmix alpha. If None, no augmentations.
+Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 <li><p><strong>eval_ood</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to evaluate the OOD
 detection performance or not. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>eval_grouping_loss</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to evaluate the
 grouping loss or not. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>ood_criterion</strong> (<em>str</em><em>, </em><em>optional</em>) – <p>OOD criterion. Available options are</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;msp&quot;</span></code> (default): Maximum softmax probability.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;logit&quot;</span></code>: Maximum logit.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;energy&quot;</span></code>: Logsumexp of the mean logits.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;entropy&quot;</span></code>: Entropy of the mean prediction.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;mi&quot;</span></code>: Mutual information of the ensemble.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;vr&quot;</span></code>: Variation ratio of the ensemble.</p></li>
-</ul>
-</p></li>
+<li><p><strong>ood_criterion</strong> (<em>str</em><em>, </em><em>optional</em>) – OOD criterion. Available options are
+- <code class="docutils literal notranslate"><span class="pre">&quot;msp&quot;</span></code> (default): Maximum softmax probability.
+- <code class="docutils literal notranslate"><span class="pre">&quot;logit&quot;</span></code>: Maximum logit.
+- <code class="docutils literal notranslate"><span class="pre">&quot;energy&quot;</span></code>: Logsumexp of the mean logits.
+- <code class="docutils literal notranslate"><span class="pre">&quot;entropy&quot;</span></code>: Entropy of the mean prediction.
+- <code class="docutils literal notranslate"><span class="pre">&quot;mi&quot;</span></code>: Mutual information of the ensemble.
+- <code class="docutils literal notranslate"><span class="pre">&quot;vr&quot;</span></code>: Variation ratio of the ensemble.</p></li>
+<li><p><strong>post_processing</strong> (<em>PostProcessing</em><em>, </em><em>optional</em>) – Post-processing method
+to train on the calibration set. No post-processing if None.
+Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>calibration_set</strong> (<em>str</em><em>, </em><em>optional</em>) – The post-hoc calibration dataset to
+use for the post-processing method. Defaults to <code class="docutils literal notranslate"><span class="pre">val</span></code>.</p></li>
+<li><p><strong>num_calibration_bins</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of bins to compute calibration
+metrics. Defaults to <code class="docutils literal notranslate"><span class="pre">15</span></code>.</p></li>
 <li><p><strong>log_plots</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to log plots from
 metrics. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>save_in_csv</strong> (<em>bool</em><em>, </em><em>optional</em>) – Save the results in csv. Defaults to
 <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>calibration_set</strong> (<em>str</em><em>, </em><em>optional</em>) – The post-hoc calibration dataset to
-use for scaling. If not <code class="docutils literal notranslate"><span class="pre">None</span></code>, it uses either the validation
-set when set to <code class="docutils literal notranslate"><span class="pre">&quot;val&quot;</span></code> or the test set when set to <code class="docutils literal notranslate"><span class="pre">&quot;test&quot;</span></code>.
-Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>. Else, no post-hoc calibration.</p></li>
-<li><p><strong>num_calibration_bins</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of bins to compute calibration
-metrics. Defaults to <code class="docutils literal notranslate"><span class="pre">15</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>You must define <code class="xref py py-attr docutils literal notranslate"><span class="pre">optim_recipe</span></code> if you do not use the CLI.</p>
+<p>You must define <code class="xref py py-attr docutils literal notranslate"><span class="pre">optim_recipe</span></code> if you do not use the Lightning CLI.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -354,7 +346,7 @@ not. Defaults to <code class="docutils literal notranslate"><span class="pre">Fa
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="torch_uncertainty.routines.RegressionRoutine.html" class="btn btn-neutral float-right" title="RegressionRoutine" accesskey="n"
+    <a href="torch_uncertainty.routines.SegmentationRoutine.html" class="btn btn-neutral float-right" title="SegmentationRoutine" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     

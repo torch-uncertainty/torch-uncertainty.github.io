@@ -1,0 +1,600 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Corrupting Images with TorchUncertainty to Benchmark Robustness &mdash; TorchUncertainty 0.2.0 documentation</title>
+  
+
+  <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
+  
+  
+
+  
+
+  
+  
+  
+
+  
+
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx-codeautolink.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="index" title="Index" href="../genindex.html" />
+  <link rel="search" title="Search" href="../search.html" />
+  <link rel="next" title="Deep Evidential Classification on a Toy Example" href="tutorial_evidential_classification.html" />
+  <link rel="prev" title="Train a Bayesian Neural Network in Three Minutes" href="tutorial_bayesian.html" />
+  <!-- Google Analytics -->
+  <script type="text/javascript">
+    var collapsedSections = [];
+  </script>
+  
+  <!-- End Google Analytics -->
+  
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+  <script>
+    MathJax = {
+        chtml: {
+            scale: 1,
+            minScale: 1,
+        },
+        svg: {
+            scale: 1,
+            minScale: 1,
+        }
+    }
+</script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css"
+    integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://torch-uncertainty.github.io/"
+        aria-label="OpenMMLab"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+  
+
+  <div class="table-of-contents-link-wrapper">
+    <span>Table of Contents</span>
+    <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+  </div>
+
+  <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+    <div class="pytorch-side-scroll">
+      <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <div class="pytorch-left-menu-search">
+          
+
+          
+          
+          
+          
+
+          
+
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        
+        
+        
+        
+        
+        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli_guide.html">CLI Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+        
+        
+      </div>
+    </div>
+  </nav>
+
+  <div class="pytorch-container">
+    <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+      <div class="pytorch-breadcrumbs-wrapper">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+    <li>
+      <a href="../index.html">
+        Docs
+      </a> &gt;
+    </li>
+
+    
+    <li><a href="index.html">Tutorials</a> &gt;</li>
+    
+    <li>Corrupting Images with TorchUncertainty to Benchmark Robustness</li>
+    
+    <!-- 
+    <li class="pytorch-breadcrumbs-aside">
+      
+      
+      
+      
+      
+      <a href="/zh_CN//auto_tutorials/tutorial_corruption.html" class="fa fa-language"> 以中文阅读</a>
+      
+      
+    </li>
+    
+     -->
+  </ul>
+
+  
+</div>
+      </div>
+
+      <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+        Shortcuts
+      </div>
+    </div>
+
+    <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+      <div class="pytorch-content-left">
+
+        
+
+        <div class="pytorch-call-to-action-links">
+          <div id="tutorial-type">auto_tutorials/tutorial_corruption</div>
+
+          <!-- <div id="google-colab-link">
+            <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg" />
+            <div class="call-to-action-desktop-view">Run in Google Colab</div>
+            <div class="call-to-action-mobile-view">Colab</div>
+          </div> -->
+          <div id="download-notebook-link">
+            <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg" />
+            <div class="call-to-action-desktop-view">Download Notebook</div>
+            <div class="call-to-action-mobile-view">Notebook</div>
+          </div>
+          <div id="github-view-link">
+            <img class="call-to-action-img" src="../_static/images/pytorch-github.svg" />
+            <div class="call-to-action-desktop-view">View on GitHub</div>
+            <div class="call-to-action-mobile-view">GitHub</div>
+          </div>
+        </div>
+
+        
+        
+          <div class="rst-content">
+            
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+                
+                
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-tutorials-tutorial-corruption-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="corrupting-images-with-torchuncertainty-to-benchmark-robustness">
+<span id="sphx-glr-auto-tutorials-tutorial-corruption-py"></span><h1>Corrupting Images with TorchUncertainty to Benchmark Robustness<a class="headerlink" href="#corrupting-images-with-torchuncertainty-to-benchmark-robustness" title="Permalink to this heading">¶</a></h1>
+<p>This tutorial shows the impact of the different corruptions available in the
+TorchUncertainty library. These corruptions were first proposed in the paper
+Benchmarking Neural Network Robustness to Common Corruptions and Perturbations
+by Dan Hendrycks and Thomas Dietterich.</p>
+<p>For this tutorial, we will only load the corruption transforms available in
+torch_uncertainty.transforms.corruptions. We also need to load utilities from
+torchvision and matplotlib.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchvision.datasets</span> <span class="kn">import</span> <span class="n">CIFAR10</span>
+<span class="kn">from</span> <span class="nn">torchvision.transforms</span> <span class="kn">import</span> <span class="n">Compose</span><span class="p">,</span> <span class="n">ToTensor</span><span class="p">,</span> <span class="n">Resize</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">CIFAR10</span><span class="p">(</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_images</span><span class="p">(</span><span class="n">main_corruption</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an image showing the 6 levels of corruption of a given transform.&quot;&quot;&quot;</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">severity</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+        <span class="n">ds_transforms</span> <span class="o">=</span> <span class="n">Compose</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">ToTensor</span><span class="p">(),</span> <span class="n">main_corruption</span><span class="p">(</span><span class="n">severity</span><span class="p">),</span> <span class="n">Resize</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="n">antialias</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+        <span class="p">)</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">CIFAR10</span><span class="p">(</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ds_transforms</span><span class="p">)</span>
+        <span class="n">images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">images</span>
+
+
+<span class="k">def</span> <span class="nf">show_images</span><span class="p">(</span><span class="n">transforms</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Show the effect of all given transforms.&quot;&quot;&quot;</span>
+    <span class="n">num_corruptions</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">transforms</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">num_corruptions</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1.5</span> <span class="o">*</span> <span class="n">num_corruptions</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">transform</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">transforms</span><span class="p">):</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">get_images</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+            <span class="o">-</span><span class="mf">0.1</span><span class="p">,</span>
+            <span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;vertical&quot;</span><span class="p">,</span>
+            <span class="n">horizontalalignment</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="n">verticalalignment</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+            <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Severity </span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ./data/cifar-10-python.tar.gz
+
+  0%|          | 0/170498071 [00:00&lt;?, ?it/s]
+  0%|          | 32768/170498071 [00:00&lt;10:26, 272010.37it/s]
+  0%|          | 229376/170498071 [00:00&lt;02:40, 1063243.66it/s]
+  1%|          | 884736/170498071 [00:00&lt;00:52, 3253077.52it/s]
+  2%|▏         | 3538944/170498071 [00:00&lt;00:15, 10856541.44it/s]
+  5%|▌         | 9011200/170498071 [00:00&lt;00:06, 25106514.61it/s]
+  8%|▊         | 12910592/170498071 [00:00&lt;00:05, 29348106.32it/s]
+ 11%|█         | 19103744/170498071 [00:00&lt;00:04, 37066808.99it/s]
+ 15%|█▍        | 24805376/170498071 [00:00&lt;00:03, 42888710.37it/s]
+ 17%|█▋        | 29163520/170498071 [00:01&lt;00:03, 42014101.79it/s]
+ 20%|██        | 34799616/170498071 [00:01&lt;00:02, 45688292.25it/s]
+ 23%|██▎       | 39419904/170498071 [00:01&lt;00:02, 45748043.68it/s]
+ 26%|██▌       | 44695552/170498071 [00:01&lt;00:02, 47435430.29it/s]
+ 29%|██▉       | 50069504/170498071 [00:01&lt;00:02, 49267104.98it/s]
+ 32%|███▏      | 55050240/170498071 [00:01&lt;00:02, 47056104.40it/s]
+ 35%|███▌      | 60325888/170498071 [00:01&lt;00:02, 48497264.86it/s]
+ 38%|███▊      | 65470464/170498071 [00:01&lt;00:02, 49345724.92it/s]
+ 41%|████▏     | 70451200/170498071 [00:01&lt;00:02, 47042633.96it/s]
+ 45%|████▍     | 76251136/170498071 [00:01&lt;00:01, 49458316.11it/s]
+ 48%|████▊     | 81264640/170498071 [00:02&lt;00:01, 49650688.25it/s]
+ 51%|█████     | 86278144/170498071 [00:02&lt;00:01, 47278173.39it/s]
+ 54%|█████▍    | 92078080/170498071 [00:02&lt;00:01, 49999151.73it/s]
+ 57%|█████▋    | 97124352/170498071 [00:02&lt;00:01, 49560665.87it/s]
+ 60%|█████▉    | 102105088/170498071 [00:02&lt;00:01, 48059836.50it/s]
+ 63%|██████▎   | 107839488/170498071 [00:02&lt;00:01, 50641649.19it/s]
+ 66%|██████▌   | 112951296/170498071 [00:02&lt;00:01, 49155307.23it/s]
+ 69%|██████▉   | 117899264/170498071 [00:02&lt;00:01, 47719353.12it/s]
+ 73%|███████▎  | 123699200/170498071 [00:02&lt;00:00, 50617775.40it/s]
+ 76%|███████▌  | 128811008/170498071 [00:03&lt;00:00, 49100565.27it/s]
+ 78%|███████▊  | 133758976/170498071 [00:03&lt;00:00, 48633634.73it/s]
+ 82%|████████▏ | 139493376/170498071 [00:03&lt;00:00, 50692390.13it/s]
+ 85%|████████▍ | 144605184/170498071 [00:03&lt;00:00, 48657581.45it/s]
+ 88%|████████▊ | 149520384/170498071 [00:03&lt;00:00, 48553451.10it/s]
+ 91%|█████████ | 154828800/170498071 [00:03&lt;00:00, 49762813.95it/s]
+ 94%|█████████▍| 159842304/170498071 [00:03&lt;00:00, 47730805.06it/s]
+ 97%|█████████▋| 165412864/170498071 [00:03&lt;00:00, 49882035.19it/s]
+100%|█████████▉| 170459136/170498071 [00:03&lt;00:00, 49711218.83it/s]
+100%|██████████| 170498071/170498071 [00:03&lt;00:00, 44090956.13it/s]
+Extracting ./data/cifar-10-python.tar.gz to ./data
+</pre></div>
+</div>
+<section id="noise-corruptions">
+<h2>1. Noise Corruptions<a class="headerlink" href="#noise-corruptions" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GaussianNoise</span><span class="p">,</span>
+    <span class="n">ShotNoise</span><span class="p">,</span>
+    <span class="n">ImpulseNoise</span><span class="p">,</span>
+    <span class="n">SpeckleNoise</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">show_images</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">GaussianNoise</span><span class="p">,</span>
+        <span class="n">ShotNoise</span><span class="p">,</span>
+        <span class="n">ImpulseNoise</span><span class="p">,</span>
+        <span class="n">SpeckleNoise</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_tutorial_corruption_001.png" srcset="../_images/sphx_glr_tutorial_corruption_001.png" alt="Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5" class = "sphx-glr-single-img"/></section>
+<section id="blur-corruptions">
+<h2>2. Blur Corruptions<a class="headerlink" href="#blur-corruptions" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GaussianBlur</span><span class="p">,</span>
+    <span class="n">GlassBlur</span><span class="p">,</span>
+    <span class="n">DefocusBlur</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">show_images</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">GaussianBlur</span><span class="p">,</span>
+        <span class="n">GlassBlur</span><span class="p">,</span>
+        <span class="n">DefocusBlur</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_tutorial_corruption_002.png" srcset="../_images/sphx_glr_tutorial_corruption_002.png" alt="Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5" class = "sphx-glr-single-img"/></section>
+<section id="other-corruptions">
+<h2>3. Other Corruptions<a class="headerlink" href="#other-corruptions" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">JPEGCompression</span><span class="p">,</span>
+    <span class="n">Pixelate</span><span class="p">,</span>
+    <span class="n">Frost</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">show_images</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">JPEGCompression</span><span class="p">,</span>
+        <span class="n">Pixelate</span><span class="p">,</span>
+        <span class="n">Frost</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_tutorial_corruption_003.png" srcset="../_images/sphx_glr_tutorial_corruption_003.png" alt="Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://zenodo.org/records/10438904/files/frost.zip to data/frost.zip
+
+  0%|          | 0/1780178 [00:00&lt;?, ?it/s]
+  2%|▏         | 32768/1780178 [00:00&lt;00:09, 179707.86it/s]
+  4%|▎         | 65536/1780178 [00:00&lt;00:08, 192485.08it/s]
+  7%|▋         | 131072/1780178 [00:00&lt;00:05, 305357.89it/s]
+ 15%|█▍        | 262144/1780178 [00:00&lt;00:02, 545895.90it/s]
+ 29%|██▉       | 524288/1780178 [00:00&lt;00:01, 956446.34it/s]
+ 61%|██████    | 1081344/1780178 [00:00&lt;00:00, 1834516.03it/s]
+100%|██████████| 1780178/1780178 [00:00&lt;00:00, 1788539.26it/s]
+Extracting data/frost.zip to data
+Downloaded frost.zip to data
+Files already downloaded and verified
+Files already downloaded and verified
+Files already downloaded and verified
+Files already downloaded and verified
+Files already downloaded and verified
+</pre></div>
+</div>
+<section id="reference">
+<h3>Reference<a class="headerlink" href="#reference" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Benchmarking Neural Network Robustness to Common Corruptions and Perturbations</strong>, Dan Hendrycks and Thomas Dietterich. <a class="reference external" href="https://arxiv.org/pdf/1903.12261">ICLR 2019</a>.</p></li>
+</ul>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 27.951 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-corruption-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/fb6a5e9834a7c6a46122640646eaa723/tutorial_corruption.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_corruption.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/271afc6f38341c6455eb53e36052da36/tutorial_corruption.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_corruption.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+</section>
+
+
+              </article>
+              
+            </div>
+            <footer>
+  
+  <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+    
+    <a href="tutorial_evidential_classification.html" class="btn btn-neutral float-right" title="Deep Evidential Classification on a Toy Example" accesskey="n"
+      rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
+        class="next-page"></a>
+    
+    
+    <a href="tutorial_bayesian.html" class="btn btn-neutral" title="Train a Bayesian Neural Network in Three Minutes" accesskey="p"
+      rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
+    
+  </div>
+  
+
+  <hr>
+
+  <div role="contentinfo">
+    <p>
+      &copy; Copyright 2024, Adrien Lafage and Olivier Laurent.
+
+    </p>
+  </div>
+  
+  <div>
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a
+      href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the
+      Docs</a>.
+  </div>
+   
+
+</footer>
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">Corrupting Images with TorchUncertainty to Benchmark Robustness</a><ul>
+<li><a class="reference internal" href="#noise-corruptions">1. Noise Corruptions</a></li>
+<li><a class="reference internal" href="#blur-corruptions">2. Blur Corruptions</a></li>
+<li><a class="reference internal" href="#other-corruptions">3. Other Corruptions</a><ul>
+<li><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+    </section>
+  </div>
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" id="documentation_options" data-url_root="../"
+    src="../_static/documentation_options.js"></script>
+  <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+  <script src="../_static/jquery.js"></script>
+  <script src="../_static/underscore.js"></script>
+  <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+  <script src="../_static/doctools.js"></script>
+  <script src="../_static/sphinx_highlight.js"></script>
+  <script src="../_static/clipboard.min.js"></script>
+  <script src="../_static/copybutton.js"></script>
+  
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+  </div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://torch-uncertainty.github.io/" aria-label="OpenMMLab"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
+          </li>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function (e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+
+</html>

@@ -256,17 +256,27 @@
 
 
 <div class="viewcode-block" id="DistributionNLL"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.DistributionNLL.html#torch_uncertainty.metrics.regression.DistributionNLL">[docs]</a><span class="k">class</span> <span class="nc">DistributionNLL</span><span class="p">(</span><span class="n">CategoricalNLL</span><span class="p">):</span>
-<div class="viewcode-block" id="DistributionNLL.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.DistributionNLL.html#torch_uncertainty.metrics.regression.DistributionNLL.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">:</span> <span class="n">distributions</span><span class="o">.</span><span class="n">Distribution</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="DistributionNLL.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.DistributionNLL.html#torch_uncertainty.metrics.regression.DistributionNLL.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dist</span><span class="p">:</span> <span class="n">distributions</span><span class="o">.</span><span class="n">Distribution</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">padding_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update state with the predicted distributions and the targets.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            dist (torch.distributions.Distribution): Predicted distributions.</span>
 <span class="sd">            target (Tensor): Ground truth labels.</span>
+<span class="sd">            padding_mask (Tensor, optional): The padding mask. Defaults to None.</span>
+<span class="sd">                Sets the loss to 0 for padded values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nlog_prob</span> <span class="o">=</span> <span class="o">-</span><span class="n">dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">padding_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nlog_prob</span> <span class="o">=</span> <span class="n">nlog_prob</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">padding_mask</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nlog_prob</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">+=</span> <span class="o">-</span><span class="n">dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">+=</span> <span class="n">nlog_prob</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">+=</span> <span class="n">target</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DistributionNLL.compute"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.DistributionNLL.html#torch_uncertainty.metrics.regression.DistributionNLL.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>

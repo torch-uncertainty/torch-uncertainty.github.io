@@ -59,13 +59,14 @@ Here is the outline of the process:
 1. Load and normalize CIFAR10
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-51
+.. GENERATED FROM PYTHON SOURCE LINES 45-52
 
 .. code-block:: Python
 
     import torch
     import torchvision
     import torchvision.transforms as transforms
+    from torch.utils.data import DataLoader
 
     torch.set_num_threads(1)
 
@@ -76,18 +77,18 @@ Here is the outline of the process:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-54
+.. GENERATED FROM PYTHON SOURCE LINES 53-55
 
 The output of torchvision datasets are PILImage images of range [0, 1].
 We transform them to Tensors of normalized range [-1, 1].
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-59
+.. GENERATED FROM PYTHON SOURCE LINES 57-60
 
 .. note::
     If running on Windows and you get a BrokenPipeError, try setting
     the num_worker of torch.utils.data.DataLoader() to 0.
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-96
+.. GENERATED FROM PYTHON SOURCE LINES 60-97
 
 .. code-block:: Python
 
@@ -104,14 +105,14 @@ We transform them to Tensors of normalized range [-1, 1].
     trainset = torchvision.datasets.CIFAR10(
         root="./data", train=True, download=True, transform=transform
     )
-    trainloader = torch.utils.data.DataLoader(
+    trainloader = DataLoader(
         trainset, batch_size=batch_size, shuffle=True, num_workers=2
     )
 
     testset = torchvision.datasets.CIFAR10(
         root="./data", train=False, download=True, transform=transform
     )
-    testloader = torch.utils.data.DataLoader(
+    testloader = DataLoader(
         testset, batch_size=batch_size, shuffle=False, num_workers=2
     )
 
@@ -142,11 +143,11 @@ We transform them to Tensors of normalized range [-1, 1].
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-98
+.. GENERATED FROM PYTHON SOURCE LINES 98-99
 
 Let us show some of the training images, for fun.
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-125
+.. GENERATED FROM PYTHON SOURCE LINES 99-126
 
 .. code-block:: Python
 
@@ -190,19 +191,19 @@ Let us show some of the training images, for fun.
 
  .. code-block:: none
 
-    car   plane plane cat  
+    ship  cat   deer  ship 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-130
+.. GENERATED FROM PYTHON SOURCE LINES 127-131
 
 2. Define a Packed-Ensemble from a standard classifier
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 First we define a standard classifier for CIFAR10 for reference. We will use a
 convolutional neural network.
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-157
+.. GENERATED FROM PYTHON SOURCE LINES 131-158
 
 .. code-block:: Python
 
@@ -240,12 +241,12 @@ convolutional neural network.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-160
+.. GENERATED FROM PYTHON SOURCE LINES 159-161
 
 Let's modify the standard classifier into a Packed-Ensemble classifier of
 parameters :math:`M=4,\ \alpha=2\text{ and }\gamma=1`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 160-200
+.. GENERATED FROM PYTHON SOURCE LINES 161-201
 
 .. code-block:: Python
 
@@ -296,13 +297,13 @@ parameters :math:`M=4,\ \alpha=2\text{ and }\gamma=1`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 201-204
+.. GENERATED FROM PYTHON SOURCE LINES 202-205
 
 3. Define a Loss function and optimizer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Let's use a Classification Cross-Entropy loss and SGD with momentum.
 
-.. GENERATED FROM PYTHON SOURCE LINES 204-210
+.. GENERATED FROM PYTHON SOURCE LINES 205-211
 
 .. code-block:: Python
 
@@ -319,13 +320,13 @@ Let's use a Classification Cross-Entropy loss and SGD with momentum.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-214
+.. GENERATED FROM PYTHON SOURCE LINES 212-215
 
 4. Train the Packed-Ensemble on the training data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Let's train the Packed-Ensemble on the training data.
 
-.. GENERATED FROM PYTHON SOURCE LINES 214-237
+.. GENERATED FROM PYTHON SOURCE LINES 215-238
 
 .. code-block:: Python
 
@@ -360,28 +361,28 @@ Let's train the Packed-Ensemble on the training data.
 
  .. code-block:: none
 
-    [1,  2000] loss: 2.990
-    [1,  4000] loss: 2.195
-    [1,  6000] loss: 2.065
-    [1,  8000] loss: 1.950
-    [1, 10000] loss: 1.849
-    [1, 12000] loss: 1.786
-    [2,  2000] loss: 1.751
-    [2,  4000] loss: 1.721
-    [2,  6000] loss: 1.682
-    [2,  8000] loss: 1.672
-    [2, 10000] loss: 1.633
-    [2, 12000] loss: 1.599
+    [1,  2000] loss: 3.145
+    [1,  4000] loss: 2.227
+    [1,  6000] loss: 2.082
+    [1,  8000] loss: 1.986
+    [1, 10000] loss: 1.892
+    [1, 12000] loss: 1.812
+    [2,  2000] loss: 1.726
+    [2,  4000] loss: 1.697
+    [2,  6000] loss: 1.668
+    [2,  8000] loss: 1.639
+    [2, 10000] loss: 1.622
+    [2, 12000] loss: 1.591
     Finished Training
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 238-239
+.. GENERATED FROM PYTHON SOURCE LINES 239-240
 
 Save our trained model:
 
-.. GENERATED FROM PYTHON SOURCE LINES 239-243
+.. GENERATED FROM PYTHON SOURCE LINES 240-244
 
 .. code-block:: Python
 
@@ -396,13 +397,13 @@ Save our trained model:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 244-247
+.. GENERATED FROM PYTHON SOURCE LINES 245-248
 
 5. Test the Packed-Ensemble on the test data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Let us display an image from the test set to get familiar.
 
-.. GENERATED FROM PYTHON SOURCE LINES 247-258
+.. GENERATED FROM PYTHON SOURCE LINES 248-259
 
 .. code-block:: Python
 
@@ -435,12 +436,12 @@ Let us display an image from the test set to get familiar.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 259-261
+.. GENERATED FROM PYTHON SOURCE LINES 260-262
 
 Next, let us load back in our saved model (note: saving and re-loading the
 model wasn't necessary here, we only did it to illustrate how to do so):
 
-.. GENERATED FROM PYTHON SOURCE LINES 261-265
+.. GENERATED FROM PYTHON SOURCE LINES 262-266
 
 .. code-block:: Python
 
@@ -461,11 +462,11 @@ model wasn't necessary here, we only did it to illustrate how to do so):
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 266-267
+.. GENERATED FROM PYTHON SOURCE LINES 267-268
 
 Let us see what the Packed-Ensemble thinks these examples above are:
 
-.. GENERATED FROM PYTHON SOURCE LINES 267-280
+.. GENERATED FROM PYTHON SOURCE LINES 268-281
 
 .. code-block:: Python
 
@@ -490,19 +491,19 @@ Let us see what the Packed-Ensemble thinks these examples above are:
 
  .. code-block:: none
 
-    Predicted:  frog  ship  car   plane
+    Predicted:  cat   ship  car   plane
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 281-282
+.. GENERATED FROM PYTHON SOURCE LINES 282-283
 
 The results seem pretty good.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 46.995 seconds)
+   **Total running time of the script:** (1 minutes 48.057 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_pe_cifar10.py:

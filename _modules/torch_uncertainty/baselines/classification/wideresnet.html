@@ -266,10 +266,10 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.transforms</span> <span class="kn">import</span> <span class="n">MIMOBatchFormat</span><span class="p">,</span> <span class="n">RepeatTarget</span>
 
+<span class="n">ENSEMBLE_METHODS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;packed&quot;</span><span class="p">,</span> <span class="s2">&quot;batched&quot;</span><span class="p">,</span> <span class="s2">&quot;masked&quot;</span><span class="p">,</span> <span class="s2">&quot;mimo&quot;</span><span class="p">,</span> <span class="s2">&quot;mc-dropout&quot;</span><span class="p">]</span>
+
 
 <div class="viewcode-block" id="WideResNetBaseline"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.baselines.classification.WideResNetBaseline.html#torch_uncertainty.baselines.classification.WideResNetBaseline">[docs]</a><span class="k">class</span> <span class="nc">WideResNetBaseline</span><span class="p">(</span><span class="n">ClassificationRoutine</span><span class="p">):</span>
-    <span class="n">single</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;std&quot;</span><span class="p">]</span>
-    <span class="n">ensemble</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;packed&quot;</span><span class="p">,</span> <span class="s2">&quot;batched&quot;</span><span class="p">,</span> <span class="s2">&quot;masked&quot;</span><span class="p">,</span> <span class="s2">&quot;mimo&quot;</span><span class="p">,</span> <span class="s2">&quot;mc-dropout&quot;</span><span class="p">]</span>
     <span class="n">versions</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">wideresnet28x10</span><span class="p">],</span>
         <span class="s2">&quot;mc-dropout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">wideresnet28x10</span><span class="p">],</span>
@@ -290,13 +290,7 @@
         <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;imagenet&quot;</span><span class="p">,</span>
         <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">dropout_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">mixtype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;erm&quot;</span><span class="p">,</span>
-        <span class="n">mixmode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;elem&quot;</span><span class="p">,</span>
-        <span class="n">dist_sim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;emb&quot;</span><span class="p">,</span>
-        <span class="n">kernel_tau_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
-        <span class="n">kernel_tau_std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
-        <span class="n">mixup_alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">cutmix_alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">mixup_params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">last_layer_dropout</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -309,7 +303,7 @@
         <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;msp&quot;</span><span class="p">,</span>
         <span class="n">log_plots</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">save_in_csv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">calibration_set</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">calibration_set</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;val&quot;</span><span class="p">,</span>
         <span class="n">eval_ood</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">eval_grouping_loss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -340,17 +334,10 @@
 <span class="sd">                Only used if :attr:`version` is either ``&quot;packed&quot;``, ``&quot;batched&quot;``</span>
 <span class="sd">                or ``&quot;masked&quot;`` Defaults to ``None``.</span>
 <span class="sd">            dropout_rate (float, optional): Dropout rate. Defaults to ``0.0``.</span>
-<span class="sd">            mixtype (str, optional): Mixup type. Defaults to ``&quot;erm&quot;``.</span>
-<span class="sd">            mixmode (str, optional): Mixup mode. Defaults to ``&quot;elem&quot;``.</span>
-<span class="sd">            dist_sim (str, optional): Distance similarity. Defaults to ``&quot;emb&quot;``.</span>
-<span class="sd">            kernel_tau_max (float, optional): Maximum value for the kernel tau.</span>
-<span class="sd">                Defaults to ``1.0``.</span>
-<span class="sd">            kernel_tau_std (float, optional): Standard deviation for the kernel</span>
-<span class="sd">                tau. Defaults to ``0.5``.</span>
-<span class="sd">            mixup_alpha (float, optional): Alpha parameter for Mixup. Defaults</span>
-<span class="sd">                to ``0``.</span>
-<span class="sd">            cutmix_alpha (float, optional): Alpha parameter for CutMix.</span>
-<span class="sd">                Defaults to ``0``.</span>
+<span class="sd">            mixup_params (dict, optional): Mixup parameters. Can include mixtype,</span>
+<span class="sd">                mixmode, dist_sim, kernel_tau_max, kernel_tau_std,</span>
+<span class="sd">                mixup_alpha, and cutmix_alpha. If None, no augmentations.</span>
+<span class="sd">                Defaults to ``None``.</span>
 <span class="sd">            last_layer_dropout (bool): whether to apply dropout to the last layer only.</span>
 <span class="sd">            groups (int, optional): Number of groups in convolutions. Defaults to</span>
 <span class="sd">                ``1``.</span>
@@ -406,7 +393,7 @@
         <span class="k">if</span> <span class="n">version</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">versions</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown version: </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">version</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensemble</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">ENSEMBLE_METHODS</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">|=</span> <span class="p">{</span>
                 <span class="s2">&quot;num_estimators&quot;</span><span class="p">:</span> <span class="n">num_estimators</span><span class="p">,</span>
             <span class="p">}</span>
@@ -448,15 +435,9 @@
             <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span>
             <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
             <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
-            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">is_ensemble</span><span class="o">=</span><span class="n">version</span> <span class="ow">in</span> <span class="n">ENSEMBLE_METHODS</span><span class="p">,</span>
             <span class="n">format_batch_fn</span><span class="o">=</span><span class="n">format_batch_fn</span><span class="p">,</span>
-            <span class="n">mixtype</span><span class="o">=</span><span class="n">mixtype</span><span class="p">,</span>
-            <span class="n">mixmode</span><span class="o">=</span><span class="n">mixmode</span><span class="p">,</span>
-            <span class="n">dist_sim</span><span class="o">=</span><span class="n">dist_sim</span><span class="p">,</span>
-            <span class="n">kernel_tau_max</span><span class="o">=</span><span class="n">kernel_tau_max</span><span class="p">,</span>
-            <span class="n">kernel_tau_std</span><span class="o">=</span><span class="n">kernel_tau_std</span><span class="p">,</span>
-            <span class="n">mixup_alpha</span><span class="o">=</span><span class="n">mixup_alpha</span><span class="p">,</span>
-            <span class="n">cutmix_alpha</span><span class="o">=</span><span class="n">cutmix_alpha</span><span class="p">,</span>
+            <span class="n">mixup_params</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">,</span>
             <span class="n">eval_ood</span><span class="o">=</span><span class="n">eval_ood</span><span class="p">,</span>
             <span class="n">eval_grouping_loss</span><span class="o">=</span><span class="n">eval_grouping_loss</span><span class="p">,</span>
             <span class="n">ood_criterion</span><span class="o">=</span><span class="n">ood_criterion</span><span class="p">,</span>

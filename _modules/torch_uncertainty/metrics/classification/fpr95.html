@@ -251,42 +251,10 @@
   <h1>Source code for torch_uncertainty.metrics.classification.fpr95</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torchmetrics</span> <span class="kn">import</span> <span class="n">Metric</span>
 <span class="kn">from</span> <span class="nn">torchmetrics.utilities</span> <span class="kn">import</span> <span class="n">rank_zero_warn</span>
 <span class="kn">from</span> <span class="nn">torchmetrics.utilities.data</span> <span class="kn">import</span> <span class="n">dim_zero_cat</span>
-
-
-<span class="k">def</span> <span class="nf">stable_cumsum</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">rtol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-05</span><span class="p">,</span> <span class="n">atol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-08</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Uses high precision for cumsum and checks that the final value matches</span>
-<span class="sd">    the sum.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        arr (ArrayLike): The array to be cumulatively summed as flat.</span>
-<span class="sd">        rtol (float, optional): Relative tolerance, see ``np.allclose``.</span>
-<span class="sd">            Defaults to 1e-05.</span>
-<span class="sd">        atol (float, optional): Absolute tolerance, see ``np.allclose``.</span>
-<span class="sd">            Defaults to 1e-08.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        ArrayLike: The cumulatively summed array.</span>
-
-<span class="sd">    Reference:</span>
-<span class="sd">        From https://github.com/hendrycks/anomaly-seg.</span>
-
-<span class="sd">    TODO: Check if necessary.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-    <span class="n">expected</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span>
-        <span class="n">out</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">expected</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">atol</span>
-    <span class="p">):</span>  <span class="c1"># coverage: ignore</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s2">&quot;cumsum was found to be unstable: &quot;</span>
-            <span class="s2">&quot;its last element does not correspond to sum&quot;</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">out</span>
 
 
 <span class="k">class</span> <span class="nc">FPRx</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
@@ -304,6 +272,9 @@
 <span class="sd">            recall_level (float): The recall level at which to compute the FPR.</span>
 <span class="sd">            pos_label (int): The positive label.</span>
 <span class="sd">            kwargs: Additional arguments to pass to the metric class.</span>
+
+<span class="sd">        Reference:</span>
+<span class="sd">            Inpired by https://github.com/hendrycks/anomaly-seg.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -333,13 +304,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the actual False Positive Rate at x% Recall.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the actual False Positive Rate at x% Recall.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: The value of the FPRx.</span>
-
-<span class="sd">        Reference:</span>
-<span class="sd">            Inpired by https://github.com/hendrycks/anomaly-seg.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">conf</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
         <span class="n">targets</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
@@ -371,7 +339,7 @@
         <span class="n">threshold_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">distinct_value_indices</span><span class="p">,</span> <span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
 
         <span class="c1"># accumulate the true positives with decreasing threshold</span>
-        <span class="n">tps</span> <span class="o">=</span> <span class="n">stable_cumsum</span><span class="p">(</span><span class="n">labels</span><span class="p">)[</span><span class="n">threshold_idxs</span><span class="p">]</span>
+        <span class="n">tps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">labels</span><span class="p">)[</span><span class="n">threshold_idxs</span><span class="p">]</span>
         <span class="n">fps</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">threshold_idxs</span> <span class="o">-</span> <span class="n">tps</span>  <span class="c1"># add one because of zero-based indexing</span>
 
         <span class="n">thresholds</span> <span class="o">=</span> <span class="n">examples</span><span class="p">[</span><span class="n">threshold_idxs</span><span class="p">]</span>

@@ -40,7 +40,7 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Contributing" href="../contributing.html" />
+  <link rel="next" title="MNISTC" href="torch_uncertainty.datasets.classification.MNISTC.html" />
   <link rel="prev" title="CityscapesDataModule" href="torch_uncertainty.datamodules.segmentation.CityscapesDataModule.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
@@ -262,7 +262,7 @@
 <h1>MUADDataModule<a class="headerlink" href="#muaddatamodule" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.datamodules.segmentation.MUADDataModule">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.datamodules.segmentation.</span></span><span class="sig-name descname"><span class="pre">MUADDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inference_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1024,</span> <span class="pre">2048)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pin_memory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/datamodules/segmentation/muad.html#MUADDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.datamodules.segmentation.MUADDataModule" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.datamodules.segmentation.</span></span><span class="sig-name descname"><span class="pre">MUADDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1024,</span> <span class="pre">2048)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pin_memory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/datamodules/segmentation/muad.html#MUADDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.datamodules.segmentation.MUADDataModule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Segmentation DataModule for the MUAD dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -275,7 +275,7 @@ int instead of sequence like <span class="math notranslate nohighlight">\((H, W)
 <span class="math notranslate nohighlight">\((\text{size},\text{size})\)</span> is made. If provided a sequence
 of length <span class="math notranslate nohighlight">\(1\)</span>, it will be interpreted as
 <span class="math notranslate nohighlight">\((\text{size[0]},\text{size[1]})\)</span>. Defaults to <code class="docutils literal notranslate"><span class="pre">1024</span></code>.</p></li>
-<li><p><strong>inference_size</strong> (<em>sequence</em><em> or </em><em>int</em><em>, </em><em>optional</em>) – Desired input image and
+<li><p><strong>eval_size</strong> (<em>sequence</em><em> or </em><em>int</em><em>, </em><em>optional</em>) – Desired input image and
 segmentation mask sizes during inference. If size is an int,
 smaller edge of the images will be matched to this number, i.e.,
 <span class="math notranslate nohighlight">\(\text{height}&gt;\text{width}\)</span>, then image will be rescaled to
@@ -320,7 +320,7 @@ validation/test datasets:</p>
 
 <span class="n">v2</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
     <span class="n">v2</span><span class="o">.</span><span class="n">ToImage</span><span class="p">(),</span>
-    <span class="n">v2</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">inference_size</span><span class="p">,</span> <span class="n">antialias</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">v2</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">eval_size</span><span class="p">,</span> <span class="n">antialias</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
     <span class="n">v2</span><span class="o">.</span><span class="n">ToDtype</span><span class="p">({</span>
         <span class="n">tv_tensors</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
         <span class="n">tv_tensors</span><span class="o">.</span><span class="n">Mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
@@ -346,7 +346,7 @@ and <code class="docutils literal notranslate"><span class="pre">self.test_trans
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="../contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n"
+    <a href="torch_uncertainty.datasets.classification.MNISTC.html" class="btn btn-neutral float-right" title="MNISTC" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     

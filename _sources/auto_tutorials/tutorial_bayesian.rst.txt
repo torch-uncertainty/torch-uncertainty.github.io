@@ -89,12 +89,12 @@ We will use the Adam optimizer with the default learning rate of 0.001.
 
 
 
-    def optim_lenet(model: nn.Module) -> dict:
+    def optim_lenet(model: nn.Module):
         optimizer = optim.Adam(
             model.parameters(),
             lr=1e-3,
         )
-        return {"optimizer": optimizer}
+        return optimizer
 
 
 
@@ -122,7 +122,7 @@ parameter to True. Finally, we create the model using the blueprint from torch_u
     trainer = Trainer(accelerator="cpu", enable_progress_bar=False, max_epochs=1)
 
     # datamodule
-    root = Path("") / "data"
+    root = Path("data")
     datamodule = MNISTDataModule(root=root, batch_size=128, eval_ood=False)
 
     # model
@@ -148,7 +148,7 @@ We then define the training routine using the classification training routine
 from torch_uncertainty.classification. We provide the model, the ELBO
 loss and the optimizer to the routine.
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-110
+.. GENERATED FROM PYTHON SOURCE LINES 95-111
 
 .. code-block:: Python
 
@@ -165,6 +165,7 @@ loss and the optimizer to the routine.
         num_classes=datamodule.num_classes,
         loss=loss,
         optim_recipe=optim_lenet(model),
+        is_ensemble=True
     )
 
 
@@ -174,7 +175,7 @@ loss and the optimizer to the routine.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-120
+.. GENERATED FROM PYTHON SOURCE LINES 112-121
 
 5. Gathering Everything and Training the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -186,7 +187,7 @@ training/eval logic and the datamodule
 The dataset will be downloaded automatically in the root/data folder, and the
 logs will be saved in the root/logs folder.
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-124
+.. GENERATED FROM PYTHON SOURCE LINES 121-125
 
 .. code-block:: Python
 
@@ -202,74 +203,43 @@ logs will be saved in the root/logs folder.
 
  .. code-block:: none
 
-    Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz
-    Failed to download (trying next):
-    HTTP Error 403: Forbidden
-
-    Downloading https://ossci-datasets.s3.amazonaws.com/mnist/train-images-idx3-ubyte.gz
-    Downloading https://ossci-datasets.s3.amazonaws.com/mnist/train-images-idx3-ubyte.gz to data/MNIST/raw/train-images-idx3-ubyte.gz
-      0%|          | 0/9912422 [00:00<?, ?it/s]      3%|▎         | 294912/9912422 [00:00<00:03, 2936813.44it/s]      7%|▋         | 720896/9912422 [00:00<00:02, 3684114.20it/s]     13%|█▎        | 1277952/9912422 [00:00<00:01, 4501938.71it/s]     20%|█▉        | 1966080/9912422 [00:00<00:01, 5325576.73it/s]     29%|██▉       | 2850816/9912422 [00:00<00:01, 6544678.72it/s]     40%|████      | 3997696/9912422 [00:00<00:00, 8138381.71it/s]     53%|█████▎    | 5210112/9912422 [00:00<00:00, 8784973.13it/s]     69%|██████▉   | 6848512/9912422 [00:00<00:00, 11012287.77it/s]     81%|████████  | 8028160/9912422 [00:00<00:00, 11179303.89it/s]     94%|█████████▎| 9273344/9912422 [00:01<00:00, 11490701.29it/s]    100%|██████████| 9912422/9912422 [00:01<00:00, 9137904.55it/s] 
-    Extracting data/MNIST/raw/train-images-idx3-ubyte.gz to data/MNIST/raw
-
-    Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz
-    Failed to download (trying next):
-    HTTP Error 403: Forbidden
-
-    Downloading https://ossci-datasets.s3.amazonaws.com/mnist/train-labels-idx1-ubyte.gz
-    Downloading https://ossci-datasets.s3.amazonaws.com/mnist/train-labels-idx1-ubyte.gz to data/MNIST/raw/train-labels-idx1-ubyte.gz
-      0%|          | 0/28881 [00:00<?, ?it/s]    100%|██████████| 28881/28881 [00:00<00:00, 1418168.44it/s]
-    Extracting data/MNIST/raw/train-labels-idx1-ubyte.gz to data/MNIST/raw
-
-    Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz
-    Failed to download (trying next):
-    HTTP Error 403: Forbidden
-
-    Downloading https://ossci-datasets.s3.amazonaws.com/mnist/t10k-images-idx3-ubyte.gz
-    Downloading https://ossci-datasets.s3.amazonaws.com/mnist/t10k-images-idx3-ubyte.gz to data/MNIST/raw/t10k-images-idx3-ubyte.gz
-      0%|          | 0/1648877 [00:00<?, ?it/s]     46%|████▌     | 753664/1648877 [00:00<00:00, 6523588.07it/s]    100%|██████████| 1648877/1648877 [00:00<00:00, 11800533.38it/s]
-    Extracting data/MNIST/raw/t10k-images-idx3-ubyte.gz to data/MNIST/raw
-
-    Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz
-    Failed to download (trying next):
-    HTTP Error 403: Forbidden
-
-    Downloading https://ossci-datasets.s3.amazonaws.com/mnist/t10k-labels-idx1-ubyte.gz
-    Downloading https://ossci-datasets.s3.amazonaws.com/mnist/t10k-labels-idx1-ubyte.gz to data/MNIST/raw/t10k-labels-idx1-ubyte.gz
-      0%|          | 0/4542 [00:00<?, ?it/s]    100%|██████████| 4542/4542 [00:00<00:00, 16843968.85it/s]
-    Extracting data/MNIST/raw/t10k-labels-idx1-ubyte.gz to data/MNIST/raw
-
     /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
     /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
     /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The 'test_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃        Test metric        ┃       DataLoader 0        ┃
     ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │       test/cal/ECE        │   0.020742561668157578    │
-    │       test/cal/aECE       │    0.01969822309911251    │
-    │       test/cls/Acc        │    0.9541000127792358     │
-    │      test/cls/Brier       │    0.07072366029024124    │
-    │       test/cls/NLL        │    0.15280374884605408    │
-    │     test/cls/entropy      │    0.2065856009721756     │
-    │       test/sc/AURC        │   0.004371211263570491    │
+    │       test/cal/ECE        │    0.01927024871110916    │
+    │       test/cal/aECE       │   0.019230687990784645    │
+    │       test/cls/Acc        │    0.9621000289916992     │
+    │      test/cls/Brier       │    0.0607721321284771     │
+    │       test/cls/NLL        │    0.13123469054698944    │
+    │     test/cls/entropy      │    0.18412761390209198    │
+    │   test/ens_Disagreement   │   0.004938333760946989    │
+    │     test/ens_Entropy      │    0.18340398371219635    │
+    │        test/ens_MI        │   0.0007236007368192077   │
+    │       test/sc/AURC        │   0.0034290889237258227   │
     │    test/sc/CovAt5Risk     │            1.0            │
-    │    test/sc/RiskAt80Cov    │   0.005125000141561031    │
+    │    test/sc/RiskAt80Cov    │   0.0036249998956918716   │
     └───────────────────────────┴───────────────────────────┘
 
-    [{'test/cal/ECE': 0.020742561668157578, 'test/cal/aECE': 0.01969822309911251, 'test/cls/Acc': 0.9541000127792358, 'test/cls/Brier': 0.07072366029024124, 'test/cls/NLL': 0.15280374884605408, 'test/sc/AURC': 0.004371211263570491, 'test/sc/CovAt5Risk': 1.0, 'test/sc/RiskAt80Cov': 0.005125000141561031, 'test/cls/entropy': 0.2065856009721756}]
+    [{'test/cal/ECE': 0.01927024871110916, 'test/cal/aECE': 0.019230687990784645, 'test/cls/Acc': 0.9621000289916992, 'test/cls/Brier': 0.0607721321284771, 'test/cls/NLL': 0.13123469054698944, 'test/sc/AURC': 0.0034290889237258227, 'test/sc/CovAt5Risk': 1.0, 'test/sc/RiskAt80Cov': 0.0036249998956918716, 'test/cls/entropy': 0.18412761390209198, 'test/ens_Disagreement': 0.004938333760946989, 'test/ens_Entropy': 0.18340398371219635, 'test/ens_MI': 0.0007236007368192077}]
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-129
+.. GENERATED FROM PYTHON SOURCE LINES 126-133
 
 6. Testing the Model
 ~~~~~~~~~~~~~~~~~~~~
 
-Now that the model is trained, let's test it on MNIST
+Now that the model is trained, let's test it on MNIST.
+Please note that we apply a reshape to the logits to determine the dimension corresponding to the ensemble
+and to the batch. As for TorchUncertainty 0.2.0, the ensemble dimension is merged with the batch dimension
+in this order (num_estimator x batch, classes).
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-158
+.. GENERATED FROM PYTHON SOURCE LINES 133-167
 
 .. code-block:: Python
-
 
     import matplotlib.pyplot as plt
     import numpy as np
@@ -292,13 +262,19 @@ Now that the model is trained, let's test it on MNIST
     imshow(torchvision.utils.make_grid(images[:4, ...]))
     print("Ground truth: ", " ".join(f"{labels[j]}" for j in range(4)))
 
-    logits = model(images)
-    probs = torch.nn.functional.softmax(logits, dim=-1)
+    # Put the model in eval mode to use several samples
+    model = model.eval()
+    logits = model(images).reshape(16, 128, 10) # num_estimators, batch_size, num_classes
 
-    _, predicted = torch.max(probs, 1)
+    # We apply the softmax on the classes and average over the estimators
+    probs = torch.nn.functional.softmax(logits, dim=-1)
+    avg_probs = probs.mean(dim=0)
+    var_probs = probs.std(dim=0)
+
+    _, predicted = torch.max(avg_probs, 1)
 
     print("Predicted digits: ", " ".join(f"{predicted[j]}" for j in range(4)))
-
+    print("Std. dev. of the scores over the posterior samples", " ".join(f"{var_probs[j][predicted[j]]:.3}" for j in range(4)))
 
 
 
@@ -312,14 +288,18 @@ Now that the model is trained, let's test it on MNIST
 
  .. code-block:: none
 
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.42421296..2.8214867].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
     Ground truth:  7 2 1 0
     Predicted digits:  7 2 1 0
+    Std. dev. of the scores over the posterior samples 0.000244 5.87e-05 0.00046 0.0353
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-166
+.. GENERATED FROM PYTHON SOURCE LINES 168-178
+
+Here, we show the variance of the top prediction. This is a non-standard but intuitive way to show the diversity of the predictions
+of the ensemble. Ideally, the variance should be high when the average top prediction is incorrect.
 
 References
 ----------
@@ -332,7 +312,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 38.712 seconds)
+   **Total running time of the script:** (0 minutes 53.058 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_bayesian.py:

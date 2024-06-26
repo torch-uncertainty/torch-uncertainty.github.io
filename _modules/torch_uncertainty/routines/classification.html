@@ -284,9 +284,29 @@
     <span class="n">RiskAt80Cov</span><span class="p">,</span>
     <span class="n">VariationRatio</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.post_processing</span> <span class="kn">import</span> <span class="n">TemperatureScaler</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.transforms</span> <span class="kn">import</span> <span class="n">Mixup</span><span class="p">,</span> <span class="n">MixupIO</span><span class="p">,</span> <span class="n">RegMixup</span><span class="p">,</span> <span class="n">WarpingMixup</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">EPOCH_UPDATE_MODEL</span><span class="p">,</span>
+    <span class="n">STEP_UPDATE_MODEL</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.post_processing</span> <span class="kn">import</span> <span class="n">PostProcessing</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.transforms</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Mixup</span><span class="p">,</span>
+    <span class="n">MixupIO</span><span class="p">,</span>
+    <span class="n">RegMixup</span><span class="p">,</span>
+    <span class="n">RepeatTarget</span><span class="p">,</span>
+    <span class="n">WarpingMixup</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.utils</span> <span class="kn">import</span> <span class="n">csv_writer</span><span class="p">,</span> <span class="n">plot_hist</span>
+
+<span class="n">MIXUP_PARAMS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;mixtype&quot;</span><span class="p">:</span> <span class="s2">&quot;erm&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mixmode&quot;</span><span class="p">:</span> <span class="s2">&quot;elem&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dist_sim&quot;</span><span class="p">:</span> <span class="s2">&quot;emb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;kernel_tau_max&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;kernel_tau_std&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="s2">&quot;mixup_alpha&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">&quot;cutmix_alpha&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">}</span>
 
 
 <div class="viewcode-block" id="ClassificationRoutine"><a class="viewcode-back" href="../../../generated/torch_uncertainty.routines.ClassificationRoutine.html#torch_uncertainty.routines.ClassificationRoutine">[docs]</a><span class="k">class</span> <span class="nc">ClassificationRoutine</span><span class="p">(</span><span class="n">LightningModule</span><span class="p">):</span>
@@ -295,74 +315,62 @@
         <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
         <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">loss</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
-        <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">is_ensemble</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">format_batch_fn</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">optim_recipe</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">Optimizer</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">mixtype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;erm&quot;</span><span class="p">,</span>
-        <span class="n">mixmode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;elem&quot;</span><span class="p">,</span>
-        <span class="n">dist_sim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;emb&quot;</span><span class="p">,</span>
-        <span class="n">kernel_tau_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
-        <span class="n">kernel_tau_std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
-        <span class="n">mixup_alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">cutmix_alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">mixup_params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">eval_ood</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">eval_grouping_loss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">ood_criterion</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
             <span class="s2">&quot;msp&quot;</span><span class="p">,</span> <span class="s2">&quot;logit&quot;</span><span class="p">,</span> <span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="s2">&quot;entropy&quot;</span><span class="p">,</span> <span class="s2">&quot;mi&quot;</span><span class="p">,</span> <span class="s2">&quot;vr&quot;</span>
         <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;msp&quot;</span><span class="p">,</span>
+        <span class="n">post_processing</span><span class="p">:</span> <span class="n">PostProcessing</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">calibration_set</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;val&quot;</span><span class="p">,</span>
+        <span class="n">num_calibration_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
         <span class="n">log_plots</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">save_in_csv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">calibration_set</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">num_calibration_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Routine for training &amp; testing on **classification tasks**.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Routine for training &amp; testing on **classification** tasks.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            model (torch.nn.Module): Model to train.</span>
 <span class="sd">            num_classes (int): Number of classes.</span>
 <span class="sd">            loss (torch.nn.Module): Loss function to optimize the :attr:`model`.</span>
-<span class="sd">            num_estimators (int, optional): Number of estimators for the</span>
-<span class="sd">                ensemble. Defaults to ``1`` (single model).</span>
+<span class="sd">            is_ensemble (bool, optional): Indicates whether the model is an</span>
+<span class="sd">                ensemble at test time or not. Defaults to ``False``.</span>
 <span class="sd">            format_batch_fn (torch.nn.Module, optional): Function to format the batch.</span>
 <span class="sd">                Defaults to :class:`torch.nn.Identity()`.</span>
 <span class="sd">            optim_recipe (dict or torch.optim.Optimizer, optional): The optimizer and</span>
 <span class="sd">                optionally the scheduler to use. Defaults to ``None``.</span>
-<span class="sd">            mixtype (str, optional): Mixup type. Defaults to ``&quot;erm&quot;``.</span>
-<span class="sd">            mixmode (str, optional): Mixup mode. Defaults to ``&quot;elem&quot;``.</span>
-<span class="sd">            dist_sim (str, optional): Distance similarity. Defaults to ``&quot;emb&quot;``.</span>
-<span class="sd">            kernel_tau_max (float, optional): Maximum value for the kernel tau.</span>
-<span class="sd">                Defaults to ``1.0``.</span>
-<span class="sd">            kernel_tau_std (float, optional): Standard deviation for the kernel tau.</span>
-<span class="sd">                Defaults to ``0.5``.</span>
-<span class="sd">            mixup_alpha (float, optional): Alpha parameter for Mixup. Defaults to ``0``.</span>
-<span class="sd">            cutmix_alpha (float, optional): Alpha parameter for Cutmix.</span>
-<span class="sd">                Defaults to ``0``.</span>
+<span class="sd">            mixup_params (dict, optional): Mixup parameters. Can include mixup type,</span>
+<span class="sd">                mixup mode, distance similarity, kernel tau max, kernel tau std,</span>
+<span class="sd">                mixup alpha, and cutmix alpha. If None, no augmentations.</span>
+<span class="sd">                Defaults to ``None``.</span>
 <span class="sd">            eval_ood (bool, optional): Indicates whether to evaluate the OOD</span>
 <span class="sd">                detection performance or not. Defaults to ``False``.</span>
 <span class="sd">            eval_grouping_loss (bool, optional): Indicates whether to evaluate the</span>
 <span class="sd">                grouping loss or not. Defaults to ``False``.</span>
 <span class="sd">            ood_criterion (str, optional): OOD criterion. Available options are</span>
-
 <span class="sd">                - ``&quot;msp&quot;`` (default): Maximum softmax probability.</span>
 <span class="sd">                - ``&quot;logit&quot;``: Maximum logit.</span>
 <span class="sd">                - ``&quot;energy&quot;``: Logsumexp of the mean logits.</span>
 <span class="sd">                - ``&quot;entropy&quot;``: Entropy of the mean prediction.</span>
 <span class="sd">                - ``&quot;mi&quot;``: Mutual information of the ensemble.</span>
 <span class="sd">                - ``&quot;vr&quot;``: Variation ratio of the ensemble.</span>
-
+<span class="sd">            post_processing (PostProcessing, optional): Post-processing method</span>
+<span class="sd">                to train on the calibration set. No post-processing if None.</span>
+<span class="sd">                Defaults to ``None``.</span>
+<span class="sd">            calibration_set (str, optional): The post-hoc calibration dataset to</span>
+<span class="sd">                use for the post-processing method. Defaults to ``val``.</span>
+<span class="sd">            num_calibration_bins (int, optional): Number of bins to compute calibration</span>
+<span class="sd">                metrics. Defaults to ``15``.</span>
 <span class="sd">            log_plots (bool, optional): Indicates whether to log plots from</span>
 <span class="sd">                metrics. Defaults to ``False``.</span>
 <span class="sd">            save_in_csv(bool, optional): Save the results in csv. Defaults to</span>
 <span class="sd">                ``False``.</span>
-<span class="sd">            calibration_set (str, optional): The post-hoc calibration dataset to</span>
-<span class="sd">                use for scaling. If not ``None``, it uses either the validation</span>
-<span class="sd">                set when set to ``&quot;val&quot;`` or the test set when set to ``&quot;test&quot;``.</span>
-<span class="sd">                Defaults to ``None``. Else, no post-hoc calibration.</span>
-<span class="sd">            num_calibration_bins (int, optional): Number of bins to compute calibration</span>
-<span class="sd">                metrics. Defaults to ``15``.</span>
 
 <span class="sd">        Warning:</span>
-<span class="sd">            You must define :attr:`optim_recipe` if you do not use the CLI.</span>
+<span class="sd">            You must define :attr:`optim_recipe` if you do not use the Lightning CLI.</span>
 
 <span class="sd">        Note:</span>
 <span class="sd">            :attr:`optim_recipe` can be anything that can be returned by</span>
@@ -373,17 +381,19 @@
         <span class="n">_classification_routine_checks</span><span class="p">(</span>
             <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
             <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span>
-            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">is_ensemble</span><span class="o">=</span><span class="n">is_ensemble</span><span class="p">,</span>
             <span class="n">ood_criterion</span><span class="o">=</span><span class="n">ood_criterion</span><span class="p">,</span>
             <span class="n">eval_grouping_loss</span><span class="o">=</span><span class="n">eval_grouping_loss</span><span class="p">,</span>
             <span class="n">num_calibration_bins</span><span class="o">=</span><span class="n">num_calibration_bins</span><span class="p">,</span>
+            <span class="n">mixup_params</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">,</span>
+            <span class="n">post_processing</span><span class="o">=</span><span class="n">post_processing</span><span class="p">,</span>
+            <span class="n">format_batch_fn</span><span class="o">=</span><span class="n">format_batch_fn</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">format_batch_fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">format_batch_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="n">num_classes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="n">num_estimators</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="o">=</span> <span class="n">eval_ood</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eval_grouping_loss</span> <span class="o">=</span> <span class="n">eval_grouping_loss</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span> <span class="o">=</span> <span class="n">ood_criterion</span>
@@ -391,30 +401,48 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">save_in_csv</span> <span class="o">=</span> <span class="n">save_in_csv</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">calibration_set</span> <span class="o">=</span> <span class="n">calibration_set</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">binary_cls</span> <span class="o">=</span> <span class="n">num_classes</span> <span class="o">==</span> <span class="mi">1</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">needs_epoch_update</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">EPOCH_UPDATE_MODEL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">needs_step_update</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">STEP_UPDATE_MODEL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_calibration_bins</span> <span class="o">=</span> <span class="n">num_calibration_bins</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">format_batch_fn</span> <span class="o">=</span> <span class="n">format_batch_fn</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optim_recipe</span> <span class="o">=</span> <span class="n">optim_recipe</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span> <span class="o">=</span> <span class="n">is_ensemble</span>
 
-        <span class="c1"># metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="o">=</span> <span class="n">post_processing</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_metrics</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mixup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_mixup</span><span class="p">(</span><span class="n">mixup_params</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_elbo</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">ELBOLoss</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_elbo</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_dec</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">DECLoss</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_logit_storage</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ood_logit_storage</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_init_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">task</span> <span class="o">=</span> <span class="s2">&quot;binary&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_cls</span> <span class="k">else</span> <span class="s2">&quot;multiclass&quot;</span>
 
         <span class="n">cls_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
             <span class="p">{</span>
-                <span class="s2">&quot;cls/Acc&quot;</span><span class="p">:</span> <span class="n">Accuracy</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">),</span>
-                <span class="s2">&quot;cls/Brier&quot;</span><span class="p">:</span> <span class="n">BrierScore</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">),</span>
+                <span class="s2">&quot;cls/Acc&quot;</span><span class="p">:</span> <span class="n">Accuracy</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">),</span>
+                <span class="s2">&quot;cls/Brier&quot;</span><span class="p">:</span> <span class="n">BrierScore</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">),</span>
                 <span class="s2">&quot;cls/NLL&quot;</span><span class="p">:</span> <span class="n">CategoricalNLL</span><span class="p">(),</span>
                 <span class="s2">&quot;cal/ECE&quot;</span><span class="p">:</span> <span class="n">CalibrationError</span><span class="p">(</span>
                     <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
-                    <span class="n">num_bins</span><span class="o">=</span><span class="n">num_calibration_bins</span><span class="p">,</span>
-                    <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span>
+                    <span class="n">num_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_calibration_bins</span><span class="p">,</span>
+                    <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="s2">&quot;cal/aECE&quot;</span><span class="p">:</span> <span class="n">CalibrationError</span><span class="p">(</span>
                     <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
                     <span class="n">adaptive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">num_bins</span><span class="o">=</span><span class="n">num_calibration_bins</span><span class="p">,</span>
-                    <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span>
+                    <span class="n">num_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_calibration_bins</span><span class="p">,</span>
+                    <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="s2">&quot;sc/AURC&quot;</span><span class="p">:</span> <span class="n">AURC</span><span class="p">(),</span>
                 <span class="s2">&quot;sc/CovAt5Risk&quot;</span><span class="p">:</span> <span class="n">CovAt5Risk</span><span class="p">(),</span>
@@ -432,7 +460,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">val_cls_metrics</span> <span class="o">=</span> <span class="n">cls_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;val/&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span> <span class="o">=</span> <span class="n">cls_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test/&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibration_set</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ts_cls_metrics</span> <span class="o">=</span> <span class="n">cls_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test/ts_&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">test_id_entropy</span> <span class="o">=</span> <span class="n">Entropy</span><span class="p">()</span>
@@ -450,7 +478,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_entropy</span> <span class="o">=</span> <span class="n">Entropy</span><span class="p">()</span>
 
         <span class="c1"># metrics for ensembles only</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
             <span class="n">ens_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
                 <span class="p">{</span>
                     <span class="s2">&quot;Disagreement&quot;</span><span class="p">:</span> <span class="n">Disagreement</span><span class="p">(),</span>
@@ -464,78 +492,75 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_ens_metrics</span> <span class="o">=</span> <span class="n">ens_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;ood/ens_&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Mixup</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mixtype</span> <span class="o">=</span> <span class="n">mixtype</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mixmode</span> <span class="o">=</span> <span class="n">mixmode</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dist_sim</span> <span class="o">=</span> <span class="n">dist_sim</span>
-        <span class="k">if</span> <span class="n">num_estimators</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">mixup_alpha</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">cutmix_alpha</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;Cutmix alpha and Mixup alpha must be positive.&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">mixup_alpha</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">cutmix_alpha</span><span class="si">}</span><span class="s2">.&quot;</span>
-                <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_grouping_loss</span><span class="p">:</span>
+            <span class="n">grouping_loss</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;cls/grouping_loss&quot;</span><span class="p">:</span> <span class="n">GroupingLoss</span><span class="p">()}</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val_grouping_loss</span> <span class="o">=</span> <span class="n">grouping_loss</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;val/&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_grouping_loss</span> <span class="o">=</span> <span class="n">grouping_loss</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test/&quot;</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">mixup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_mixup</span><span class="p">(</span>
-                <span class="n">mixup_alpha</span><span class="p">,</span> <span class="n">cutmix_alpha</span><span class="p">,</span> <span class="n">kernel_tau_max</span><span class="p">,</span> <span class="n">kernel_tau_std</span>
+    <span class="k">def</span> <span class="nf">_init_mixup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mixup_params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mixup_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mixup_params</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">mixup_params</span> <span class="o">=</span> <span class="n">MIXUP_PARAMS</span> <span class="o">|</span> <span class="n">mixup_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mixup_params</span> <span class="o">=</span> <span class="n">mixup_params</span>
+
+        <span class="k">if</span> <span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixup_alpha&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;cutmix_alpha&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Cutmix alpha and Mixup alpha must be positive.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">mixup_params</span><span class="p">[</span><span class="s1">&#39;mixup_alpha&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">mixup_params</span><span class="p">[</span><span class="s1">&#39;cutmix_alpha&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_grouping_loss</span><span class="p">:</span>
-                <span class="n">grouping_loss</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
-                    <span class="p">{</span><span class="s2">&quot;cls/grouping_loss&quot;</span><span class="p">:</span> <span class="n">GroupingLoss</span><span class="p">()}</span>
-                <span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">val_grouping_loss</span> <span class="o">=</span> <span class="n">grouping_loss</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;val/&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">test_grouping_loss</span> <span class="o">=</span> <span class="n">grouping_loss</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test/&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">is_elbo</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">ELBOLoss</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_elbo</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">is_dec</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">DECLoss</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">id_logit_storage</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ood_logit_storage</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="k">def</span> <span class="nf">init_mixup</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">mixup_alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">cutmix_alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">kernel_tau_max</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">kernel_tau_std</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixtype</span> <span class="o">==</span> <span class="s2">&quot;timm&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixtype&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;timm&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">timm_Mixup</span><span class="p">(</span>
-                <span class="n">mixup_alpha</span><span class="o">=</span><span class="n">mixup_alpha</span><span class="p">,</span>
-                <span class="n">cutmix_alpha</span><span class="o">=</span><span class="n">cutmix_alpha</span><span class="p">,</span>
-                <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mixmode</span><span class="p">,</span>
+                <span class="n">mixup_alpha</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixup_alpha&quot;</span><span class="p">],</span>
+                <span class="n">cutmix_alpha</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;cutmix_alpha&quot;</span><span class="p">],</span>
+                <span class="n">mode</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixmode&quot;</span><span class="p">],</span>
                 <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixtype</span> <span class="o">==</span> <span class="s2">&quot;mixup&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixtype&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;mixup&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Mixup</span><span class="p">(</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="n">mixup_alpha</span><span class="p">,</span>
-                <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mixmode</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixup_alpha&quot;</span><span class="p">],</span>
+                <span class="n">mode</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixmode&quot;</span><span class="p">],</span>
                 <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixtype</span> <span class="o">==</span> <span class="s2">&quot;mixup_io&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixtype&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;mixup_io&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">MixupIO</span><span class="p">(</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="n">mixup_alpha</span><span class="p">,</span>
-                <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mixmode</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixup_alpha&quot;</span><span class="p">],</span>
+                <span class="n">mode</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixmode&quot;</span><span class="p">],</span>
                 <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixtype</span> <span class="o">==</span> <span class="s2">&quot;regmixup&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixtype&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;regmixup&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">RegMixup</span><span class="p">(</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="n">mixup_alpha</span><span class="p">,</span>
-                <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mixmode</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixup_alpha&quot;</span><span class="p">],</span>
+                <span class="n">mode</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixmode&quot;</span><span class="p">],</span>
                 <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixtype</span> <span class="o">==</span> <span class="s2">&quot;kernel_warping&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixtype&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;kernel_warping&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">WarpingMixup</span><span class="p">(</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="n">mixup_alpha</span><span class="p">,</span>
-                <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mixmode</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixup_alpha&quot;</span><span class="p">],</span>
+                <span class="n">mode</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixmode&quot;</span><span class="p">],</span>
                 <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
                 <span class="n">apply_kernel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">tau_max</span><span class="o">=</span><span class="n">kernel_tau_max</span><span class="p">,</span>
-                <span class="n">tau_std</span><span class="o">=</span><span class="n">kernel_tau_std</span><span class="p">,</span>
+                <span class="n">tau_max</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;kernel_tau_max&quot;</span><span class="p">],</span>
+                <span class="n">tau_std</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;kernel_tau_std&quot;</span><span class="p">],</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">Identity</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_apply_mixup</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixtype&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;kernel_warping&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;dist_sim&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;emb&quot;</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                        <span class="n">feats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">feats_forward</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+                    <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixup</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">,</span> <span class="n">feats</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># self.mixup_params[&quot;dist_sim&quot;] == &quot;inp&quot;:</span>
+                    <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixup</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixup</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">batch</span>
 
     <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optimizer</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_recipe</span>
@@ -546,26 +571,32 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="p">,</span>
             <span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">on_validation_start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">needs_epoch_update</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">sanity_checking</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">update_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;need_bn_update&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">bn_update</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+                <span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">on_test_start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibration_set</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibration_set</span> <span class="ow">in</span> <span class="p">[</span>
-            <span class="s2">&quot;val&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;test&quot;</span><span class="p">,</span>
-        <span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">calibration_dataset</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">datamodule</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">()</span><span class="o">.</span><span class="n">dataset</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibration_set</span> <span class="o">==</span> <span class="s2">&quot;val&quot;</span>
                 <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">datamodule</span><span class="o">.</span><span class="n">test_dataloader</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span>
             <span class="p">)</span>
             <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">inference_mode</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cal_model</span> <span class="o">=</span> <span class="n">TemperatureScaler</span><span class="p">(</span>
-                    <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">calibration_dataset</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cal_model</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">calibration_dataset</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_plots</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">Logger</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">id_logit_storage</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ood_logit_storage</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;need_bn_update&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">bn_update</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+            <span class="p">)</span>
 
 <div class="viewcode-block" id="ClassificationRoutine.forward"><a class="viewcode-back" href="../../../generated/torch_uncertainty.routines.ClassificationRoutine.html#torch_uncertainty.routines.ClassificationRoutine.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">save_feats</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass of the model.</span>
@@ -592,19 +623,7 @@
     <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">STEP_OUTPUT</span><span class="p">:</span>
-        <span class="c1"># Mixup only for single models</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixtype</span> <span class="o">==</span> <span class="s2">&quot;kernel_warping&quot;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_sim</span> <span class="o">==</span> <span class="s2">&quot;emb&quot;</span><span class="p">:</span>
-                    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-                        <span class="n">feats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">feats_forward</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
-
-                    <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixup</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">,</span> <span class="n">feats</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_sim</span> <span class="o">==</span> <span class="s2">&quot;inp&quot;</span><span class="p">:</span>
-                    <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixup</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixup</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">)</span>
-
+        <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_mixup</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
         <span class="n">inputs</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_batch_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_elbo</span><span class="p">:</span>
@@ -620,18 +639,17 @@
                 <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">)</span>
-
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">needs_step_update</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">update_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;train_loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">loss</span>
 
     <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">inputs</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">batch</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span>
-            <span class="n">inputs</span><span class="p">,</span> <span class="n">save_feats</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_grouping_loss</span>
-        <span class="p">)</span>  <span class="c1"># (m*b, c)</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="s2">&quot;(m b) c -&gt; b m c&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">)</span>
+        <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">batch</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">save_feats</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_grouping_loss</span><span class="p">)</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="s2">&quot;(m b) c -&gt; b m c&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">targets</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_cls</span><span class="p">:</span>
             <span class="n">probs_per_est</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
@@ -639,10 +657,10 @@
             <span class="n">probs_per_est</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="n">probs</span> <span class="o">=</span> <span class="n">probs_per_est</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">val_cls_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_cls_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_grouping_loss</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">val_grouping_loss</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val_grouping_loss</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -650,18 +668,9 @@
         <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">dataloader_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">inputs</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">batch</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span>
-            <span class="n">inputs</span><span class="p">,</span> <span class="n">save_feats</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_grouping_loss</span>
-        <span class="p">)</span>  <span class="c1"># (m*b, c)</span>
-        <span class="k">if</span> <span class="n">logits</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;The number of predicted samples </span><span class="si">{</span><span class="n">logits</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="s2"> is not &quot;</span>
-                <span class="s2">&quot;divisible by the reported number of estimators &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="si">}</span><span class="s2"> of the routine. Please check the &quot;</span>
-                <span class="s2">&quot;correspondence between these values.&quot;</span>
-            <span class="p">)</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="s2">&quot;(n b) c -&gt; b n c&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">)</span>
+        <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">batch</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">save_feats</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_grouping_loss</span><span class="p">)</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="s2">&quot;(n b) c -&gt; b n c&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">targets</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_cls</span><span class="p">:</span>
             <span class="n">probs_per_est</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
@@ -689,20 +698,19 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ood_scores</span> <span class="o">=</span> <span class="o">-</span><span class="n">confs</span>
 
-        <span class="c1"># Scaling for single models</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cal_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cal_logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cal_model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
-            <span class="n">cal_probs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">cal_logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ts_cls_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">cal_probs</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pp_logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+            <span class="n">pp_probs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">pp_logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ts_cls_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pp_probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">dataloader_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># squeeze if binary classification only for binary metrics</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
                 <span class="n">probs</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_cls</span> <span class="k">else</span> <span class="n">probs</span><span class="p">,</span>
-                <span class="n">target</span><span class="p">,</span>
+                <span class="n">targets</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_grouping_loss</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">test_grouping_loss</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">test_grouping_loss</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">add_dataloader_idx</span><span class="o">=</span><span class="kc">False</span>
@@ -715,19 +723,19 @@
                 <span class="n">add_dataloader_idx</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">)</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">test_id_ens_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs_per_est</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                    <span class="n">ood_scores</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                    <span class="n">ood_scores</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
                 <span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_logit_storage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">id_logit_storage</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="ow">and</span> <span class="n">dataloader_idx</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ood_scores</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ood_scores</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">targets</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_entropy</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
                 <span class="s2">&quot;ood/Entropy&quot;</span><span class="p">,</span>
@@ -735,7 +743,7 @@
                 <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">add_dataloader_idx</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_ens_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs_per_est</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_logit_storage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -758,11 +766,7 @@
             <span class="p">{</span><span class="s2">&quot;test/Entropy&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_id_entropy</span><span class="o">.</span><span class="n">compute</span><span class="p">()},</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
 
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">==</span> <span class="mi">1</span>
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibration_set</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cal_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">tmp_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts_cls_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="n">tmp_metrics</span><span class="p">,</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">result_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_metrics</span><span class="p">)</span>
@@ -773,7 +777,7 @@
                 <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
             <span class="n">tmp_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_id_ens_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="n">tmp_metrics</span><span class="p">,</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">result_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_metrics</span><span class="p">)</span>
@@ -786,7 +790,7 @@
             <span class="c1"># already logged</span>
             <span class="n">result_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;ood/Entropy&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_entropy</span><span class="o">.</span><span class="n">compute</span><span class="p">()})</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
                 <span class="n">tmp_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_ens_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="n">tmp_metrics</span><span class="p">,</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">result_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_metrics</span><span class="p">)</span>
@@ -800,7 +804,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span><span class="p">[</span><span class="s2">&quot;sc/AURC&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
             <span class="p">)</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cal_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
                     <span class="s2">&quot;Reliabity diagram after calibration&quot;</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">ts_cls_metrics</span><span class="p">[</span><span class="s2">&quot;cal/ECE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
@@ -849,17 +853,14 @@
 <span class="k">def</span> <span class="nf">_classification_routine_checks</span><span class="p">(</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
     <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">is_ensemble</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">ood_criterion</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">eval_grouping_loss</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">num_calibration_bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">mixup_params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">post_processing</span><span class="p">:</span> <span class="n">PostProcessing</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">format_batch_fn</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_estimators</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">num_estimators</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;The number of estimators must be a positive integer &gt;= 1.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="p">)</span>
-
     <span class="k">if</span> <span class="n">ood_criterion</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
         <span class="s2">&quot;msp&quot;</span><span class="p">,</span>
         <span class="s2">&quot;logit&quot;</span><span class="p">,</span>
@@ -873,13 +874,13 @@
             <span class="sa">f</span><span class="s2">&quot; &#39;mi&#39; or &#39;vr&#39;. Got </span><span class="si">{</span><span class="n">ood_criterion</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">num_estimators</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">ood_criterion</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;mi&quot;</span><span class="p">,</span> <span class="s2">&quot;vr&quot;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_ensemble</span> <span class="ow">and</span> <span class="n">ood_criterion</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;mi&quot;</span><span class="p">,</span> <span class="s2">&quot;vr&quot;</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;You cannot use mutual information or variation ratio with a single&quot;</span>
             <span class="s2">&quot; model.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">num_estimators</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">eval_grouping_loss</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">is_ensemble</span> <span class="ow">and</span> <span class="n">eval_grouping_loss</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
             <span class="s2">&quot;Groupng loss for ensembles is not yet implemented. Raise an issue if needed.&quot;</span>
         <span class="p">)</span>
@@ -907,6 +908,16 @@
     <span class="k">if</span> <span class="n">num_calibration_bins</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;num_calibration_bins must be at least 2, got </span><span class="si">{</span><span class="n">num_calibration_bins</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">mixup_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">format_batch_fn</span><span class="p">,</span> <span class="n">RepeatTarget</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Mixup is not supported for ensembles at training time. Please set mixup_params to None.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">is_ensemble</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Ensembles and post-processing methods cannot be used together. Raise an issue if needed.&quot;</span>
         <span class="p">)</span>
 </pre></div>
 

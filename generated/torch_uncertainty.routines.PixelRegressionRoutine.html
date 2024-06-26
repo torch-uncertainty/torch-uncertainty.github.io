@@ -41,7 +41,7 @@
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
   <link rel="next" title="ResNetBaseline" href="torch_uncertainty.baselines.classification.ResNetBaseline.html" />
-  <link rel="prev" title="SegmentationRoutine" href="torch_uncertainty.routines.SegmentationRoutine.html" />
+  <link rel="prev" title="RegressionRoutine" href="torch_uncertainty.routines.RegressionRoutine.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -262,8 +262,29 @@
 <h1>PixelRegressionRoutine<a class="headerlink" href="#pixelregressionroutine" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.routines.PixelRegressionRoutine">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.routines.</span></span><span class="sig-name descname"><span class="pre">PixelRegressionRoutine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probabilistic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_recipe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_batch_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_image_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/pixel_regression.html#PixelRegressionRoutine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.PixelRegressionRoutine" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py method">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.routines.</span></span><span class="sig-name descname"><span class="pre">PixelRegressionRoutine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probabilistic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_ensemble</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_batch_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_recipe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_image_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_plots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/pixel_regression.html#PixelRegressionRoutine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.PixelRegressionRoutine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine for training &amp; testing on <strong>pixel regression</strong> tasks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>nn.Module</em>) – Model to train.</p></li>
+<li><p><strong>output_dim</strong> (<em>int</em>) – Number of outputs of the model.</p></li>
+<li><p><strong>probabilistic</strong> (<em>bool</em>) – Whether the model is probabilistic, i.e.,
+outputs a PyTorch distribution.</p></li>
+<li><p><strong>loss</strong> (<em>nn.Module</em>) – Loss function to optimize the <code class="xref py py-attr docutils literal notranslate"><span class="pre">model</span></code>.</p></li>
+<li><p><strong>is_ensemble</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the model is an ensemble.
+Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>optim_recipe</strong> (<em>dict</em><em> or </em><em>Optimizer</em><em>, </em><em>optional</em>) – The optimizer and
+optionally the scheduler to use. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>format_batch_fn</strong> (<em>nn.Module</em><em>, </em><em>optional</em>) – The function to format the
+batch. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>num_image_plot</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of images to plot. Defaults to <code class="docutils literal notranslate"><span class="pre">4</span></code>.</p></li>
+<li><p><strong>log_plots</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to log plots from
+metrics. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.routines.PixelRegressionRoutine.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/pixel_regression.html#PixelRegressionRoutine.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.PixelRegressionRoutine.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Forward pass of the routine.</p>
@@ -299,7 +320,7 @@ is one-dimensional and if the routine contains a single model.</p>
         class="next-page"></a>
     
     
-    <a href="torch_uncertainty.routines.SegmentationRoutine.html" class="btn btn-neutral" title="SegmentationRoutine" accesskey="p"
+    <a href="torch_uncertainty.routines.RegressionRoutine.html" class="btn btn-neutral" title="RegressionRoutine" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>
