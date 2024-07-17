@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MCDropout &mdash; TorchUncertainty 0.2.1 documentation</title>
+  <title>MCDropout &mdash; TorchUncertainty 0.2.1.post0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -268,34 +268,52 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<em>nn.Module</em>) – model to wrap</p></li>
-<li><p><strong>num_estimators</strong> (<em>int</em>) – number of estimators to use</p></li>
+<li><p><strong>num_estimators</strong> (<em>int</em>) – number of estimators to use during the
+evaluation</p></li>
 <li><p><strong>last_layer</strong> (<em>bool</em>) – whether to apply dropout to the last layer only.</p></li>
-<li><p><strong>on_batch</strong> (<em>bool</em>) – Increase the batch_size to perform MC-Dropout.
-Otherwise in a for loop.</p></li>
+<li><p><strong>on_batch</strong> (<em>bool</em>) – Perform the MC-Dropout on the batch-size.
+Otherwise in a for loop. Useful when constrained in memory.</p></li>
 </ul>
 </dd>
 </dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Apply dropout using modules and not functional for this wrapper to
-work as intended.</p>
+<p>This module will work only if you apply dropout through modules
+declared in the constructor (__init__).</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The underlying models must have a non-zero <code class="xref py py-attr docutils literal notranslate"><span class="pre">dropout_rate</span></code>
-attribute.</p>
+<p>The <cite>last-layer</cite> option disables the lastly initialized dropout
+during evaluation: make sure that the last dropout is either
+functional or a module of its own.</p>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>For the <cite>last-layer</cite> option to work properly, the model must
-declare the last dropout at the end of the initialization
-(i.e. after all the other dropout layers).</p>
-</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.models.MCDropout.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/models/wrappers/mc_dropout.html#MCDropout.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.models.MCDropout.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass of the model.</p>
+<p>During training, the forward pass is the same as of the core model.
+During evaluation, the forward pass is repeated <cite>num_estimators</cite> times
+either on the batch size or in a for loop depending on
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">last_layer</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – input tensor of shape (B, …)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>output tensor of shape (<code class="xref py py-attr docutils literal notranslate"><span class="pre">num_estimators</span></code> * B, …)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.models.MCDropout.train">
 <span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/models/wrappers/mc_dropout.html#MCDropout.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.models.MCDropout.train" title="Permalink to this definition">¶</a></dt>
 <dd><p>Override the default train method to set the training mode of
-each submodule to be the same as the module itself.</p>
+each submodule to be the same as the module itself except for the
+selected dropout modules.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>mode</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to set the module to training
@@ -353,6 +371,7 @@ mode. Defaults to True.</p>
               <ul>
 <li><a class="reference internal" href="#">MCDropout</a><ul>
 <li><a class="reference internal" href="#torch_uncertainty.models.MCDropout"><code class="docutils literal notranslate"><span class="pre">MCDropout</span></code></a><ul>
+<li><a class="reference internal" href="#torch_uncertainty.models.MCDropout.forward"><code class="docutils literal notranslate"><span class="pre">MCDropout.forward()</span></code></a></li>
 <li><a class="reference internal" href="#torch_uncertainty.models.MCDropout.train"><code class="docutils literal notranslate"><span class="pre">MCDropout.train()</span></code></a></li>
 </ul>
 </li>

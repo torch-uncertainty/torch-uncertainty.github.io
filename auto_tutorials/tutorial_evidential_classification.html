@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Deep Evidential Classification on a Toy Example &mdash; TorchUncertainty 0.2.1 documentation</title>
+  <title>Deep Evidential Classification on a Toy Example &mdash; TorchUncertainty 0.2.1.post0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -280,10 +280,8 @@ to download the full example code.</p>
 <li><p>the evidential objective: the DECLoss from torch_uncertainty.losses</p></li>
 <li><p>the datamodule that handles dataloaders &amp; transforms: MNISTDataModule from torch_uncertainty.datamodules</p></li>
 </ul>
-<p>We also need to define an optimizer using torch.optim, the neural network utils within torch.nn, as well as the partial util to provide
-the modified default arguments for the DEC loss.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<p>We also need to define an optimizer using torch.optim, the neural network utils within torch.nn.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">lightning.pytorch</span> <span class="kn">import</span> <span class="n">Trainer</span>
@@ -328,11 +326,10 @@ original DEC paper. We only train for 3 epochs for the sake of time.</p>
 </section>
 <section id="the-loss-and-the-training-routine">
 <h3>4. The Loss and the Training Routine<a class="headerlink" href="#the-loss-and-the-training-routine" title="Permalink to this heading">¶</a></h3>
-<p>Next, we need to define the loss to be used during training. To do this, we
-redefine the default parameters for the DEC loss using the partial
-function from functools. After that, we define the training routine using
+<p>Next, we need to define the loss to be used during training.
+After that, we define the training routine using
 the single classification model training routine from
-torch_uncertainty.routines.classification.ClassificationSingle.
+torch_uncertainty.routines.ClassificationRoutine.
 In this routine, we provide the model, the DEC loss, the optimizer,
 and all the default arguments.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">loss</span> <span class="o">=</span> <span class="n">DECLoss</span><span class="p">(</span><span class="n">reg_weight</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">)</span>
@@ -358,18 +355,18 @@ and all the default arguments.</p>
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃        Test metric        ┃       DataLoader 0        ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│       test/cal/ECE        │    0.06083257868885994    │
-│       test/cal/aECE       │    0.0696539357304573     │
-│       test/cls/Acc        │    0.8414000272750854     │
-│      test/cls/Brier       │    0.20010608434677124    │
+│       test/cal/ECE        │   0.051117029041051865    │
+│       test/cal/aECE       │    0.05111684650182724    │
+│       test/cls/Acc        │    0.9424999952316284     │
+│      test/cls/Brier       │    0.10592764616012573    │
 │       test/cls/NLL        │            inf            │
-│     test/cls/entropy      │    0.14870017766952515    │
-│       test/sc/AURC        │   0.034919430916518474    │
-│    test/sc/CovAt5Risk     │    0.7932000160217285     │
-│    test/sc/RiskAt80Cov    │   0.054249998182058334    │
+│     test/cls/entropy      │    0.01571059785783291    │
+│       test/sc/AURC        │   0.016681041568517685    │
+│    test/sc/CovAt5Risk     │    0.9857000112533569     │
+│    test/sc/RiskAt80Cov    │   0.017625000327825546    │
 └───────────────────────────┴───────────────────────────┘
 
-[{&#39;test/cal/ECE&#39;: 0.06083257868885994, &#39;test/cal/aECE&#39;: 0.0696539357304573, &#39;test/cls/Acc&#39;: 0.8414000272750854, &#39;test/cls/Brier&#39;: 0.20010608434677124, &#39;test/cls/NLL&#39;: inf, &#39;test/sc/AURC&#39;: 0.034919430916518474, &#39;test/sc/CovAt5Risk&#39;: 0.7932000160217285, &#39;test/sc/RiskAt80Cov&#39;: 0.054249998182058334, &#39;test/cls/entropy&#39;: 0.14870017766952515}]
+[{&#39;test/cal/ECE&#39;: 0.051117029041051865, &#39;test/cal/aECE&#39;: 0.05111684650182724, &#39;test/cls/Acc&#39;: 0.9424999952316284, &#39;test/cls/Brier&#39;: 0.10592764616012573, &#39;test/cls/NLL&#39;: inf, &#39;test/sc/AURC&#39;: 0.016681041568517685, &#39;test/sc/CovAt5Risk&#39;: 0.9857000112533569, &#39;test/sc/RiskAt80Cov&#39;: 0.017625000327825546, &#39;test/cls/entropy&#39;: 0.01571059785783291}]
 </pre></div>
 </div>
 </section>
@@ -425,22 +422,22 @@ and all the default arguments.</p>
 </div>
 <img src="../_images/sphx_glr_tutorial_evidential_classification_001.png" srcset="../_images/sphx_glr_tutorial_evidential_classification_001.png" alt="tutorial evidential classification" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
 Ground truth:  7 2 1 0
-Predicted digits for the image 0: 7 with strength 68.3 and entropy 0.68.
-Predicted digits for the image 1: 0 with strength 10.0 and entropy 2.3.
-Predicted digits for the image 2: 1 with strength 90.2 and entropy 0.544.
-Predicted digits for the image 3: 0 with strength 40.9 and entropy 1.16.
+Predicted digits for the image 0: 0 with strength 10.0 and entropy 2.3.
+Predicted digits for the image 1: 2 with strength 90.3 and entropy 0.672.
+Predicted digits for the image 2: 1 with strength 83.3 and entropy 0.58.
+Predicted digits for the image 3: 0 with strength 68.4 and entropy 0.679.
 Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
 Ground truth:  7 2 1 0
-Predicted digits for the image 0: 4 with strength 33.4 and entropy 1.18.
-Predicted digits for the image 1: 4 with strength 31.3 and entropy 1.5.
-Predicted digits for the image 2: 1 with strength 12.0 and entropy 2.21.
-Predicted digits for the image 3: 0 with strength 42.3 and entropy 0.984.
+Predicted digits for the image 0: 4 with strength 12.4 and entropy 2.18.
+Predicted digits for the image 1: 0 with strength 24.8 and entropy 1.59.
+Predicted digits for the image 2: 8 with strength 13.5 and entropy 2.19.
+Predicted digits for the image 3: 0 with strength 61.7 and entropy 0.849.
 Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
 Ground truth:  7 2 1 0
-Predicted digits for the image 0: 0 with strength 20.5 and entropy 1.82.
-Predicted digits for the image 1: 4 with strength 43.8 and entropy 0.959.
-Predicted digits for the image 2: 7 with strength 25.9 and entropy 1.41.
-Predicted digits for the image 3: 0 with strength 39.3 and entropy 1.46.
+Predicted digits for the image 0: 6 with strength 29.3 and entropy 1.65.
+Predicted digits for the image 1: 4 with strength 54.4 and entropy 1.19.
+Predicted digits for the image 2: 2 with strength 17.8 and entropy 1.8.
+Predicted digits for the image 3: 0 with strength 61.7 and entropy 1.19.
 </pre></div>
 </div>
 </section>
@@ -448,9 +445,9 @@ Predicted digits for the image 3: 0 with strength 39.3 and entropy 1.46.
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Deep Evidential Classification:</strong> Murat Sensoy, Lance Kaplan, &amp; Melih Kandemir (2018). Evidential Deep Learning to Quantify Classification Uncertainty <a class="reference external" href="https://arxiv.org/pdf/1806.01768">NeurIPS 2018</a></p></li>
+<li><p><strong>Deep Evidential Classification:</strong> Murat Sensoy, Lance Kaplan, &amp; Melih Kandemir (2018). Evidential Deep Learning to Quantify Classification Uncertainty <a class="reference external" href="https://arxiv.org/pdf/1806.01768">NeurIPS 2018</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 53.925 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 55.576 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-evidential-classification-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9652bd96a002fb3887242f283d0d22de/tutorial_evidential_classification.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_evidential_classification.ipynb</span></code></a></p>

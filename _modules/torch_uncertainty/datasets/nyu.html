@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.datasets.nyu &mdash; TorchUncertainty 0.2.1 documentation</title>
+  <title>torch_uncertainty.datasets.nyu &mdash; TorchUncertainty 0.2.1.post0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -250,11 +250,11 @@
                 
   <h1>Source code for torch_uncertainty.datasets.nyu</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">util</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="kn">import</span> <span class="nn">cv2</span>
-<span class="kn">import</span> <span class="nn">h5py</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 <span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">tv_tensors</span>
@@ -264,6 +264,13 @@
     <span class="n">download_and_extract_archive</span><span class="p">,</span>
     <span class="n">download_url</span><span class="p">,</span>
 <span class="p">)</span>
+
+<span class="k">if</span> <span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;h5py&quot;</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">h5py</span>
+
+    <span class="n">h5py_installed</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">else</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
+    <span class="n">h5py_installed</span> <span class="o">=</span> <span class="kc">False</span>
 
 
 <div class="viewcode-block" id="NYUv2"><a class="viewcode-back" href="../../../generated/torch_uncertainty.datasets.NYUv2.html#torch_uncertainty.datasets.NYUv2">[docs]</a><span class="k">class</span> <span class="nc">NYUv2</span><span class="p">(</span><span class="n">VisionDataset</span><span class="p">):</span>
@@ -299,6 +306,12 @@
 <span class="sd">            max_depth (float): Maximum depth value. Defaults to 10.</span>
 <span class="sd">            download (bool): Download dataset if not found. Defaults to False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">h5py_installed</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+                <span class="s2">&quot;The h5py library is not installed. Please install&quot;</span>
+                <span class="s2">&quot;torch_uncertainty with the image option:&quot;</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;pip install -U &quot;torch_uncertainty[image]&quot;.&quot;&quot;&quot;</span>
+            <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;NYUv2&quot;</span><span class="p">,</span> <span class="n">transforms</span><span class="o">=</span><span class="n">transforms</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_depth</span> <span class="o">=</span> <span class="n">min_depth</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span> <span class="o">=</span> <span class="n">max_depth</span>

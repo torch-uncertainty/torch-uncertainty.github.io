@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>SWAG &mdash; TorchUncertainty 0.2.1 documentation</title>
+  <title>SWAG &mdash; TorchUncertainty 0.2.1.post0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -268,6 +268,10 @@
 <cite>cycle_start</cite>. Samples <code class="xref py py-attr docutils literal notranslate"><span class="pre">num_estimators</span></code> models from the SWAG
 posterior after each update. Uses the SWAG posterior estimation only
 at test time. Otherwise, uses the base model for training.</p>
+<p>Call <a class="reference internal" href="#torch_uncertainty.models.SWAG.update_wrapper" title="torch_uncertainty.models.SWAG.update_wrapper"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update_wrapper()</span></code></a> at the end of each epoch. It will update
+the SWAG posterior if the current epoch number minus <code class="xref py py-attr docutils literal notranslate"><span class="pre">cycle_start</span></code>
+is a multiple of <code class="xref py py-attr docutils literal notranslate"><span class="pre">cycle_length</span></code>. Call <a class="reference internal" href="#torch_uncertainty.models.SWAG.bn_update" title="torch_uncertainty.models.SWAG.bn_update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bn_update()</span></code></a> to update
+the batchnorm statistics of the current SWAG samples.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -310,9 +314,18 @@ deep learning. In NeurIPS 2019.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.models.SWAG.eval_forward">
+<span class="sig-name descname"><span class="pre">eval_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/models/wrappers/swag.html#SWAG.eval_forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.models.SWAG.eval_forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass of the SWAG model when in eval mode.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.models.SWAG.initialize_stats">
 <span class="sig-name descname"><span class="pre">initialize_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/models/wrappers/swag.html#SWAG.initialize_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.models.SWAG.initialize_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the SWAG dictionary of statistics.</p>
+<p>For each parameter, we create a mean, squared mean, and covariance
+square root. The covariance square root is only used when
+<cite>diag_covariance</cite> is False.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -337,6 +350,12 @@ covariance. Defaults to False.</p></li>
 <dd class="field-odd"><p>nn.Module</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.models.SWAG.state_dict">
+<span class="sig-name descname"><span class="pre">state_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/models/wrappers/swag.html#SWAG.state_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.models.SWAG.state_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the SWAG statistics to the state dict.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -403,8 +422,10 @@ of the cycle length.</p>
 <li><a class="reference internal" href="#">SWAG</a><ul>
 <li><a class="reference internal" href="#torch_uncertainty.models.SWAG"><code class="docutils literal notranslate"><span class="pre">SWAG</span></code></a><ul>
 <li><a class="reference internal" href="#torch_uncertainty.models.SWAG.bn_update"><code class="docutils literal notranslate"><span class="pre">SWAG.bn_update()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.models.SWAG.eval_forward"><code class="docutils literal notranslate"><span class="pre">SWAG.eval_forward()</span></code></a></li>
 <li><a class="reference internal" href="#torch_uncertainty.models.SWAG.initialize_stats"><code class="docutils literal notranslate"><span class="pre">SWAG.initialize_stats()</span></code></a></li>
 <li><a class="reference internal" href="#torch_uncertainty.models.SWAG.sample"><code class="docutils literal notranslate"><span class="pre">SWAG.sample()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.models.SWAG.state_dict"><code class="docutils literal notranslate"><span class="pre">SWAG.state_dict()</span></code></a></li>
 <li><a class="reference internal" href="#torch_uncertainty.models.SWAG.update_wrapper"><code class="docutils literal notranslate"><span class="pre">SWAG.update_wrapper()</span></code></a></li>
 </ul>
 </li>

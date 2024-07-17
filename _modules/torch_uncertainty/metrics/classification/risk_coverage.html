@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.metrics.classification.risk_coverage &mdash; TorchUncertainty 0.2.1 documentation</title>
+  <title>torch_uncertainty.metrics.classification.risk_coverage &mdash; TorchUncertainty 0.2.1.post0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -254,9 +254,9 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">auc</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torchmetrics.metric</span> <span class="kn">import</span> <span class="n">Metric</span>
+<span class="kn">from</span> <span class="nn">torchmetrics.utilities.compute</span> <span class="kn">import</span> <span class="n">_auc_compute</span>
 <span class="kn">from</span> <span class="nn">torchmetrics.utilities.data</span> <span class="kn">import</span> <span class="n">dim_zero_cat</span>
 <span class="kn">from</span> <span class="nn">torchmetrics.utilities.plot</span> <span class="kn">import</span> <span class="n">_AX_TYPE</span>
 
@@ -334,12 +334,15 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: The AURC.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">error_rates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">partial_compute</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+        <span class="n">error_rates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">partial_compute</span><span class="p">()</span>
         <span class="n">num_samples</span> <span class="o">=</span> <span class="n">error_rates</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_samples</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">auc</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">error_rates</span><span class="p">)],</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
-            <span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">num_samples</span>
-        <span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">num_samples</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)],</span> <span class="n">device</span><span class="o">=</span><span class="n">error_rates</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_samples</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">error_rates</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="o">/</span> <span class="n">num_samples</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">_auc_compute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">error_rates</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">num_samples</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AURC.plot"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -365,15 +368,15 @@
         <span class="c1"># Computation of AUSEC</span>
         <span class="n">error_rates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">partial_compute</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">num_samples</span> <span class="o">=</span> <span class="n">error_rates</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">rejection_rates</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
 
-        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span>
-        <span class="n">aurc</span> <span class="o">=</span> <span class="n">auc</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">error_rates</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span>
+        <span class="n">aurc</span> <span class="o">=</span> <span class="n">_auc_compute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">error_rates</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
         <span class="c1"># reduce plot size</span>
         <span class="n">plot_xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mi">100</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
-        <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">num_samples</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span>
-        <span class="n">rejection_rates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">plot_xs</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">rejection_rates</span><span class="p">)</span>
+        <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">num_samples</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span>
+
+        <span class="n">rejection_rates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">plot_xs</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
         <span class="n">error_rates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">plot_xs</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">error_rates</span><span class="p">)</span>
 
         <span class="c1"># plot</span>
@@ -387,7 +390,7 @@
             <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
                 <span class="mf">0.02</span><span class="p">,</span>
                 <span class="mf">0.95</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;AUSEC=</span><span class="si">{</span><span class="n">aurc</span><span class="si">:</span><span class="s2">.3%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;AUSEC=</span><span class="si">{</span><span class="n">aurc</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
                 <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span>
                 <span class="n">va</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
@@ -470,13 +473,16 @@
         <span class="n">scores</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">)</span>
         <span class="n">errors</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
         <span class="n">num_samples</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">num_samples</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)],</span> <span class="n">device</span><span class="o">=</span><span class="n">scores</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="n">error_rates</span> <span class="o">=</span> <span class="n">_aurc_rejection_rate_compute</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
         <span class="n">admissible_risks</span> <span class="o">=</span> <span class="p">(</span><span class="n">error_rates</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">risk_threshold</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span>
         <span class="n">max_cov_at_risk</span> <span class="o">=</span> <span class="n">admissible_risks</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+
         <span class="c1"># check if max_cov_at_risk is really admissible, if not return nan</span>
         <span class="n">risk</span> <span class="o">=</span> <span class="n">admissible_risks</span><span class="p">[</span><span class="n">max_cov_at_risk</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">risk</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">risk_threshold</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)])</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)],</span> <span class="n">device</span><span class="o">=</span><span class="n">scores</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">max_cov_at_risk</span> <span class="o">/</span> <span class="n">num_samples</span>
 
 

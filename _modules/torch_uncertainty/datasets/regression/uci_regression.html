@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.datasets.regression.uci_regression &mdash; TorchUncertainty 0.2.1 documentation</title>
+  <title>torch_uncertainty.datasets.regression.uci_regression &mdash; TorchUncertainty 0.2.1.post0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -256,6 +256,11 @@
 <span class="k">if</span> <span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;pandas&quot;</span><span class="p">):</span>
     <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
+    <span class="n">pandas_installed</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">else</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
+    <span class="n">pandas_installed</span> <span class="o">=</span> <span class="kc">False</span>
+
+
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
@@ -476,9 +481,10 @@
 
     <span class="k">def</span> <span class="nf">_make_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create dataset from extracted files.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;pandas&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pandas_installed</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                <span class="s2">&quot;Please install pandas manually to use the UCI datasets.&quot;</span>
+                <span class="s2">&quot;Please install torch_uncertainty with the tabular option:&quot;</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;pip install -U &quot;torch_uncertainty[tabular]&quot;.&quot;&quot;&quot;</span>
             <span class="p">)</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_appendix</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_name</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_name</span> <span class="o">==</span> <span class="s2">&quot;boston&quot;</span><span class="p">:</span>
