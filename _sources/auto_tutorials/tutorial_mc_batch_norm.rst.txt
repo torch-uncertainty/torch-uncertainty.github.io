@@ -41,7 +41,7 @@ First, we have to load the following utilities from TorchUncertainty:
 
 We also need import the neural network utils within `torch.nn`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-36
+.. GENERATED FROM PYTHON SOURCE LINES 26-37
 
 .. code-block:: Python
 
@@ -63,7 +63,7 @@ We also need import the neural network utils within `torch.nn`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-42
+.. GENERATED FROM PYTHON SOURCE LINES 38-43
 
 2. Creating the necessary variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,7 +71,7 @@ In the following, we define the root of the datasets and the
 logs. We also create the datamodule that handles the MNIST dataset
 dataloaders and transforms.
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-56
+.. GENERATED FROM PYTHON SOURCE LINES 43-57
 
 .. code-block:: Python
 
@@ -96,7 +96,7 @@ dataloaders and transforms.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-63
+.. GENERATED FROM PYTHON SOURCE LINES 58-64
 
 3. The Loss and the Training Routine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -105,7 +105,7 @@ We define the training routine using the classification training routine from
 torch_uncertainty.training.classification. We provide the number of classes,
 and the optimization recipe.
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-71
+.. GENERATED FROM PYTHON SOURCE LINES 64-72
 
 .. code-block:: Python
 
@@ -124,14 +124,14 @@ and the optimization recipe.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-76
+.. GENERATED FROM PYTHON SOURCE LINES 73-77
 
 4. Gathering Everything and Training the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 You can also save the results in a variable by saving the output of
 `trainer.test`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-80
+.. GENERATED FROM PYTHON SOURCE LINES 77-81
 
 .. code-block:: Python
 
@@ -153,21 +153,22 @@ You can also save the results in a variable by saving the output of
     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃        Test metric        ┃       DataLoader 0        ┃
     ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │       test/cal/ECE        │   0.005359123460948467    │
-    │       test/cal/aECE       │   0.0031696660444140434   │
-    │       test/cls/Acc        │    0.9696000218391418     │
-    │      test/cls/Brier       │    0.04561099782586098    │
-    │       test/cls/NLL        │    0.09344269335269928    │
-    │     test/cls/entropy      │    0.08572450280189514    │
-    │       test/sc/AURC        │   0.002173523185774684    │
+    │       test/cal/ECE        │   0.0033683213405311108   │
+    │       test/cal/aECE       │   0.0023463224060833454   │
+    │       test/cls/Acc        │    0.9775999784469604     │
+    │      test/cls/Brier       │    0.03513507544994354    │
+    │       test/cls/NLL        │    0.07319575548171997    │
+    │     test/cls/entropy      │    0.06545519828796387    │
+    │       test/sc/AUGRC       │   0.0012126312358304858   │
+    │       test/sc/AURC        │   0.0013845751527696848   │
     │    test/sc/CovAt5Risk     │            1.0            │
-    │    test/sc/RiskAt80Cov    │   0.0021250001154839993   │
+    │    test/sc/RiskAt80Cov    │   0.0010000000474974513   │
     └───────────────────────────┴───────────────────────────┘
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-90
+.. GENERATED FROM PYTHON SOURCE LINES 82-91
 
 5. Wrapping the Model in a MCBatchNorm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -179,7 +180,7 @@ The larger the ``mc_batch_size``, the more stochastic the predictions will be.
 The authors suggest 32 as a good value for ``mc_batch_size`` but we use 4 here
 to highlight the effect of stochasticity on the predictions.
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-97
+.. GENERATED FROM PYTHON SOURCE LINES 91-98
 
 .. code-block:: Python
 
@@ -197,19 +198,19 @@ to highlight the effect of stochasticity on the predictions.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-107
+.. GENERATED FROM PYTHON SOURCE LINES 99-108
 
 6. Testing the Model
 ~~~~~~~~~~~~~~~~~~~~
 Now that the model is trained, let's test it on MNIST. Don't forget to call
-.eval() to enable Monte Carlo batch normalization at inference.
+.eval() to enable Monte Carlo batch normalization at evaluation (sometimes called inference).
 In this tutorial, we plot the most uncertain images, i.e. the images for which
 the variance of the predictions is the highest.
 Please note that we apply a reshape to the logits to determine the dimension corresponding to the ensemble
 and to the batch. As for TorchUncertainty 2.0, the ensemble dimension is merged with the batch dimension
 in this order (num_estimator x batch, classes).
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-142
+.. GENERATED FROM PYTHON SOURCE LINES 108-143
 
 .. code-block:: Python
 
@@ -263,15 +264,15 @@ in this order (num_estimator x batch, classes).
 
     Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
     Ground truth:  7 2 1 0
-    Predicted digits for the image 78:  9 9 8 9 9 8 9 9
-    Predicted digits for the image 96:  8 1 1 1 1 1 1 1
-    Predicted digits for the image 115:  9 4 4 9 9 9 4 9
-    Predicted digits for the image 121:  8 4 4 4 4 8 4 4
+    Predicted digits for the image 73:  9 9 9 9 9 9 9 8
+    Predicted digits for the image 104:  9 9 9 9 5 9 5 5
+    Predicted digits for the image 115:  4 4 4 4 4 4 4 4
+    Predicted digits for the image 119:  7 7 7 7 7 7 7 2
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-147
+.. GENERATED FROM PYTHON SOURCE LINES 144-148
 
 The predictions are mostly erroneous, which is expected since we selected
 the most uncertain images. We also see that there stochasticity in the
@@ -281,7 +282,7 @@ stochastic estimator used.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 36.712 seconds)
+   **Total running time of the script:** (0 minutes 35.444 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_mc_batch_norm.py:

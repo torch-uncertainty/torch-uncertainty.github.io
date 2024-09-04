@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.datamodules.classification.tiny_imagenet &mdash; TorchUncertainty 0.2.1.post0 documentation</title>
+  <title>torch_uncertainty.datamodules.classification.tiny_imagenet &mdash; TorchUncertainty 0.2.2 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -281,6 +281,7 @@
         <span class="n">val_split</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ood_ds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;svhn&quot;</span><span class="p">,</span>
         <span class="n">interpolation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bilinear&quot;</span><span class="p">,</span>
+        <span class="n">basic_augment</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">rand_augment_opt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">pin_memory</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -295,7 +296,6 @@
             <span class="n">persistent_workers</span><span class="o">=</span><span class="n">persistent_workers</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="c1"># TODO: COMPUTE STATS</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="o">=</span> <span class="n">eval_ood</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ood_ds</span> <span class="o">=</span> <span class="n">ood_ds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">=</span> <span class="n">interpolation_modes_from_str</span><span class="p">(</span><span class="n">interpolation</span><span class="p">)</span>
@@ -313,6 +313,16 @@
                 <span class="sa">f</span><span class="s2">&quot;OOD dataset </span><span class="si">{</span><span class="n">ood_ds</span><span class="si">}</span><span class="s2"> not supported for TinyImageNet.&quot;</span>
             <span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">basic_augment</span><span class="p">:</span>
+            <span class="n">basic_transform</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">T</span><span class="o">.</span><span class="n">RandomCrop</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
+                    <span class="n">T</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">basic_transform</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
+
         <span class="k">if</span> <span class="n">rand_augment_opt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">main_transform</span> <span class="o">=</span> <span class="n">rand_augment_transform</span><span class="p">(</span><span class="n">rand_augment_opt</span><span class="p">,</span> <span class="p">{})</span>
         <span class="k">else</span><span class="p">:</span>
@@ -320,8 +330,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="n">T</span><span class="o">.</span><span class="n">RandomCrop</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
-                <span class="n">T</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
+                <span class="n">basic_transform</span><span class="p">,</span>
                 <span class="n">main_transform</span><span class="p">,</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">)),</span>

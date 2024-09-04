@@ -43,7 +43,7 @@ To train a LeNet with the DEC loss function using TorchUncertainty, we have to l
 
 We also need to define an optimizer using torch.optim, the neural network utils within torch.nn.
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-39
+.. GENERATED FROM PYTHON SOURCE LINES 28-40
 
 .. code-block:: Python
 
@@ -66,14 +66,14 @@ We also need to define an optimizer using torch.optim, the neural network utils 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-44
+.. GENERATED FROM PYTHON SOURCE LINES 41-45
 
 2. Creating the Optimizer Wrapper
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We follow the official implementation in DEC, use the Adam optimizer
 with the default learning rate of 0.001 and a step scheduler.
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-50
+.. GENERATED FROM PYTHON SOURCE LINES 45-51
 
 .. code-block:: Python
 
@@ -90,7 +90,7 @@ with the default learning rate of 0.001 and a step scheduler.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-58
+.. GENERATED FROM PYTHON SOURCE LINES 52-59
 
 3. Creating the necessary variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -100,7 +100,7 @@ fake-parse the arguments needed for using the PyTorch Lightning Trainer. We
 also use the same MNIST classification example as that used in the
 original DEC paper. We only train for 3 epochs for the sake of time.
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-69
+.. GENERATED FROM PYTHON SOURCE LINES 59-70
 
 .. code-block:: Python
 
@@ -122,7 +122,7 @@ original DEC paper. We only train for 3 epochs for the sake of time.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-78
+.. GENERATED FROM PYTHON SOURCE LINES 71-79
 
 4. The Loss and the Training Routine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -133,7 +133,7 @@ torch_uncertainty.routines.ClassificationRoutine.
 In this routine, we provide the model, the DEC loss, the optimizer,
 and all the default arguments.
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-88
+.. GENERATED FROM PYTHON SOURCE LINES 79-89
 
 .. code-block:: Python
 
@@ -154,12 +154,12 @@ and all the default arguments.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-91
+.. GENERATED FROM PYTHON SOURCE LINES 90-92
 
 5. Gathering Everything and Training the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-95
+.. GENERATED FROM PYTHON SOURCE LINES 92-96
 
 .. code-block:: Python
 
@@ -181,28 +181,29 @@ and all the default arguments.
     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃        Test metric        ┃       DataLoader 0        ┃
     ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │       test/cal/ECE        │    0.18223567306995392    │
-    │       test/cal/aECE       │    0.18187206983566284    │
-    │       test/cls/Acc        │    0.6692000031471252     │
-    │      test/cls/Brier       │    0.4479137063026428     │
-    │       test/cls/NLL        │            inf            │
-    │     test/cls/entropy      │    0.3542986512184143     │
-    │       test/sc/AURC        │    0.09185262769460678    │
-    │    test/sc/CovAt5Risk     │    0.6008000373840332     │
-    │    test/sc/RiskAt80Cov    │    0.20225000381469727    │
+    │       test/cal/ECE        │    0.1281798779964447     │
+    │       test/cal/aECE       │    0.1251538246870041     │
+    │       test/cls/Acc        │    0.8468000292778015     │
+    │      test/cls/Brier       │    0.2868146598339081     │
+    │       test/cls/NLL        │     1.340763807296753     │
+    │     test/cls/entropy      │    0.08219337463378906    │
+    │       test/sc/AUGRC       │    0.03284154459834099    │
+    │       test/sc/AURC        │    0.04903455078601837    │
+    │    test/sc/CovAt5Risk     │    0.7705000042915344     │
+    │    test/sc/RiskAt80Cov    │    0.07599999755620956    │
     └───────────────────────────┴───────────────────────────┘
 
-    [{'test/cal/ECE': 0.18223567306995392, 'test/cal/aECE': 0.18187206983566284, 'test/cls/Acc': 0.6692000031471252, 'test/cls/Brier': 0.4479137063026428, 'test/cls/NLL': inf, 'test/sc/AURC': 0.09185262769460678, 'test/sc/CovAt5Risk': 0.6008000373840332, 'test/sc/RiskAt80Cov': 0.20225000381469727, 'test/cls/entropy': 0.3542986512184143}]
+    [{'test/cal/ECE': 0.1281798779964447, 'test/cal/aECE': 0.1251538246870041, 'test/cls/Acc': 0.8468000292778015, 'test/cls/Brier': 0.2868146598339081, 'test/cls/NLL': 1.340763807296753, 'test/sc/AUGRC': 0.03284154459834099, 'test/sc/AURC': 0.04903455078601837, 'test/sc/CovAt5Risk': 0.7705000042915344, 'test/sc/RiskAt80Cov': 0.07599999755620956, 'test/cls/entropy': 0.08219337463378906}]
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-99
+.. GENERATED FROM PYTHON SOURCE LINES 97-100
 
 6. Testing the Model
 ~~~~~~~~~~~~~~~~~~~~
 Now that the model is trained, let's test it on MNIST.
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-146
+.. GENERATED FROM PYTHON SOURCE LINES 100-147
 
 .. code-block:: Python
 
@@ -266,29 +267,26 @@ Now that the model is trained, let's test it on MNIST.
 
  .. code-block:: none
 
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
     Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 0 with strength 10.0 and entropy 2.3.
-    Predicted digits for the image 1: 2 with strength 39.3 and entropy 1.04.
-    Predicted digits for the image 2: 1 with strength 78.9 and entropy 0.606.
+    Predicted digits for the image 0: 7 with strength 73.6 and entropy 0.64.
+    Predicted digits for the image 1: 2 with strength 70.1 and entropy 0.665.
+    Predicted digits for the image 2: 0 with strength 10.0 and entropy 2.3.
+    Predicted digits for the image 3: 6 with strength 10.5 and entropy 2.29.
+    Ground truth:  7 2 1 0
+    Predicted digits for the image 0: 4 with strength 15.0 and entropy 1.99.
+    Predicted digits for the image 1: 4 with strength 19.4 and entropy 1.92.
+    Predicted digits for the image 2: 8 with strength 21.7 and entropy 1.7.
     Predicted digits for the image 3: 0 with strength 10.0 and entropy 2.3.
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
     Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 4 with strength 30.1 and entropy 1.37.
-    Predicted digits for the image 1: 4 with strength 31.0 and entropy 1.24.
-    Predicted digits for the image 2: 1 with strength 19.1 and entropy 1.72.
-    Predicted digits for the image 3: 0 with strength 10.0 and entropy 2.3.
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
-    Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 0 with strength 10.0 and entropy 2.3.
-    Predicted digits for the image 1: 4 with strength 47.6 and entropy 1.36.
-    Predicted digits for the image 2: 2 with strength 25.0 and entropy 1.44.
-    Predicted digits for the image 3: 9 with strength 20.0 and entropy 1.68.
+    Predicted digits for the image 0: 4 with strength 13.4 and entropy 2.11.
+    Predicted digits for the image 1: 4 with strength 73.7 and entropy 1.18.
+    Predicted digits for the image 2: 7 with strength 56.1 and entropy 1.5.
+    Predicted digits for the image 3: 9 with strength 29.1 and entropy 1.3.
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-151
+.. GENERATED FROM PYTHON SOURCE LINES 148-152
 
 References
 ----------
@@ -298,7 +296,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 53.104 seconds)
+   **Total running time of the script:** (0 minutes 52.851 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_evidential_classification.py:

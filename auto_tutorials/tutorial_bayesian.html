@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Train a Bayesian Neural Network in Three Minutes &mdash; TorchUncertainty 0.2.1.post0 documentation</title>
+  <title>Train a Bayesian Neural Network in Three Minutes &mdash; TorchUncertainty 0.2.2 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -40,8 +40,8 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Corrupting Images with TorchUncertainty to Benchmark Robustness" href="tutorial_corruption.html" />
-  <link rel="prev" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
+  <link rel="next" title="Deep Evidential Classification on a Toy Example" href="tutorial_evidential_classification.html" />
+  <link rel="prev" title="Corrupting Images with TorchUncertainty to Benchmark Robustness" href="tutorial_corruption.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -280,7 +280,7 @@ seen as Dirac distributions on the weights.</p>
 </section>
 <section id="training-a-bayesian-lenet-using-torchuncertainty-models-and-lightning">
 <h2>Training a Bayesian LeNet using TorchUncertainty models and Lightning<a class="headerlink" href="#training-a-bayesian-lenet-using-torchuncertainty-models-and-lightning" title="Permalink to this heading">¶</a></h2>
-<p>In this part, we train a bayesian LeNet, based on the model and routines already implemented in TU.</p>
+<p>In this part, we train a Bayesian LeNet, based on the model and routines already implemented in TU.</p>
 <section id="loading-the-utilities">
 <h3>1. Loading the utilities<a class="headerlink" href="#loading-the-utilities" title="Permalink to this heading">¶</a></h3>
 <p>To train a BNN using TorchUncertainty, we have to load the following modules:</p>
@@ -288,12 +288,11 @@ seen as Dirac distributions on the weights.</p>
 <li><p>the Trainer from Lightning</p></li>
 <li><p>the model: bayesian_lenet, which lies in the torch_uncertainty.model</p></li>
 <li><p>the classification training routine from torch_uncertainty.routines</p></li>
-<li><p>the bayesian objective: the ELBOLoss, which lies in the torch_uncertainty.losses file</p></li>
+<li><p>the Bayesian objective: the ELBOLoss, which lies in the torch_uncertainty.losses file</p></li>
 <li><p>the datamodule that handles dataloaders: MNISTDataModule from torch_uncertainty.datamodules</p></li>
 </ul>
-<p>We will also need to define an optimizer using torch.optim, the
-neural network utils from torch.nn, as well as the partial util to provide
-the modified default arguments for the ELBO loss.</p>
+<p>We will also need to define an optimizer using torch.optim and Pytorch’s
+neural network utils from torch.nn.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span> <span class="nn">lightning.pytorch</span> <span class="kn">import</span> <span class="n">Trainer</span>
@@ -348,7 +347,7 @@ loss and the optimizer to the routine.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">loss</span> <span class="o">=</span> <span class="n">ELBOLoss</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
     <span class="n">inner_loss</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">(),</span>
-    <span class="n">kl_weight</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">50000</span><span class="p">,</span>
+    <span class="n">kl_weight</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">10000</span><span class="p">,</span>
     <span class="n">num_samples</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -380,21 +379,22 @@ logs will be saved in the root/logs folder.</p>
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃        Test metric        ┃       DataLoader 0        ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│       test/cal/ECE        │    0.01932930015027523    │
-│       test/cal/aECE       │    0.01806747354567051    │
-│       test/cls/Acc        │    0.9588000178337097     │
-│      test/cls/Brier       │    0.0632113367319107     │
-│       test/cls/NLL        │    0.13375651836395264    │
-│     test/cls/entropy      │    0.19301338493824005    │
-│   test/ens_Disagreement   │   0.004691667389124632    │
-│     test/ens_Entropy      │    0.1922835111618042     │
-│        test/ens_MI        │   0.0007298928103409708   │
-│       test/sc/AURC        │   0.0031919251196086407   │
+│       test/cal/ECE        │   0.014166461303830147    │
+│       test/cal/aECE       │   0.013968216255307198    │
+│       test/cls/Acc        │    0.9567000269889832     │
+│      test/cls/Brier       │    0.0674557015299797     │
+│       test/cls/NLL        │    0.14276862144470215    │
+│     test/cls/entropy      │    0.1845618039369583     │
+│   test/ens_Disagreement   │   0.0067833345383405685   │
+│     test/ens_Entropy      │    0.18382255733013153    │
+│        test/ens_MI        │   0.0007392223342321813   │
+│       test/sc/AUGRC       │   0.0031934045255184174   │
+│       test/sc/AURC        │   0.0034860761370509863   │
 │    test/sc/CovAt5Risk     │            1.0            │
-│    test/sc/RiskAt80Cov    │   0.0032500000670552254   │
+│    test/sc/RiskAt80Cov    │   0.003874999936670065    │
 └───────────────────────────┴───────────────────────────┘
 
-[{&#39;test/cal/ECE&#39;: 0.01932930015027523, &#39;test/cal/aECE&#39;: 0.01806747354567051, &#39;test/cls/Acc&#39;: 0.9588000178337097, &#39;test/cls/Brier&#39;: 0.0632113367319107, &#39;test/cls/NLL&#39;: 0.13375651836395264, &#39;test/sc/AURC&#39;: 0.0031919251196086407, &#39;test/sc/CovAt5Risk&#39;: 1.0, &#39;test/sc/RiskAt80Cov&#39;: 0.0032500000670552254, &#39;test/cls/entropy&#39;: 0.19301338493824005, &#39;test/ens_Disagreement&#39;: 0.004691667389124632, &#39;test/ens_Entropy&#39;: 0.1922835111618042, &#39;test/ens_MI&#39;: 0.0007298928103409708}]
+[{&#39;test/cal/ECE&#39;: 0.014166461303830147, &#39;test/cal/aECE&#39;: 0.013968216255307198, &#39;test/cls/Acc&#39;: 0.9567000269889832, &#39;test/cls/Brier&#39;: 0.0674557015299797, &#39;test/cls/NLL&#39;: 0.14276862144470215, &#39;test/sc/AUGRC&#39;: 0.0031934045255184174, &#39;test/sc/AURC&#39;: 0.0034860761370509863, &#39;test/sc/CovAt5Risk&#39;: 1.0, &#39;test/sc/RiskAt80Cov&#39;: 0.003874999936670065, &#39;test/cls/entropy&#39;: 0.1845618039369583, &#39;test/ens_Disagreement&#39;: 0.0067833345383405685, &#39;test/ens_Entropy&#39;: 0.18382255733013153, &#39;test/ens_MI&#39;: 0.0007392223342321813}]
 </pre></div>
 </div>
 </section>
@@ -440,10 +440,9 @@ in this order (num_estimator x batch, classes).</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Std. dev. of the scores over the posterior samples&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var_probs</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">predicted</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s2">.3</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_tutorial_bayesian_001.png" srcset="../_images/sphx_glr_tutorial_bayesian_001.png" alt="tutorial bayesian" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
-Ground truth:  7 2 1 0
+<img src="../_images/sphx_glr_tutorial_bayesian_001.png" srcset="../_images/sphx_glr_tutorial_bayesian_001.png" alt="tutorial bayesian" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ground truth:  7 2 1 0
 Predicted digits:  7 2 1 0
-Std. dev. of the scores over the posterior samples 1.47e-05 0.00242 0.000672 0.0418
+Std. dev. of the scores over the posterior samples 0.000122 0.00136 0.00147 0.00332
 </pre></div>
 </div>
 <p>Here, we show the variance of the top prediction. This is a non-standard but intuitive way to show the diversity of the predictions
@@ -458,7 +457,7 @@ of the ensemble. Ideally, the variance should be high when the average top predi
 <li><p><strong>The Adam optimizer:</strong> Kingma, D. P., &amp; Ba, J. (2014). “Adam: A method for stochastic optimization.” <a class="reference external" href="https://arxiv.org/pdf/1412.6980.pdf">ICLR 2015</a>.</p></li>
 <li><p><strong>The Blitz</strong> <a class="reference external" href="https://github.com/piEsposito/blitz-bayesian-deep-learning">library</a> (for the hyperparameters).</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 52.787 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 54.962 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-bayesian-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/f43d536d36d9261bef3ab9c0808ea674/tutorial_bayesian.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_bayesian.ipynb</span></code></a></p>
@@ -482,12 +481,12 @@ of the ensemble. Ideally, the variance should be high when the average top predi
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="tutorial_corruption.html" class="btn btn-neutral float-right" title="Corrupting Images with TorchUncertainty to Benchmark Robustness" accesskey="n"
+    <a href="tutorial_evidential_classification.html" class="btn btn-neutral float-right" title="Deep Evidential Classification on a Toy Example" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     
     
-    <a href="tutorial_der_cubic.html" class="btn btn-neutral" title="Deep Evidential Regression on a Toy Example" accesskey="p"
+    <a href="tutorial_corruption.html" class="btn btn-neutral" title="Corrupting Images with TorchUncertainty to Benchmark Robustness" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>

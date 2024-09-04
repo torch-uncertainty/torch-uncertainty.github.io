@@ -39,7 +39,7 @@ For more information on Bayesian Neural Networks, we refer the reader to the fol
 Training a Bayesian LeNet using TorchUncertainty models and Lightning
 ---------------------------------------------------------------------
 
-In this part, we train a bayesian LeNet, based on the model and routines already implemented in TU.
+In this part, we train a Bayesian LeNet, based on the model and routines already implemented in TU.
 
 1. Loading the utilities
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -49,12 +49,11 @@ To train a BNN using TorchUncertainty, we have to load the following modules:
 - the Trainer from Lightning
 - the model: bayesian_lenet, which lies in the torch_uncertainty.model
 - the classification training routine from torch_uncertainty.routines
-- the bayesian objective: the ELBOLoss, which lies in the torch_uncertainty.losses file
+- the Bayesian objective: the ELBOLoss, which lies in the torch_uncertainty.losses file
 - the datamodule that handles dataloaders: MNISTDataModule from torch_uncertainty.datamodules
 
-We will also need to define an optimizer using torch.optim, the
-neural network utils from torch.nn, as well as the partial util to provide
-the modified default arguments for the ELBO loss.
+We will also need to define an optimizer using torch.optim and Pytorch's
+neural network utils from torch.nn.
 
 .. GENERATED FROM PYTHON SOURCE LINES 40-50
 
@@ -156,7 +155,7 @@ loss and the optimizer to the routine.
     loss = ELBOLoss(
         model=model,
         inner_loss=nn.CrossEntropyLoss(),
-        kl_weight=1 / 50000,
+        kl_weight=1 / 10000,
         num_samples=3,
     )
 
@@ -209,21 +208,22 @@ logs will be saved in the root/logs folder.
     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃        Test metric        ┃       DataLoader 0        ┃
     ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │       test/cal/ECE        │    0.01932930015027523    │
-    │       test/cal/aECE       │    0.01806747354567051    │
-    │       test/cls/Acc        │    0.9588000178337097     │
-    │      test/cls/Brier       │    0.0632113367319107     │
-    │       test/cls/NLL        │    0.13375651836395264    │
-    │     test/cls/entropy      │    0.19301338493824005    │
-    │   test/ens_Disagreement   │   0.004691667389124632    │
-    │     test/ens_Entropy      │    0.1922835111618042     │
-    │        test/ens_MI        │   0.0007298928103409708   │
-    │       test/sc/AURC        │   0.0031919251196086407   │
+    │       test/cal/ECE        │   0.014166461303830147    │
+    │       test/cal/aECE       │   0.013968216255307198    │
+    │       test/cls/Acc        │    0.9567000269889832     │
+    │      test/cls/Brier       │    0.0674557015299797     │
+    │       test/cls/NLL        │    0.14276862144470215    │
+    │     test/cls/entropy      │    0.1845618039369583     │
+    │   test/ens_Disagreement   │   0.0067833345383405685   │
+    │     test/ens_Entropy      │    0.18382255733013153    │
+    │        test/ens_MI        │   0.0007392223342321813   │
+    │       test/sc/AUGRC       │   0.0031934045255184174   │
+    │       test/sc/AURC        │   0.0034860761370509863   │
     │    test/sc/CovAt5Risk     │            1.0            │
-    │    test/sc/RiskAt80Cov    │   0.0032500000670552254   │
+    │    test/sc/RiskAt80Cov    │   0.003874999936670065    │
     └───────────────────────────┴───────────────────────────┘
 
-    [{'test/cal/ECE': 0.01932930015027523, 'test/cal/aECE': 0.01806747354567051, 'test/cls/Acc': 0.9588000178337097, 'test/cls/Brier': 0.0632113367319107, 'test/cls/NLL': 0.13375651836395264, 'test/sc/AURC': 0.0031919251196086407, 'test/sc/CovAt5Risk': 1.0, 'test/sc/RiskAt80Cov': 0.0032500000670552254, 'test/cls/entropy': 0.19301338493824005, 'test/ens_Disagreement': 0.004691667389124632, 'test/ens_Entropy': 0.1922835111618042, 'test/ens_MI': 0.0007298928103409708}]
+    [{'test/cal/ECE': 0.014166461303830147, 'test/cal/aECE': 0.013968216255307198, 'test/cls/Acc': 0.9567000269889832, 'test/cls/Brier': 0.0674557015299797, 'test/cls/NLL': 0.14276862144470215, 'test/sc/AUGRC': 0.0031934045255184174, 'test/sc/AURC': 0.0034860761370509863, 'test/sc/CovAt5Risk': 1.0, 'test/sc/RiskAt80Cov': 0.003874999936670065, 'test/cls/entropy': 0.1845618039369583, 'test/ens_Disagreement': 0.0067833345383405685, 'test/ens_Entropy': 0.18382255733013153, 'test/ens_MI': 0.0007392223342321813}]
 
 
 
@@ -288,10 +288,9 @@ in this order (num_estimator x batch, classes).
 
  .. code-block:: none
 
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
     Ground truth:  7 2 1 0
     Predicted digits:  7 2 1 0
-    Std. dev. of the scores over the posterior samples 1.47e-05 0.00242 0.000672 0.0418
+    Std. dev. of the scores over the posterior samples 0.000122 0.00136 0.00147 0.00332
 
 
 
@@ -312,7 +311,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 52.787 seconds)
+   **Total running time of the script:** (0 minutes 54.962 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_bayesian.py:

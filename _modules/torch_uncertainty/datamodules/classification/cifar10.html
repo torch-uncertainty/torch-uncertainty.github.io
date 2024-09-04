@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.datamodules.classification.cifar10 &mdash; TorchUncertainty 0.2.1.post0 documentation</title>
+  <title>torch_uncertainty.datamodules.classification.cifar10 &mdash; TorchUncertainty 0.2.2 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -280,6 +280,7 @@
         <span class="n">eval_ood</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">val_split</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">basic_augment</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">cutout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">auto_augment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">test_alt</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -298,6 +299,8 @@
 <span class="sd">                to ``0.0``.</span>
 <span class="sd">            num_workers (int): Number of workers to use for data loading. Defaults</span>
 <span class="sd">                to ``1``.</span>
+<span class="sd">            basic_augment (bool): Whether to apply base augmentations. Defaults to</span>
+<span class="sd">                ``True``.</span>
 <span class="sd">            cutout (int): Size of cutout to apply to images. Defaults to ``None``.</span>
 <span class="sd">            randaugment (bool): Whether to apply RandAugment. Defaults to</span>
 <span class="sd">                ``False``.</span>
@@ -340,6 +343,16 @@
                 <span class="s2">&quot;GitHub issue if needed.&quot;</span>
             <span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">basic_augment</span><span class="p">:</span>
+            <span class="n">basic_transform</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">T</span><span class="o">.</span><span class="n">RandomCrop</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
+                    <span class="n">T</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">basic_transform</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
+
         <span class="k">if</span> <span class="n">cutout</span><span class="p">:</span>
             <span class="n">main_transform</span> <span class="o">=</span> <span class="n">Cutout</span><span class="p">(</span><span class="n">cutout</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">auto_augment</span><span class="p">:</span>
@@ -349,8 +362,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="n">T</span><span class="o">.</span><span class="n">RandomCrop</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
-                <span class="n">T</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
+                <span class="n">basic_transform</span><span class="p">,</span>
                 <span class="n">main_transform</span><span class="p">,</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span>

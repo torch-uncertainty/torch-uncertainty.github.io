@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.routines.regression &mdash; TorchUncertainty 0.2.1.post0 documentation</title>
+  <title>torch_uncertainty.routines.regression &mdash; TorchUncertainty 0.2.2 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -262,6 +262,7 @@
 <span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Optimizer</span>
 <span class="kn">from</span> <span class="nn">torchmetrics</span> <span class="kn">import</span> <span class="n">MeanAbsoluteError</span><span class="p">,</span> <span class="n">MeanSquaredError</span><span class="p">,</span> <span class="n">MetricCollection</span>
 
+<span class="kn">from</span> <span class="nn">torch_uncertainty.losses</span> <span class="kn">import</span> <span class="n">ELBOLoss</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.metrics</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">DistributionNLL</span><span class="p">,</span>
 <span class="p">)</span>
@@ -405,12 +406,16 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">STEP_OUTPUT</span><span class="p">:</span>
         <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_batch_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
-        <span class="n">dists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">one_dim_regression</span><span class="p">:</span>
             <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">dists</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">ELBOLoss</span><span class="p">):</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">dists</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">needs_step_update</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">update_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;train_loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">)</span>
@@ -433,7 +438,6 @@
                     <span class="n">dist_size</span><span class="p">(</span><span class="n">preds</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
                 <span class="p">)</span>
             <span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">ens_dist</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">ens_dist</span><span class="p">))</span>
             <span class="n">mixture</span> <span class="o">=</span> <span class="n">MixtureSameFamily</span><span class="p">(</span><span class="n">mix</span><span class="p">,</span> <span class="n">ens_dist</span><span class="p">)</span>
             <span class="n">preds</span> <span class="o">=</span> <span class="n">mixture</span><span class="o">.</span><span class="n">mean</span>
         <span class="k">else</span><span class="p">:</span>

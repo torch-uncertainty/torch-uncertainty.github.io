@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Corrupting Images with TorchUncertainty to Benchmark Robustness &mdash; TorchUncertainty 0.2.1.post0 documentation</title>
+  <title>Corrupting Images with TorchUncertainty to Benchmark Robustness &mdash; TorchUncertainty 0.2.2 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -40,8 +40,8 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Deep Evidential Classification on a Toy Example" href="tutorial_evidential_classification.html" />
-  <link rel="prev" title="Train a Bayesian Neural Network in Three Minutes" href="tutorial_bayesian.html" />
+  <link rel="next" title="Train a Bayesian Neural Network in Three Minutes" href="tutorial_bayesian.html" />
+  <link rel="prev" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -265,12 +265,12 @@ to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="corrupting-images-with-torchuncertainty-to-benchmark-robustness">
 <span id="sphx-glr-auto-tutorials-tutorial-corruption-py"></span><h1>Corrupting Images with TorchUncertainty to Benchmark Robustness<a class="headerlink" href="#corrupting-images-with-torchuncertainty-to-benchmark-robustness" title="Permalink to this heading">¶</a></h1>
-<p>This tutorial shows the impact of the different corruptions available in the
-TorchUncertainty library. These corruptions were first proposed in the paper
+<p>This tutorial shows the impact of the different corruption transforms available in the
+TorchUncertainty library. These corruption transforms were first proposed in the paper
 Benchmarking Neural Network Robustness to Common Corruptions and Perturbations
 by Dan Hendrycks and Thomas Dietterich.</p>
 <p>For this tutorial, we will only load the corruption transforms available in
-torch_uncertainty.transforms.corruptions. We also need to load utilities from
+torch_uncertainty.transforms.corruption. We also need to load utilities from
 torchvision and matplotlib.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchvision.datasets</span> <span class="kn">import</span> <span class="n">CIFAR10</span>
 <span class="kn">from</span> <span class="nn">torchvision.transforms</span> <span class="kn">import</span> <span class="n">Compose</span><span class="p">,</span> <span class="n">ToTensor</span><span class="p">,</span> <span class="n">Resize</span>
@@ -321,28 +321,36 @@ torchvision and matplotlib.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ./data/cifar-10-python.tar.gz
 
   0%|          | 0/170498071 [00:00&lt;?, ?it/s]
-  1%|          | 917504/170498071 [00:00&lt;00:20, 8142996.76it/s]
-  6%|▋         | 10780672/170498071 [00:00&lt;00:02, 58697876.27it/s]
- 13%|█▎        | 22380544/170498071 [00:00&lt;00:01, 84124068.93it/s]
- 20%|█▉        | 33914880/170498071 [00:00&lt;00:01, 96187921.43it/s]
- 27%|██▋       | 45481984/170498071 [00:00&lt;00:01, 103101448.31it/s]
- 33%|███▎      | 57049088/170498071 [00:00&lt;00:01, 107293366.49it/s]
- 40%|████      | 68616192/170498071 [00:00&lt;00:00, 109924352.11it/s]
- 47%|████▋     | 80216064/170498071 [00:00&lt;00:00, 111818427.25it/s]
- 54%|█████▍    | 91783168/170498071 [00:00&lt;00:00, 112982415.98it/s]
- 61%|██████    | 103317504/170498071 [00:01&lt;00:00, 113617286.15it/s]
- 67%|██████▋   | 114917376/170498071 [00:01&lt;00:00, 114222944.84it/s]
- 74%|███████▍  | 126484480/170498071 [00:01&lt;00:00, 114561103.64it/s]
- 81%|████████  | 138051584/170498071 [00:01&lt;00:00, 114851188.92it/s]
- 88%|████████▊ | 149618688/170498071 [00:01&lt;00:00, 115031427.50it/s]
- 95%|█████████▍| 161185792/170498071 [00:01&lt;00:00, 115125643.66it/s]
-100%|██████████| 170498071/170498071 [00:01&lt;00:00, 106828607.60it/s]
+  1%|          | 2064384/170498071 [00:00&lt;00:08, 20415575.94it/s]
+  5%|▍         | 8290304/170498071 [00:00&lt;00:03, 44909926.00it/s]
+ 10%|▉         | 16646144/170498071 [00:00&lt;00:02, 62399634.81it/s]
+ 13%|█▎        | 22904832/170498071 [00:00&lt;00:02, 59562791.56it/s]
+ 18%|█▊        | 31195136/170498071 [00:00&lt;00:02, 67672034.90it/s]
+ 22%|██▏       | 38010880/170498071 [00:00&lt;00:02, 64252686.46it/s]
+ 27%|██▋       | 45678592/170498071 [00:00&lt;00:01, 68085923.62it/s]
+ 31%|███       | 52559872/170498071 [00:00&lt;00:01, 64596895.79it/s]
+ 35%|███▌      | 60030976/170498071 [00:00&lt;00:01, 67448846.65it/s]
+ 39%|███▉      | 66846720/170498071 [00:01&lt;00:01, 64689010.04it/s]
+ 44%|████▍     | 74776576/170498071 [00:01&lt;00:01, 68837153.08it/s]
+ 48%|████▊     | 81756160/170498071 [00:01&lt;00:01, 65694047.35it/s]
+ 53%|█████▎    | 89686016/170498071 [00:01&lt;00:01, 69484381.32it/s]
+ 57%|█████▋    | 96731136/170498071 [00:01&lt;00:01, 66675892.37it/s]
+ 61%|██████    | 104398848/170498071 [00:01&lt;00:00, 69444222.80it/s]
+ 65%|██████▌   | 111411200/170498071 [00:01&lt;00:00, 66289075.53it/s]
+ 70%|███████   | 119373824/170498071 [00:01&lt;00:00, 69846836.64it/s]
+ 74%|███████▍  | 126451712/170498071 [00:01&lt;00:00, 69792289.89it/s]
+ 79%|███████▉  | 134283264/170498071 [00:02&lt;00:00, 72241181.93it/s]
+ 83%|████████▎ | 141557760/170498071 [00:02&lt;00:00, 69128088.16it/s]
+ 88%|████████▊ | 149848064/170498071 [00:02&lt;00:00, 73036233.08it/s]
+ 92%|█████████▏| 157220864/170498071 [00:02&lt;00:00, 69353365.63it/s]
+ 97%|█████████▋| 165150720/170498071 [00:02&lt;00:00, 72059605.11it/s]
+100%|██████████| 170498071/170498071 [00:02&lt;00:00, 66911750.74it/s]
 Extracting ./data/cifar-10-python.tar.gz to ./data
 </pre></div>
 </div>
 <section id="noise-corruptions">
 <h2>1. Noise Corruptions<a class="headerlink" href="#noise-corruptions" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruption</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">GaussianNoise</span><span class="p">,</span>
     <span class="n">ShotNoise</span><span class="p">,</span>
     <span class="n">ImpulseNoise</span><span class="p">,</span>
@@ -362,7 +370,7 @@ Extracting ./data/cifar-10-python.tar.gz to ./data
 <img src="../_images/sphx_glr_tutorial_corruption_001.png" srcset="../_images/sphx_glr_tutorial_corruption_001.png" alt="Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5" class = "sphx-glr-single-img"/></section>
 <section id="blur-corruptions">
 <h2>2. Blur Corruptions<a class="headerlink" href="#blur-corruptions" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruption</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">GaussianBlur</span><span class="p">,</span>
     <span class="n">GlassBlur</span><span class="p">,</span>
     <span class="n">DefocusBlur</span><span class="p">,</span>
@@ -380,7 +388,7 @@ Extracting ./data/cifar-10-python.tar.gz to ./data
 <img src="../_images/sphx_glr_tutorial_corruption_002.png" srcset="../_images/sphx_glr_tutorial_corruption_002.png" alt="Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5" class = "sphx-glr-single-img"/></section>
 <section id="other-corruptions">
 <h2>3. Other Corruptions<a class="headerlink" href="#other-corruptions" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruptions</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruption</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">JPEGCompression</span><span class="p">,</span>
     <span class="n">Pixelate</span><span class="p">,</span>
     <span class="n">Frost</span><span class="p">,</span>
@@ -398,18 +406,28 @@ Extracting ./data/cifar-10-python.tar.gz to ./data
 <img src="../_images/sphx_glr_tutorial_corruption_003.png" srcset="../_images/sphx_glr_tutorial_corruption_003.png" alt="Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://zenodo.org/records/10438904/files/frost.zip to data/frost.zip
 
   0%|          | 0/1780178 [00:00&lt;?, ?it/s]
-  2%|▏         | 32768/1780178 [00:00&lt;00:06, 275361.44it/s]
-  7%|▋         | 131072/1780178 [00:00&lt;00:03, 438187.42it/s]
- 29%|██▉       | 524288/1780178 [00:00&lt;00:00, 1445222.08it/s]
- 61%|██████    | 1081344/1780178 [00:00&lt;00:00, 2320021.38it/s]
-100%|██████████| 1780178/1780178 [00:00&lt;00:00, 2944198.34it/s]
+  2%|▏         | 32768/1780178 [00:00&lt;00:06, 283956.57it/s]
+  4%|▎         | 65536/1780178 [00:00&lt;00:05, 287284.26it/s]
+  7%|▋         | 131072/1780178 [00:00&lt;00:03, 418423.76it/s]
+ 11%|█         | 196608/1780178 [00:00&lt;00:03, 479369.56it/s]
+ 17%|█▋        | 294912/1780178 [00:00&lt;00:02, 615654.57it/s]
+ 20%|██        | 360448/1780178 [00:00&lt;00:02, 601642.71it/s]
+ 26%|██▌       | 458752/1780178 [00:00&lt;00:01, 684058.84it/s]
+ 31%|███▏      | 557056/1780178 [00:00&lt;00:01, 736462.13it/s]
+ 37%|███▋      | 655360/1780178 [00:01&lt;00:01, 778777.83it/s]
+ 42%|████▏     | 753664/1780178 [00:01&lt;00:01, 613874.29it/s]
+ 48%|████▊     | 851968/1780178 [00:01&lt;00:01, 673726.89it/s]
+ 53%|█████▎    | 950272/1780178 [00:01&lt;00:01, 723171.38it/s]
+ 59%|█████▉    | 1048576/1780178 [00:01&lt;00:00, 761261.68it/s]
+ 64%|██████▍   | 1146880/1780178 [00:01&lt;00:01, 617305.36it/s]
+ 70%|██████▉   | 1245184/1780178 [00:01&lt;00:00, 672349.42it/s]
+ 75%|███████▌  | 1343488/1780178 [00:02&lt;00:00, 713058.65it/s]
+ 81%|████████  | 1441792/1780178 [00:02&lt;00:00, 601196.44it/s]
+ 87%|████████▋ | 1540096/1780178 [00:02&lt;00:00, 658346.82it/s]
+ 92%|█████████▏| 1638400/1780178 [00:02&lt;00:00, 701805.28it/s]
+ 98%|█████████▊| 1736704/1780178 [00:02&lt;00:00, 742130.20it/s]
+100%|██████████| 1780178/1780178 [00:02&lt;00:00, 647819.68it/s]
 Extracting data/frost.zip to data
-Downloaded frost.zip to data
-Files already downloaded and verified
-Files already downloaded and verified
-Files already downloaded and verified
-Files already downloaded and verified
-Files already downloaded and verified
 </pre></div>
 </div>
 <section id="reference">
@@ -417,7 +435,7 @@ Files already downloaded and verified
 <ul class="simple">
 <li><p><strong>Benchmarking Neural Network Robustness to Common Corruptions and Perturbations</strong>, Dan Hendrycks and Thomas Dietterich. <a class="reference external" href="https://arxiv.org/pdf/1903.12261">ICLR 2019</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 24.823 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 27.800 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-corruption-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/fb6a5e9834a7c6a46122640646eaa723/tutorial_corruption.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_corruption.ipynb</span></code></a></p>
@@ -442,12 +460,12 @@ Files already downloaded and verified
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="tutorial_evidential_classification.html" class="btn btn-neutral float-right" title="Deep Evidential Classification on a Toy Example" accesskey="n"
+    <a href="tutorial_bayesian.html" class="btn btn-neutral float-right" title="Train a Bayesian Neural Network in Three Minutes" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     
     
-    <a href="tutorial_bayesian.html" class="btn btn-neutral" title="Train a Bayesian Neural Network in Three Minutes" accesskey="p"
+    <a href="tutorial_der_cubic.html" class="btn btn-neutral" title="Deep Evidential Regression on a Toy Example" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>

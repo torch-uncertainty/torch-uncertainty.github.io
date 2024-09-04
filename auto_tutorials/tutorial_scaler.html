@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Improve Top-label Calibration with Temperature Scaling &mdash; TorchUncertainty 0.2.1.post0 documentation</title>
+  <title>Improve Top-label Calibration with Temperature Scaling &mdash; TorchUncertainty 0.2.2 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -329,23 +329,23 @@ of out-of-distribution data. Otherwise, it is a list of 1 element.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz to data/cifar-100-python.tar.gz
 
   0%|          | 0/169001437 [00:00&lt;?, ?it/s]
-  0%|          | 819200/169001437 [00:00&lt;00:23, 7307146.72it/s]
-  6%|▌         | 10354688/169001437 [00:00&lt;00:02, 56370597.45it/s]
- 13%|█▎        | 21266432/169001437 [00:00&lt;00:01, 79512542.92it/s]
- 19%|█▉        | 32702464/169001437 [00:00&lt;00:01, 92918851.44it/s]
- 26%|██▌       | 43843584/169001437 [00:00&lt;00:01, 99376350.49it/s]
- 33%|███▎      | 55377920/169001437 [00:00&lt;00:01, 104688890.67it/s]
- 39%|███▉      | 65929216/169001437 [00:00&lt;00:00, 104839699.04it/s]
- 46%|████▌     | 76939264/169001437 [00:00&lt;00:00, 106492216.57it/s]
- 52%|█████▏    | 88440832/169001437 [00:00&lt;00:00, 109138743.70it/s]
- 59%|█████▉    | 99385344/169001437 [00:01&lt;00:00, 108355389.02it/s]
- 65%|██████▌   | 110264320/169001437 [00:01&lt;00:00, 107752865.29it/s]
- 72%|███████▏  | 121307136/169001437 [00:01&lt;00:00, 108520733.80it/s]
- 78%|███████▊  | 132448256/169001437 [00:01&lt;00:00, 109377561.30it/s]
- 85%|████████▌ | 143949824/169001437 [00:01&lt;00:00, 110961475.62it/s]
- 92%|█████████▏| 155549696/169001437 [00:01&lt;00:00, 112468998.18it/s]
- 99%|█████████▉| 166985728/169001437 [00:01&lt;00:00, 113026094.11it/s]
-100%|██████████| 169001437/169001437 [00:01&lt;00:00, 103174083.12it/s]
+  1%|▏         | 2195456/169001437 [00:00&lt;00:07, 21926247.18it/s]
+  8%|▊         | 13467648/169001437 [00:00&lt;00:02, 75191926.19it/s]
+ 14%|█▍        | 24477696/169001437 [00:00&lt;00:01, 91109430.63it/s]
+ 21%|██        | 35225600/169001437 [00:00&lt;00:01, 97550082.30it/s]
+ 27%|██▋       | 46235648/169001437 [00:00&lt;00:01, 102049553.24it/s]
+ 34%|███▍      | 57409536/169001437 [00:00&lt;00:01, 105312449.63it/s]
+ 40%|████      | 68190208/169001437 [00:00&lt;00:00, 106105734.65it/s]
+ 47%|████▋     | 79069184/169001437 [00:00&lt;00:00, 106912835.54it/s]
+ 53%|█████▎    | 89948160/169001437 [00:00&lt;00:00, 107426344.80it/s]
+ 60%|█████▉    | 100892672/169001437 [00:01&lt;00:00, 108012741.47it/s]
+ 66%|██████▌   | 111706112/169001437 [00:01&lt;00:00, 107838644.89it/s]
+ 73%|███████▎  | 122716160/169001437 [00:01&lt;00:00, 108463136.09it/s]
+ 79%|███████▉  | 133595136/169001437 [00:01&lt;00:00, 108168883.63it/s]
+ 85%|████████▌ | 144441344/169001437 [00:01&lt;00:00, 107860556.70it/s]
+ 92%|█████████▏| 155516928/169001437 [00:01&lt;00:00, 108676651.10it/s]
+ 98%|█████████▊| 166395904/169001437 [00:01&lt;00:00, 108613935.48it/s]
+100%|██████████| 169001437/169001437 [00:01&lt;00:00, 103707613.24it/s]
 Extracting data/cifar-100-python.tar.gz to data
 Files already downloaded and verified
 </pre></div>
@@ -380,7 +380,7 @@ of the test set.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ECE before scaling - </span><span class="si">{</span><span class="n">ece</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span><span class="si">:</span><span class="s2">.3%</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE before scaling - 8.177%.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE before scaling - 12.021%.
 </pre></div>
 </div>
 <p>We also compute and plot the top-label calibration figure. We see that the
@@ -402,38 +402,38 @@ a subset of the test set and containing 1000 data. Look at the code run by Tempe
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/32 [00:00&lt;?, ?it/s]
-  3%|▎         | 1/32 [00:00&lt;00:07,  3.93it/s]
-  6%|▋         | 2/32 [00:00&lt;00:07,  4.04it/s]
-  9%|▉         | 3/32 [00:00&lt;00:07,  4.08it/s]
- 12%|█▎        | 4/32 [00:00&lt;00:06,  4.08it/s]
- 16%|█▌        | 5/32 [00:01&lt;00:06,  4.10it/s]
- 19%|█▉        | 6/32 [00:01&lt;00:06,  4.11it/s]
- 22%|██▏       | 7/32 [00:01&lt;00:06,  4.11it/s]
- 25%|██▌       | 8/32 [00:01&lt;00:05,  4.10it/s]
- 28%|██▊       | 9/32 [00:02&lt;00:05,  4.11it/s]
- 31%|███▏      | 10/32 [00:02&lt;00:05,  4.12it/s]
- 34%|███▍      | 11/32 [00:02&lt;00:05,  4.12it/s]
- 38%|███▊      | 12/32 [00:02&lt;00:04,  4.10it/s]
- 41%|████      | 13/32 [00:03&lt;00:04,  4.10it/s]
- 44%|████▍     | 14/32 [00:03&lt;00:04,  4.11it/s]
- 47%|████▋     | 15/32 [00:03&lt;00:04,  4.11it/s]
- 50%|█████     | 16/32 [00:03&lt;00:03,  4.09it/s]
- 53%|█████▎    | 17/32 [00:04&lt;00:03,  4.10it/s]
- 56%|█████▋    | 18/32 [00:04&lt;00:03,  4.11it/s]
- 59%|█████▉    | 19/32 [00:04&lt;00:03,  4.11it/s]
- 62%|██████▎   | 20/32 [00:04&lt;00:02,  4.10it/s]
- 66%|██████▌   | 21/32 [00:05&lt;00:02,  4.11it/s]
- 69%|██████▉   | 22/32 [00:05&lt;00:02,  4.11it/s]
- 72%|███████▏  | 23/32 [00:05&lt;00:02,  4.12it/s]
- 75%|███████▌  | 24/32 [00:05&lt;00:01,  4.10it/s]
- 78%|███████▊  | 25/32 [00:06&lt;00:01,  4.11it/s]
- 81%|████████▏ | 26/32 [00:06&lt;00:01,  4.11it/s]
- 84%|████████▍ | 27/32 [00:06&lt;00:01,  4.11it/s]
- 88%|████████▊ | 28/32 [00:06&lt;00:00,  4.12it/s]
- 91%|█████████ | 29/32 [00:07&lt;00:00,  4.11it/s]
- 94%|█████████▍| 30/32 [00:07&lt;00:00,  4.11it/s]
- 97%|█████████▋| 31/32 [00:07&lt;00:00,  4.12it/s]
-100%|██████████| 32/32 [00:07&lt;00:00,  4.20it/s]
+  3%|▎         | 1/32 [00:00&lt;00:08,  3.71it/s]
+  6%|▋         | 2/32 [00:00&lt;00:07,  3.86it/s]
+  9%|▉         | 3/32 [00:00&lt;00:07,  3.90it/s]
+ 12%|█▎        | 4/32 [00:01&lt;00:07,  3.93it/s]
+ 16%|█▌        | 5/32 [00:01&lt;00:06,  3.92it/s]
+ 19%|█▉        | 6/32 [00:01&lt;00:06,  3.93it/s]
+ 22%|██▏       | 7/32 [00:01&lt;00:06,  3.94it/s]
+ 25%|██▌       | 8/32 [00:02&lt;00:06,  3.94it/s]
+ 28%|██▊       | 9/32 [00:02&lt;00:05,  3.92it/s]
+ 31%|███▏      | 10/32 [00:02&lt;00:05,  3.94it/s]
+ 34%|███▍      | 11/32 [00:02&lt;00:05,  3.94it/s]
+ 38%|███▊      | 12/32 [00:03&lt;00:05,  3.95it/s]
+ 41%|████      | 13/32 [00:03&lt;00:04,  3.94it/s]
+ 44%|████▍     | 14/32 [00:03&lt;00:04,  3.94it/s]
+ 47%|████▋     | 15/32 [00:03&lt;00:04,  3.95it/s]
+ 50%|█████     | 16/32 [00:04&lt;00:04,  3.90it/s]
+ 53%|█████▎    | 17/32 [00:04&lt;00:03,  3.85it/s]
+ 56%|█████▋    | 18/32 [00:04&lt;00:03,  3.88it/s]
+ 59%|█████▉    | 19/32 [00:04&lt;00:03,  3.91it/s]
+ 62%|██████▎   | 20/32 [00:05&lt;00:03,  3.93it/s]
+ 66%|██████▌   | 21/32 [00:05&lt;00:02,  3.91it/s]
+ 69%|██████▉   | 22/32 [00:05&lt;00:02,  3.93it/s]
+ 72%|███████▏  | 23/32 [00:05&lt;00:02,  3.94it/s]
+ 75%|███████▌  | 24/32 [00:06&lt;00:02,  3.96it/s]
+ 78%|███████▊  | 25/32 [00:06&lt;00:01,  3.94it/s]
+ 81%|████████▏ | 26/32 [00:06&lt;00:01,  3.95it/s]
+ 84%|████████▍ | 27/32 [00:06&lt;00:01,  3.96it/s]
+ 88%|████████▊ | 28/32 [00:07&lt;00:01,  3.95it/s]
+ 91%|█████████ | 29/32 [00:07&lt;00:00,  3.93it/s]
+ 94%|█████████▍| 30/32 [00:07&lt;00:00,  3.94it/s]
+ 97%|█████████▋| 31/32 [00:07&lt;00:00,  3.95it/s]
+100%|██████████| 32/32 [00:07&lt;00:00,  4.02it/s]
 </pre></div>
 </div>
 </section>
@@ -454,7 +454,7 @@ the previous and current iterations.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ECE after scaling - </span><span class="si">{</span><span class="n">ece</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span><span class="si">:</span><span class="s2">.3%</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE after scaling - 2.494%.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE after scaling - 2.654%.
 </pre></div>
 </div>
 <p>We finally compute and plot the scaled top-label calibration figure. We see
@@ -477,7 +477,7 @@ However, this may not hold true in real-world cases where dataset shift could ha
 <li><p><strong>Expected Calibration Error:</strong> Naeini, M. P., Cooper, G. F., &amp; Hauskrecht, M. (2015). Obtaining Well Calibrated Probabilities Using Bayesian Binning. In <a class="reference external" href="https://arxiv.org/pdf/1411.0160.pdf">AAAI 2015</a>.</p></li>
 <li><p><strong>Temperature Scaling:</strong> Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. (2017). On calibration of modern neural networks. In <a class="reference external" href="https://arxiv.org/pdf/1706.04599.pdf">ICML 2017</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 28.699 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 30.905 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-scaler-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/35097fc86b1c61efee915836b2ab44fc/tutorial_scaler.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_scaler.ipynb</span></code></a></p>

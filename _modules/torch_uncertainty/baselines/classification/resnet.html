@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.baselines.classification.resnet &mdash; TorchUncertainty 0.2.1.post0 documentation</title>
+  <title>torch_uncertainty.baselines.classification.resnet &mdash; TorchUncertainty 0.2.2 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -285,7 +285,7 @@
         <span class="s2">&quot;mimo&quot;</span><span class="p">:</span> <span class="n">mimo_resnet</span><span class="p">,</span>
         <span class="s2">&quot;mc-dropout&quot;</span><span class="p">:</span> <span class="n">resnet</span><span class="p">,</span>
     <span class="p">}</span>
-    <span class="n">archs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">152</span><span class="p">]</span>
+    <span class="n">archs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">44</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">56</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">110</span><span class="p">,</span> <span class="mi">152</span><span class="p">,</span> <span class="mi">1202</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -303,6 +303,7 @@
         <span class="p">],</span>
         <span class="n">arch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;imagenet&quot;</span><span class="p">,</span>
+        <span class="n">normalization_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">,</span>
         <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">dropout_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">mixup_params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -357,6 +358,8 @@
 
 <span class="sd">            style (str, optional): Which ResNet style to use. Defaults to</span>
 <span class="sd">            ``imagenet``.</span>
+<span class="sd">            normalization_layer (type[nn.Module], optional): Normalization layer</span>
+<span class="sd">                to use. Defaults to ``nn.BatchNorm2d``.</span>
 <span class="sd">            num_estimators (int, optional): Number of estimators in the ensemble.</span>
 <span class="sd">                Only used if :attr:`version` is either ``&quot;packed&quot;``, ``&quot;batched&quot;``,</span>
 <span class="sd">                ``&quot;masked&quot;`` or ``&quot;mc-dropout&quot;`` Defaults to ``None``.</span>
@@ -426,6 +429,7 @@
             <span class="s2">&quot;in_channels&quot;</span><span class="p">:</span> <span class="n">in_channels</span><span class="p">,</span>
             <span class="s2">&quot;num_classes&quot;</span><span class="p">:</span> <span class="n">num_classes</span><span class="p">,</span>
             <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="n">style</span><span class="p">,</span>
+            <span class="s2">&quot;normalization_layer&quot;</span><span class="p">:</span> <span class="n">normalization_layer</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="n">format_batch_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
