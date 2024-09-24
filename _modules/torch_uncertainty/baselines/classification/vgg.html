@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.baselines.classification.vgg &mdash; TorchUncertainty 0.2.2 documentation</title>
+  <title>torch_uncertainty.baselines.classification.vgg &mdash; TorchUncertainty 0.2.2.post0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -252,6 +252,7 @@
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Optimizer</span>
 
 <span class="kn">from</span> <span class="nn">torch_uncertainty.models</span> <span class="kn">import</span> <span class="n">mc_dropout</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.models.vgg</span> <span class="kn">import</span> <span class="p">(</span>
@@ -283,6 +284,7 @@
         <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">dropout_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">last_layer_dropout</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">optim_recipe</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">Optimizer</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">mixup_params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">alpha</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -303,6 +305,10 @@
 <span class="sd">            num_classes (int): Number of classes to predict.</span>
 <span class="sd">            in_channels (int): Number of input channels.</span>
 <span class="sd">            loss (nn.Module): Training loss.</span>
+<span class="sd">            optim_recipe (Any): optimization recipe, corresponds to</span>
+<span class="sd">                what expect the `LightningModule.configure_optimizers()</span>
+<span class="sd">                &lt;https://pytorch-lightning.readthedocs.io/en/stable/common/lightning_module.html#configure-optimizers&gt;`_</span>
+<span class="sd">                method.</span>
 <span class="sd">            version (str):</span>
 <span class="sd">                Determines which VGG version to use:</span>
 
@@ -415,6 +421,7 @@
             <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
             <span class="n">is_ensemble</span><span class="o">=</span><span class="n">version</span> <span class="ow">in</span> <span class="n">ENSEMBLE_METHODS</span><span class="p">,</span>
             <span class="n">format_batch_fn</span><span class="o">=</span><span class="n">format_batch_fn</span><span class="p">,</span>
+            <span class="n">optim_recipe</span><span class="o">=</span><span class="n">optim_recipe</span><span class="p">,</span>
             <span class="n">mixup_params</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">,</span>
             <span class="n">eval_ood</span><span class="o">=</span><span class="n">eval_ood</span><span class="p">,</span>
             <span class="n">ood_criterion</span><span class="o">=</span><span class="n">ood_criterion</span><span class="p">,</span>
