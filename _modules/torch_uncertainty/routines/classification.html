@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.routines.classification &mdash; TorchUncertainty 0.2.2.post0 documentation</title>
+  <title>torch_uncertainty.routines.classification &mdash; TorchUncertainty 0.2.2.post1 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -289,7 +289,7 @@
     <span class="n">EPOCH_UPDATE_MODEL</span><span class="p">,</span>
     <span class="n">STEP_UPDATE_MODEL</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.post_processing</span> <span class="kn">import</span> <span class="n">PostProcessing</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.post_processing</span> <span class="kn">import</span> <span class="n">LaplaceApprox</span><span class="p">,</span> <span class="n">PostProcessing</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.transforms</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Mixup</span><span class="p">,</span>
     <span class="n">MixupIO</span><span class="p">,</span>
@@ -700,11 +700,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ood_scores</span> <span class="o">=</span> <span class="o">-</span><span class="n">confs</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">pp_logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
-            <span class="n">pp_probs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">pp_logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ts_cls_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pp_probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="n">dataloader_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># squeeze if binary classification only for binary metrics</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
@@ -735,6 +730,14 @@
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_logit_storage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">id_logit_storage</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">pp_logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">,</span> <span class="n">LaplaceApprox</span><span class="p">):</span>
+                    <span class="n">pp_probs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">pp_logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">pp_probs</span> <span class="o">=</span> <span class="n">pp_logits</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ts_cls_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pp_probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="ow">and</span> <span class="n">dataloader_idx</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ood_scores</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">targets</span><span class="p">))</span>

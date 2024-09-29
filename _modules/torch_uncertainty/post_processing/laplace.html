@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.post_processing.laplace &mdash; TorchUncertainty 0.2.2.post0 documentation</title>
+  <title>torch_uncertainty.post_processing.laplace &mdash; TorchUncertainty 0.2.2.post1 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -277,6 +277,7 @@
             <span class="s2">&quot;mc&quot;</span><span class="p">,</span> <span class="s2">&quot;probit&quot;</span><span class="p">,</span> <span class="s2">&quot;bridge&quot;</span><span class="p">,</span> <span class="s2">&quot;bridge_norm&quot;</span>
         <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;probit&quot;</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+        <span class="n">optimize_prior_precision</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Laplace approximation for uncertainty estimation.</span>
 
@@ -296,6 +297,8 @@
 <span class="sd">                See the Laplace library for more details. Defaults to &quot;probit&quot;.</span>
 <span class="sd">            batch_size (int, optional): batch size for the Laplace approximation.</span>
 <span class="sd">                Defaults to 256.</span>
+<span class="sd">            optimize_prior_precision (bool, optional): whether to optimize the prior</span>
+<span class="sd">                precision. Defaults to True.</span>
 
 <span class="sd">        Reference:</span>
 <span class="sd">            Daxberger et al. Laplace Redux - Effortless Bayesian Deep Learning. In NeurIPS 2021.</span>
@@ -328,6 +331,7 @@
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dl</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">la</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_loader</span><span class="o">=</span><span class="n">dl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">la</span><span class="o">.</span><span class="n">optimize_prior_precision</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;marglik&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
