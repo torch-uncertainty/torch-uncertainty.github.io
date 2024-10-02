@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.routines.pixel_regression &mdash; TorchUncertainty 0.2.2.post1 documentation</title>
+  <title>torch_uncertainty.routines.pixel_regression &mdash; TorchUncertainty 0.2.2.post2 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -350,17 +350,17 @@
 
         <span class="n">depth_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
             <span class="p">{</span>
-                <span class="s2">&quot;SILog&quot;</span><span class="p">:</span> <span class="n">SILog</span><span class="p">(),</span>
-                <span class="s2">&quot;log10&quot;</span><span class="p">:</span> <span class="n">Log10</span><span class="p">(),</span>
-                <span class="s2">&quot;ARE&quot;</span><span class="p">:</span> <span class="n">MeanGTRelativeAbsoluteError</span><span class="p">(),</span>
-                <span class="s2">&quot;RSRE&quot;</span><span class="p">:</span> <span class="n">MeanGTRelativeSquaredError</span><span class="p">(</span><span class="n">squared</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-                <span class="s2">&quot;RMSE&quot;</span><span class="p">:</span> <span class="n">MeanSquaredError</span><span class="p">(</span><span class="n">squared</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-                <span class="s2">&quot;RMSELog&quot;</span><span class="p">:</span> <span class="n">MeanSquaredLogError</span><span class="p">(</span><span class="n">squared</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-                <span class="s2">&quot;iMAE&quot;</span><span class="p">:</span> <span class="n">MeanAbsoluteErrorInverse</span><span class="p">(),</span>
-                <span class="s2">&quot;iRMSE&quot;</span><span class="p">:</span> <span class="n">MeanSquaredErrorInverse</span><span class="p">(</span><span class="n">squared</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-                <span class="s2">&quot;d1&quot;</span><span class="p">:</span> <span class="n">ThresholdAccuracy</span><span class="p">(</span><span class="n">power</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-                <span class="s2">&quot;d2&quot;</span><span class="p">:</span> <span class="n">ThresholdAccuracy</span><span class="p">(</span><span class="n">power</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-                <span class="s2">&quot;d3&quot;</span><span class="p">:</span> <span class="n">ThresholdAccuracy</span><span class="p">(</span><span class="n">power</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+                <span class="s2">&quot;reg/SILog&quot;</span><span class="p">:</span> <span class="n">SILog</span><span class="p">(),</span>
+                <span class="s2">&quot;reg/log10&quot;</span><span class="p">:</span> <span class="n">Log10</span><span class="p">(),</span>
+                <span class="s2">&quot;reg/ARE&quot;</span><span class="p">:</span> <span class="n">MeanGTRelativeAbsoluteError</span><span class="p">(),</span>
+                <span class="s2">&quot;reg/RSRE&quot;</span><span class="p">:</span> <span class="n">MeanGTRelativeSquaredError</span><span class="p">(</span><span class="n">squared</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                <span class="s2">&quot;reg/RMSE&quot;</span><span class="p">:</span> <span class="n">MeanSquaredError</span><span class="p">(</span><span class="n">squared</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                <span class="s2">&quot;reg/RMSELog&quot;</span><span class="p">:</span> <span class="n">MeanSquaredLogError</span><span class="p">(</span><span class="n">squared</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                <span class="s2">&quot;reg/iMAE&quot;</span><span class="p">:</span> <span class="n">MeanAbsoluteErrorInverse</span><span class="p">(),</span>
+                <span class="s2">&quot;reg/iRMSE&quot;</span><span class="p">:</span> <span class="n">MeanSquaredErrorInverse</span><span class="p">(</span><span class="n">squared</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                <span class="s2">&quot;reg/d1&quot;</span><span class="p">:</span> <span class="n">ThresholdAccuracy</span><span class="p">(</span><span class="n">power</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="s2">&quot;reg/d2&quot;</span><span class="p">:</span> <span class="n">ThresholdAccuracy</span><span class="p">(</span><span class="n">power</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+                <span class="s2">&quot;reg/d3&quot;</span><span class="p">:</span> <span class="n">ThresholdAccuracy</span><span class="p">(</span><span class="n">power</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
             <span class="p">},</span>
             <span class="n">compute_groups</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
@@ -370,7 +370,7 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">probabilistic</span><span class="p">:</span>
             <span class="n">depth_prob_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
-                <span class="p">{</span><span class="s2">&quot;NLL&quot;</span><span class="p">:</span> <span class="n">DistributionNLL</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)}</span>
+                <span class="p">{</span><span class="s2">&quot;reg/NLL&quot;</span><span class="p">:</span> <span class="n">DistributionNLL</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)}</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">val_prob_metrics</span> <span class="o">=</span> <span class="n">depth_prob_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;val/&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_prob_metrics</span> <span class="o">=</span> <span class="n">depth_prob_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test/&quot;</span><span class="p">)</span>

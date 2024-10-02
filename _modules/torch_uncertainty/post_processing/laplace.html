@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.post_processing.laplace &mdash; TorchUncertainty 0.2.2.post1 documentation</title>
+  <title>torch_uncertainty.post_processing.laplace &mdash; TorchUncertainty 0.2.2.post2 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -315,6 +315,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">weight_subset</span> <span class="o">=</span> <span class="n">weight_subset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hessian_struct</span> <span class="o">=</span> <span class="n">hessian_struct</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimize_prior_precision</span> <span class="o">=</span> <span class="n">optimize_prior_precision</span>
 
         <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
@@ -331,7 +332,8 @@
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dl</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">la</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_loader</span><span class="o">=</span><span class="n">dl</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">la</span><span class="o">.</span><span class="n">optimize_prior_precision</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;marglik&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimize_prior_precision</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">la</span><span class="o">.</span><span class="n">optimize_prior_precision</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;marglik&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
