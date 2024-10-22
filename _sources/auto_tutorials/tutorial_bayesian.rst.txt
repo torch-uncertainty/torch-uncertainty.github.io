@@ -46,7 +46,7 @@ In this part, we train a Bayesian LeNet, based on the model and routines already
 
 To train a BNN using TorchUncertainty, we have to load the following modules:
 
-- the Trainer from Lightning
+- our TUTrainer
 - the model: bayesian_lenet, which lies in the torch_uncertainty.model
 - the classification training routine from torch_uncertainty.routines
 - the Bayesian objective: the ELBOLoss, which lies in the torch_uncertainty.losses file
@@ -61,9 +61,9 @@ neural network utils from torch.nn.
 
     from pathlib import Path
 
-    from lightning.pytorch import Trainer
     from torch import nn, optim
 
+    from torch_uncertainty import TUTrainer
     from torch_uncertainty.datamodules import MNISTDataModule
     from torch_uncertainty.losses import ELBOLoss
     from torch_uncertainty.models.lenet import bayesian_lenet
@@ -108,7 +108,7 @@ We will use the Adam optimizer with the default learning rate of 0.001.
 3. Creating the necessary variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In the following, we define the Lightning trainer, the root of the datasets and the logs.
+In the following, we instantiate our trainer, define the root of the datasets and the logs.
 We also create the datamodule that handles the MNIST dataset, dataloaders and transforms.
 Please note that the datamodules can also handle OOD detection by setting the eval_ood
 parameter to True. Finally, we create the model using the blueprint from torch_uncertainty.models.
@@ -118,7 +118,7 @@ parameter to True. Finally, we create the model using the blueprint from torch_u
 .. code-block:: Python
 
 
-    trainer = Trainer(accelerator="cpu", enable_progress_bar=False, max_epochs=1)
+    trainer = TUTrainer(accelerator="cpu", enable_progress_bar=False, max_epochs=1)
 
     # datamodule
     root = Path("data")
@@ -180,7 +180,7 @@ loss and the optimizer to the routine.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Now that we have prepared all of this, we just have to gather everything in
-the main function and to train the model using the Lightning Trainer.
+the main function and to train the model using our wrapper of Lightning Trainer.
 Specifically, it needs the routine, that includes the model as well as the
 training/eval logic and the datamodule
 The dataset will be downloaded automatically in the root/data folder, and the
@@ -205,25 +205,30 @@ logs will be saved in the root/logs folder.
     /opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
     /opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
     /opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The 'test_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
-    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-    ┃        Test metric        ┃       DataLoader 0        ┃
-    ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │       test/cal/ECE        │   0.015476556494832039    │
-    │       test/cal/aECE       │   0.015153355896472931    │
-    │       test/cls/Acc        │    0.9595999717712402     │
-    │      test/cls/Brier       │    0.06332594156265259    │
-    │     test/cls/Entropy      │    0.17385056614875793    │
-    │       test/cls/NLL        │    0.13424794375896454    │
-    │   test/ens_Disagreement   │   0.006201666779816151    │
-    │     test/ens_Entropy      │    0.17306047677993774    │
-    │        test/ens_MI        │   0.0007900520577095449   │
-    │       test/sc/AUGRC       │   0.0029178515542298555   │
-    │       test/sc/AURC        │   0.0032012364827096462   │
-    │     test/sc/Cov@5Risk     │            1.0            │
-    │    test/sc/Risk@80Cov     │   0.0031250000465661287   │
-    └───────────────────────────┴───────────────────────────┘
+    ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+    ┃ Test metric  ┃      Classification       ┃
+    ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+    │     Acc      │          95.76%           │
+    │    Brier     │          0.06663          │
+    │   Entropy    │          0.20715          │
+    │     NLL      │          0.14664          │
+    └──────────────┴───────────────────────────┘
+    ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+    ┃ Test metric  ┃        Calibration        ┃
+    ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+    │     ECE      │          0.02098          │
+    │     aECE     │          0.02092          │
+    └──────────────┴───────────────────────────┘
+    ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+    ┃ Test metric  ┃ Selective Classification  ┃
+    ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+    │    AUGRC     │           0.33%           │
+    │     AURC     │           0.38%           │
+    │  Cov@5Risk   │          100.00%          │
+    │  Risk@80Cov  │           0.43%           │
+    └──────────────┴───────────────────────────┘
 
-    [{'test/cal/ECE': 0.015476556494832039, 'test/cal/aECE': 0.015153355896472931, 'test/cls/Acc': 0.9595999717712402, 'test/cls/Brier': 0.06332594156265259, 'test/cls/NLL': 0.13424794375896454, 'test/sc/AUGRC': 0.0029178515542298555, 'test/sc/AURC': 0.0032012364827096462, 'test/sc/Cov@5Risk': 1.0, 'test/sc/Risk@80Cov': 0.0031250000465661287, 'test/cls/Entropy': 0.17385056614875793, 'test/ens_Disagreement': 0.006201666779816151, 'test/ens_Entropy': 0.17306047677993774, 'test/ens_MI': 0.0007900520577095449}]
+    [{'test/cal/ECE': 0.02098269760608673, 'test/cal/aECE': 0.020919786766171455, 'test/cls/Acc': 0.9575999975204468, 'test/cls/Brier': 0.06662513315677643, 'test/cls/NLL': 0.14663520455360413, 'test/sc/AUGRC': 0.0033164420165121555, 'test/sc/AURC': 0.0037514716386795044, 'test/sc/Cov@5Risk': 1.0, 'test/sc/Risk@80Cov': 0.0042500002309679985, 'test/cls/Entropy': 0.20715144276618958, 'test/ens_Disagreement': 0.005782501772046089, 'test/ens_Entropy': 0.20630016922950745, 'test/ens_MI': 0.000851309101562947}]
 
 
 
@@ -290,7 +295,7 @@ in this order (num_estimator x batch, classes).
 
     Ground truth:  7 2 1 0
     Predicted digits:  7 2 1 0
-    Std. dev. of the scores over the posterior samples 0.000988 0.00014 0.000444 0.00248
+    Std. dev. of the scores over the posterior samples 0.000226 0.000901 0.000338 0.00271
 
 
 
@@ -311,7 +316,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 52.978 seconds)
+   **Total running time of the script:** (0 minutes 59.383 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_bayesian.py:

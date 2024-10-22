@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.routines.classification &mdash; TorchUncertainty 0.2.2.post2 documentation</title>
+  <title>torch_uncertainty.routines.classification &mdash; TorchUncertainty 0.3.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -321,6 +321,7 @@
         <span class="n">optim_recipe</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">Optimizer</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">mixup_params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">eval_ood</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">eval_shift</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">eval_grouping_loss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">ood_criterion</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
             <span class="s2">&quot;msp&quot;</span><span class="p">,</span> <span class="s2">&quot;logit&quot;</span><span class="p">,</span> <span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="s2">&quot;entropy&quot;</span><span class="p">,</span> <span class="s2">&quot;mi&quot;</span><span class="p">,</span> <span class="s2">&quot;vr&quot;</span>
@@ -345,10 +346,12 @@
 <span class="sd">                optionally the scheduler to use. Defaults to ``None``.</span>
 <span class="sd">            mixup_params (dict, optional): Mixup parameters. Can include mixup type,</span>
 <span class="sd">                mixup mode, distance similarity, kernel tau max, kernel tau std,</span>
-<span class="sd">                mixup alpha, and cutmix alpha. If None, no augmentations.</span>
+<span class="sd">                mixup alpha, and cutmix alpha. If None, no mixup augmentations.</span>
 <span class="sd">                Defaults to ``None``.</span>
 <span class="sd">            eval_ood (bool, optional): Indicates whether to evaluate the OOD</span>
-<span class="sd">                detection performance or not. Defaults to ``False``.</span>
+<span class="sd">                detection performance. Defaults to ``False``.</span>
+<span class="sd">            eval_shift (bool, optional): Indicates whether to evaluate the Distribution</span>
+<span class="sd">                shift performance. Defaults to ``False``.</span>
 <span class="sd">            eval_grouping_loss (bool, optional): Indicates whether to evaluate the</span>
 <span class="sd">                grouping loss or not. Defaults to ``False``.</span>
 <span class="sd">            ood_criterion (str, optional): OOD criterion. Available options are</span>
@@ -396,6 +399,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="n">num_classes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="o">=</span> <span class="n">eval_ood</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_shift</span> <span class="o">=</span> <span class="n">eval_shift</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eval_grouping_loss</span> <span class="o">=</span> <span class="n">eval_grouping_loss</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span> <span class="o">=</span> <span class="n">ood_criterion</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_plots</span> <span class="o">=</span> <span class="n">log_plots</span>
@@ -479,6 +483,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_metrics</span> <span class="o">=</span> <span class="n">ood_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;ood/&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_entropy</span> <span class="o">=</span> <span class="n">Entropy</span><span class="p">()</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_shift</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_shift_metrics</span> <span class="o">=</span> <span class="n">cls_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;shift/&quot;</span><span class="p">)</span>
+
         <span class="c1"># metrics for ensembles only</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
             <span class="n">ens_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
@@ -493,6 +500,11 @@
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_ens_metrics</span> <span class="o">=</span> <span class="n">ens_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;ood/ens_&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_shift</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">test_shift_ens_metrics</span> <span class="o">=</span> <span class="n">ens_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span>
+                    <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;shift/ens_&quot;</span>
+                <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_grouping_loss</span><span class="p">:</span>
             <span class="n">grouping_loss</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
@@ -739,7 +751,7 @@
                     <span class="n">pp_probs</span> <span class="o">=</span> <span class="n">pp_logits</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">post_cls_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pp_probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="ow">and</span> <span class="n">dataloader_idx</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="ow">and</span> <span class="n">dataloader_idx</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ood_scores</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">targets</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_entropy</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
@@ -754,15 +766,20 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_logit_storage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ood_logit_storage</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_shift</span> <span class="ow">and</span> <span class="n">dataloader_idx</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="k">else</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_shift_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">test_shift_ens_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs_per_est</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">on_validation_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">val_cls_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span>
-        <span class="p">)</span>
+        <span class="n">res_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_cls_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="n">res_dict</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
             <span class="s2">&quot;Acc%&quot;</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">val_cls_metrics</span><span class="p">[</span><span class="s2">&quot;cls/Acc&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="n">res_dict</span><span class="p">[</span><span class="s2">&quot;val/cls/Acc&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
             <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">logger</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_cls_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 
@@ -805,6 +822,20 @@
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
                 <span class="n">tmp_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_ens_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="n">tmp_metrics</span><span class="p">,</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">result_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_metrics</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_shift</span><span class="p">:</span>
+            <span class="n">tmp_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_shift_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+            <span class="n">shift_severity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">test_dataloaders</span><span class="p">[</span>
+                <span class="mi">2</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="k">else</span> <span class="mi">1</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">shift_severity</span>
+            <span class="n">tmp_metrics</span><span class="p">[</span><span class="s2">&quot;shift/shift_severity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shift_severity</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="n">tmp_metrics</span><span class="p">,</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">result_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_metrics</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
+                <span class="n">tmp_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_shift_ens_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="n">tmp_metrics</span><span class="p">,</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">result_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_metrics</span><span class="p">)</span>
 

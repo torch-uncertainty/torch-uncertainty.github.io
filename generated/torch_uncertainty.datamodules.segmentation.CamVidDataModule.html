@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>CamVidDataModule &mdash; TorchUncertainty 0.2.2.post2 documentation</title>
+  <title>CamVidDataModule &mdash; TorchUncertainty 0.3.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -262,13 +262,29 @@
 <h1>CamVidDataModule<a class="headerlink" href="#camviddatamodule" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.datamodules.segmentation.CamVidDataModule">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.datamodules.segmentation.</span></span><span class="sig-name descname"><span class="pre">CamVidDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pin_memory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/datamodules/segmentation/camvid.html#CamVidDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.datamodules.segmentation.CamVidDataModule" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.datamodules.segmentation.</span></span><span class="sig-name descname"><span class="pre">CamVidDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">640</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(720,</span> <span class="pre">960)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basic_augment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pin_memory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/datamodules/segmentation/camvid.html#CamVidDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.datamodules.segmentation.CamVidDataModule" title="Permalink to this definition">¶</a></dt>
 <dd><p>DataModule for the CamVid dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>root</strong> (<em>str</em><em> or </em><em>Path</em>) – Root directory of the datasets.</p></li>
 <li><p><strong>batch_size</strong> (<em>int</em>) – Number of samples per batch.</p></li>
+<li><p><strong>crop_size</strong> (<em>sequence</em><em> or </em><em>int</em><em>, </em><em>optional</em>) – Desired input image and
+segmentation mask sizes during training. If <code class="xref py py-attr docutils literal notranslate"><span class="pre">crop_size</span></code> is an
+int instead of sequence like <span class="math notranslate nohighlight">\((H, W)\)</span>, a square crop
+<span class="math notranslate nohighlight">\((\text{size},\text{size})\)</span> is made. If provided a sequence
+of length <span class="math notranslate nohighlight">\(1\)</span>, it will be interpreted as
+<span class="math notranslate nohighlight">\((\text{size[0]},\text{size[1]})\)</span>. Defaults to <code class="docutils literal notranslate"><span class="pre">640</span></code>.</p></li>
+<li><p><strong>eval_size</strong> (<em>sequence</em><em> or </em><em>int</em><em>, </em><em>optional</em>) – Desired input image and
+segmentation mask sizes during evaluation. If size is an int,
+smaller edge of the images will be matched to this number, i.e.,
+<span class="math notranslate nohighlight">\(\text{height}&gt;\text{width}\)</span>, then image will be rescaled to
+<span class="math notranslate nohighlight">\((\text{size}\times\text{height}/\text{width},\text{size})\)</span>.
+Defaults to <code class="docutils literal notranslate"><span class="pre">(720,960)</span></code>.</p></li>
+<li><p><strong>group_classes</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to group the 32 classes into
+11 superclasses. Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>basic_augment</strong> (<em>bool</em>) – Whether to apply base augmentations. Defaults to
+<code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 <li><p><strong>val_split</strong> (<em>float</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Share of training samples to use
 for validation. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 <li><p><strong>num_workers</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of dataloaders to use. Defaults to
@@ -288,7 +304,7 @@ validation/test datasets:</p>
 
 <span class="n">v2</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
     <span class="p">[</span>
-        <span class="n">v2</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">360</span><span class="p">,</span> <span class="mi">480</span><span class="p">)),</span>
+        <span class="n">v2</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">640</span><span class="p">),</span>
         <span class="n">v2</span><span class="o">.</span><span class="n">ToDtype</span><span class="p">(</span>
             <span class="n">dtype</span><span class="o">=</span><span class="p">{</span>
                 <span class="n">tv_tensors</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
@@ -379,6 +395,7 @@ and <code class="docutils literal notranslate"><span class="pre">self.test_trans
   <script src="../_static/sphinx_highlight.js"></script>
   <script src="../_static/clipboard.min.js"></script>
   <script src="../_static/copybutton.js"></script>
+  <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   
 
   

@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.metrics.classification.grouping_loss &mdash; TorchUncertainty 0.2.2.post2 documentation</title>
+  <title>torch_uncertainty.metrics.classification.grouping_loss &mdash; TorchUncertainty 0.3.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -249,8 +249,17 @@
                 
                 
   <h1>Source code for torch_uncertainty.metrics.classification.grouping_loss</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">glest</span> <span class="kn">import</span> <span class="n">GLEstimator</span> <span class="k">as</span> <span class="n">GLEstimatorBase</span>
+<span></span><span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">util</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="k">if</span> <span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;glest&quot;</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">glest</span> <span class="kn">import</span> <span class="n">GLEstimator</span> <span class="k">as</span> <span class="n">GLEstimatorBase</span>
+
+    <span class="n">glest_installed</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">else</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
+    <span class="n">glest_installed</span> <span class="o">=</span> <span class="kc">False</span>
+
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torchmetrics</span> <span class="kn">import</span> <span class="n">Metric</span>
 <span class="kn">from</span> <span class="nn">torchmetrics.utilities</span> <span class="kn">import</span> <span class="n">rank_zero_warn</span>
@@ -306,6 +315,13 @@
 <span class="sd">            networks. In ICLR 2023.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">glest_installed</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+                <span class="s2">&quot;The glest library is not installed. Please install&quot;</span>
+                <span class="s2">&quot;torch_uncertainty with the all option:&quot;</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;pip install -U &quot;torch_uncertainty[all]&quot;.&quot;&quot;&quot;</span>
+            <span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="n">GLEstimator</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;probs&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;cat&quot;</span><span class="p">)</span>
@@ -332,7 +348,7 @@
 <span class="sd">                (batch, num_estimators, num_features) or (batch, num_features)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">target</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Expected `target` to be of shape (batch) or (batch, num_classes) &quot;</span>

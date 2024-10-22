@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Deep Evidential Classification on a Toy Example &mdash; TorchUncertainty 0.2.2.post2 documentation</title>
+  <title>Deep Evidential Classification on a Toy Example &mdash; TorchUncertainty 0.3.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -40,7 +40,7 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="From a Standard Classifier to a Packed-Ensemble" href="tutorial_pe_cifar10.html" />
+  <link rel="next" title="Corrupting Images with TorchUncertainty to Benchmark Robustness" href="tutorial_corruption.html" />
   <link rel="prev" title="Train a Bayesian Neural Network in Three Minutes" href="tutorial_bayesian.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
@@ -274,7 +274,7 @@ to download the full example code.</p>
 <h3>1. Loading the utilities<a class="headerlink" href="#loading-the-utilities" title="Permalink to this heading">¶</a></h3>
 <p>To train a LeNet with the DEC loss function using TorchUncertainty, we have to load the following utilities from TorchUncertainty:</p>
 <ul class="simple">
-<li><p>the Trainer from Lightning</p></li>
+<li><p>our wrapper of the Lightning Trainer</p></li>
 <li><p>the model: LeNet, which lies in torch_uncertainty.models</p></li>
 <li><p>the classification training routine in the torch_uncertainty.routines</p></li>
 <li><p>the evidential objective: the DECLoss from torch_uncertainty.losses</p></li>
@@ -284,9 +284,9 @@ to download the full example code.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">lightning.pytorch</span> <span class="kn">import</span> <span class="n">Trainer</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
 
+<span class="kn">from</span> <span class="nn">torch_uncertainty</span> <span class="kn">import</span> <span class="n">TUTrainer</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <span class="n">MNISTDataModule</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.losses</span> <span class="kn">import</span> <span class="n">DECLoss</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.models.lenet</span> <span class="kn">import</span> <span class="n">lenet</span>
@@ -308,10 +308,9 @@ with the default learning rate of 0.001 and a step scheduler.</p>
 <section id="creating-the-necessary-variables">
 <h3>3. Creating the necessary variables<a class="headerlink" href="#creating-the-necessary-variables" title="Permalink to this heading">¶</a></h3>
 <p>In the following, we need to define the root of the logs, and to
-fake-parse the arguments needed for using the PyTorch Lightning Trainer. We
-also use the same MNIST classification example as that used in the
+We use the same MNIST classification example as that used in the
 original DEC paper. We only train for 3 epochs for the sake of time.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">TUTrainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># datamodule</span>
 <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
@@ -352,22 +351,30 @@ and all the default arguments.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The &#39;val_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
 /opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The &#39;train_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
 /opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The &#39;test_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃        Test metric        ┃       DataLoader 0        ┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│       test/cal/ECE        │    0.06731276959180832    │
-│       test/cal/aECE       │    0.07941680401563644    │
-│       test/cls/Acc        │    0.6834999918937683     │
-│      test/cls/Brier       │    0.3807658553123474     │
-│     test/cls/Entropy      │     0.510145366191864     │
-│       test/cls/NLL        │            inf            │
-│       test/sc/AUGRC       │    0.07286640256643295    │
-│       test/sc/AURC        │    0.09229239821434021    │
-│     test/sc/Cov@5Risk     │    0.6073000431060791     │
-│    test/sc/Risk@80Cov     │    0.22374999523162842    │
-└───────────────────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃      Classification       ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     Acc      │          92.98%           │
+│    Brier     │          0.12869          │
+│   Entropy    │          0.01974          │
+│     NLL      │            inf            │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃        Calibration        ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     ECE      │          0.06158          │
+│     aECE     │          0.06158          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃ Selective Classification  ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│    AUGRC     │           1.18%           │
+│     AURC     │           1.96%           │
+│  Cov@5Risk   │          95.60%           │
+│  Risk@80Cov  │           1.98%           │
+└──────────────┴───────────────────────────┘
 
-[{&#39;test/cal/ECE&#39;: 0.06731276959180832, &#39;test/cal/aECE&#39;: 0.07941680401563644, &#39;test/cls/Acc&#39;: 0.6834999918937683, &#39;test/cls/Brier&#39;: 0.3807658553123474, &#39;test/cls/NLL&#39;: inf, &#39;test/sc/AUGRC&#39;: 0.07286640256643295, &#39;test/sc/AURC&#39;: 0.09229239821434021, &#39;test/sc/Cov@5Risk&#39;: 0.6073000431060791, &#39;test/sc/Risk@80Cov&#39;: 0.22374999523162842, &#39;test/cls/Entropy&#39;: 0.510145366191864}]
+[{&#39;test/cal/ECE&#39;: 0.06158379465341568, &#39;test/cal/aECE&#39;: 0.06158360838890076, &#39;test/cls/Acc&#39;: 0.9297999739646912, &#39;test/cls/Brier&#39;: 0.12868519127368927, &#39;test/cls/NLL&#39;: inf, &#39;test/sc/AUGRC&#39;: 0.011840693652629852, &#39;test/sc/AURC&#39;: 0.01963195577263832, &#39;test/sc/Cov@5Risk&#39;: 0.9559999704360962, &#39;test/sc/Risk@80Cov&#39;: 0.019750000908970833, &#39;test/cls/Entropy&#39;: 0.01973584294319153}]
 </pre></div>
 </div>
 </section>
@@ -422,20 +429,20 @@ and all the default arguments.</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_tutorial_evidential_classification_001.png" srcset="../_images/sphx_glr_tutorial_evidential_classification_001.png" alt="tutorial evidential classification" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ground truth:  7 2 1 0
-Predicted digits for the image 0: 7 with strength 72.8 and entropy 0.646.
-Predicted digits for the image 1: 2 with strength 68.6 and entropy 0.677.
-Predicted digits for the image 2: 1 with strength 62.1 and entropy 0.732.
-Predicted digits for the image 3: 0 with strength 34.0 and entropy 1.16.
+Predicted digits for the image 0: 7 with strength 65.8 and entropy 0.7.
+Predicted digits for the image 1: 2 with strength 64.1 and entropy 0.714.
+Predicted digits for the image 2: 1 with strength 86.8 and entropy 0.561.
+Predicted digits for the image 3: 0 with strength 52.6 and entropy 0.833.
 Ground truth:  7 2 1 0
-Predicted digits for the image 0: 0 with strength 10.0 and entropy 2.3.
-Predicted digits for the image 1: 0 with strength 10.0 and entropy 2.3.
-Predicted digits for the image 2: 0 with strength 10.0 and entropy 2.3.
-Predicted digits for the image 3: 0 with strength 24.0 and entropy 1.48.
+Predicted digits for the image 0: 9 with strength 27.0 and entropy 1.71.
+Predicted digits for the image 1: 0 with strength 19.1 and entropy 1.9.
+Predicted digits for the image 2: 3 with strength 27.8 and entropy 1.85.
+Predicted digits for the image 3: 0 with strength 53.2 and entropy 1.15.
 Ground truth:  7 2 1 0
-Predicted digits for the image 0: 7 with strength 22.3 and entropy 1.79.
-Predicted digits for the image 1: 2 with strength 28.5 and entropy 1.38.
-Predicted digits for the image 2: 7 with strength 37.9 and entropy 1.3.
-Predicted digits for the image 3: 0 with strength 21.6 and entropy 1.6.
+Predicted digits for the image 0: 0 with strength 28.1 and entropy 1.33.
+Predicted digits for the image 1: 4 with strength 53.8 and entropy 1.15.
+Predicted digits for the image 2: 2 with strength 45.8 and entropy 1.47.
+Predicted digits for the image 3: 0 with strength 51.1 and entropy 1.32.
 </pre></div>
 </div>
 </section>
@@ -445,7 +452,7 @@ Predicted digits for the image 3: 0 with strength 21.6 and entropy 1.6.
 <ul class="simple">
 <li><p><strong>Deep Evidential Classification:</strong> Murat Sensoy, Lance Kaplan, &amp; Melih Kandemir (2018). Evidential Deep Learning to Quantify Classification Uncertainty <a class="reference external" href="https://arxiv.org/pdf/1806.01768">NeurIPS 2018</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 52.823 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 57.071 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-evidential-classification-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9652bd96a002fb3887242f283d0d22de/tutorial_evidential_classification.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_evidential_classification.ipynb</span></code></a></p>
@@ -469,7 +476,7 @@ Predicted digits for the image 3: 0 with strength 21.6 and entropy 1.6.
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="tutorial_pe_cifar10.html" class="btn btn-neutral float-right" title="From a Standard Classifier to a Packed-Ensemble" accesskey="n"
+    <a href="tutorial_corruption.html" class="btn btn-neutral float-right" title="Corrupting Images with TorchUncertainty to Benchmark Robustness" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     

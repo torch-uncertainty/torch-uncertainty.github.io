@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>SegmentationRoutine &mdash; TorchUncertainty 0.2.2.post2 documentation</title>
+  <title>SegmentationRoutine &mdash; TorchUncertainty 0.3.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -262,7 +262,7 @@
 <h1>SegmentationRoutine<a class="headerlink" href="#segmentationroutine" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.routines.SegmentationRoutine">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.routines.</span></span><span class="sig-name descname"><span class="pre">SegmentationRoutine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_recipe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_batch_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_subsampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_plots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_calibration_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/segmentation.html#SegmentationRoutine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.SegmentationRoutine" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.routines.</span></span><span class="sig-name descname"><span class="pre">SegmentationRoutine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_recipe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_batch_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_subsampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_plots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples_to_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_calibration_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/segmentation.html#SegmentationRoutine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.SegmentationRoutine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Routine for training &amp; testing on <strong>segmentation</strong> tasks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -272,12 +272,16 @@
 <li><p><strong>loss</strong> (<em>torch.nn.Module</em>) – Loss function to optimize the <code class="xref py py-attr docutils literal notranslate"><span class="pre">model</span></code>.</p></li>
 <li><p><strong>optim_recipe</strong> (<em>dict</em><em> or </em><em>Optimizer</em><em>, </em><em>optional</em>) – The optimizer and
 optionally the scheduler to use. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>eval_shift</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to evaluate the Distribution
+shift performance. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>format_batch_fn</strong> (<em>torch.nn.Module</em><em>, </em><em>optional</em>) – The function to format the
 batch. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 <li><p><strong>metric_subsampling_rate</strong> (<em>float</em><em>, </em><em>optional</em>) – The rate of subsampling for the
 memory consuming metrics. Defaults to <code class="docutils literal notranslate"><span class="pre">1e-2</span></code>.</p></li>
 <li><p><strong>log_plots</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to log plots from
 metrics. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>num_samples_to_plot</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of samples to plot in the
+segmentation results. Defaults to <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p></li>
 <li><p><strong>num_calibration_bins</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of bins to compute calibration
 metrics. Defaults to <code class="docutils literal notranslate"><span class="pre">15</span></code>.</p></li>
 </ul>
@@ -302,6 +306,12 @@ metrics. Defaults to <code class="docutils literal notranslate"><span class="pre
 <dd class="field-odd"><p><strong>inputs</strong> (<em>torch.Tensor</em>) – Input tensor.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.SegmentationRoutine.log_segmentation_plots">
+<span class="sig-name descname"><span class="pre">log_segmentation_plots</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/segmentation.html#SegmentationRoutine.log_segmentation_plots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.SegmentationRoutine.log_segmentation_plots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds and logs examples of segmentation plots from the test set.</p>
 </dd></dl>
 
 </dd></dl>
@@ -354,6 +364,7 @@ metrics. Defaults to <code class="docutils literal notranslate"><span class="pre
 <li><a class="reference internal" href="#">SegmentationRoutine</a><ul>
 <li><a class="reference internal" href="#torch_uncertainty.routines.SegmentationRoutine"><code class="docutils literal notranslate"><span class="pre">SegmentationRoutine</span></code></a><ul>
 <li><a class="reference internal" href="#torch_uncertainty.routines.SegmentationRoutine.forward"><code class="docutils literal notranslate"><span class="pre">SegmentationRoutine.forward()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.SegmentationRoutine.log_segmentation_plots"><code class="docutils literal notranslate"><span class="pre">SegmentationRoutine.log_segmentation_plots()</span></code></a></li>
 </ul>
 </li>
 </ul>

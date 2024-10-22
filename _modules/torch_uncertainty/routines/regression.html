@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.routines.regression &mdash; TorchUncertainty 0.2.2.post2 documentation</title>
+  <title>torch_uncertainty.routines.regression &mdash; TorchUncertainty 0.3.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -286,6 +286,7 @@
         <span class="n">loss</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
         <span class="n">is_ensemble</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">optim_recipe</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">Optimizer</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">eval_shift</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">format_batch_fn</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Routine for training &amp; testing on **regression** tasks.</span>
@@ -300,6 +301,8 @@
 <span class="sd">                Defaults to ``False``.</span>
 <span class="sd">            optim_recipe (dict or torch.optim.Optimizer, optional): The optimizer and</span>
 <span class="sd">                optionally the scheduler to use. Defaults to ``None``.</span>
+<span class="sd">            eval_shift (bool, optional): Indicates whether to evaluate the Distribution</span>
+<span class="sd">                shift performance. Defaults to ``False``.</span>
 <span class="sd">            format_batch_fn (torch.nn.Module, optional): The function to format the</span>
 <span class="sd">                batch. Defaults to ``None``.</span>
 
@@ -318,6 +321,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">_regression_routine_checks</span><span class="p">(</span><span class="n">output_dim</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">eval_shift</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Distribution shift evaluation not implemented yet. Raise an issue &quot;</span>
+                <span class="s2">&quot;if needed.&quot;</span>
+            <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">probabilistic</span> <span class="o">=</span> <span class="n">probabilistic</span>
@@ -485,7 +493,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">test_prob_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">mixture</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">on_validation_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">res_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="n">res_dict</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+            <span class="s2">&quot;RMSE&quot;</span><span class="p">,</span>
+            <span class="n">res_dict</span><span class="p">[</span><span class="s2">&quot;val/reg/RMSE&quot;</span><span class="p">],</span>
+            <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">probabilistic</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_prob_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

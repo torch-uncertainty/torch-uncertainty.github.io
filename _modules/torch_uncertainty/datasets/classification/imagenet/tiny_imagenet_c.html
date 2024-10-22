@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.datasets.classification.imagenet.tiny_imagenet_c &mdash; TorchUncertainty 0.2.2.post2 documentation</title>
+  <title>torch_uncertainty.datasets.classification.imagenet.tiny_imagenet_c &mdash; TorchUncertainty 0.3.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../../_static/images/logo_torch_uncertainty.png" />
@@ -272,7 +272,7 @@
 <span class="sd">            takes in the target and transforms it. Defaults to None.</span>
 <span class="sd">        subset (str): The subset to use, one of ``all`` or the keys in</span>
 <span class="sd">            ``cifarc_subsets``.</span>
-<span class="sd">        severity (int): The severity of the corruption, between 1 and 5.</span>
+<span class="sd">        shift_severity (int): The shift_severity of the corruption, between 1 and 5.</span>
 <span class="sd">        download (bool, optional): If True, downloads the dataset from the</span>
 <span class="sd">            internet and puts it in root directory. If dataset is already</span>
 <span class="sd">            downloaded, it is not downloaded again. Defaults to False.</span>
@@ -319,7 +319,7 @@
         <span class="n">transform</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">target_transform</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">subset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
-        <span class="n">severity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">shift_severity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
@@ -340,28 +340,28 @@
                 <span class="sa">f</span><span class="s2">&quot;The subset &#39;</span><span class="si">{</span><span class="n">subset</span><span class="si">}</span><span class="s2">&#39; does not exist in TinyImageNet-C.&quot;</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">subset</span> <span class="o">=</span> <span class="n">subset</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">severity</span> <span class="o">=</span> <span class="n">severity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shift_severity</span> <span class="o">=</span> <span class="n">shift_severity</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">transform</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_transform</span> <span class="o">=</span> <span class="n">target_transform</span>
 
-        <span class="k">if</span> <span class="n">severity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">shift_severity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Corruptions severity should be chosen between 1 and 5 included.&quot;</span>
+                <span class="s2">&quot;Corruptions shift_severity should be chosen between 1 and 5 included.&quot;</span>
             <span class="p">)</span>
 
-        <span class="c1"># Update samples given the subset and severity</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_make_c_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">severity</span><span class="p">)</span>
+        <span class="c1"># Update samples given the subset and shift_severity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_make_c_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shift_severity</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_make_c_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subset</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">severity</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_make_c_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subset</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">shift_severity</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Build the corrupted dataset according to the chosen subset and</span>
-<span class="sd">            severity. If the subset is &#39;all&#39;, gather all corruption types</span>
+<span class="sd">            shift_severity. If the subset is &#39;all&#39;, gather all corruption types</span>
 <span class="sd">            in the dataset.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            subset (str): The name of the corruption subset to be used. Choose</span>
 <span class="sd">                `all` for the dataset to contain all subsets.</span>
-<span class="sd">            severity (int): The severity of the corruption applied to the</span>
+<span class="sd">            shift_severity (int): The shift_severity of the corruption applied to the</span>
 <span class="sd">                images.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">subset</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
@@ -371,7 +371,7 @@
                     <span class="p">(</span>
                         <span class="n">img</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                         <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;brightness&quot;</span><span class="p">,</span> <span class="n">subset</span><span class="p">)</span>
-                        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/1/&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">severity</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">),</span>
+                        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/1/&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">shift_severity</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">),</span>
                         <span class="n">img</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                     <span class="p">)</span>
                     <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">imgs</span>
@@ -385,7 +385,7 @@
                 <span class="p">(</span>
                     <span class="n">img</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;brightness&quot;</span><span class="p">,</span> <span class="n">subset</span><span class="p">)</span>
-                    <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/1/&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">severity</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">),</span>
+                    <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/1/&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">shift_severity</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">),</span>
                     <span class="n">img</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                 <span class="p">)</span>
                 <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">imgs</span>

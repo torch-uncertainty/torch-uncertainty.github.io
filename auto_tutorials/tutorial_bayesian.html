@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Train a Bayesian Neural Network in Three Minutes &mdash; TorchUncertainty 0.2.2.post2 documentation</title>
+  <title>Train a Bayesian Neural Network in Three Minutes &mdash; TorchUncertainty 0.3.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -41,7 +41,7 @@
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
   <link rel="next" title="Deep Evidential Classification on a Toy Example" href="tutorial_evidential_classification.html" />
-  <link rel="prev" title="Corrupting Images with TorchUncertainty to Benchmark Robustness" href="tutorial_corruption.html" />
+  <link rel="prev" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -285,7 +285,7 @@ seen as Dirac distributions on the weights.</p>
 <h3>1. Loading the utilities<a class="headerlink" href="#loading-the-utilities" title="Permalink to this heading">¶</a></h3>
 <p>To train a BNN using TorchUncertainty, we have to load the following modules:</p>
 <ul class="simple">
-<li><p>the Trainer from Lightning</p></li>
+<li><p>our TUTrainer</p></li>
 <li><p>the model: bayesian_lenet, which lies in the torch_uncertainty.model</p></li>
 <li><p>the classification training routine from torch_uncertainty.routines</p></li>
 <li><p>the Bayesian objective: the ELBOLoss, which lies in the torch_uncertainty.losses file</p></li>
@@ -295,9 +295,9 @@ seen as Dirac distributions on the weights.</p>
 neural network utils from torch.nn.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">lightning.pytorch</span> <span class="kn">import</span> <span class="n">Trainer</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
 
+<span class="kn">from</span> <span class="nn">torch_uncertainty</span> <span class="kn">import</span> <span class="n">TUTrainer</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <span class="n">MNISTDataModule</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.losses</span> <span class="kn">import</span> <span class="n">ELBOLoss</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.models.lenet</span> <span class="kn">import</span> <span class="n">bayesian_lenet</span>
@@ -319,11 +319,11 @@ neural network utils from torch.nn.</p>
 </section>
 <section id="creating-the-necessary-variables">
 <h3>3. Creating the necessary variables<a class="headerlink" href="#creating-the-necessary-variables" title="Permalink to this heading">¶</a></h3>
-<p>In the following, we define the Lightning trainer, the root of the datasets and the logs.
+<p>In the following, we instantiate our trainer, define the root of the datasets and the logs.
 We also create the datamodule that handles the MNIST dataset, dataloaders and transforms.
 Please note that the datamodules can also handle OOD detection by setting the eval_ood
 parameter to True. Finally, we create the model using the blueprint from torch_uncertainty.models.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">TUTrainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="c1"># datamodule</span>
 <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
@@ -364,7 +364,7 @@ loss and the optimizer to the routine.</p>
 <section id="gathering-everything-and-training-the-model">
 <h3>5. Gathering Everything and Training the Model<a class="headerlink" href="#gathering-everything-and-training-the-model" title="Permalink to this heading">¶</a></h3>
 <p>Now that we have prepared all of this, we just have to gather everything in
-the main function and to train the model using the Lightning Trainer.
+the main function and to train the model using our wrapper of Lightning Trainer.
 Specifically, it needs the routine, that includes the model as well as the
 training/eval logic and the datamodule
 The dataset will be downloaded automatically in the root/data folder, and the
@@ -376,25 +376,30 @@ logs will be saved in the root/logs folder.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The &#39;val_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
 /opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The &#39;train_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
 /opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The &#39;test_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃        Test metric        ┃       DataLoader 0        ┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│       test/cal/ECE        │   0.015476556494832039    │
-│       test/cal/aECE       │   0.015153355896472931    │
-│       test/cls/Acc        │    0.9595999717712402     │
-│      test/cls/Brier       │    0.06332594156265259    │
-│     test/cls/Entropy      │    0.17385056614875793    │
-│       test/cls/NLL        │    0.13424794375896454    │
-│   test/ens_Disagreement   │   0.006201666779816151    │
-│     test/ens_Entropy      │    0.17306047677993774    │
-│        test/ens_MI        │   0.0007900520577095449   │
-│       test/sc/AUGRC       │   0.0029178515542298555   │
-│       test/sc/AURC        │   0.0032012364827096462   │
-│     test/sc/Cov@5Risk     │            1.0            │
-│    test/sc/Risk@80Cov     │   0.0031250000465661287   │
-└───────────────────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃      Classification       ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     Acc      │          95.76%           │
+│    Brier     │          0.06663          │
+│   Entropy    │          0.20715          │
+│     NLL      │          0.14664          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃        Calibration        ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     ECE      │          0.02098          │
+│     aECE     │          0.02092          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃ Selective Classification  ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│    AUGRC     │           0.33%           │
+│     AURC     │           0.38%           │
+│  Cov@5Risk   │          100.00%          │
+│  Risk@80Cov  │           0.43%           │
+└──────────────┴───────────────────────────┘
 
-[{&#39;test/cal/ECE&#39;: 0.015476556494832039, &#39;test/cal/aECE&#39;: 0.015153355896472931, &#39;test/cls/Acc&#39;: 0.9595999717712402, &#39;test/cls/Brier&#39;: 0.06332594156265259, &#39;test/cls/NLL&#39;: 0.13424794375896454, &#39;test/sc/AUGRC&#39;: 0.0029178515542298555, &#39;test/sc/AURC&#39;: 0.0032012364827096462, &#39;test/sc/Cov@5Risk&#39;: 1.0, &#39;test/sc/Risk@80Cov&#39;: 0.0031250000465661287, &#39;test/cls/Entropy&#39;: 0.17385056614875793, &#39;test/ens_Disagreement&#39;: 0.006201666779816151, &#39;test/ens_Entropy&#39;: 0.17306047677993774, &#39;test/ens_MI&#39;: 0.0007900520577095449}]
+[{&#39;test/cal/ECE&#39;: 0.02098269760608673, &#39;test/cal/aECE&#39;: 0.020919786766171455, &#39;test/cls/Acc&#39;: 0.9575999975204468, &#39;test/cls/Brier&#39;: 0.06662513315677643, &#39;test/cls/NLL&#39;: 0.14663520455360413, &#39;test/sc/AUGRC&#39;: 0.0033164420165121555, &#39;test/sc/AURC&#39;: 0.0037514716386795044, &#39;test/sc/Cov@5Risk&#39;: 1.0, &#39;test/sc/Risk@80Cov&#39;: 0.0042500002309679985, &#39;test/cls/Entropy&#39;: 0.20715144276618958, &#39;test/ens_Disagreement&#39;: 0.005782501772046089, &#39;test/ens_Entropy&#39;: 0.20630016922950745, &#39;test/ens_MI&#39;: 0.000851309101562947}]
 </pre></div>
 </div>
 </section>
@@ -442,7 +447,7 @@ in this order (num_estimator x batch, classes).</p>
 </div>
 <img src="../_images/sphx_glr_tutorial_bayesian_001.png" srcset="../_images/sphx_glr_tutorial_bayesian_001.png" alt="tutorial bayesian" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ground truth:  7 2 1 0
 Predicted digits:  7 2 1 0
-Std. dev. of the scores over the posterior samples 0.000988 0.00014 0.000444 0.00248
+Std. dev. of the scores over the posterior samples 0.000226 0.000901 0.000338 0.00271
 </pre></div>
 </div>
 <p>Here, we show the variance of the top prediction. This is a non-standard but intuitive way to show the diversity of the predictions
@@ -457,7 +462,7 @@ of the ensemble. Ideally, the variance should be high when the average top predi
 <li><p><strong>The Adam optimizer:</strong> Kingma, D. P., &amp; Ba, J. (2014). “Adam: A method for stochastic optimization.” <a class="reference external" href="https://arxiv.org/pdf/1412.6980.pdf">ICLR 2015</a>.</p></li>
 <li><p><strong>The Blitz</strong> <a class="reference external" href="https://github.com/piEsposito/blitz-bayesian-deep-learning">library</a> (for the hyperparameters).</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 52.978 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 59.383 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-bayesian-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/f43d536d36d9261bef3ab9c0808ea674/tutorial_bayesian.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_bayesian.ipynb</span></code></a></p>
@@ -486,7 +491,7 @@ of the ensemble. Ideally, the variance should be high when the average top predi
         class="next-page"></a>
     
     
-    <a href="tutorial_corruption.html" class="btn btn-neutral" title="Corrupting Images with TorchUncertainty to Benchmark Robustness" accesskey="p"
+    <a href="tutorial_der_cubic.html" class="btn btn-neutral" title="Deep Evidential Regression on a Toy Example" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>

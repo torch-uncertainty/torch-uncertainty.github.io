@@ -35,7 +35,7 @@ In this part, we train a neural network, based on the model and routines already
 
 To train a LeNet with the DEC loss function using TorchUncertainty, we have to load the following utilities from TorchUncertainty:
 
-- the Trainer from Lightning
+- our wrapper of the Lightning Trainer
 - the model: LeNet, which lies in torch_uncertainty.models
 - the classification training routine in the torch_uncertainty.routines
 - the evidential objective: the DECLoss from torch_uncertainty.losses
@@ -50,9 +50,9 @@ We also need to define an optimizer using torch.optim, the neural network utils 
     from pathlib import Path
 
     import torch
-    from lightning.pytorch import Trainer
     from torch import nn, optim
 
+    from torch_uncertainty import TUTrainer
     from torch_uncertainty.datamodules import MNISTDataModule
     from torch_uncertainty.losses import DECLoss
     from torch_uncertainty.models.lenet import lenet
@@ -90,21 +90,20 @@ with the default learning rate of 0.001 and a step scheduler.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-59
+.. GENERATED FROM PYTHON SOURCE LINES 52-58
 
 3. Creating the necessary variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the following, we need to define the root of the logs, and to
-fake-parse the arguments needed for using the PyTorch Lightning Trainer. We
-also use the same MNIST classification example as that used in the
+We use the same MNIST classification example as that used in the
 original DEC paper. We only train for 3 epochs for the sake of time.
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-70
+.. GENERATED FROM PYTHON SOURCE LINES 58-69
 
 .. code-block:: Python
 
-    trainer = Trainer(accelerator="cpu", max_epochs=3, enable_progress_bar=False)
+    trainer = TUTrainer(accelerator="cpu", max_epochs=3, enable_progress_bar=False)
 
     # datamodule
     root = Path() / "data"
@@ -122,7 +121,7 @@ original DEC paper. We only train for 3 epochs for the sake of time.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-79
+.. GENERATED FROM PYTHON SOURCE LINES 70-78
 
 4. The Loss and the Training Routine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -133,7 +132,7 @@ torch_uncertainty.routines.ClassificationRoutine.
 In this routine, we provide the model, the DEC loss, the optimizer,
 and all the default arguments.
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-89
+.. GENERATED FROM PYTHON SOURCE LINES 78-88
 
 .. code-block:: Python
 
@@ -154,12 +153,12 @@ and all the default arguments.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-92
+.. GENERATED FROM PYTHON SOURCE LINES 89-91
 
 5. Gathering Everything and Training the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-96
+.. GENERATED FROM PYTHON SOURCE LINES 91-95
 
 .. code-block:: Python
 
@@ -178,32 +177,40 @@ and all the default arguments.
     /opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
     /opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
     /opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The 'test_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
-    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-    ┃        Test metric        ┃       DataLoader 0        ┃
-    ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │       test/cal/ECE        │    0.06731276959180832    │
-    │       test/cal/aECE       │    0.07941680401563644    │
-    │       test/cls/Acc        │    0.6834999918937683     │
-    │      test/cls/Brier       │    0.3807658553123474     │
-    │     test/cls/Entropy      │     0.510145366191864     │
-    │       test/cls/NLL        │            inf            │
-    │       test/sc/AUGRC       │    0.07286640256643295    │
-    │       test/sc/AURC        │    0.09229239821434021    │
-    │     test/sc/Cov@5Risk     │    0.6073000431060791     │
-    │    test/sc/Risk@80Cov     │    0.22374999523162842    │
-    └───────────────────────────┴───────────────────────────┘
+    ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+    ┃ Test metric  ┃      Classification       ┃
+    ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+    │     Acc      │          92.98%           │
+    │    Brier     │          0.12869          │
+    │   Entropy    │          0.01974          │
+    │     NLL      │            inf            │
+    └──────────────┴───────────────────────────┘
+    ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+    ┃ Test metric  ┃        Calibration        ┃
+    ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+    │     ECE      │          0.06158          │
+    │     aECE     │          0.06158          │
+    └──────────────┴───────────────────────────┘
+    ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+    ┃ Test metric  ┃ Selective Classification  ┃
+    ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+    │    AUGRC     │           1.18%           │
+    │     AURC     │           1.96%           │
+    │  Cov@5Risk   │          95.60%           │
+    │  Risk@80Cov  │           1.98%           │
+    └──────────────┴───────────────────────────┘
 
-    [{'test/cal/ECE': 0.06731276959180832, 'test/cal/aECE': 0.07941680401563644, 'test/cls/Acc': 0.6834999918937683, 'test/cls/Brier': 0.3807658553123474, 'test/cls/NLL': inf, 'test/sc/AUGRC': 0.07286640256643295, 'test/sc/AURC': 0.09229239821434021, 'test/sc/Cov@5Risk': 0.6073000431060791, 'test/sc/Risk@80Cov': 0.22374999523162842, 'test/cls/Entropy': 0.510145366191864}]
+    [{'test/cal/ECE': 0.06158379465341568, 'test/cal/aECE': 0.06158360838890076, 'test/cls/Acc': 0.9297999739646912, 'test/cls/Brier': 0.12868519127368927, 'test/cls/NLL': inf, 'test/sc/AUGRC': 0.011840693652629852, 'test/sc/AURC': 0.01963195577263832, 'test/sc/Cov@5Risk': 0.9559999704360962, 'test/sc/Risk@80Cov': 0.019750000908970833, 'test/cls/Entropy': 0.01973584294319153}]
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-100
+.. GENERATED FROM PYTHON SOURCE LINES 96-99
 
 6. Testing the Model
 ~~~~~~~~~~~~~~~~~~~~
 Now that the model is trained, let's test it on MNIST.
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-147
+.. GENERATED FROM PYTHON SOURCE LINES 99-146
 
 .. code-block:: Python
 
@@ -268,25 +275,25 @@ Now that the model is trained, let's test it on MNIST.
  .. code-block:: none
 
     Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 7 with strength 72.8 and entropy 0.646.
-    Predicted digits for the image 1: 2 with strength 68.6 and entropy 0.677.
-    Predicted digits for the image 2: 1 with strength 62.1 and entropy 0.732.
-    Predicted digits for the image 3: 0 with strength 34.0 and entropy 1.16.
+    Predicted digits for the image 0: 7 with strength 65.8 and entropy 0.7.
+    Predicted digits for the image 1: 2 with strength 64.1 and entropy 0.714.
+    Predicted digits for the image 2: 1 with strength 86.8 and entropy 0.561.
+    Predicted digits for the image 3: 0 with strength 52.6 and entropy 0.833.
     Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 0 with strength 10.0 and entropy 2.3.
-    Predicted digits for the image 1: 0 with strength 10.0 and entropy 2.3.
-    Predicted digits for the image 2: 0 with strength 10.0 and entropy 2.3.
-    Predicted digits for the image 3: 0 with strength 24.0 and entropy 1.48.
+    Predicted digits for the image 0: 9 with strength 27.0 and entropy 1.71.
+    Predicted digits for the image 1: 0 with strength 19.1 and entropy 1.9.
+    Predicted digits for the image 2: 3 with strength 27.8 and entropy 1.85.
+    Predicted digits for the image 3: 0 with strength 53.2 and entropy 1.15.
     Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 7 with strength 22.3 and entropy 1.79.
-    Predicted digits for the image 1: 2 with strength 28.5 and entropy 1.38.
-    Predicted digits for the image 2: 7 with strength 37.9 and entropy 1.3.
-    Predicted digits for the image 3: 0 with strength 21.6 and entropy 1.6.
+    Predicted digits for the image 0: 0 with strength 28.1 and entropy 1.33.
+    Predicted digits for the image 1: 4 with strength 53.8 and entropy 1.15.
+    Predicted digits for the image 2: 2 with strength 45.8 and entropy 1.47.
+    Predicted digits for the image 3: 0 with strength 51.1 and entropy 1.32.
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-152
+.. GENERATED FROM PYTHON SOURCE LINES 147-151
 
 References
 ----------
@@ -296,7 +303,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 52.823 seconds)
+   **Total running time of the script:** (0 minutes 57.071 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_evidential_classification.py:

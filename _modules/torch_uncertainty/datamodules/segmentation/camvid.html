@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.datamodules.segmentation.camvid &mdash; TorchUncertainty 0.2.2.post2 documentation</title>
+  <title>torch_uncertainty.datamodules.segmentation.camvid &mdash; TorchUncertainty 0.3.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -249,22 +249,36 @@
                 
                 
   <h1>Source code for torch_uncertainty.datamodules.segmentation.camvid</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch.nn.common_types</span> <span class="kn">import</span> <span class="n">_size_2_t</span>
+<span class="kn">from</span> <span class="nn">torch.nn.modules.utils</span> <span class="kn">import</span> <span class="n">_pair</span>
 <span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">tv_tensors</span>
 <span class="kn">from</span> <span class="nn">torchvision.transforms</span> <span class="kn">import</span> <span class="n">v2</span>
 
-<span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules.abstract</span> <span class="kn">import</span> <span class="n">TUDataModule</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <span class="n">TUDataModule</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.datasets.segmentation</span> <span class="kn">import</span> <span class="n">CamVid</span>
+<span class="kn">from</span> <span class="nn">torch_uncertainty.transforms</span> <span class="kn">import</span> <span class="n">RandomRescale</span>
 
 
 <div class="viewcode-block" id="CamVidDataModule"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.datamodules.segmentation.CamVidDataModule.html#torch_uncertainty.datamodules.segmentation.CamVidDataModule">[docs]</a><span class="k">class</span> <span class="nc">CamVidDataModule</span><span class="p">(</span><span class="n">TUDataModule</span><span class="p">):</span>
+    <span class="n">num_channels</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">training_task</span> <span class="o">=</span> <span class="s2">&quot;segmentation&quot;</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">)</span>
+    <span class="n">std</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">val_split</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># FIXME: not used for now</span>
+        <span class="n">crop_size</span><span class="p">:</span> <span class="n">_size_2_t</span> <span class="o">=</span> <span class="mi">640</span><span class="p">,</span>
+        <span class="n">eval_size</span><span class="p">:</span> <span class="n">_size_2_t</span> <span class="o">=</span> <span class="p">(</span><span class="mi">720</span><span class="p">,</span> <span class="mi">960</span><span class="p">),</span>
+        <span class="n">group_classes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">basic_augment</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">val_split</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">pin_memory</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">persistent_workers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -274,6 +288,22 @@
 <span class="sd">        Args:</span>
 <span class="sd">            root (str or Path): Root directory of the datasets.</span>
 <span class="sd">            batch_size (int): Number of samples per batch.</span>
+<span class="sd">            crop_size (sequence or int, optional): Desired input image and</span>
+<span class="sd">                segmentation mask sizes during training. If :attr:`crop_size` is an</span>
+<span class="sd">                int instead of sequence like :math:`(H, W)`, a square crop</span>
+<span class="sd">                :math:`(\text{size},\text{size})` is made. If provided a sequence</span>
+<span class="sd">                of length :math:`1`, it will be interpreted as</span>
+<span class="sd">                :math:`(\text{size[0]},\text{size[1]})`. Defaults to ``640``.</span>
+<span class="sd">            eval_size (sequence or int, optional): Desired input image and</span>
+<span class="sd">                segmentation mask sizes during evaluation. If size is an int,</span>
+<span class="sd">                smaller edge of the images will be matched to this number, i.e.,</span>
+<span class="sd">                :math:`\text{height}&gt;\text{width}`, then image will be rescaled to</span>
+<span class="sd">                :math:`(\text{size}\times\text{height}/\text{width},\text{size})`.</span>
+<span class="sd">                Defaults to ``(720,960)``.</span>
+<span class="sd">            group_classes (bool, optional): Whether to group the 32 classes into</span>
+<span class="sd">                11 superclasses. Default: ``True``.</span>
+<span class="sd">            basic_augment (bool): Whether to apply base augmentations. Defaults to</span>
+<span class="sd">                ``True``.</span>
 <span class="sd">            val_split (float or None, optional): Share of training samples to use</span>
 <span class="sd">                for validation. Defaults to ``None``.</span>
 <span class="sd">            num_workers (int, optional): Number of dataloaders to use. Defaults to</span>
@@ -293,7 +323,7 @@
 
 <span class="sd">                v2.Compose(</span>
 <span class="sd">                    [</span>
-<span class="sd">                        v2.Resize((360, 480)),</span>
+<span class="sd">                        v2.Resize(640),</span>
 <span class="sd">                        v2.ToDtype(</span>
 <span class="sd">                            dtype={</span>
 <span class="sd">                                tv_tensors.Image: torch.float32,</span>
@@ -308,6 +338,9 @@
 <span class="sd">            This behavior can be modified by overriding ``self.train_transform``</span>
 <span class="sd">            and ``self.test_transform`` after initialization.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">val_split</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;val_split is not used for CamVidDataModule.&quot;</span><span class="p">)</span>
+
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span>
             <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
@@ -316,11 +349,37 @@
             <span class="n">pin_memory</span><span class="o">=</span><span class="n">pin_memory</span><span class="p">,</span>
             <span class="n">persistent_workers</span><span class="o">=</span><span class="n">persistent_workers</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="k">if</span> <span class="n">group_classes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="mi">11</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="mi">32</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">CamVid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_classes</span> <span class="o">=</span> <span class="n">group_classes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crop_size</span> <span class="o">=</span> <span class="n">_pair</span><span class="p">(</span><span class="n">crop_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_size</span> <span class="o">=</span> <span class="n">_pair</span><span class="p">(</span><span class="n">eval_size</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">basic_augment</span><span class="p">:</span>
+            <span class="n">basic_transform</span> <span class="o">=</span> <span class="n">v2</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">RandomRescale</span><span class="p">(</span><span class="n">min_scale</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_scale</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">antialias</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                    <span class="n">v2</span><span class="o">.</span><span class="n">RandomCrop</span><span class="p">(</span>
+                        <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">crop_size</span><span class="p">,</span>
+                        <span class="n">pad_if_needed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">fill</span><span class="o">=</span><span class="p">{</span><span class="n">tv_tensors</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">tv_tensors</span><span class="o">.</span><span class="n">Mask</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
+                    <span class="p">),</span>
+                    <span class="n">v2</span><span class="o">.</span><span class="n">ColorJitter</span><span class="p">(</span>
+                        <span class="n">brightness</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">contrast</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">saturation</span><span class="o">=</span><span class="mf">0.5</span>
+                    <span class="p">),</span>
+                    <span class="n">v2</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">basic_transform</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span> <span class="o">=</span> <span class="n">v2</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="n">v2</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">360</span><span class="p">,</span> <span class="mi">480</span><span class="p">)),</span>
+                <span class="n">v2</span><span class="o">.</span><span class="n">ToImage</span><span class="p">(),</span>
+                <span class="n">basic_transform</span><span class="p">,</span>
                 <span class="n">v2</span><span class="o">.</span><span class="n">ToDtype</span><span class="p">(</span>
                     <span class="n">dtype</span><span class="o">=</span><span class="p">{</span>
                         <span class="n">tv_tensors</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
@@ -329,11 +388,13 @@
                     <span class="p">},</span>
                     <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="p">),</span>
+                <span class="n">v2</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">std</span><span class="p">),</span>
             <span class="p">]</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span> <span class="o">=</span> <span class="n">v2</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="n">v2</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">360</span><span class="p">,</span> <span class="mi">480</span><span class="p">)),</span>
+                <span class="n">v2</span><span class="o">.</span><span class="n">ToImage</span><span class="p">(),</span>
+                <span class="n">v2</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_size</span><span class="p">,</span> <span class="n">antialias</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
                 <span class="n">v2</span><span class="o">.</span><span class="n">ToDtype</span><span class="p">(</span>
                     <span class="n">dtype</span><span class="o">=</span><span class="p">{</span>
                         <span class="n">tv_tensors</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
@@ -342,6 +403,7 @@
                     <span class="p">},</span>
                     <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="p">),</span>
+                <span class="n">v2</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">std</span><span class="p">),</span>
             <span class="p">]</span>
         <span class="p">)</span>
 
@@ -353,12 +415,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
                 <span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                 <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
+                <span class="n">group_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">group_classes</span><span class="p">,</span>
                 <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">transforms</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
                 <span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                 <span class="n">split</span><span class="o">=</span><span class="s2">&quot;val&quot;</span><span class="p">,</span>
+                <span class="n">group_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">group_classes</span><span class="p">,</span>
                 <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">transforms</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
             <span class="p">)</span>
@@ -366,6 +430,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
                 <span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                 <span class="n">split</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
+                <span class="n">group_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">group_classes</span><span class="p">,</span>
                 <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">transforms</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
             <span class="p">)</span>

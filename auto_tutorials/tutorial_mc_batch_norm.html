@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Training a LeNet with Monte Carlo Batch Normalization &mdash; TorchUncertainty 0.2.2.post2 documentation</title>
+  <title>Training a LeNet with Monte Carlo Batch Normalization &mdash; TorchUncertainty 0.3.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -273,7 +273,7 @@ to download the full example code.</p>
 <h3>1. Loading the utilities<a class="headerlink" href="#loading-the-utilities" title="Permalink to this heading">¶</a></h3>
 <p>First, we have to load the following utilities from TorchUncertainty:</p>
 <ul class="simple">
-<li><p>the Trainer from Lightning</p></li>
+<li><p>the TUTrainer from our framework</p></li>
 <li><p>the datamodule handling dataloaders: MNISTDataModule from torch_uncertainty.datamodules</p></li>
 <li><p>the model: LeNet, which lies in torch_uncertainty.models</p></li>
 <li><p>the MC Batch Normalization wrapper: mc_batch_norm, which lies in torch_uncertainty.post_processing</p></li>
@@ -283,9 +283,9 @@ to download the full example code.</p>
 <p>We also need import the neural network utils within <cite>torch.nn</cite>.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">lightning</span> <span class="kn">import</span> <span class="n">Trainer</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 
+<span class="kn">from</span> <span class="nn">torch_uncertainty</span> <span class="kn">import</span> <span class="n">TUTrainer</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <span class="n">MNISTDataModule</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.models.lenet</span> <span class="kn">import</span> <span class="n">lenet</span>
 <span class="kn">from</span> <span class="nn">torch_uncertainty.optim_recipes</span> <span class="kn">import</span> <span class="n">optim_cifar10_resnet18</span>
@@ -299,7 +299,7 @@ to download the full example code.</p>
 <p>In the following, we define the root of the datasets and the
 logs. We also create the datamodule that handles the MNIST dataset
 dataloaders and transforms.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">TUTrainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># datamodule</span>
 <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
@@ -340,20 +340,28 @@ and the optimization recipe.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The &#39;val_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
 /opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The &#39;train_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
 /opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:424: The &#39;test_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃        Test metric        ┃       DataLoader 0        ┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│       test/cal/ECE        │   0.0033924118615686893   │
-│       test/cal/aECE       │   0.0034381954465061426   │
-│       test/cls/Acc        │     0.979200005531311     │
-│      test/cls/Brier       │   0.033331550657749176    │
-│     test/cls/Entropy      │    0.07857280224561691    │
-│       test/cls/NLL        │    0.06889386475086212    │
-│       test/sc/AUGRC       │   0.0009254226461052895   │
-│       test/sc/AURC        │   0.0009821804706007242   │
-│     test/sc/Cov@5Risk     │            1.0            │
-│    test/sc/Risk@80Cov     │   0.0006249999860301614   │
-└───────────────────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃      Classification       ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     Acc      │          97.93%           │
+│    Brier     │          0.03264          │
+│   Entropy    │          0.06677          │
+│     NLL      │          0.06907          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃        Calibration        ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     ECE      │          0.00242          │
+│     aECE     │          0.00206          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃ Selective Classification  ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│    AUGRC     │           0.10%           │
+│     AURC     │           0.11%           │
+│  Cov@5Risk   │          100.00%          │
+│  Risk@80Cov  │           0.12%           │
+└──────────────┴───────────────────────────┘
 </pre></div>
 </div>
 </section>
@@ -418,19 +426,18 @@ in this order (num_estimator x batch, classes).</p>
     <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_tutorial_mc_batch_norm_001.png" srcset="../_images/sphx_glr_tutorial_mc_batch_norm_001.png" alt="tutorial mc batch norm" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
-Ground truth:  7 2 1 0
-Predicted digits for the image 18:  8 8 8 3 8 8 3 3
-Predicted digits for the image 62:  9 8 8 9 9 9 5 5
-Predicted digits for the image 78:  9 8 8 9 9 9 9 9
-Predicted digits for the image 115:  9 9 4 4 4 9 4 4
+<img src="../_images/sphx_glr_tutorial_mc_batch_norm_001.png" srcset="../_images/sphx_glr_tutorial_mc_batch_norm_001.png" alt="tutorial mc batch norm" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ground truth:  7 2 1 0
+Predicted digits for the image 43:  2 2 2 4 4 2 4 2
+Predicted digits for the image 92:  9 9 9 4 4 9 4 9
+Predicted digits for the image 111:  7 7 7 1 1 7 1 7
+Predicted digits for the image 118:  9 9 9 9 4 9 4 9
 </pre></div>
 </div>
 <p>The predictions are mostly erroneous, which is expected since we selected
 the most uncertain images. We also see that there stochasticity in the
 predictions, as the predictions for the same image differ depending on the
 stochastic estimator used.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 35.062 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 39.775 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-mc-batch-norm-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/631ac265c1ce7636bf5c4db0e5a4f3c3/tutorial_mc_batch_norm.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_batch_norm.ipynb</span></code></a></p>

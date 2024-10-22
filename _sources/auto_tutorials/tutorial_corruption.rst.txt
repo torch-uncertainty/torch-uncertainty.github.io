@@ -30,27 +30,39 @@ For this tutorial, we will only load the corruption transforms available in
 torch_uncertainty.transforms.corruption. We also need to load utilities from
 torchvision and matplotlib.
 
-.. GENERATED FROM PYTHON SOURCE LINES 15-61
+.. GENERATED FROM PYTHON SOURCE LINES 15-73
 
 .. code-block:: Python
 
-    from torchvision.datasets import CIFAR10
-    from torchvision.transforms import Compose, ToTensor, Resize
+    from torchvision.transforms import Compose, ToTensor, Resize, CenterCrop
 
     import matplotlib.pyplot as plt
+    from PIL import Image
+    from urllib import request
 
-    ds = CIFAR10("./data", train=False, download=True)
+    urls = [
+        "https://upload.wikimedia.org/wikipedia/commons/d/d9/Carduelis_tristis_-Michigan%2C_USA_-male-8.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/5/5d/Border_Collie_Blanca_y_Negra_Hembra_%28Belen%2C_Border_Collie_Los_Baganes%29.png",
+        "https://upload.wikimedia.org/wikipedia/commons/f/f8/Birmakatze_Seal-Point.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/a/a9/Garranos_fight.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/8/8b/Cottontail_Rabbit.jpg",
+    ]
+
+    def download_img(url, i):
+        request.urlretrieve(url, f"tmp_{i}.png")
+        return Image.open(f"tmp_{i}.png").convert('RGB')
+
+    images_ds = [download_img(url, i) for i, url in enumerate(urls)]
 
 
     def get_images(main_corruption, index: int = 0):
         """Create an image showing the 6 levels of corruption of a given transform."""
         images = []
         for severity in range(6):
-            ds_transforms = Compose(
-                [ToTensor(), main_corruption(severity), Resize(256, antialias=True)]
+            transforms = Compose(
+                [Resize(256, antialias=True), CenterCrop(256), ToTensor(), main_corruption(severity), CenterCrop(224)]
             )
-            ds = CIFAR10("./data", train=False, download=False, transform=ds_transforms)
-            images.append(ds[index][0].permute(1, 2, 0).numpy())
+            images.append(transforms(images_ds[index]).permute(1, 2, 0).numpy())
         return images
 
 
@@ -84,23 +96,15 @@ torchvision and matplotlib.
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ./data/cifar-10-python.tar.gz
-      0%|          | 0/170498071 [00:00<?, ?it/s]      0%|          | 458752/170498071 [00:00<00:37, 4576144.84it/s]      3%|▎         | 4816896/170498071 [00:00<00:06, 27401590.82it/s]      6%|▋         | 10977280/170498071 [00:00<00:03, 42956279.99it/s]     10%|▉         | 16875520/170498071 [00:00<00:03, 49200578.16it/s]     15%|█▌        | 25821184/170498071 [00:00<00:02, 63656942.48it/s]     21%|██        | 35782656/170498071 [00:00<00:01, 75802707.53it/s]     26%|██▌       | 44204032/170498071 [00:00<00:01, 78480750.50it/s]     32%|███▏      | 55246848/170498071 [00:00<00:01, 88599270.11it/s]     38%|███▊      | 64192512/170498071 [00:00<00:01, 88709274.17it/s]     43%|████▎     | 73170944/170498071 [00:01<00:01, 88973473.22it/s]     49%|████▉     | 84377600/170498071 [00:01<00:00, 95982244.97it/s]     55%|█████▌    | 93978624/170498071 [00:01<00:00, 93199410.82it/s]     61%|██████    | 103317504/170498071 [00:01<00:00, 93098868.69it/s]     67%|██████▋   | 114491392/170498071 [00:01<00:00, 98583565.22it/s]     73%|███████▎  | 124387328/170498071 [00:01<00:00, 92928767.26it/s]     79%|███████▉  | 135331840/170498071 [00:01<00:00, 97606013.70it/s]     85%|████████▌ | 145195008/170498071 [00:01<00:00, 94192641.58it/s]     91%|█████████ | 155058176/170498071 [00:01<00:00, 95428480.67it/s]     97%|█████████▋| 165740544/170498071 [00:01<00:00, 98642432.35it/s]    100%|██████████| 170498071/170498071 [00:02<00:00, 84961707.89it/s]
-    Extracting ./data/cifar-10-python.tar.gz to ./data
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 62-64
+.. GENERATED FROM PYTHON SOURCE LINES 74-76
 
 1. Noise Corruptions
 ~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-80
+.. GENERATED FROM PYTHON SOURCE LINES 76-90
 
 .. code-block:: Python
 
@@ -108,7 +112,6 @@ torchvision and matplotlib.
         GaussianNoise,
         ShotNoise,
         ImpulseNoise,
-        SpeckleNoise,
     )
 
     show_images(
@@ -116,7 +119,6 @@ torchvision and matplotlib.
             GaussianNoise,
             ShotNoise,
             ImpulseNoise,
-            SpeckleNoise,
         ]
     )
 
@@ -132,26 +134,28 @@ torchvision and matplotlib.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-83
+.. GENERATED FROM PYTHON SOURCE LINES 91-93
 
 2. Blur Corruptions
 ~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-97
+.. GENERATED FROM PYTHON SOURCE LINES 93-109
 
 .. code-block:: Python
 
     from torch_uncertainty.transforms.corruption import (
-        GaussianBlur,
+        MotionBlur,
         GlassBlur,
         DefocusBlur,
+        ZoomBlur,
     )
 
     show_images(
         [
-            GaussianBlur,
             GlassBlur,
+            MotionBlur,
             DefocusBlur,
+            ZoomBlur,
         ]
     )
 
@@ -167,26 +171,26 @@ torchvision and matplotlib.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-100
+.. GENERATED FROM PYTHON SOURCE LINES 110-112
 
-3. Other Corruptions
-~~~~~~~~~~~~~~~~~~~~
+3. Weather Corruptions
+~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-114
+.. GENERATED FROM PYTHON SOURCE LINES 112-126
 
 .. code-block:: Python
 
     from torch_uncertainty.transforms.corruption import (
-        JPEGCompression,
-        Pixelate,
         Frost,
+        Snow,
+        Fog,
     )
 
     show_images(
         [
-            JPEGCompression,
-            Pixelate,
+            Fog,
             Frost,
+            Snow,
         ]
     )
 
@@ -204,13 +208,85 @@ torchvision and matplotlib.
  .. code-block:: none
 
     Downloading https://zenodo.org/records/10438904/files/frost.zip to data/frost.zip
-      0%|          | 0/1780178 [00:00<?, ?it/s]      4%|▎         | 65536/1780178 [00:00<00:05, 337233.37it/s]     13%|█▎        | 229376/1780178 [00:00<00:01, 810844.87it/s]     35%|███▍      | 622592/1780178 [00:00<00:00, 1551045.81it/s]    100%|██████████| 1780178/1780178 [00:00<00:00, 3052226.89it/s]
+      0%|          | 0.00/1.78M [00:00<?, ?B/s]      4%|▎         | 65.5k/1.78M [00:00<00:05, 341kB/s]     15%|█▍        | 262k/1.78M [00:00<00:02, 745kB/s]      61%|██████    | 1.08M/1.78M [00:00<00:00, 2.36MB/s]    100%|██████████| 1.78M/1.78M [00:00<00:00, 3.09MB/s]
     Extracting data/frost.zip to data
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-119
+.. GENERATED FROM PYTHON SOURCE LINES 127-128
+
+4. Other Corruptions
+
+.. GENERATED FROM PYTHON SOURCE LINES 128-142
+
+.. code-block:: Python
+
+
+    from torch_uncertainty.transforms.corruption import (
+        Brightness, Contrast, Elastic, JPEGCompression, Pixelate)
+
+    show_images(
+        [
+            Brightness,
+            Contrast,
+            JPEGCompression,
+            Pixelate,
+            Elastic,
+        ]
+    )
+
+
+
+
+.. image-sg:: /auto_tutorials/images/sphx_glr_tutorial_corruption_004.png
+   :alt: Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5
+   :srcset: /auto_tutorials/images/sphx_glr_tutorial_corruption_004.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 143-145
+
+5. Unused Corruptions
+~~~~~~~~~~~~~~~~~~~~~
+
+.. GENERATED FROM PYTHON SOURCE LINES 145-162
+
+.. code-block:: Python
+
+
+    # The following corruptions are not used in the paper Benchmarking Neural Network Robustness to Common Corruptions and Perturbations.
+
+    from torch_uncertainty.transforms.corruption import (
+        GaussianBlur,
+        SpeckleNoise,
+        Saturation,
+    )
+
+    show_images(
+        [
+            GaussianBlur,
+            SpeckleNoise,
+            Saturation,
+        ]
+    )
+
+
+
+
+.. image-sg:: /auto_tutorials/images/sphx_glr_tutorial_corruption_005.png
+   :alt: Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5
+   :srcset: /auto_tutorials/images/sphx_glr_tutorial_corruption_005.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 163-167
 
 Reference
 ---------
@@ -220,7 +296,7 @@ Reference
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 24.953 seconds)
+   **Total running time of the script:** (0 minutes 10.207 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_corruption.py:

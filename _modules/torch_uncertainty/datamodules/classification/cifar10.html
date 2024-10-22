@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.datamodules.classification.cifar10 &mdash; TorchUncertainty 0.2.2.post2 documentation</title>
+  <title>torch_uncertainty.datamodules.classification.cifar10 &mdash; TorchUncertainty 0.3.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -272,19 +272,22 @@
     <span class="n">num_channels</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="n">input_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
     <span class="n">training_task</span> <span class="o">=</span> <span class="s2">&quot;classification&quot;</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.4914</span><span class="p">,</span> <span class="mf">0.4822</span><span class="p">,</span> <span class="mf">0.4465</span><span class="p">)</span>
+    <span class="n">std</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.2023</span><span class="p">,</span> <span class="mf">0.1994</span><span class="p">,</span> <span class="mf">0.2010</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">eval_ood</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">eval_shift</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">shift_severity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">val_split</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">basic_augment</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">cutout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">auto_augment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">test_alt</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">corruption_severity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">test_alt</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;h&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_dataloaders</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">pin_memory</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">persistent_workers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -294,6 +297,9 @@
 <span class="sd">        Args:</span>
 <span class="sd">            root (str): Root directory of the datasets.</span>
 <span class="sd">            eval_ood (bool): Whether to evaluate on out-of-distribution data.</span>
+<span class="sd">                Defaults to ``False``.</span>
+<span class="sd">            eval_shift (bool): Whether to evaluate on shifted data. Defaults to</span>
+<span class="sd">                ``False``.</span>
 <span class="sd">            batch_size (int): Number of samples per batch.</span>
 <span class="sd">            val_split (float): Share of samples to use for validation. Defaults</span>
 <span class="sd">                to ``0.0``.</span>
@@ -306,7 +312,7 @@
 <span class="sd">                ``False``.</span>
 <span class="sd">            auto_augment (str): Which auto-augment to apply. Defaults to ``None``.</span>
 <span class="sd">            test_alt (str): Which test set to use. Defaults to ``None``.</span>
-<span class="sd">            corruption_severity (int): Severity of corruption to apply for</span>
+<span class="sd">            shift_severity (int): Severity of corruption to apply for</span>
 <span class="sd">                CIFAR10-C. Defaults to ``1``.</span>
 <span class="sd">            num_dataloaders (int): Number of dataloaders to use. Defaults to ``1``.</span>
 <span class="sd">            pin_memory (bool): Whether to pin memory. Defaults to ``True``.</span>
@@ -325,17 +331,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span> <span class="o">=</span> <span class="n">val_split</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_dataloaders</span> <span class="o">=</span> <span class="n">num_dataloaders</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="o">=</span> <span class="n">eval_ood</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_shift</span> <span class="o">=</span> <span class="n">eval_shift</span>
 
-        <span class="k">if</span> <span class="n">test_alt</span> <span class="o">==</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">CIFAR10C</span>
-        <span class="k">elif</span> <span class="n">test_alt</span> <span class="o">==</span> <span class="s2">&quot;h&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">test_alt</span> <span class="o">==</span> <span class="s2">&quot;h&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">CIFAR10H</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">test_alt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">CIFAR10</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Test set </span><span class="si">{</span><span class="n">test_alt</span><span class="si">}</span><span class="s2"> is not supported.&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">test_alt</span> <span class="o">=</span> <span class="n">test_alt</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">corruption_severity</span> <span class="o">=</span> <span class="n">corruption_severity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shift_severity</span> <span class="o">=</span> <span class="n">shift_severity</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span> <span class="o">=</span> <span class="n">SVHN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shift_dataset</span> <span class="o">=</span> <span class="n">CIFAR10C</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="n">cutout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">auto_augment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -362,12 +370,12 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">train_transform</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
             <span class="p">[</span>
+                <span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
                 <span class="n">basic_transform</span><span class="p">,</span>
                 <span class="n">main_transform</span><span class="p">,</span>
-                <span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span>
-                    <span class="p">(</span><span class="mf">0.4914</span><span class="p">,</span> <span class="mf">0.4822</span><span class="p">,</span> <span class="mf">0.4465</span><span class="p">),</span>
-                    <span class="p">(</span><span class="mf">0.2023</span><span class="p">,</span> <span class="mf">0.1994</span><span class="p">,</span> <span class="mf">0.2010</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">std</span><span class="p">,</span>
                 <span class="p">),</span>
             <span class="p">]</span>
         <span class="p">)</span>
@@ -376,8 +384,8 @@
             <span class="p">[</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
                 <span class="n">T</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span>
-                    <span class="p">(</span><span class="mf">0.4914</span><span class="p">,</span> <span class="mf">0.4822</span><span class="p">,</span> <span class="mf">0.4465</span><span class="p">),</span>
-                    <span class="p">(</span><span class="mf">0.2023</span><span class="p">,</span> <span class="mf">0.1994</span><span class="p">,</span> <span class="mf">0.2010</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">std</span><span class="p">,</span>
                 <span class="p">),</span>
             <span class="p">]</span>
         <span class="p">)</span>
@@ -386,12 +394,6 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_alt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_alt</span> <span class="o">==</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
-                <span class="n">severity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">corruption_severity</span><span class="p">,</span>
-                <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
@@ -400,6 +402,12 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_shift</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shift_dataset</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
+                <span class="n">shift_severity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shift_severity</span><span class="p">,</span>
+                <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;fit&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;fit&quot;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -438,12 +446,18 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                     <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
-                    <span class="n">severity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">corruption_severity</span><span class="p">,</span>
+                    <span class="n">shift_severity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shift_severity</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                     <span class="n">split</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
+                    <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_shift</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">shift</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shift_dataset</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                     <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
                 <span class="p">)</span>
@@ -467,12 +481,14 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get test dataloaders.</span>
 
 <span class="sd">        Return:</span>
-<span class="sd">            List[DataLoader]: test set for in distribution data</span>
+<span class="sd">            list[DataLoader]: test set for in distribution data</span>
 <span class="sd">            and out-of-distribution data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dataloader</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_loader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">)]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
             <span class="n">dataloader</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_loader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ood</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_shift</span><span class="p">:</span>
+            <span class="n">dataloader</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_loader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shift</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">dataloader</span></div>
 
     <span class="k">def</span> <span class="nf">_get_train_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArrayLike</span><span class="p">:</span>
