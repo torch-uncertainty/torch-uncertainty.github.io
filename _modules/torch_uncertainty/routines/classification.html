@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.routines.classification &mdash; TorchUncertainty 0.3.0 documentation</title>
+  <title>torch_uncertainty.routines.classification &mdash; TorchUncertainty 0.3.1 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -433,36 +433,43 @@
     <span class="k">def</span> <span class="nf">_init_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">task</span> <span class="o">=</span> <span class="s2">&quot;binary&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_cls</span> <span class="k">else</span> <span class="s2">&quot;multiclass&quot;</span>
 
-        <span class="n">cls_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
-            <span class="p">{</span>
-                <span class="s2">&quot;cls/Acc&quot;</span><span class="p">:</span> <span class="n">Accuracy</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">),</span>
-                <span class="s2">&quot;cls/Brier&quot;</span><span class="p">:</span> <span class="n">BrierScore</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">),</span>
-                <span class="s2">&quot;cls/NLL&quot;</span><span class="p">:</span> <span class="n">CategoricalNLL</span><span class="p">(),</span>
-                <span class="s2">&quot;cal/ECE&quot;</span><span class="p">:</span> <span class="n">CalibrationError</span><span class="p">(</span>
-                    <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
-                    <span class="n">num_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_calibration_bins</span><span class="p">,</span>
-                    <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
-                <span class="p">),</span>
-                <span class="s2">&quot;cal/aECE&quot;</span><span class="p">:</span> <span class="n">CalibrationError</span><span class="p">(</span>
-                    <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
-                    <span class="n">adaptive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">num_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_calibration_bins</span><span class="p">,</span>
-                    <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
-                <span class="p">),</span>
-                <span class="s2">&quot;sc/AURC&quot;</span><span class="p">:</span> <span class="n">AURC</span><span class="p">(),</span>
-                <span class="s2">&quot;sc/AUGRC&quot;</span><span class="p">:</span> <span class="n">AUGRC</span><span class="p">(),</span>
-                <span class="s2">&quot;sc/Cov@5Risk&quot;</span><span class="p">:</span> <span class="n">CovAt5Risk</span><span class="p">(),</span>
-                <span class="s2">&quot;sc/Risk@80Cov&quot;</span><span class="p">:</span> <span class="n">RiskAt80Cov</span><span class="p">(),</span>
-            <span class="p">},</span>
-            <span class="n">compute_groups</span><span class="o">=</span><span class="p">[</span>
-                <span class="p">[</span><span class="s2">&quot;cls/Acc&quot;</span><span class="p">],</span>
-                <span class="p">[</span><span class="s2">&quot;cls/Brier&quot;</span><span class="p">],</span>
-                <span class="p">[</span><span class="s2">&quot;cls/NLL&quot;</span><span class="p">],</span>
-                <span class="p">[</span><span class="s2">&quot;cal/ECE&quot;</span><span class="p">,</span> <span class="s2">&quot;cal/aECE&quot;</span><span class="p">],</span>
-                <span class="p">[</span><span class="s2">&quot;sc/AURC&quot;</span><span class="p">,</span> <span class="s2">&quot;sc/AUGRC&quot;</span><span class="p">,</span> <span class="s2">&quot;sc/Cov@5Risk&quot;</span><span class="p">,</span> <span class="s2">&quot;sc/Risk@80Cov&quot;</span><span class="p">],</span>
-            <span class="p">],</span>
-        <span class="p">)</span>
+        <span class="n">metrics_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;cls/Acc&quot;</span><span class="p">:</span> <span class="n">Accuracy</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">),</span>
+            <span class="s2">&quot;cls/Brier&quot;</span><span class="p">:</span> <span class="n">BrierScore</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">),</span>
+            <span class="s2">&quot;cls/NLL&quot;</span><span class="p">:</span> <span class="n">CategoricalNLL</span><span class="p">(),</span>
+            <span class="s2">&quot;cal/ECE&quot;</span><span class="p">:</span> <span class="n">CalibrationError</span><span class="p">(</span>
+                <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+                <span class="n">num_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_calibration_bins</span><span class="p">,</span>
+                <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;cal/aECE&quot;</span><span class="p">:</span> <span class="n">CalibrationError</span><span class="p">(</span>
+                <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+                <span class="n">adaptive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">num_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_calibration_bins</span><span class="p">,</span>
+                <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;sc/AURC&quot;</span><span class="p">:</span> <span class="n">AURC</span><span class="p">(),</span>
+            <span class="s2">&quot;sc/AUGRC&quot;</span><span class="p">:</span> <span class="n">AUGRC</span><span class="p">(),</span>
+            <span class="s2">&quot;sc/Cov@5Risk&quot;</span><span class="p">:</span> <span class="n">CovAt5Risk</span><span class="p">(),</span>
+            <span class="s2">&quot;sc/Risk@80Cov&quot;</span><span class="p">:</span> <span class="n">RiskAt80Cov</span><span class="p">(),</span>
+        <span class="p">}</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="s2">&quot;cls/Acc&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;cls/Brier&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;cls/NLL&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;cal/ECE&quot;</span><span class="p">,</span> <span class="s2">&quot;cal/aECE&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;sc/AURC&quot;</span><span class="p">,</span> <span class="s2">&quot;sc/AUGRC&quot;</span><span class="p">,</span> <span class="s2">&quot;sc/Cov@5Risk&quot;</span><span class="p">,</span> <span class="s2">&quot;sc/Risk@80Cov&quot;</span><span class="p">],</span>
+        <span class="p">]</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_cls</span><span class="p">:</span>
+            <span class="n">metrics_dict</span> <span class="o">|=</span> <span class="p">{</span>
+                <span class="s2">&quot;cls/AUROC&quot;</span><span class="p">:</span> <span class="n">BinaryAUROC</span><span class="p">(),</span>
+                <span class="s2">&quot;cls/AUPR&quot;</span><span class="p">:</span> <span class="n">BinaryAveragePrecision</span><span class="p">(),</span>
+                <span class="s2">&quot;cls/FRP95&quot;</span><span class="p">:</span> <span class="n">FPR95</span><span class="p">(</span><span class="n">pos_label</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="p">}</span>
+            <span class="n">groups</span><span class="o">.</span><span class="n">extend</span><span class="p">([[</span><span class="s2">&quot;cls/AUROC&quot;</span><span class="p">,</span> <span class="s2">&quot;cls/AUPR&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;cls/FRP95&quot;</span><span class="p">]])</span>
+
+        <span class="n">cls_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span><span class="n">metrics_dict</span><span class="p">,</span> <span class="n">compute_groups</span><span class="o">=</span><span class="n">groups</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_cls_metrics</span> <span class="o">=</span> <span class="n">cls_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;val/&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span> <span class="o">=</span> <span class="n">cls_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test/&quot;</span><span class="p">)</span>
 
@@ -474,9 +481,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
             <span class="n">ood_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;FPR95&quot;</span><span class="p">:</span> <span class="n">FPR95</span><span class="p">(</span><span class="n">pos_label</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
                     <span class="s2">&quot;AUROC&quot;</span><span class="p">:</span> <span class="n">BinaryAUROC</span><span class="p">(),</span>
                     <span class="s2">&quot;AUPR&quot;</span><span class="p">:</span> <span class="n">BinaryAveragePrecision</span><span class="p">(),</span>
+                    <span class="s2">&quot;FPR95&quot;</span><span class="p">:</span> <span class="n">FPR95</span><span class="p">(</span><span class="n">pos_label</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
                 <span class="p">},</span>
                 <span class="n">compute_groups</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;AUROC&quot;</span><span class="p">,</span> <span class="s2">&quot;AUPR&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;FPR95&quot;</span><span class="p">]],</span>
             <span class="p">)</span>

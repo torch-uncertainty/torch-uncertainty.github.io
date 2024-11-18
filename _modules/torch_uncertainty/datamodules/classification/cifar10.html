@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.datamodules.classification.cifar10 &mdash; TorchUncertainty 0.3.0 documentation</title>
+  <title>torch_uncertainty.datamodules.classification.cifar10 &mdash; TorchUncertainty 0.3.1 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -328,7 +328,6 @@
             <span class="n">persistent_workers</span><span class="o">=</span><span class="n">persistent_workers</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span> <span class="o">=</span> <span class="n">val_split</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_dataloaders</span> <span class="o">=</span> <span class="n">num_dataloaders</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="o">=</span> <span class="n">eval_ood</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eval_shift</span> <span class="o">=</span> <span class="n">eval_shift</span>
@@ -411,8 +410,8 @@
 
     <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;fit&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;fit&quot;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_alt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CIFAR-C and H can only be used in testing.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_alt</span> <span class="o">==</span> <span class="s2">&quot;h&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CIFAR-H can only be used in testing.&quot;</span><span class="p">)</span>
             <span class="n">full</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                 <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -425,7 +424,6 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">val_split</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
                 <span class="p">)</span>
-
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">train</span> <span class="o">=</span> <span class="n">full</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>

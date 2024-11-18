@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.losses.classification &mdash; TorchUncertainty 0.3.0 documentation</title>
+  <title>torch_uncertainty.losses.classification &mdash; TorchUncertainty 0.3.1 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -587,6 +587,53 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">loss</span></div>
+
+
+<div class="viewcode-block" id="BCEWithLogitsLSLoss"><a class="viewcode-back" href="../../../generated/torch_uncertainty.losses.BCEWithLogitsLSLoss.html#torch_uncertainty.losses.BCEWithLogitsLSLoss">[docs]</a><span class="k">class</span> <span class="nc">BCEWithLogitsLSLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">BCEWithLogitsLoss</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">weight</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">reduction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
+        <span class="n">label_smoothing</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Binary Cross Entropy with Logits Loss with label smoothing.</span>
+
+<span class="sd">        The original PyTorch implementation of the BCEWithLogitsLoss does not</span>
+<span class="sd">        support label smoothing. This implementation adds label smoothing to</span>
+<span class="sd">        the BCEWithLogitsLoss.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            weight (Tensor, optional): A manual rescaling weight given to the</span>
+<span class="sd">                loss of each batch element. If given, has to be a Tensor of size</span>
+<span class="sd">                &quot;nbatch&quot;. Defaults to None.</span>
+<span class="sd">            reduction (str, optional): Specifies the reduction to apply to the</span>
+<span class="sd">                output: &#39;none&#39; | &#39;mean&#39; | &#39;sum&#39;. &#39;none&#39;: no reduction will be applied,</span>
+<span class="sd">                &#39;mean&#39;: the sum of the output will be divided by the number of</span>
+<span class="sd">                elements in the output, &#39;sum&#39;: the output will be summed. Defaults</span>
+<span class="sd">                to &#39;mean&#39;.</span>
+<span class="sd">            label_smoothing (float, optional): The label smoothing factor. Defaults</span>
+<span class="sd">                to 0.0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="n">reduction</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_smoothing</span> <span class="o">=</span> <span class="n">label_smoothing</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preds</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_smoothing</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">targets</span><span class="o">.</span><span class="n">type_as</span><span class="p">(</span><span class="n">preds</span><span class="p">))</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">targets</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_smoothing</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_smoothing</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">targets</span> <span class="o">*</span> <span class="n">F</span><span class="o">.</span><span class="n">logsigmoid</span><span class="p">(</span><span class="n">preds</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">targets</span><span class="p">)</span> <span class="o">*</span> <span class="n">F</span><span class="o">.</span><span class="n">logsigmoid</span><span class="p">(</span>
+            <span class="o">-</span><span class="n">preds</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">loss</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">loss</span></div>
 </pre></div>
 
               </article>
