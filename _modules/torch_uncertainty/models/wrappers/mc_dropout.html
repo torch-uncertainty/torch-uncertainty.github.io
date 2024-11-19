@@ -339,9 +339,7 @@
             <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">core_model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="c1"># Else, for loop</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
-            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">core_model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">core_model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="mc_dropout"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.mc_dropout.html#torch_uncertainty.models.mc_dropout">[docs]</a><span class="k">def</span> <span class="nf">mc_dropout</span><span class="p">(</span>
@@ -369,9 +367,7 @@
     <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_dropout_checks</span><span class="p">(</span>
-    <span class="n">filtered_modules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span> <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_dropout_checks</span><span class="p">(</span><span class="n">filtered_modules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span> <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">filtered_modules</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;No dropout module found in the model. &quot;</span>
@@ -379,13 +375,9 @@
         <span class="p">)</span>
     <span class="c1"># Check that at least one module has &gt; 0.0 dropout rate</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">filtered_modules</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;At least one dropout module must have a dropout rate &gt; 0.0.&quot;</span>
-        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;At least one dropout module must have a dropout rate &gt; 0.0.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">num_estimators</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;`num_estimators` must be strictly positive to use MC Dropout.&quot;</span>
-        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`num_estimators` must be strictly positive to use MC Dropout.&quot;</span><span class="p">)</span>
 </pre></div>
 
               </article>

@@ -334,8 +334,7 @@
         <span class="n">_depth_routine_checks</span><span class="p">(</span><span class="n">output_dim</span><span class="p">,</span> <span class="n">num_image_plot</span><span class="p">,</span> <span class="n">log_plots</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">eval_shift</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;Distribution shift evaluation not implemented yet. Raise an issue &quot;</span>
-                <span class="s2">&quot;if needed.&quot;</span>
+                <span class="s2">&quot;Distribution shift evaluation not implemented yet. Raise an issue &quot;</span> <span class="s2">&quot;if needed.&quot;</span>
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
@@ -377,9 +376,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">test_metrics</span> <span class="o">=</span> <span class="n">depth_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test/&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">probabilistic</span><span class="p">:</span>
-            <span class="n">depth_prob_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
-                <span class="p">{</span><span class="s2">&quot;reg/NLL&quot;</span><span class="p">:</span> <span class="n">DistributionNLL</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)}</span>
-            <span class="p">)</span>
+            <span class="n">depth_prob_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">({</span><span class="s2">&quot;reg/NLL&quot;</span><span class="p">:</span> <span class="n">DistributionNLL</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)})</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">val_prob_metrics</span> <span class="o">=</span> <span class="n">depth_prob_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;val/&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_prob_metrics</span> <span class="o">=</span> <span class="n">depth_prob_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test/&quot;</span><span class="p">)</span>
 
@@ -396,15 +393,11 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">needs_epoch_update</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">sanity_checking</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">update_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;need_bn_update&quot;</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">bn_update</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
-                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">bn_update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">on_test_start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;need_bn_update&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">bn_update</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
-            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">bn_update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PixelRegressionRoutine.forward"><a class="viewcode-back" href="../../../generated/torch_uncertainty.routines.PixelRegressionRoutine.html#torch_uncertainty.routines.PixelRegressionRoutine.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="n">Distribution</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass of the routine.</span>
@@ -427,21 +420,14 @@
                 <span class="n">pred</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pred</span></div>
 
-    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">STEP_OUTPUT</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">STEP_OUTPUT</span><span class="p">:</span>
         <span class="n">inputs</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_batch_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">one_dim_depth</span><span class="p">:</span>
             <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="n">dists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">probabilistic</span><span class="p">:</span>
-            <span class="n">out_shape</span> <span class="o">=</span> <span class="n">dist_size</span><span class="p">(</span><span class="n">dists</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">out_shape</span> <span class="o">=</span> <span class="n">dists</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
-        <span class="n">target</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span>
-            <span class="n">target</span><span class="p">,</span> <span class="n">out_shape</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">InterpolationMode</span><span class="o">.</span><span class="n">NEAREST</span>
-        <span class="p">)</span>
+        <span class="n">out_shape</span> <span class="o">=</span> <span class="n">dist_size</span><span class="p">(</span><span class="n">dists</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">probabilistic</span> <span class="k">else</span> <span class="n">dists</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">out_shape</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">InterpolationMode</span><span class="o">.</span><span class="n">NEAREST</span><span class="p">)</span>
         <span class="n">padding_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">probabilistic</span><span class="p">:</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">dists</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">padding_mask</span><span class="p">)</span>
@@ -453,9 +439,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;train_loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">loss</span>
 
-    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">batch</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">one_dim_depth</span><span class="p">:</span>
             <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -465,16 +449,10 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">probabilistic</span><span class="p">:</span>
             <span class="n">ens_dist</span> <span class="o">=</span> <span class="n">Independent</span><span class="p">(</span>
-                <span class="n">dist_rearrange</span><span class="p">(</span>
-                    <span class="n">preds</span><span class="p">,</span> <span class="s2">&quot;(m b) c h w -&gt; (b c h w) m&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">batch_size</span>
-                <span class="p">),</span>
+                <span class="n">dist_rearrange</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="s2">&quot;(m b) c h w -&gt; (b c h w) m&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">batch_size</span><span class="p">),</span>
                 <span class="mi">0</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="n">mix</span> <span class="o">=</span> <span class="n">Categorical</span><span class="p">(</span>
-                <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span>
-                    <span class="p">(</span><span class="n">dist_size</span><span class="p">(</span><span class="n">preds</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">batch_size</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="n">mix</span> <span class="o">=</span> <span class="n">Categorical</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">dist_size</span><span class="p">(</span><span class="n">preds</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">batch_size</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">))</span>
             <span class="n">mixture</span> <span class="o">=</span> <span class="n">MixtureSameFamily</span><span class="p">(</span><span class="n">mix</span><span class="p">,</span> <span class="n">ens_dist</span><span class="p">)</span>
             <span class="n">preds</span> <span class="o">=</span> <span class="n">mixture</span><span class="o">.</span><span class="n">mean</span>
         <span class="k">else</span><span class="p">:</span>
@@ -502,8 +480,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">dataloader_idx</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;Depth OOD detection not implemented yet. Raise an issue &quot;</span>
-                <span class="s2">&quot;if needed.&quot;</span>
+                <span class="s2">&quot;Depth OOD detection not implemented yet. Raise an issue &quot;</span> <span class="s2">&quot;if needed.&quot;</span>
             <span class="p">)</span>
         <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">batch</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">one_dim_depth</span><span class="p">:</span>
@@ -513,14 +490,8 @@
         <span class="n">preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">probabilistic</span><span class="p">:</span>
-            <span class="n">ens_dist</span> <span class="o">=</span> <span class="n">dist_rearrange</span><span class="p">(</span>
-                <span class="n">preds</span><span class="p">,</span> <span class="s2">&quot;(m b) c h w -&gt; (b c h w) m&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">batch_size</span>
-            <span class="p">)</span>
-            <span class="n">mix</span> <span class="o">=</span> <span class="n">Categorical</span><span class="p">(</span>
-                <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span>
-                    <span class="p">(</span><span class="n">dist_size</span><span class="p">(</span><span class="n">preds</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">batch_size</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="n">ens_dist</span> <span class="o">=</span> <span class="n">dist_rearrange</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="s2">&quot;(m b) c h w -&gt; (b c h w) m&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
+            <span class="n">mix</span> <span class="o">=</span> <span class="n">Categorical</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">dist_size</span><span class="p">(</span><span class="n">preds</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">batch_size</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">))</span>
             <span class="n">mixture</span> <span class="o">=</span> <span class="n">MixtureSameFamily</span><span class="p">(</span><span class="n">mix</span><span class="p">,</span> <span class="n">ens_dist</span><span class="p">)</span>
             <span class="n">preds</span> <span class="o">=</span> <span class="n">mixture</span><span class="o">.</span><span class="n">mean</span>
         <span class="k">else</span><span class="p">:</span>
@@ -529,9 +500,7 @@
 
         <span class="k">if</span> <span class="n">batch_idx</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_plots</span><span class="p">:</span>
             <span class="n">num_images</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">num_image_plot</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_image_plot</span> <span class="o">&lt;</span> <span class="n">inputs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-                <span class="k">else</span> <span class="n">inputs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_image_plot</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_image_plot</span> <span class="o">&lt;</span> <span class="n">inputs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="n">inputs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_plot_depth</span><span class="p">(</span>
                 <span class="n">inputs</span><span class="p">[:</span><span class="n">num_images</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
@@ -591,12 +560,8 @@
             <span class="n">all_imgs</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
                 <span class="n">img</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">inv_norm_params</span><span class="p">)</span>
-                <span class="n">pred</span> <span class="o">=</span> <span class="n">colorize</span><span class="p">(</span>
-                    <span class="n">preds</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">max_depth</span>
-                <span class="p">)</span>
-                <span class="n">tgt</span> <span class="o">=</span> <span class="n">colorize</span><span class="p">(</span>
-                    <span class="n">target</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">max_depth</span>
-                <span class="p">)</span>
+                <span class="n">pred</span> <span class="o">=</span> <span class="n">colorize</span><span class="p">(</span><span class="n">preds</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">max_depth</span><span class="p">)</span>
+                <span class="n">tgt</span> <span class="o">=</span> <span class="n">colorize</span><span class="p">(</span><span class="n">target</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">max_depth</span><span class="p">)</span>
                 <span class="n">all_imgs</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">img</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">tgt</span><span class="p">])</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_image</span><span class="p">(</span>
@@ -631,15 +596,11 @@
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> <span class="o">/</span> <span class="mf">255.0</span>
 
 
-<span class="k">def</span> <span class="nf">_depth_routine_checks</span><span class="p">(</span>
-    <span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_image_plot</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">log_plots</span><span class="p">:</span> <span class="nb">bool</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_depth_routine_checks</span><span class="p">(</span><span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_image_plot</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">log_plots</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">output_dim</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output_dim must be positive, got </span><span class="si">{</span><span class="n">output_dim</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">num_image_plot</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">log_plots</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;num_image_plot must be positive, got </span><span class="si">{</span><span class="n">num_image_plot</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;num_image_plot must be positive, got </span><span class="si">{</span><span class="n">num_image_plot</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 </pre></div>
 
               </article>

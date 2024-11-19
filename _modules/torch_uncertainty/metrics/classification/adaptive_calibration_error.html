@@ -321,9 +321,7 @@
 <span class="sd">        Tensor: Adaptive Calibration error scalar.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-        <span class="n">acc_bin</span><span class="p">,</span> <span class="n">conf_bin</span><span class="p">,</span> <span class="n">prop_bin</span> <span class="o">=</span> <span class="n">_equal_binning_bucketize</span><span class="p">(</span>
-            <span class="n">confidences</span><span class="p">,</span> <span class="n">accuracies</span><span class="p">,</span> <span class="n">num_bins</span>
-        <span class="p">)</span>
+        <span class="n">acc_bin</span><span class="p">,</span> <span class="n">conf_bin</span><span class="p">,</span> <span class="n">prop_bin</span> <span class="o">=</span> <span class="n">_equal_binning_bucketize</span><span class="p">(</span><span class="n">confidences</span><span class="p">,</span> <span class="n">accuracies</span><span class="p">,</span> <span class="n">num_bins</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">norm</span> <span class="o">==</span> <span class="s2">&quot;l1&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">acc_bin</span> <span class="o">-</span> <span class="n">conf_bin</span><span class="p">)</span> <span class="o">*</span> <span class="n">prop_bin</span><span class="p">)</span>
@@ -362,9 +360,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ignore_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;ignore_index is not supported for multiclass tasks.&quot;</span>
-            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ignore_index is not supported for multiclass tasks.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">validate_args</span><span class="p">:</span>
             <span class="n">_binary_calibration_error_arg_validation</span><span class="p">(</span><span class="n">n_bins</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">ignore_index</span><span class="p">)</span>
@@ -385,9 +381,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute metric.&quot;&quot;&quot;</span>
         <span class="n">confidences</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confidences</span><span class="p">)</span>
         <span class="n">accuracies</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracies</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">_ace_compute</span><span class="p">(</span>
-            <span class="n">confidences</span><span class="p">,</span> <span class="n">accuracies</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_bins</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">norm</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">_ace_compute</span><span class="p">(</span><span class="n">confidences</span><span class="p">,</span> <span class="n">accuracies</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_bins</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">MulticlassAdaptiveCalibrationError</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
@@ -411,14 +405,10 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ignore_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;ignore_index is not supported for multiclass tasks.&quot;</span>
-            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ignore_index is not supported for multiclass tasks.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">validate_args</span><span class="p">:</span>
-            <span class="n">_multiclass_calibration_error_arg_validation</span><span class="p">(</span>
-                <span class="n">num_classes</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">ignore_index</span>
-            <span class="p">)</span>
+            <span class="n">_multiclass_calibration_error_arg_validation</span><span class="p">(</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">ignore_index</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_bins</span> <span class="o">=</span> <span class="n">n_bins</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">norm</span> <span class="o">=</span> <span class="n">norm</span>
 
@@ -436,9 +426,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute metric.&quot;&quot;&quot;</span>
         <span class="n">confidences</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confidences</span><span class="p">)</span>
         <span class="n">accuracies</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracies</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">_ace_compute</span><span class="p">(</span>
-            <span class="n">confidences</span><span class="p">,</span> <span class="n">accuracies</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_bins</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">norm</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">_ace_compute</span><span class="p">(</span><span class="n">confidences</span><span class="p">,</span> <span class="n">accuracies</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_bins</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="AdaptiveCalibrationError"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AdaptiveCalibrationError.html#torch_uncertainty.metrics.classification.AdaptiveCalibrationError">[docs]</a><span class="k">class</span> <span class="nc">AdaptiveCalibrationError</span><span class="p">:</span>

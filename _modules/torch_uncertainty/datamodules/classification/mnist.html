@@ -329,16 +329,11 @@
         <span class="k">elif</span> <span class="n">ood_ds</span> <span class="o">==</span> <span class="s2">&quot;notMNIST&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span> <span class="o">=</span> <span class="n">NotMNIST</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`ood_ds` should be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ood_datasets</span><span class="si">}</span><span class="s2">. Got </span><span class="si">{</span><span class="n">ood_ds</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`ood_ds` should be in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ood_datasets</span><span class="si">}</span><span class="s2">. Got </span><span class="si">{</span><span class="n">ood_ds</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shift_dataset</span> <span class="o">=</span> <span class="n">MNISTC</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shift_severity</span> <span class="o">=</span> <span class="mi">1</span>
 
-        <span class="k">if</span> <span class="n">basic_augment</span><span class="p">:</span>
-            <span class="n">basic_transform</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">RandomCrop</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">basic_transform</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
+        <span class="n">basic_transform</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">RandomCrop</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">if</span> <span class="n">basic_augment</span> <span class="k">else</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
 
         <span class="n">main_transform</span> <span class="o">=</span> <span class="n">Cutout</span><span class="p">(</span><span class="n">cutout</span><span class="p">)</span> <span class="k">if</span> <span class="n">cutout</span> <span class="k">else</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
 
