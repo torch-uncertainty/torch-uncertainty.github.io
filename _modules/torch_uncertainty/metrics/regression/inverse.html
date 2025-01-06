@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.metrics.regression.inverse &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>torch_uncertainty.metrics.regression.inverse &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -249,13 +249,13 @@
                 
                 
   <h1>Source code for torch_uncertainty.metrics.regression.inverse</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torchmetrics</span> <span class="kn">import</span> <span class="n">MeanAbsoluteError</span><span class="p">,</span> <span class="n">MeanSquaredError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeanAbsoluteError</span><span class="p">,</span> <span class="n">MeanSquaredError</span>
 
 
-<span class="k">def</span> <span class="nf">_unit_to_factor</span><span class="p">(</span><span class="n">unit</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;mm&quot;</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="s2">&quot;km&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_unit_to_factor</span><span class="p">(</span><span class="n">unit</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;mm&quot;</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="s2">&quot;km&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a unit to a factor for scaling.</span>
 
 <span class="sd">    Args:</span>
@@ -271,7 +271,7 @@
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unit must be one of &#39;mm&#39;, &#39;m&#39;, &#39;km&#39;. Got </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="MeanSquaredErrorInverse"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.MeanSquaredErrorInverse.html#torch_uncertainty.metrics.regression.MeanSquaredErrorInverse">[docs]</a><span class="k">class</span> <span class="nc">MeanSquaredErrorInverse</span><span class="p">(</span><span class="n">MeanSquaredError</span><span class="p">):</span>
+<div class="viewcode-block" id="MeanSquaredErrorInverse"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.MeanSquaredErrorInverse.html#torch_uncertainty.metrics.regression.MeanSquaredErrorInverse">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MeanSquaredErrorInverse</span><span class="p">(</span><span class="n">MeanSquaredError</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Mean Squared Error of the inverse predictions (iMSE).</span>
 
 <span class="sd">    .. math:: \text{iMSE} = \frac{1}{N}\sum_i^N(\frac{1}{y_i} - \frac{1}{\hat{y_i}})^2</span>
@@ -301,7 +301,7 @@
 <span class="sd">        kwargs: Additional keyword arguments.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">squared</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">num_outputs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -311,12 +311,12 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">squared</span><span class="p">,</span> <span class="n">num_outputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">unit_factor</span> <span class="o">=</span> <span class="n">_unit_to_factor</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MeanSquaredErrorInverse.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.MeanSquaredErrorInverse.html#torch_uncertainty.metrics.regression.MeanSquaredErrorInverse.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preds</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MeanSquaredErrorInverse.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.MeanSquaredErrorInverse.html#torch_uncertainty.metrics.regression.MeanSquaredErrorInverse.update">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preds</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update state with predictions and targets.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">preds</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_factor</span><span class="p">),</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">target</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_factor</span><span class="p">))</span></div></div>
 
 
-<div class="viewcode-block" id="MeanAbsoluteErrorInverse"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.MeanAbsoluteErrorInverse.html#torch_uncertainty.metrics.regression.MeanAbsoluteErrorInverse">[docs]</a><span class="k">class</span> <span class="nc">MeanAbsoluteErrorInverse</span><span class="p">(</span><span class="n">MeanAbsoluteError</span><span class="p">):</span>
+<div class="viewcode-block" id="MeanAbsoluteErrorInverse"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.MeanAbsoluteErrorInverse.html#torch_uncertainty.metrics.regression.MeanAbsoluteErrorInverse">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MeanAbsoluteErrorInverse</span><span class="p">(</span><span class="n">MeanAbsoluteError</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Mean Absolute Error of the inverse predictions (iMAE).</span>
 
 <span class="sd">    .. math:: \text{iMAE} = \frac{1}{N}\sum_i^N | \frac{1}{y_i} - \frac{1}{\hat{y_i}} |</span>
@@ -344,11 +344,11 @@
 <span class="sd">        kwargs: Additional keyword arguments.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;km&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;km&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">unit_factor</span> <span class="o">=</span> <span class="n">_unit_to_factor</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MeanAbsoluteErrorInverse.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.MeanAbsoluteErrorInverse.html#torch_uncertainty.metrics.regression.MeanAbsoluteErrorInverse.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preds</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MeanAbsoluteErrorInverse.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.MeanAbsoluteErrorInverse.html#torch_uncertainty.metrics.regression.MeanAbsoluteErrorInverse.update">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preds</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update state with predictions and targets.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">preds</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_factor</span><span class="p">),</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">target</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_factor</span><span class="p">))</span></div></div>
 </pre></div>

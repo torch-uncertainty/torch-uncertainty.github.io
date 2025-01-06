@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Train a Bayesian Neural Network in Three Minutes &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>Train a Bayesian Neural Network in Three Minutes &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -40,8 +40,8 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Deep Evidential Classification on a Toy Example" href="tutorial_evidential_classification.html" />
-  <link rel="prev" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
+  <link rel="next" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
+  <link rel="prev" title="Training a LeNet with Monte Carlo Batch Normalization" href="tutorial_mc_batch_norm.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -293,22 +293,22 @@ seen as Dirac distributions on the weights.</p>
 </ul>
 <p>We will also need to define an optimizer using torch.optim and Pytorch’s
 neural network utils from torch.nn.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
 
-<span class="kn">from</span> <span class="nn">torch_uncertainty</span> <span class="kn">import</span> <span class="n">TUTrainer</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <span class="n">MNISTDataModule</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.losses</span> <span class="kn">import</span> <span class="n">ELBOLoss</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.models.lenet</span> <span class="kn">import</span> <span class="n">bayesian_lenet</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.routines</span> <span class="kn">import</span> <span class="n">ClassificationRoutine</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty</span><span class="w"> </span><span class="kn">import</span> <span class="n">TUTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.datamodules</span><span class="w"> </span><span class="kn">import</span> <span class="n">MNISTDataModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.losses</span><span class="w"> </span><span class="kn">import</span> <span class="n">ELBOLoss</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models.lenet</span><span class="w"> </span><span class="kn">import</span> <span class="n">bayesian_lenet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.routines</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassificationRoutine</span>
 </pre></div>
 </div>
 </section>
 <section id="the-optimization-recipe">
 <h3>2. The Optimization Recipe<a class="headerlink" href="#the-optimization-recipe" title="Permalink to this heading">¶</a></h3>
 <p>We will use the Adam optimizer with the default learning rate of 0.001.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">optim_lenet</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">optim_lenet</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span>
         <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span>
         <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
@@ -379,27 +379,27 @@ logs will be saved in the root/logs folder.</p>
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          94.05%           │
-│    Brier     │          0.08943          │
-│   Entropy    │          0.21839          │
-│     NLL      │          0.18962          │
+│     Acc      │          95.60%           │
+│    Brier     │          0.06667          │
+│   Entropy    │          0.19789          │
+│     NLL      │          0.14290          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          0.01414          │
-│     aECE     │          0.01157          │
+│     ECE      │          0.01819          │
+│     aECE     │          0.01724          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │           0.57%           │
-│     AURC     │           0.64%           │
-│  Cov@5Risk   │          98.20%           │
-│  Risk@80Cov  │           0.85%           │
+│    AUGRC     │           0.33%           │
+│     AURC     │           0.37%           │
+│  Cov@5Risk   │          100.00%          │
+│  Risk@80Cov  │           0.39%           │
 └──────────────┴───────────────────────────┘
 
-[{&#39;test/cal/ECE&#39;: 0.014143800362944603, &#39;test/cal/aECE&#39;: 0.011571398936212063, &#39;test/cls/Acc&#39;: 0.940500020980835, &#39;test/cls/Brier&#39;: 0.08942904323339462, &#39;test/cls/NLL&#39;: 0.18962018191814423, &#39;test/sc/AUGRC&#39;: 0.005662701092660427, &#39;test/sc/AURC&#39;: 0.006422941107302904, &#39;test/sc/Cov@5Risk&#39;: 0.9819999933242798, &#39;test/sc/Risk@80Cov&#39;: 0.008500000461935997, &#39;test/cls/Entropy&#39;: 0.21839286386966705, &#39;test/ens_Disagreement&#39;: 0.008704166859388351, &#39;test/ens_Entropy&#39;: 0.21737651526927948, &#39;test/ens_MI&#39;: 0.0010163336992263794}]
+[{&#39;test/cal/ECE&#39;: 0.018186209723353386, &#39;test/cal/aECE&#39;: 0.01723717711865902, &#39;test/cls/Acc&#39;: 0.9559999704360962, &#39;test/cls/Brier&#39;: 0.0666707307100296, &#39;test/cls/NLL&#39;: 0.1429000049829483, &#39;test/sc/AUGRC&#39;: 0.003267636988312006, &#39;test/sc/AURC&#39;: 0.0037397730629891157, &#39;test/sc/Cov@5Risk&#39;: 1.0, &#39;test/sc/Risk@80Cov&#39;: 0.003874999936670065, &#39;test/cls/Entropy&#39;: 0.19788746535778046, &#39;test/ens_Disagreement&#39;: 0.006658333819359541, &#39;test/ens_Entropy&#39;: 0.19692672789096832, &#39;test/ens_MI&#39;: 0.0009606724488548934}]
 </pre></div>
 </div>
 </section>
@@ -409,13 +409,13 @@ logs will be saved in the root/logs folder.</p>
 Please note that we apply a reshape to the logits to determine the dimension corresponding to the ensemble
 and to the batch. As for TorchUncertainty 0.2.0, the ensemble dimension is merged with the batch dimension
 in this order (num_estimator x batch, classes).</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torchvision</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torchvision</span>
 
 
-<span class="k">def</span> <span class="nf">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
     <span class="n">npimg</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">npimg</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
@@ -447,7 +447,7 @@ in this order (num_estimator x batch, classes).</p>
 </div>
 <img src="../_images/sphx_glr_tutorial_bayesian_001.png" srcset="../_images/sphx_glr_tutorial_bayesian_001.png" alt="tutorial bayesian" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ground truth:  7 2 1 0
 Predicted digits:  7 2 1 0
-Std. dev. of the scores over the posterior samples 0.000992 0.000234 0.0011 0.000224
+Std. dev. of the scores over the posterior samples 0.00146 8.01e-05 0.000643 0.00884
 </pre></div>
 </div>
 <p>Here, we show the variance of the top prediction. This is a non-standard but intuitive way to show the diversity of the predictions
@@ -462,7 +462,7 @@ of the ensemble. Ideally, the variance should be high when the average top predi
 <li><p><strong>The Adam optimizer:</strong> Kingma, D. P., &amp; Ba, J. (2014). “Adam: A method for stochastic optimization.” <a class="reference external" href="https://arxiv.org/pdf/1412.6980.pdf">ICLR 2015</a>.</p></li>
 <li><p><strong>The Blitz</strong> <a class="reference external" href="https://github.com/piEsposito/blitz-bayesian-deep-learning">library</a> (for the hyperparameters).</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 54.969 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 54.935 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-bayesian-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/f43d536d36d9261bef3ab9c0808ea674/tutorial_bayesian.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_bayesian.ipynb</span></code></a></p>
@@ -486,12 +486,12 @@ of the ensemble. Ideally, the variance should be high when the average top predi
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="tutorial_evidential_classification.html" class="btn btn-neutral float-right" title="Deep Evidential Classification on a Toy Example" accesskey="n"
+    <a href="tutorial_der_cubic.html" class="btn btn-neutral float-right" title="Deep Evidential Regression on a Toy Example" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     
     
-    <a href="tutorial_der_cubic.html" class="btn btn-neutral" title="Deep Evidential Regression on a Toy Example" accesskey="p"
+    <a href="tutorial_mc_batch_norm.html" class="btn btn-neutral" title="Training a LeNet with Monte Carlo Batch Normalization" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>

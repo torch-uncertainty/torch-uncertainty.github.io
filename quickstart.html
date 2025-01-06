@@ -9,7 +9,7 @@
 <meta charset="utf-8"/>
 <meta content="Docutils 0.19: https://docutils.sourceforge.io/" name="generator">
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Quickstart — TorchUncertainty 0.3.1 documentation</title>
+<title>Quickstart — TorchUncertainty 0.4.0 documentation</title>
 <link href="_static/images/logo_torch_uncertainty.png" rel="shortcut icon"/>
 <link href="_static/css/custom.css" rel="stylesheet" type="text/css"/>
 <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
@@ -183,10 +183,10 @@ PyTorch layers.</p>
 <p>TorchUncertainty provides a set of Ligthning training and evaluation routines that wrap PyTorch models. Let’s have a look at the
 <a class="reference external" href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty/blob/main/torch_uncertainty/routines/classification.py">Classification routine</a>
 and its parameters.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lightning.pytorch</span> <span class="kn">import</span> <span class="n">LightningModule</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">lightning.pytorch</span><span class="w"> </span><span class="kn">import</span> <span class="n">LightningModule</span>
 
-<span class="k">class</span> <span class="nc">ClassificationRoutine</span><span class="p">(</span><span class="n">LightningModule</span><span class="p">):</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ClassificationRoutine</span><span class="p">(</span><span class="n">LightningModule</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
     <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -212,7 +212,7 @@ and its parameters.</p>
 <p>This routine is a wrapper of any custom or TorchUncertainty classification model. To use it,
 just build your model and pass it to the routine as argument along with an optimization recipe
 and the loss as well as the number of classes that we use for torch metrics.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">MyModel</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">routine</span> <span class="o">=</span> <span class="n">ClassificationRoutine</span><span class="p">(</span>
@@ -230,8 +230,8 @@ and the loss as well as the number of classes that we use for torch metrics.</p>
 or PyTorch dataloaders. When benchmarking models, we advise to use lightning datamodules that will automatically handle
 train/val/test splits, out-of-distribution detection and dataset shift. For this example, let us use TorchUncertainty’s
 CIFAR10 datamodule.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.classification.cifar10.CIFAR10DataModule"><span class="n">CIFAR10DataModule</span></a>
-<span class="kn">from</span> <span class="nn">lightning.pytorch</span> <span class="kn">import</span> <span class="n">TUTrainer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.datamodules</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.classification.cifar10.CIFAR10DataModule"><span class="n">CIFAR10DataModule</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lightning.pytorch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TUTrainer</span>
 
 <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.classification.cifar10.CIFAR10DataModule"><span class="n">dm</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.classification.cifar10.CIFAR10DataModule"><span class="n">CIFAR10DataModule</span></a><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s2">"data"</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">TUTrainer</span><span class="p">(</span><span class="n">gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
@@ -293,7 +293,7 @@ require Lightning.</p>
 <h3>Example<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <p>You can initialize a Packed-Ensemble out of a ResNet18
 backbone with the following code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.models.resnet</span> <span class="kn">import</span> <span class="n">packed_resnet</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models.resnet</span><span class="w"> </span><span class="kn">import</span> <span class="n">packed_resnet</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">packed_resnet</span><span class="p">(</span>
     <span class="n">in_channels</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
@@ -330,11 +330,11 @@ layer usage.</p>
 <h3>Example<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
 <p>You can create a Packed-Ensemble <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> model with the following
 code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">einops</span> <span class="kn">import</span> <span class="n">rearrange</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.layers</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.layers.PackedConv2d.html#torch_uncertainty.layers.PackedConv2d" title="torch_uncertainty.layers.packed.PackedConv2d"><span class="n">PackedConv2d</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.layers.PackedLinear.html#torch_uncertainty.layers.PackedLinear" title="torch_uncertainty.layers.packed.PackedLinear"><span class="n">PackedLinear</span></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">einops</span><span class="w"> </span><span class="kn">import</span> <span class="n">rearrange</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.layers</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.layers.PackedConv2d.html#torch_uncertainty.layers.PackedConv2d" title="torch_uncertainty.layers.packed.PackedConv2d"><span class="n">PackedConv2d</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.layers.PackedLinear.html#torch_uncertainty.layers.PackedLinear" title="torch_uncertainty.layers.packed.PackedLinear"><span class="n">PackedLinear</span></a>
 
-<span class="k">class</span> <span class="nc">PackedNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PackedNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">M</span> <span class="o">=</span> <span class="mi">4</span>
         <span class="n">alpha</span> <span class="o">=</span> <span class="mi">2</span>
@@ -348,7 +348,7 @@ code:</p>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="n">M</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span>

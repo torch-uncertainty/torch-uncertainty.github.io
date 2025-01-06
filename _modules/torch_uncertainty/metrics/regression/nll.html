@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.metrics.regression.nll &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>torch_uncertainty.metrics.regression.nll &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -249,14 +249,14 @@
                 
                 
   <h1>Source code for torch_uncertainty.metrics.regression.nll</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">distributions</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.utilities.data</span> <span class="kn">import</span> <span class="n">dim_zero_cat</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">distributions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">dim_zero_cat</span>
 
-<span class="kn">from</span> <span class="nn">torch_uncertainty.metrics</span> <span class="kn">import</span> <span class="n">CategoricalNLL</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">CategoricalNLL</span>
 
 
-<div class="viewcode-block" id="DistributionNLL"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.DistributionNLL.html#torch_uncertainty.metrics.regression.DistributionNLL">[docs]</a><span class="k">class</span> <span class="nc">DistributionNLL</span><span class="p">(</span><span class="n">CategoricalNLL</span><span class="p">):</span>
-<div class="viewcode-block" id="DistributionNLL.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.DistributionNLL.html#torch_uncertainty.metrics.regression.DistributionNLL.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
+<div class="viewcode-block" id="DistributionNLL"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.DistributionNLL.html#torch_uncertainty.metrics.regression.DistributionNLL">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DistributionNLL</span><span class="p">(</span><span class="n">CategoricalNLL</span><span class="p">):</span>
+<div class="viewcode-block" id="DistributionNLL.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.DistributionNLL.html#torch_uncertainty.metrics.regression.DistributionNLL.update">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dist</span><span class="p">:</span> <span class="n">distributions</span><span class="o">.</span><span class="n">Distribution</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -272,21 +272,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">nlog_prob</span> <span class="o">=</span> <span class="o">-</span><span class="n">dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">padding_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">nlog_prob</span> <span class="o">=</span> <span class="n">nlog_prob</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">padding_mask</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">nlog_prob</span> <span class="o">=</span> <span class="n">nlog_prob</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">padding_mask</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nlog_prob</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">+=</span> <span class="n">nlog_prob</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">+=</span> <span class="n">target</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">+=</span> <span class="n">nlog_prob</span><span class="o">.</span><span class="n">nansum</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">+=</span> <span class="n">padding_mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">if</span> <span class="n">padding_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">target</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="DistributionNLL.compute"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.DistributionNLL.html#torch_uncertainty.metrics.regression.DistributionNLL.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="DistributionNLL.compute"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.DistributionNLL.html#torch_uncertainty.metrics.regression.DistributionNLL.compute">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes NLL based on inputs passed in to ``update`` previously.&quot;&quot;&quot;</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">nansum</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span>
+            <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">nansum</span><span class="p">()</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span>
         <span class="c1"># reduction is None or &quot;none&quot;</span>
         <span class="k">return</span> <span class="n">values</span></div></div>
 </pre></div>

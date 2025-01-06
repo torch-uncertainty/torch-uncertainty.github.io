@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.metrics.classification.calibration_error &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>torch_uncertainty.metrics.classification.calibration_error &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -249,29 +249,29 @@
                 
                 
   <h1>Source code for torch_uncertainty.metrics.classification.calibration_error</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span>
 
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">matplotlib.ticker</span> <span class="k">as</span> <span class="nn">mticker</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.classification.calibration_error</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mticker</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.classification.calibration_error</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BinaryCalibrationError</span><span class="p">,</span>
     <span class="n">MulticlassCalibrationError</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.functional.classification.calibration_error</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.functional.classification.calibration_error</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_binning_bucketize</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.metric</span> <span class="kn">import</span> <span class="n">Metric</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.utilities.data</span> <span class="kn">import</span> <span class="n">dim_zero_cat</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.utilities.enums</span> <span class="kn">import</span> <span class="n">ClassificationTaskNoMultilabel</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.utilities.plot</span> <span class="kn">import</span> <span class="n">_PLOT_OUT_TYPE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.metric</span><span class="w"> </span><span class="kn">import</span> <span class="n">Metric</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">dim_zero_cat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassificationTaskNoMultilabel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">_PLOT_OUT_TYPE</span>
 
-<span class="kn">from</span> <span class="nn">.adaptive_calibration_error</span> <span class="kn">import</span> <span class="n">AdaptiveCalibrationError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.adaptive_calibration_error</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdaptiveCalibrationError</span>
 
 
-<span class="k">def</span> <span class="nf">_reliability_diagram_subplot</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_reliability_diagram_subplot</span><span class="p">(</span>
     <span class="n">ax</span><span class="p">,</span>
     <span class="n">accuracies</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">confidences</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -341,7 +341,7 @@
     <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="p">[</span><span class="n">gap_plt</span><span class="p">,</span> <span class="n">acc_plt</span><span class="p">])</span>
 
 
-<span class="k">def</span> <span class="nf">_confidence_histogram_subplot</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_confidence_histogram_subplot</span><span class="p">(</span>
     <span class="n">ax</span><span class="p">,</span>
     <span class="n">accuracies</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">confidences</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -384,7 +384,7 @@
     <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="p">[</span><span class="n">acc_plt</span><span class="p">,</span> <span class="n">conf_plt</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">reliability_chart</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reliability_chart</span><span class="p">(</span>
     <span class="n">accuracies</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">confidences</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">bin_accuracies</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -428,7 +428,7 @@
     <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
 
 
-<span class="k">def</span> <span class="nf">custom_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PLOT_OUT_TYPE</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">custom_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PLOT_OUT_TYPE</span><span class="p">:</span>
     <span class="n">confidences</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confidences</span><span class="p">)</span>
     <span class="n">accuracies</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracies</span><span class="p">)</span>
 
@@ -463,7 +463,7 @@
 <span class="n">MulticlassCalibrationError</span><span class="o">.</span><span class="n">plot</span> <span class="o">=</span> <span class="n">custom_plot</span>
 
 
-<div class="viewcode-block" id="CalibrationError"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.CalibrationError.html#torch_uncertainty.metrics.classification.CalibrationError">[docs]</a><span class="k">class</span> <span class="nc">CalibrationError</span><span class="p">:</span>
+<div class="viewcode-block" id="CalibrationError"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.CalibrationError.html#torch_uncertainty.metrics.classification.CalibrationError">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CalibrationError</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Top-label Calibration Error.</span>
 
 <span class="sd">    See</span>
@@ -476,7 +476,7 @@
 <span class="sd">            binning.&quot; In AAAI, 2015.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span>  <span class="c1"># type: ignore[misc]</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span>  <span class="c1"># type: ignore[misc]</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">task</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;binary&quot;</span><span class="p">,</span> <span class="s2">&quot;multiclass&quot;</span><span class="p">],</span>
         <span class="n">adaptive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>

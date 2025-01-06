@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.models.wrappers.swag &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>torch_uncertainty.models.wrappers.swag &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -249,21 +249,21 @@
                 
                 
   <h1>Source code for torch_uncertainty.models.wrappers.swag</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
 
-<span class="kn">from</span> <span class="nn">.swa</span> <span class="kn">import</span> <span class="n">SWA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.swa</span><span class="w"> </span><span class="kn">import</span> <span class="n">SWA</span>
 
 
-<div class="viewcode-block" id="SWAG"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.SWAG.html#torch_uncertainty.models.SWAG">[docs]</a><span class="k">class</span> <span class="nc">SWAG</span><span class="p">(</span><span class="n">SWA</span><span class="p">):</span>
+<div class="viewcode-block" id="SWAG"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.SWAG.html#torch_uncertainty.models.SWAG">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SWAG</span><span class="p">(</span><span class="n">SWA</span><span class="p">):</span>
     <span class="n">swag_stats</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]</span>
     <span class="n">prfx</span> <span class="o">=</span> <span class="s2">&quot;model.swag_stats.&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
         <span class="n">cycle_start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -290,7 +290,7 @@
 <span class="sd">            model (nn.Module): PyTorch model to be trained.</span>
 <span class="sd">            cycle_start (int): Begininning of the first SWAG averaging cycle.</span>
 <span class="sd">            cycle_length (int): Number of epochs between SWAG updates. The</span>
-<span class="sd">                first update occurs at :attr:`cycle_start`+:attr:`cycle_length`.</span>
+<span class="sd">                first update occurs at :attr:`cycle_start` + :attr:`cycle_length`.</span>
 <span class="sd">            scale (float, optional): Scale of the Gaussian. Defaults to 1.0.</span>
 <span class="sd">            diag_covariance (bool, optional): Whether to use a diagonal</span>
 <span class="sd">                covariance. Defaults to False.</span>
@@ -321,13 +321,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fit</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="SWAG.eval_forward"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.SWAG.html#torch_uncertainty.models.SWAG.eval_forward">[docs]</a>    <span class="k">def</span> <span class="nf">eval_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="SWAG.eval_forward"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.SWAG.html#torch_uncertainty.models.SWAG.eval_forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">eval_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass of the SWAG model when in eval mode.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">core_model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">mod</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">device</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="SWAG.initialize_stats"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.SWAG.html#torch_uncertainty.models.SWAG.initialize_stats">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="SWAG.initialize_stats"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.SWAG.html#torch_uncertainty.models.SWAG.initialize_stats">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">initialize_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the SWAG dictionary of statistics.</span>
 
 <span class="sd">        For each parameter, we create a mean, squared mean, and covariance</span>
@@ -348,7 +348,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">swag_stats</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">prfx</span> <span class="o">+</span> <span class="n">name_p</span> <span class="o">+</span> <span class="s2">&quot;_covariance_sqrt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">covariance_sqrt</span></div>
 
 <div class="viewcode-block" id="SWAG.update_wrapper"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.SWAG.html#torch_uncertainty.models.SWAG.update_wrapper">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">update_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the SWAG posterior.</span>
 
 <span class="sd">        The update is performed if the epoch is greater than the cycle start</span>
@@ -392,7 +392,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">need_bn_update</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fit</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="SWAG.bn_update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.SWAG.html#torch_uncertainty.models.SWAG.bn_update">[docs]</a>    <span class="k">def</span> <span class="nf">bn_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="SWAG.bn_update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.SWAG.html#torch_uncertainty.models.SWAG.bn_update">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">bn_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the bachnorm statistics of the current SWAG samples.</span>
 
 <span class="sd">        Args:</span>
@@ -404,7 +404,7 @@
                 <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">swa_utils</span><span class="o">.</span><span class="n">update_bn</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">mod</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">need_bn_update</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="SWAG.sample"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.SWAG.html#torch_uncertainty.models.SWAG.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+<div class="viewcode-block" id="SWAG.sample"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.SWAG.html#torch_uncertainty.models.SWAG.sample">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">diag_covariance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -436,7 +436,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fullrank_sample</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">diag_covariance</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Raise an issue if you need this feature.&quot;</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_fullrank_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">diagonal_covariance</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fullrank_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">diagonal_covariance</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
         <span class="n">new_sample</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">core_model</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">name_p</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">new_sample</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
@@ -458,18 +458,18 @@
             <span class="n">param</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">param</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_sample</span>
 
-    <span class="k">def</span> <span class="nf">_save_to_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">keep_vars</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save_to_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">keep_vars</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add the SWAG statistics to the destination dict.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_save_to_state_dict</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">keep_vars</span><span class="p">)</span>
         <span class="n">destination</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">swag_stats</span>
 
-<div class="viewcode-block" id="SWAG.state_dict"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.SWAG.html#torch_uncertainty.models.SWAG.state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">keep_vars</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">:</span>
+<div class="viewcode-block" id="SWAG.state_dict"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.SWAG.html#torch_uncertainty.models.SWAG.state_dict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">keep_vars</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add the SWAG statistics to the state dict.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">swag_stats</span> <span class="o">|</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(</span>
             <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="n">destination</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">keep_vars</span><span class="o">=</span><span class="n">keep_vars</span>
         <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_load_swag_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_swag_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the SWAG statistics from the state dict.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">swag_stats</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">swag_stats</span><span class="p">}</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">swag_stats</span><span class="p">:</span>
@@ -480,18 +480,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">need_bn_update</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fit</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">assign</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">assign</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_load_swag_stats</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">strict</span><span class="p">,</span> <span class="n">assign</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">compute_logdet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_logdet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Raise an issue if you need this feature.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">compute_logprob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">diag</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_logprob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">diag</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Raise an issue if you need this feature.&quot;</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_swag_checks</span><span class="p">(</span><span class="n">scale</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">max_num_models</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">var_clamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_swag_checks</span><span class="p">(</span><span class="n">scale</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">max_num_models</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">var_clamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">scale</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`scale` must be non-negative. Got </span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">max_num_models</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>

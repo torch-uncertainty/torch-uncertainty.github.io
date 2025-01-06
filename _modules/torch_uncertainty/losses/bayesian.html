@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.losses.bayesian &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>torch_uncertainty.losses.bayesian &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -249,14 +249,16 @@
                 
                 
   <h1>Source code for torch_uncertainty.losses.bayesian</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.distributions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Independent</span>
 
-<span class="kn">from</span> <span class="nn">torch_uncertainty.layers.bayesian</span> <span class="kn">import</span> <span class="n">bayesian_modules</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.layers.bayesian</span><span class="w"> </span><span class="kn">import</span> <span class="n">bayesian_modules</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.utils.distributions</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_dist_class</span>
 
 
-<div class="viewcode-block" id="KLDiv"><a class="viewcode-back" href="../../../generated/torch_uncertainty.losses.KLDiv.html#torch_uncertainty.losses.KLDiv">[docs]</a><span class="k">class</span> <span class="nc">KLDiv</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="KLDiv"><a class="viewcode-back" href="../../../generated/torch_uncertainty.losses.KLDiv.html#torch_uncertainty.losses.KLDiv">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">KLDiv</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;KL divergence loss for Bayesian Neural Networks. Gathers the KL from the</span>
 <span class="sd">        modules computed in the forward passes.</span>
 
@@ -266,10 +268,10 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kl_div</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_kl_div</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_kl_div</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gathers pre-computed KL-Divergences from :attr:`model`.&quot;&quot;&quot;</span>
         <span class="n">kl_divergence</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
@@ -281,13 +283,14 @@
         <span class="k">return</span> <span class="n">kl_divergence</span> <span class="o">/</span> <span class="n">count</span></div>
 
 
-<div class="viewcode-block" id="ELBOLoss"><a class="viewcode-back" href="../../../generated/torch_uncertainty.losses.ELBOLoss.html#torch_uncertainty.losses.ELBOLoss">[docs]</a><span class="k">class</span> <span class="nc">ELBOLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="ELBOLoss"><a class="viewcode-back" href="../../../generated/torch_uncertainty.losses.ELBOLoss.html#torch_uncertainty.losses.ELBOLoss">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ELBOLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">inner_loss</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
         <span class="n">kl_weight</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">dist_family</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The Evidence Lower Bound (ELBO) loss for Bayesian Neural Networks.</span>
 
@@ -299,6 +302,8 @@
 <span class="sd">            inner_loss (nn.Module): The loss function to use during training</span>
 <span class="sd">            kl_weight (float): The weight of the KL divergence term</span>
 <span class="sd">            num_samples (int): The number of samples to use for the ELBO loss</span>
+<span class="sd">            dist_family (str, optional): The distribution family to use for the</span>
+<span class="sd">                output of the model. ``None`` means point-wise prediction. Defaults to ``None``.</span>
 
 <span class="sd">        Note:</span>
 <span class="sd">            Set the model to None if you use the ELBOLoss within</span>
@@ -311,8 +316,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">inner_loss</span> <span class="o">=</span> <span class="n">inner_loss</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kl_weight</span> <span class="o">=</span> <span class="n">kl_weight</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span> <span class="o">=</span> <span class="n">num_samples</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist_family</span> <span class="o">=</span> <span class="n">dist_family</span>
 
-<div class="viewcode-block" id="ELBOLoss.forward"><a class="viewcode-back" href="../../../generated/torch_uncertainty.losses.ELBOLoss.html#torch_uncertainty.losses.ELBOLoss.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="ELBOLoss.forward"><a class="viewcode-back" href="../../../generated/torch_uncertainty.losses.ELBOLoss.html#torch_uncertainty.losses.ELBOLoss.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gather the KL divergence from the Bayesian modules and aggregate</span>
 <span class="sd">        the ELBO loss for a given network.</span>
 
@@ -324,20 +330,24 @@
 <span class="sd">            Tensor: The aggregated ELBO loss</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">aggregated_elbo</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">inputs</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">dist_class</span> <span class="o">=</span> <span class="n">get_dist_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_family</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_family</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span><span class="p">):</span>
-            <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
-            <span class="n">aggregated_elbo</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner_loss</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dist_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Wrap the distribution in an Independent distribution for log_prob computation.</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">Independent</span><span class="p">(</span><span class="n">dist_class</span><span class="p">(</span><span class="o">**</span><span class="n">out</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">aggregated_elbo</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner_loss</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
             <span class="c1"># TODO: This shouldn&#39;t be necessary</span>
             <span class="n">aggregated_elbo</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kl_weight</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kl_div</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">aggregated_elbo</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_samples</span></div>
 
-    <span class="k">def</span> <span class="nf">set_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_kl_div</span> <span class="o">=</span> <span class="n">KLDiv</span><span class="p">(</span><span class="n">model</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_elbo_loss_checks</span><span class="p">(</span><span class="n">inner_loss</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">kl_weight</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_elbo_loss_checks</span><span class="p">(</span><span class="n">inner_loss</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">kl_weight</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_loss</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The inner_loss should be an instance of a class.&quot;</span> <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">inner_loss</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 

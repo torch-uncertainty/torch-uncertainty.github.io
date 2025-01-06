@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MeanIntersectionOverUnion &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>MeanIntersectionOverUnion &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -262,8 +262,41 @@
 <h1>MeanIntersectionOverUnion<a class="headerlink" href="#meanintersectionoverunion" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.classification.MeanIntersectionOverUnion">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.classification.</span></span><span class="sig-name descname"><span class="pre">MeanIntersectionOverUnion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multidim_average</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'global'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/mean_iou.html#MeanIntersectionOverUnion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.MeanIntersectionOverUnion" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the MeanIntersection over Union (IoU) score.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.classification.</span></span><span class="sig-name descname"><span class="pre">MeanIntersectionOverUnion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/mean_iou.html#MeanIntersectionOverUnion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.MeanIntersectionOverUnion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes Mean Intersection over Union (IoU) score.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_classes</strong> (<em>int</em>) – Integer specifying the number of classes.</p></li>
+<li><p><strong>top_k</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of highest probability or logit score predictions
+considered to find the correct label. Only works when <code class="docutils literal notranslate"><span class="pre">preds</span></code> contain
+probabilities/logits. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>ignore_index</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Specifies a target value that is ignored and does
+not contribute to the metric calculation. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>validate_args</strong> (<em>bool</em><em>, </em><em>optional</em>) – Bool indicating if input arguments and tensors should
+be validated for correctness. Set to <code class="docutils literal notranslate"><span class="pre">False</span></code> for faster computations. Defaults to
+<code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>**kwargs</strong> – kwargs: Additional keyword arguments, see
+<a class="reference external" href="https://lightning.ai/docs/torchmetrics/stable/pages/overview.html#metric-kwargs">Advanced metric settings</a>
+for more info.</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt>Shape:</dt><dd><p>As input to <code class="docutils literal notranslate"><span class="pre">forward</span></code> and <code class="docutils literal notranslate"><span class="pre">update</span></code> the metric accepts the following input:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">preds</span></code> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): An int tensor of shape <code class="docutils literal notranslate"><span class="pre">(B,</span> <span class="pre">...)</span></code> or float tensor of shape <code class="docutils literal notranslate"><span class="pre">(B,</span> <span class="pre">C,</span> <span class="pre">..)</span></code>.
+If preds is a floating point we apply <code class="docutils literal notranslate"><span class="pre">torch.argmax</span></code> along the <code class="docutils literal notranslate"><span class="pre">C</span></code> dimension to automatically convert
+probabilities/logits into an int tensor.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">target</span></code> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): An int tensor of shape <code class="docutils literal notranslate"><span class="pre">(B,</span> <span class="pre">...)</span></code>.</p></li>
+</ul>
+<p>As output to <code class="docutils literal notranslate"><span class="pre">forward</span></code> and <code class="docutils literal notranslate"><span class="pre">compute</span></code> the metric returns the following output:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mean_iou</span></code> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): The computed Mean Intersection over Union (IoU) score.
+A tensor containing a single float value.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.classification.MeanIntersectionOverUnion.compute">
 <span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/mean_iou.html#MeanIntersectionOverUnion.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.MeanIntersectionOverUnion.compute" title="Permalink to this definition">¶</a></dt>

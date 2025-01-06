@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.metrics.classification.adaptive_calibration_error &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>torch_uncertainty.metrics.classification.adaptive_calibration_error &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -249,21 +249,21 @@
                 
                 
   <h1>Source code for torch_uncertainty.metrics.classification.adaptive_calibration_error</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torch.nn.utils.rnn</span> <span class="kn">import</span> <span class="n">pad_sequence</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.classification.calibration_error</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn.utils.rnn</span><span class="w"> </span><span class="kn">import</span> <span class="n">pad_sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.classification.calibration_error</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_binary_calibration_error_arg_validation</span><span class="p">,</span>
     <span class="n">_multiclass_calibration_error_arg_validation</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.metric</span> <span class="kn">import</span> <span class="n">Metric</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.utilities.data</span> <span class="kn">import</span> <span class="n">dim_zero_cat</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.utilities.enums</span> <span class="kn">import</span> <span class="n">ClassificationTaskNoMultilabel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.metric</span><span class="w"> </span><span class="kn">import</span> <span class="n">Metric</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">dim_zero_cat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassificationTaskNoMultilabel</span>
 
 
-<span class="k">def</span> <span class="nf">_equal_binning_bucketize</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_equal_binning_bucketize</span><span class="p">(</span>
     <span class="n">confidences</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">accuracies</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">num_bins</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute bins for the adaptive calibration error.</span>
@@ -296,7 +296,7 @@
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_ace_compute</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_ace_compute</span><span class="p">(</span>
     <span class="n">confidences</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">accuracies</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">num_bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -340,7 +340,7 @@
     <span class="k">return</span> <span class="n">ace</span>
 
 
-<span class="k">class</span> <span class="nc">BinaryAdaptiveCalibrationError</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BinaryAdaptiveCalibrationError</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Adaptive Top-label Calibration Error for binary tasks.&quot;&quot;&quot;</span>
 
     <span class="n">is_differentiable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -350,7 +350,7 @@
     <span class="n">confidences</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span>
     <span class="n">accuracies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">n_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
         <span class="n">norm</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;l1&quot;</span><span class="p">,</span> <span class="s2">&quot;l2&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;l1&quot;</span><span class="p">,</span>
@@ -370,21 +370,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;confidences&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;cat&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;accuracies&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;cat&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update metric states with predictions and targets.&quot;&quot;&quot;</span>
         <span class="n">confidences</span><span class="p">,</span> <span class="n">preds</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">probs</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span>
         <span class="n">accuracies</span> <span class="o">=</span> <span class="n">preds</span> <span class="o">==</span> <span class="n">targets</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">confidences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">confidences</span><span class="o">.</span><span class="n">float</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">accuracies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">accuracies</span><span class="o">.</span><span class="n">float</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute metric.&quot;&quot;&quot;</span>
         <span class="n">confidences</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confidences</span><span class="p">)</span>
         <span class="n">accuracies</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracies</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_ace_compute</span><span class="p">(</span><span class="n">confidences</span><span class="p">,</span> <span class="n">accuracies</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_bins</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">MulticlassAdaptiveCalibrationError</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MulticlassAdaptiveCalibrationError</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Adaptive Top-label Calibration Error for multiclass tasks.&quot;&quot;&quot;</span>
 
     <span class="n">is_differentiable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -394,7 +394,7 @@
     <span class="n">confidences</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span>
     <span class="n">accuracies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">n_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
@@ -415,28 +415,28 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;confidences&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;cat&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;accuracies&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;cat&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update metric states with predictions and targets.&quot;&quot;&quot;</span>
         <span class="n">confidences</span><span class="p">,</span> <span class="n">preds</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">accuracies</span> <span class="o">=</span> <span class="n">preds</span> <span class="o">==</span> <span class="n">targets</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">confidences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">confidences</span><span class="o">.</span><span class="n">float</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">accuracies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">accuracies</span><span class="o">.</span><span class="n">float</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute metric.&quot;&quot;&quot;</span>
         <span class="n">confidences</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confidences</span><span class="p">)</span>
         <span class="n">accuracies</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracies</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_ace_compute</span><span class="p">(</span><span class="n">confidences</span><span class="p">,</span> <span class="n">accuracies</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_bins</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="AdaptiveCalibrationError"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AdaptiveCalibrationError.html#torch_uncertainty.metrics.classification.AdaptiveCalibrationError">[docs]</a><span class="k">class</span> <span class="nc">AdaptiveCalibrationError</span><span class="p">:</span>
+<div class="viewcode-block" id="AdaptiveCalibrationError"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AdaptiveCalibrationError.html#torch_uncertainty.metrics.classification.AdaptiveCalibrationError">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">AdaptiveCalibrationError</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;`Adaptive Top-label Calibration Error`.</span>
 
 <span class="sd">    Reference:</span>
 <span class="sd">        Nixon et al. Measuring calibration in deep learning. In CVPRW, 2019.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">task</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;binary&quot;</span><span class="p">,</span> <span class="s2">&quot;multiclass&quot;</span><span class="p">],</span>
         <span class="n">num_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>

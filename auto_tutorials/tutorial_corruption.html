@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Corrupting Images with TorchUncertainty to Benchmark Robustness &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>Corrupting Images with TorchUncertainty to Benchmark Robustness &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -41,7 +41,7 @@
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
   <link rel="next" title="From a Standard Classifier to a Packed-Ensemble" href="tutorial_pe_cifar10.html" />
-  <link rel="prev" title="Deep Evidential Classification on a Toy Example" href="tutorial_evidential_classification.html" />
+  <link rel="prev" title="Deep Probabilistic Regression" href="tutorial_probabilistic_regression.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -272,11 +272,11 @@ by Dan Hendrycks and Thomas Dietterich.</p>
 <p>For this tutorial, we will only load the corruption transforms available in
 torch_uncertainty.transforms.corruption. We also need to load utilities from
 torchvision and matplotlib.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchvision.transforms</span> <span class="kn">import</span> <span class="n">Compose</span><span class="p">,</span> <span class="n">ToTensor</span><span class="p">,</span> <span class="n">Resize</span><span class="p">,</span> <span class="n">CenterCrop</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torchvision.transforms</span><span class="w"> </span><span class="kn">import</span> <span class="n">Compose</span><span class="p">,</span> <span class="n">ToTensor</span><span class="p">,</span> <span class="n">Resize</span><span class="p">,</span> <span class="n">CenterCrop</span>
 
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">from</span> <span class="nn">urllib</span> <span class="kn">import</span> <span class="n">request</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib</span><span class="w"> </span><span class="kn">import</span> <span class="n">request</span>
 
 <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;https://upload.wikimedia.org/wikipedia/commons/d/d9/Carduelis_tristis_-Michigan%2C_USA_-male-8.jpg&quot;</span><span class="p">,</span>
@@ -286,14 +286,14 @@ torchvision and matplotlib.</p>
     <span class="s2">&quot;https://upload.wikimedia.org/wikipedia/commons/8/8b/Cottontail_Rabbit.jpg&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
-<span class="k">def</span> <span class="nf">download_img</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">download_img</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
     <span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;tmp_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;tmp_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
 
 <span class="n">images_ds</span> <span class="o">=</span> <span class="p">[</span><span class="n">download_img</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">urls</span><span class="p">)]</span>
 
 
-<span class="k">def</span> <span class="nf">get_images</span><span class="p">(</span><span class="n">main_corruption</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_images</span><span class="p">(</span><span class="n">main_corruption</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an image showing the 6 levels of corruption of a given transform.&quot;&quot;&quot;</span>
     <span class="n">images</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">severity</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
@@ -304,7 +304,7 @@ torchvision and matplotlib.</p>
     <span class="k">return</span> <span class="n">images</span>
 
 
-<span class="k">def</span> <span class="nf">show_images</span><span class="p">(</span><span class="n">transforms</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">show_images</span><span class="p">(</span><span class="n">transforms</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Show the effect of all given transforms.&quot;&quot;&quot;</span>
     <span class="n">num_corruptions</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">transforms</span><span class="p">)</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">num_corruptions</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1.5</span> <span class="o">*</span> <span class="n">num_corruptions</span><span class="p">)))</span>
@@ -332,7 +332,7 @@ torchvision and matplotlib.</p>
 </div>
 <section id="noise-corruptions">
 <h2>1. Noise Corruptions<a class="headerlink" href="#noise-corruptions" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruption</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.transforms.corruption</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GaussianNoise</span><span class="p">,</span>
     <span class="n">ShotNoise</span><span class="p">,</span>
     <span class="n">ImpulseNoise</span><span class="p">,</span>
@@ -350,7 +350,7 @@ torchvision and matplotlib.</p>
 <img src="../_images/sphx_glr_tutorial_corruption_001.png" srcset="../_images/sphx_glr_tutorial_corruption_001.png" alt="Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5" class = "sphx-glr-single-img"/></section>
 <section id="blur-corruptions">
 <h2>2. Blur Corruptions<a class="headerlink" href="#blur-corruptions" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruption</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.transforms.corruption</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MotionBlur</span><span class="p">,</span>
     <span class="n">GlassBlur</span><span class="p">,</span>
     <span class="n">DefocusBlur</span><span class="p">,</span>
@@ -370,7 +370,7 @@ torchvision and matplotlib.</p>
 <img src="../_images/sphx_glr_tutorial_corruption_002.png" srcset="../_images/sphx_glr_tutorial_corruption_002.png" alt="Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5" class = "sphx-glr-single-img"/></section>
 <section id="weather-corruptions">
 <h2>3. Weather Corruptions<a class="headerlink" href="#weather-corruptions" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruption</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.transforms.corruption</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Frost</span><span class="p">,</span>
     <span class="n">Snow</span><span class="p">,</span>
     <span class="n">Fog</span><span class="p">,</span>
@@ -388,18 +388,20 @@ torchvision and matplotlib.</p>
 <img src="../_images/sphx_glr_tutorial_corruption_003.png" srcset="../_images/sphx_glr_tutorial_corruption_003.png" alt="Original, Severity 1, Severity 2, Severity 3, Severity 4, Severity 5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://zenodo.org/records/10438904/files/frost.zip to data/frost.zip
 
   0%|          | 0.00/1.78M [00:00&lt;?, ?B/s]
-  2%|▏         | 32.8k/1.78M [00:00&lt;00:06, 276kB/s]
-  7%|▋         | 131k/1.78M [00:00&lt;00:03, 495kB/s]
- 17%|█▋        | 295k/1.78M [00:00&lt;00:01, 855kB/s]
- 61%|██████    | 1.08M/1.78M [00:00&lt;00:00, 2.95MB/s]
-100%|██████████| 1.78M/1.78M [00:00&lt;00:00, 3.01MB/s]
+  2%|▏         | 32.8k/1.78M [00:00&lt;00:10, 168kB/s]
+  4%|▎         | 65.5k/1.78M [00:00&lt;00:09, 186kB/s]
+  9%|▉         | 164k/1.78M [00:00&lt;00:04, 368kB/s]
+ 17%|█▋        | 295k/1.78M [00:00&lt;00:02, 536kB/s]
+ 35%|███▍      | 623k/1.78M [00:00&lt;00:01, 1.06MB/s]
+ 70%|██████▉   | 1.25M/1.78M [00:01&lt;00:00, 1.99MB/s]
+100%|██████████| 1.78M/1.78M [00:01&lt;00:00, 1.76MB/s]
 Extracting data/frost.zip to data
 </pre></div>
 </div>
 </section>
 <section id="other-corruptions">
 <h2>4. Other Corruptions<a class="headerlink" href="#other-corruptions" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruption</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.transforms.corruption</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Brightness</span><span class="p">,</span> <span class="n">Contrast</span><span class="p">,</span> <span class="n">Elastic</span><span class="p">,</span> <span class="n">JPEGCompression</span><span class="p">,</span> <span class="n">Pixelate</span><span class="p">)</span>
 
 <span class="n">show_images</span><span class="p">(</span>
@@ -418,7 +420,7 @@ Extracting data/frost.zip to data
 <h2>5. Unused Corruptions<a class="headerlink" href="#unused-corruptions" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># The following corruptions are not used in the paper Benchmarking Neural Network Robustness to Common Corruptions and Perturbations.</span>
 
-<span class="kn">from</span> <span class="nn">torch_uncertainty.transforms.corruption</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.transforms.corruption</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GaussianBlur</span><span class="p">,</span>
     <span class="n">SpeckleNoise</span><span class="p">,</span>
     <span class="n">Saturation</span><span class="p">,</span>
@@ -438,7 +440,7 @@ Extracting data/frost.zip to data
 <ul class="simple">
 <li><p><strong>Benchmarking Neural Network Robustness to Common Corruptions and Perturbations</strong>, Dan Hendrycks and Thomas Dietterich. <a class="reference external" href="https://arxiv.org/pdf/1903.12261">ICLR 2019</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 9.785 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 10.301 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-corruption-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/fb6a5e9834a7c6a46122640646eaa723/tutorial_corruption.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_corruption.ipynb</span></code></a></p>
@@ -468,7 +470,7 @@ Extracting data/frost.zip to data
         class="next-page"></a>
     
     
-    <a href="tutorial_evidential_classification.html" class="btn btn-neutral" title="Deep Evidential Classification on a Toy Example" accesskey="p"
+    <a href="tutorial_probabilistic_regression.html" class="btn btn-neutral" title="Deep Probabilistic Regression" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>

@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.post_processing.mc_batch_norm &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>torch_uncertainty.post_processing.mc_batch_norm &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -249,23 +249,23 @@
                 
                 
   <h1>Source code for torch_uncertainty.post_processing.mc_batch_norm</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Dataset</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Dataset</span>
 
-<span class="kn">from</span> <span class="nn">torch_uncertainty.layers.mc_batch_norm</span> <span class="kn">import</span> <span class="n">MCBatchNorm2d</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.post_processing</span> <span class="kn">import</span> <span class="n">PostProcessing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.layers.mc_batch_norm</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCBatchNorm2d</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.post_processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">PostProcessing</span>
 
 
-<div class="viewcode-block" id="MCBatchNorm"><a class="viewcode-back" href="../../../generated/torch_uncertainty.post_processing.MCBatchNorm.html#torch_uncertainty.post_processing.MCBatchNorm">[docs]</a><span class="k">class</span> <span class="nc">MCBatchNorm</span><span class="p">(</span><span class="n">PostProcessing</span><span class="p">):</span>
+<div class="viewcode-block" id="MCBatchNorm"><a class="viewcode-back" href="../../../generated/torch_uncertainty.post_processing.MCBatchNorm.html#torch_uncertainty.post_processing.MCBatchNorm">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MCBatchNorm</span><span class="p">(</span><span class="n">PostProcessing</span><span class="p">):</span>
     <span class="n">counter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">mc_batch_norm_layers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MCBatchNorm2d</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">trained</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
@@ -299,7 +299,7 @@
         <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_setup_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
         <span class="n">_mcbn_checks</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mc_batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>  <span class="c1"># Is it necessary?</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
@@ -308,11 +308,11 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">has_mcbn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;model does not contain any MCBatchNorm2d after conversion.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">set_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MCBatchNorm.fit"><a class="viewcode-back" href="../../../generated/torch_uncertainty.post_processing.MCBatchNorm.html#torch_uncertainty.post_processing.MCBatchNorm.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MCBatchNorm.fit"><a class="viewcode-back" href="../../../generated/torch_uncertainty.post_processing.MCBatchNorm.html#torch_uncertainty.post_processing.MCBatchNorm.fit">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fit the model on the dataset.</span>
 
 <span class="sd">        Args:</span>
@@ -336,13 +336,13 @@
                 <span class="k">return</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The dataset is too small to populate the MC BatchNorm statistics.&quot;</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_est_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_est_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass of a single estimator.&quot;&quot;&quot;</span>
         <span class="n">logit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">raise_counters</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">logit</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
@@ -353,23 +353,23 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_counters</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_est_forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_convert</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convert</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert all BatchNorm2d layers to MCBatchNorm2d layers.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">replace_layers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MCBatchNorm.reset_counters"><a class="viewcode-back" href="../../../generated/torch_uncertainty.post_processing.MCBatchNorm.html#torch_uncertainty.post_processing.MCBatchNorm.reset_counters">[docs]</a>    <span class="k">def</span> <span class="nf">reset_counters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MCBatchNorm.reset_counters"><a class="viewcode-back" href="../../../generated/torch_uncertainty.post_processing.MCBatchNorm.html#torch_uncertainty.post_processing.MCBatchNorm.reset_counters">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset_counters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset all counters to 0.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mc_batch_norm_layers</span><span class="p">:</span>
             <span class="n">layer</span><span class="o">.</span><span class="n">set_counter</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MCBatchNorm.raise_counters"><a class="viewcode-back" href="../../../generated/torch_uncertainty.post_processing.MCBatchNorm.html#torch_uncertainty.post_processing.MCBatchNorm.raise_counters">[docs]</a>    <span class="k">def</span> <span class="nf">raise_counters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MCBatchNorm.raise_counters"><a class="viewcode-back" href="../../../generated/torch_uncertainty.post_processing.MCBatchNorm.html#torch_uncertainty.post_processing.MCBatchNorm.raise_counters">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">raise_counters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Raise all counters by 1.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mc_batch_norm_layers</span><span class="p">:</span>
             <span class="n">layer</span><span class="o">.</span><span class="n">set_counter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">counter</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MCBatchNorm.set_accumulate"><a class="viewcode-back" href="../../../generated/torch_uncertainty.post_processing.MCBatchNorm.html#torch_uncertainty.post_processing.MCBatchNorm.set_accumulate">[docs]</a>    <span class="k">def</span> <span class="nf">set_accumulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accumulate</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MCBatchNorm.set_accumulate"><a class="viewcode-back" href="../../../generated/torch_uncertainty.post_processing.MCBatchNorm.html#torch_uncertainty.post_processing.MCBatchNorm.set_accumulate">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_accumulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accumulate</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the accumulate flag for all MCBatchNorm2d layers.</span>
 
 <span class="sd">        Args:</span>
@@ -378,7 +378,7 @@
         <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mc_batch_norm_layers</span><span class="p">:</span>
             <span class="n">layer</span><span class="o">.</span><span class="n">accumulate</span> <span class="o">=</span> <span class="n">accumulate</span></div>
 
-<div class="viewcode-block" id="MCBatchNorm.replace_layers"><a class="viewcode-back" href="../../../generated/torch_uncertainty.post_processing.MCBatchNorm.html#torch_uncertainty.post_processing.MCBatchNorm.replace_layers">[docs]</a>    <span class="k">def</span> <span class="nf">replace_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MCBatchNorm.replace_layers"><a class="viewcode-back" href="../../../generated/torch_uncertainty.post_processing.MCBatchNorm.html#torch_uncertainty.post_processing.MCBatchNorm.replace_layers">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">replace_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Replace all BatchNorm2d layers with MCBatchNorm2d layers.</span>
 
 <span class="sd">        Args:</span>
@@ -408,12 +408,12 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">mc_batch_norm_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mc_layer</span><span class="p">)</span></div></div>
 
 
-<span class="k">def</span> <span class="nf">has_mcbn</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">has_mcbn</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the model contains any MCBatchNorm2d layers.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">MCBatchNorm2d</span><span class="p">)</span> <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">())</span>
 
 
-<span class="k">def</span> <span class="nf">_mcbn_checks</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">,</span> <span class="n">mc_batch_size</span><span class="p">,</span> <span class="n">convert</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_mcbn_checks</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">,</span> <span class="n">mc_batch_size</span><span class="p">,</span> <span class="n">convert</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">num_estimators</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_estimators</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;num_estimators must be a positive integer, got </span><span class="si">{</span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">mc_batch_size</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mc_batch_size</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>

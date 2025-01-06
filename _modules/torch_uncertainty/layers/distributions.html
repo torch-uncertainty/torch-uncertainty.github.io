@@ -1,0 +1,925 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>torch_uncertainty.layers.distributions &mdash; TorchUncertainty 0.4.0 documentation</title>
+  
+
+  <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
+  
+  
+
+  
+
+  
+  
+  
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sphinx-codeautolink.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="index" title="Index" href="../../../genindex.html" />
+  <link rel="search" title="Search" href="../../../search.html" />
+  <!-- Google Analytics -->
+  <script type="text/javascript">
+    var collapsedSections = [];
+  </script>
+  
+  <!-- End Google Analytics -->
+  
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+  <script>
+    MathJax = {
+        chtml: {
+            scale: 1,
+            minScale: 1,
+        },
+        svg: {
+            scale: 1,
+            minScale: 1,
+        }
+    }
+</script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css"
+    integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://torch-uncertainty.github.io/"
+        aria-label="OpenMMLab"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+  
+
+  <div class="table-of-contents-link-wrapper">
+    <span>Table of Contents</span>
+    <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+  </div>
+
+  <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+    <div class="pytorch-side-scroll">
+      <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <div class="pytorch-left-menu-search">
+          
+
+          
+          
+          
+          
+
+          
+
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        
+        
+        
+        
+        
+        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli_guide.html">CLI Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+</ul>
+
+        
+        
+      </div>
+    </div>
+  </nav>
+
+  <div class="pytorch-container">
+    <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+      <div class="pytorch-breadcrumbs-wrapper">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+    <li>
+      <a href="../../../index.html">
+        Docs
+      </a> &gt;
+    </li>
+
+    
+    <li><a href="../../index.html">Module code</a> &gt;</li>
+    
+    <li>torch_uncertainty.layers.distributions</li>
+    
+    <!-- 
+    <li class="pytorch-breadcrumbs-aside">
+      
+    </li>
+    
+     -->
+  </ul>
+
+  
+</div>
+      </div>
+
+      <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+        Shortcuts
+      </div>
+    </div>
+
+    <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+      <div class="pytorch-content-left">
+
+        
+
+        <div class="pytorch-call-to-action-links">
+          <div id="tutorial-type">_modules/torch_uncertainty/layers/distributions</div>
+
+          <!-- <div id="google-colab-link">
+            <img class="call-to-action-img" src="../../../_static/images/pytorch-colab.svg" />
+            <div class="call-to-action-desktop-view">Run in Google Colab</div>
+            <div class="call-to-action-mobile-view">Colab</div>
+          </div> -->
+          <div id="download-notebook-link">
+            <img class="call-to-action-notebook-img" src="../../../_static/images/pytorch-download.svg" />
+            <div class="call-to-action-desktop-view">Download Notebook</div>
+            <div class="call-to-action-mobile-view">Notebook</div>
+          </div>
+          <div id="github-view-link">
+            <img class="call-to-action-img" src="../../../_static/images/pytorch-github.svg" />
+            <div class="call-to-action-desktop-view">View on GitHub</div>
+            <div class="call-to-action-mobile-view">GitHub</div>
+          </div>
+        </div>
+
+        
+        
+          <div class="rst-content">
+            
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+                
+                
+  <h1>Source code for torch_uncertainty.layers.distributions</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_dist_linear_layer</span><span class="p">(</span><span class="n">dist_family</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;normal&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">NormalLinear</span>
+    <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;laplace&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">LaplaceLinear</span>
+    <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;cauchy&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">CauchyLinear</span>
+    <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;student&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">StudentTLinear</span>
+    <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;nig&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">NormalInverseGammaLinear</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dist_family</span><span class="si">}</span><span class="s2"> distribution is not supported. Raise an issue if needed.&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_dist_conv_layer</span><span class="p">(</span><span class="n">dist_family</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;normal&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">NormalConvNd</span>
+    <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;laplace&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">LaplaceConvNd</span>
+    <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;cauchy&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">CauchyConvNd</span>
+    <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;student&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">StudentTConvNd</span>
+    <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;nig&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">NormalInverseGammaConvNd</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dist_family</span><span class="si">}</span><span class="s2"> distribution is not supported. Raise an issue if needed.&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_ExpandOutputLinear</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for expanding the output of any nn.Module using an `out_features` argument.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
+<span class="sd">        event_dim (int): The number of event dimensions.</span>
+<span class="sd">        num_params (int): The number of parameters to output. For instance, the normal distribution</span>
+<span class="sd">            has 2 parameters (loc and scale).</span>
+<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span> <span class="n">event_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_params</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">layer_args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;out_features&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">base_layer</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_layer</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> does not have an `out_features` argument.&quot;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_layer</span> <span class="o">=</span> <span class="n">base_layer</span><span class="p">(</span><span class="n">out_features</span><span class="o">=</span><span class="n">num_params</span> <span class="o">*</span> <span class="n">event_dim</span><span class="p">,</span> <span class="o">**</span><span class="n">layer_args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="o">=</span> <span class="n">event_dim</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_ExpandOutputConvNd</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for expanding the output of any nn.Module using an `out_channels` argument.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
+<span class="sd">        event_dim (int): The number of event dimensions.</span>
+<span class="sd">        num_params (int): The number of parameters to output. For instance, the normal distribution</span>
+<span class="sd">            has 2 parameters (loc and scale).</span>
+<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span> <span class="n">event_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_params</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">layer_args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;out_channels&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">base_layer</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_layer</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> does not have an `out_channels` argument.&quot;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_layer</span> <span class="o">=</span> <span class="n">base_layer</span><span class="p">(</span><span class="n">out_channels</span><span class="o">=</span><span class="n">num_params</span> <span class="o">*</span> <span class="n">event_dim</span><span class="p">,</span> <span class="o">**</span><span class="n">layer_args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="o">=</span> <span class="n">event_dim</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_LocScaleLinear</span><span class="p">(</span><span class="n">_ExpandOutputLinear</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base Linear layer for any distribution with loc and scale parameters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
+<span class="sd">        event_dim (int): The number of event dimensions.</span>
+<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">base_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
+        <span class="n">event_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">min_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">base_layer</span><span class="o">=</span><span class="n">base_layer</span><span class="p">,</span>
+            <span class="n">event_dim</span><span class="o">=</span><span class="n">event_dim</span><span class="p">,</span>
+            <span class="n">num_params</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_scale</span> <span class="o">=</span> <span class="n">min_scale</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span>
+            <span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_scale</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="n">loc</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="n">scale</span><span class="p">}</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_LocScaleConvNd</span><span class="p">(</span><span class="n">_ExpandOutputConvNd</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base Convolutional layer for any distribution with loc and scale parameters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
+<span class="sd">        event_dim (int): The number of event dimensions.</span>
+<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">base_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
+        <span class="n">event_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">min_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">base_layer</span><span class="o">=</span><span class="n">base_layer</span><span class="p">,</span>
+            <span class="n">event_dim</span><span class="o">=</span><span class="n">event_dim</span><span class="p">,</span>
+            <span class="n">num_params</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_scale</span> <span class="o">=</span> <span class="n">min_scale</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span>
+            <span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_scale</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="n">loc</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="n">scale</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="NormalLinear"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.distributions.NormalLinear.html#torch_uncertainty.layers.distributions.NormalLinear">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">NormalLinear</span><span class="p">(</span><span class="n">_LocScaleLinear</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normal Distribution Linear Density Layer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
+<span class="sd">        event_dim (int): The number of event dimensions.</span>
+<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
+
+<span class="sd">    Shape:</span>
+<span class="sd">        - Input: :math:`(\ast, H_{in})` where :math:`\ast` means any number of dimensions including</span>
+<span class="sd">          none and :math:`H_{in} = \text{in_features}`.</span>
+<span class="sd">        - Output: A dict with the following keys</span>
+
+<span class="sd">          - ``&quot;loc&quot;``: The mean of the Normal distribution of shape :math:`(\ast, H_{out})` where</span>
+<span class="sd">            all but the last dimension are the same as the input and</span>
+<span class="sd">            :math:`H_{out} = \text{out_features}`.</span>
+<span class="sd">          - ``&quot;scale&quot;``: The standard deviation of the Normal distribution of shape</span>
+<span class="sd">            :math:`(\ast, H_{out})`.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="NormalConvNd"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.distributions.NormalConvNd.html#torch_uncertainty.layers.distributions.NormalConvNd">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">NormalConvNd</span><span class="p">(</span><span class="n">_LocScaleConvNd</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normal Distribution Convolutional Density Layer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        in_channels (int): The number of input channels.</span>
+<span class="sd">        out_channels (int): The number of event channels.</span>
+<span class="sd">        kernel_size (int | tuple[int]): The size of the convolutional kernel.</span>
+<span class="sd">        stride (int | tuple[int]): The stride of the convolution.</span>
+<span class="sd">        padding (int | tuple[int]): The padding of the convolution.</span>
+<span class="sd">        dilation (int | tuple[int]): The dilation of the convolution.</span>
+<span class="sd">        groups (int): The number of groups in the convolution.</span>
+<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        device (torch.device): The device where the layer is stored.</span>
+<span class="sd">        dtype (torch.dtype): The datatype of the layer.</span>
+
+<span class="sd">    Shape:</span>
+<span class="sd">        - Input: :math:`(N, C_{in}, \ast)` where :math:`\ast` means any number of dimensions and</span>
+<span class="sd">          :math:`C_{in} = \text{in_channels}` and :math:`N` is the batch size.</span>
+<span class="sd">        - Output: A dict with the following keys</span>
+
+<span class="sd">          - ``&quot;loc&quot;``: The mean of the Normal distribution of shape :math:`(N, C_{out}, \ast)` where</span>
+<span class="sd">            :math:`C_{out} = \text{out_channels}`.</span>
+<span class="sd">          - ``&quot;scale&quot;``: The standard deviation of the Normal distribution of shape</span>
+<span class="sd">            :math:`(\ast, C_{out}, \ast)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="LaplaceLinear"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.distributions.LaplaceLinear.html#torch_uncertainty.layers.distributions.LaplaceLinear">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">LaplaceLinear</span><span class="p">(</span><span class="n">_LocScaleLinear</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Laplace Distribution Linear Density Layer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
+<span class="sd">        event_dim (int): The number of event dimensions.</span>
+<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
+
+<span class="sd">    Shape:</span>
+<span class="sd">        - Input: :math:`(\ast, H_{in})` where :math:`\ast` means any number of dimensions including</span>
+<span class="sd">          none and :math:`H_{in} = \text{in_features}`.</span>
+<span class="sd">        - Output: A dict with the following keys</span>
+
+<span class="sd">          - ``&quot;loc&quot;``: The mean of the Laplace distribution of shape :math:`(\ast, H_{out})` where</span>
+<span class="sd">            all but the last dimension are the same as the input and</span>
+<span class="sd">            :math:`H_{out} = \text{out_features}`.</span>
+<span class="sd">          - ``&quot;scale&quot;``: The standard deviation of the Laplace distribution of shape</span>
+<span class="sd">            :math:`(\ast, H_{out})`.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="LaplaceConvNd"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.distributions.LaplaceConvNd.html#torch_uncertainty.layers.distributions.LaplaceConvNd">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">LaplaceConvNd</span><span class="p">(</span><span class="n">_LocScaleConvNd</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Laplace Distribution Convolutional Density Layer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        in_channels (int): The number of input channels.</span>
+<span class="sd">        out_channels (int): The number of event channels.</span>
+<span class="sd">        kernel_size (int | tuple[int]): The size of the convolutional kernel.</span>
+<span class="sd">        stride (int | tuple[int]): The stride of the convolution.</span>
+<span class="sd">        padding (int | tuple[int]): The padding of the convolution.</span>
+<span class="sd">        dilation (int | tuple[int]): The dilation of the convolution.</span>
+<span class="sd">        groups (int): The number of groups in the convolution.</span>
+<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        device (torch.device): The device where the layer is stored.</span>
+<span class="sd">        dtype (torch.dtype): The datatype of the layer.</span>
+
+<span class="sd">    Shape:</span>
+<span class="sd">        - Input: :math:`(N, C_{in}, \ast)` where :math:`\ast` means any number of dimensions and</span>
+<span class="sd">          :math:`C_{in} = \text{in_channels}` and :math:`N` is the batch size.</span>
+<span class="sd">        - Output: A dict with the following keys</span>
+
+<span class="sd">          - ``&quot;loc&quot;``: The mean of the Laplace distribution of shape :math:`(N, C_{out}, \ast)` where</span>
+<span class="sd">            :math:`C_{out} = \text{out_channels}`.</span>
+<span class="sd">          - ``&quot;scale&quot;``: The standard deviation of the Laplace distribution of shape</span>
+<span class="sd">            :math:`(\ast, C_{out}, \ast)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="CauchyLinear"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.distributions.CauchyLinear.html#torch_uncertainty.layers.distributions.CauchyLinear">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CauchyLinear</span><span class="p">(</span><span class="n">_LocScaleLinear</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cauchy Distribution Linear Density Layer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
+<span class="sd">        event_dim (int): The number of event dimensions.</span>
+<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
+
+<span class="sd">    Shape:</span>
+<span class="sd">        - Input: :math:`(\ast, H_{in})` where :math:`\ast` means any number of dimensions including</span>
+<span class="sd">          none and :math:`H_{in} = \text{in_features}`.</span>
+<span class="sd">        - Output: A dict with the following keys</span>
+
+<span class="sd">          - ``&quot;loc&quot;``: The mean of the Cauchy distribution of shape :math:`(\ast, H_{out})` where</span>
+<span class="sd">            all but the last dimension are the same as the input and</span>
+<span class="sd">            :math:`H_{out} = \text{out_features}`.</span>
+<span class="sd">          - ``&quot;scale&quot;``: The standard deviation of the Cauchy distribution of shape</span>
+<span class="sd">            :math:`(\ast, H_{out})`.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="CauchyConvNd"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.distributions.CauchyConvNd.html#torch_uncertainty.layers.distributions.CauchyConvNd">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CauchyConvNd</span><span class="p">(</span><span class="n">_LocScaleConvNd</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cauchy Distribution Convolutional Density Layer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        in_channels (int): The number of input channels.</span>
+<span class="sd">        out_channels (int): The number of event channels.</span>
+<span class="sd">        kernel_size (int | tuple[int]): The size of the convolutional kernel.</span>
+<span class="sd">        stride (int | tuple[int]): The stride of the convolution.</span>
+<span class="sd">        padding (int | tuple[int]): The padding of the convolution.</span>
+<span class="sd">        dilation (int | tuple[int]): The dilation of the convolution.</span>
+<span class="sd">        groups (int): The number of groups in the convolution.</span>
+<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        device (torch.device): The device where the layer is stored.</span>
+<span class="sd">        dtype (torch.dtype): The datatype of the layer.</span>
+
+<span class="sd">    Shape:</span>
+<span class="sd">        - Input: :math:`(N, C_{in}, \ast)` where :math:`\ast` means any number of dimensions and</span>
+<span class="sd">          :math:`C_{in} = \text{in_channels}` and :math:`N` is the batch size.</span>
+<span class="sd">        - Output: A dict with the following keys</span>
+
+<span class="sd">          - ``&quot;loc&quot;``: The mean of the Cauchy distribution of shape :math:`(N, C_{out}, \ast)` where</span>
+<span class="sd">            :math:`C_{out} = \text{out_channels}`.</span>
+<span class="sd">          - ``&quot;scale&quot;``: The standard deviation of the Cauchy distribution of shape</span>
+<span class="sd">            :math:`(\ast, C_{out}, \ast)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="StudentTLinear"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.distributions.StudentTLinear.html#torch_uncertainty.layers.distributions.StudentTLinear">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">StudentTLinear</span><span class="p">(</span><span class="n">_ExpandOutputLinear</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Student&#39;s T-Distribution Linear Density Layer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
+<span class="sd">        event_dim (int): The number of event dimensions.</span>
+<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        min_df (float): The minimal value of the degrees of freedom parameter.</span>
+<span class="sd">        fixed_df (float): If not None, the degrees of freedom parameter is fixed to this value.</span>
+<span class="sd">            Otherwise, it is learned.</span>
+<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
+
+<span class="sd">    Shape:</span>
+<span class="sd">        - Input: :math:`(\ast, H_{in})` where :math:`\ast` means any number of dimensions including</span>
+<span class="sd">          none and :math:`H_{in} = \text{in_features}`.</span>
+<span class="sd">        - Output: A dict with the following keys</span>
+
+<span class="sd">          - ``&quot;loc&quot;``: The mean of the Student&#39;s t-distribution of shape :math:`(\ast, H_{out})` where</span>
+<span class="sd">            all but the last dimension are the same as the input and</span>
+<span class="sd">            :math:`H_{out} = \text{out_features}`.</span>
+<span class="sd">          - ``&quot;scale&quot;``: The standard deviation of the Student&#39;s t-distribution of shape</span>
+<span class="sd">            :math:`(\ast, H_{out})`.</span>
+<span class="sd">          - ``&quot;df&quot;``: The degrees of freedom of the Student&#39;s t distribution of shape</span>
+<span class="sd">            :math:`(\ast, H_{out})` or Number.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">base_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
+        <span class="n">event_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">min_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+        <span class="n">min_df</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="n">fixed_df</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">base_layer</span><span class="o">=</span><span class="n">base_layer</span><span class="p">,</span>
+            <span class="n">event_dim</span><span class="o">=</span><span class="n">event_dim</span><span class="p">,</span>
+            <span class="n">num_params</span><span class="o">=</span><span class="mi">3</span> <span class="k">if</span> <span class="n">fixed_df</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_scale</span> <span class="o">=</span> <span class="n">min_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_df</span> <span class="o">=</span> <span class="n">min_df</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_df</span> <span class="o">=</span> <span class="n">fixed_df</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span>
+            <span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_scale</span>
+        <span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="p">:]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_df</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_df</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_df</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="n">loc</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="n">scale</span><span class="p">,</span> <span class="s2">&quot;df&quot;</span><span class="p">:</span> <span class="n">df</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="StudentTConvNd"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.distributions.StudentTConvNd.html#torch_uncertainty.layers.distributions.StudentTConvNd">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">StudentTConvNd</span><span class="p">(</span><span class="n">_ExpandOutputConvNd</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Student&#39;s T-Distribution Convolutional Density Layer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
+<span class="sd">        event_dim (int): The number of event dimensions.</span>
+<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        min_df (float): The minimal value of the degrees of freedom parameter.</span>
+<span class="sd">        fixed_df (float): If not None, the degrees of freedom parameter is fixed to this value.</span>
+<span class="sd">            Otherwise, it is learned.</span>
+<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
+
+<span class="sd">    Shape:</span>
+<span class="sd">        - Input: :math:`(N, C_{in}, \ast)` where :math:`\ast` means any number of dimensions and</span>
+<span class="sd">          :math:`C_{in} = \text{in_channels}` and :math:`N` is the batch size.</span>
+<span class="sd">        - Output: A dict with the following keys</span>
+
+<span class="sd">          - ``&quot;loc&quot;``: The mean of the Student&#39;s t-distribution of shape :math:`(N, C_{out}, \ast)` where</span>
+<span class="sd">            :math:`C_{out} = \text{out_channels}`.</span>
+<span class="sd">          - ``&quot;scale&quot;``: The standard deviation of the Student&#39;s t-distribution of shape</span>
+<span class="sd">            :math:`(\ast, C_{out}, \ast)`.</span>
+<span class="sd">          - ``&quot;df&quot;``: The degrees of freedom of the Student&#39;s t distribution of shape</span>
+<span class="sd">            :math:`(\ast, C_{out}, \ast)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">base_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
+        <span class="n">event_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">min_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+        <span class="n">min_df</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="n">fixed_df</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">base_layer</span><span class="o">=</span><span class="n">base_layer</span><span class="p">,</span>
+            <span class="n">event_dim</span><span class="o">=</span><span class="n">event_dim</span><span class="p">,</span>
+            <span class="n">num_params</span><span class="o">=</span><span class="mi">3</span> <span class="k">if</span> <span class="n">fixed_df</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_scale</span> <span class="o">=</span> <span class="n">min_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_df</span> <span class="o">=</span> <span class="n">min_df</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_df</span> <span class="o">=</span> <span class="n">fixed_df</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span>
+            <span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_scale</span>
+        <span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="p">:]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_df</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_df</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_df</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="n">loc</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="n">scale</span><span class="p">,</span> <span class="s2">&quot;df&quot;</span><span class="p">:</span> <span class="n">df</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="NormalInverseGammaLinear"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.distributions.NormalInverseGammaLinear.html#torch_uncertainty.layers.distributions.NormalInverseGammaLinear">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">NormalInverseGammaLinear</span><span class="p">(</span><span class="n">_ExpandOutputLinear</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normal-Inverse-Gamma Distribution Linear Density Layer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
+<span class="sd">        event_dim (int): The number of event dimensions.</span>
+<span class="sd">        min_lmbda (float): The minimal value of the :math:`\lambda` parameter.</span>
+<span class="sd">        min_alpha (float): The minimal value of the :math:`\alpha` parameter.</span>
+<span class="sd">        min_beta (float): The minimal value of the :math:`\beta` parameter.</span>
+<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
+
+<span class="sd">    Shape:</span>
+<span class="sd">        - Input: :math:`(\ast, H_{in})` where :math:`\ast` means any number of dimensions including</span>
+<span class="sd">          none and :math:`H_{in} = \text{in_features}`.</span>
+<span class="sd">        - Output: A dict with the following keys</span>
+
+<span class="sd">          - ``&quot;loc&quot;``: The mean of the Normal-Inverse-Gamma distribution of shape :math:`(\ast, H_{out})` where</span>
+<span class="sd">            all but the last dimension are the same as the input and</span>
+<span class="sd">            :math:`H_{out} = \text{out_features}`.</span>
+<span class="sd">          - ``&quot;lmbda&quot;``: The lambda parameter of the Normal-Inverse-Gamma distribution of shape</span>
+<span class="sd">            :math:`(\ast, H_{out})`.</span>
+<span class="sd">          - ``&quot;alpha&quot;``: The alpha parameter of the Normal-Inverse-Gamma distribution of shape</span>
+<span class="sd">            :math:`(\ast, H_{out})`.</span>
+<span class="sd">          - ``&quot;beta&quot;``: The beta parameter of the Normal-Inverse-Gamma distribution of shape</span>
+<span class="sd">            :math:`(\ast, H_{out})`.</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">        - `Normal-Inverse-Gamma Distribution &lt;https://en.wikipedia.org/wiki/Normal-inverse-gamma_distribution&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">base_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
+        <span class="n">event_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">min_lmbda</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+        <span class="n">min_alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+        <span class="n">min_beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">base_layer</span><span class="o">=</span><span class="n">base_layer</span><span class="p">,</span>
+            <span class="n">event_dim</span><span class="o">=</span><span class="n">event_dim</span><span class="p">,</span>
+            <span class="n">num_params</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_lmbda</span> <span class="o">=</span> <span class="n">min_lmbda</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_alpha</span> <span class="o">=</span> <span class="n">min_alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_beta</span> <span class="o">=</span> <span class="n">min_beta</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]</span>
+        <span class="n">lmbda</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span>
+            <span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_lmbda</span>
+        <span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span>
+            <span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="p">:</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_alpha</span>
+        <span class="p">)</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="p">:]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_beta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="n">loc</span><span class="p">,</span>
+            <span class="s2">&quot;lmbda&quot;</span><span class="p">:</span> <span class="n">lmbda</span><span class="p">,</span>
+            <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="n">alpha</span><span class="p">,</span>
+            <span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="n">beta</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="NormalInverseGammaConvNd"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.distributions.NormalInverseGammaConvNd.html#torch_uncertainty.layers.distributions.NormalInverseGammaConvNd">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">NormalInverseGammaConvNd</span><span class="p">(</span><span class="n">_ExpandOutputConvNd</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normal-Inverse-Gamma Distribution Convolutional Density Layer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
+<span class="sd">        event_dim (int): The number of event dimensions.</span>
+<span class="sd">        min_lmbda (float): The minimal value of the :math:`\lambda` parameter.</span>
+<span class="sd">        min_alpha (float): The minimal value of the :math:`\alpha` parameter.</span>
+<span class="sd">        min_beta (float): The minimal value of the :math:`\beta` parameter.</span>
+<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
+
+<span class="sd">    Shape:</span>
+<span class="sd">        - Input: :math:`(N, C_{in}, \ast)` where :math:`\ast` means any number of dimensions and</span>
+<span class="sd">          :math:`C_{in} = \text{in_channels}` and :math:`N` is the batch size.</span>
+<span class="sd">        - Output: A dict with the following keys</span>
+
+<span class="sd">          - ``&quot;loc&quot;``: The mean of the Normal-Inverse-Gamma distribution of shape :math:`(N, C_{out}, \ast)` where</span>
+<span class="sd">            :math:`C_{out} = \text{out_channels}`.</span>
+<span class="sd">          - ``&quot;lmbda&quot;``: The lambda parameter of the Normal-Inverse-Gamma distribution of shape</span>
+<span class="sd">            :math:`(N, C_{out}, \ast)`.</span>
+<span class="sd">          - ``&quot;alpha&quot;``: The alpha parameter of the Normal-Inverse-Gamma distribution of shape</span>
+<span class="sd">            :math:`(N, C_{out}, \ast)`.</span>
+<span class="sd">          - ``&quot;beta&quot;``: The beta parameter of the Normal-Inverse-Gamma distribution of shape</span>
+<span class="sd">            :math:`(N, C_{out}, \ast)`.</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">        - `Normal-Inverse-Gamma Distribution &lt;https://en.wikipedia.org/wiki/Normal-inverse-gamma_distribution&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">base_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
+        <span class="n">event_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">min_lmbda</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+        <span class="n">min_alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+        <span class="n">min_beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">base_layer</span><span class="o">=</span><span class="n">base_layer</span><span class="p">,</span>
+            <span class="n">event_dim</span><span class="o">=</span><span class="n">event_dim</span><span class="p">,</span>
+            <span class="n">num_params</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_lmbda</span> <span class="o">=</span> <span class="n">min_lmbda</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_alpha</span> <span class="o">=</span> <span class="n">min_alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_beta</span> <span class="o">=</span> <span class="n">min_beta</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]</span>
+        <span class="n">lmbda</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span>
+            <span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_lmbda</span>
+        <span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span>
+            <span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="p">:</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_alpha</span>
+        <span class="p">)</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="p">:]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_beta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="n">loc</span><span class="p">,</span>
+            <span class="s2">&quot;lmbda&quot;</span><span class="p">:</span> <span class="n">lmbda</span><span class="p">,</span>
+            <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="n">alpha</span><span class="p">,</span>
+            <span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="n">beta</span><span class="p">,</span>
+        <span class="p">}</span></div>
+</pre></div>
+
+              </article>
+              
+            </div>
+            <footer>
+  
+
+  <hr>
+
+  <div role="contentinfo">
+    <p>
+      &copy; Copyright 2025, Adrien Lafage and Olivier Laurent.
+
+    </p>
+  </div>
+  
+  <div>
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a
+      href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the
+      Docs</a>.
+  </div>
+   
+
+</footer>
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              
+            </div>
+          </div>
+        </div>
+    </section>
+  </div>
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" id="documentation_options" data-url_root="../../../"
+    src="../../../_static/documentation_options.js"></script>
+  <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+  <script src="../../../_static/jquery.js"></script>
+  <script src="../../../_static/underscore.js"></script>
+  <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+  <script src="../../../_static/doctools.js"></script>
+  <script src="../../../_static/sphinx_highlight.js"></script>
+  <script src="../../../_static/clipboard.min.js"></script>
+  <script src="../../../_static/copybutton.js"></script>
+  
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+  </div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://torch-uncertainty.github.io/" aria-label="OpenMMLab"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
+          </li>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../../../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function (e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+
+</html>

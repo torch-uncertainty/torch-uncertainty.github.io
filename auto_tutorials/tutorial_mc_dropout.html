@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Training a LeNet with Monte-Carlo Dropout &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>Training a LeNet with Monte-Carlo Dropout &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -286,16 +286,16 @@ to download the full example code.</p>
 <li><p>an optimization recipe in the torch_uncertainty.optim_recipes module.</p></li>
 </ul>
 <p>We also need import the neural network utils within <cite>torch.nn</cite>.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">torch_uncertainty</span> <span class="kn">import</span> <span class="n">TUTrainer</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty</span><span class="w"> </span><span class="kn">import</span> <span class="n">TUTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
 
-<span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <span class="n">MNISTDataModule</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.models.lenet</span> <span class="kn">import</span> <span class="n">lenet</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.models</span> <span class="kn">import</span> <span class="n">mc_dropout</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.optim_recipes</span> <span class="kn">import</span> <span class="n">optim_cifar10_resnet18</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.routines</span> <span class="kn">import</span> <span class="n">ClassificationRoutine</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.datamodules</span><span class="w"> </span><span class="kn">import</span> <span class="n">MNISTDataModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models.lenet</span><span class="w"> </span><span class="kn">import</span> <span class="n">lenet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">mc_dropout</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.optim_recipes</span><span class="w"> </span><span class="kn">import</span> <span class="n">optim_cifar10_resnet18</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.routines</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassificationRoutine</span>
 </pre></div>
 </div>
 </section>
@@ -357,7 +357,11 @@ Downloading https://ossci-datasets.s3.amazonaws.com/mnist/train-images-idx3-ubyt
 Downloading https://ossci-datasets.s3.amazonaws.com/mnist/train-images-idx3-ubyte.gz to data/MNIST/raw/train-images-idx3-ubyte.gz
 
   0%|          | 0.00/9.91M [00:00&lt;?, ?B/s]
-100%|██████████| 9.91M/9.91M [00:00&lt;00:00, 105MB/s]
+  1%|          | 98.3k/9.91M [00:00&lt;00:13, 746kB/s]
+  4%|▍         | 393k/9.91M [00:00&lt;00:05, 1.62MB/s]
+ 16%|█▌        | 1.57M/9.91M [00:00&lt;00:01, 4.91MB/s]
+ 64%|██████▍   | 6.32M/9.91M [00:00&lt;00:00, 17.1MB/s]
+100%|██████████| 9.91M/9.91M [00:00&lt;00:00, 18.3MB/s]
 Extracting data/MNIST/raw/train-images-idx3-ubyte.gz to data/MNIST/raw
 
 Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz
@@ -368,7 +372,7 @@ Downloading https://ossci-datasets.s3.amazonaws.com/mnist/train-labels-idx1-ubyt
 Downloading https://ossci-datasets.s3.amazonaws.com/mnist/train-labels-idx1-ubyte.gz to data/MNIST/raw/train-labels-idx1-ubyte.gz
 
   0%|          | 0.00/28.9k [00:00&lt;?, ?B/s]
-100%|██████████| 28.9k/28.9k [00:00&lt;00:00, 14.2MB/s]
+100%|██████████| 28.9k/28.9k [00:00&lt;00:00, 426kB/s]
 Extracting data/MNIST/raw/train-labels-idx1-ubyte.gz to data/MNIST/raw
 
 Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz
@@ -379,7 +383,10 @@ Downloading https://ossci-datasets.s3.amazonaws.com/mnist/t10k-images-idx3-ubyte
 Downloading https://ossci-datasets.s3.amazonaws.com/mnist/t10k-images-idx3-ubyte.gz to data/MNIST/raw/t10k-images-idx3-ubyte.gz
 
   0%|          | 0.00/1.65M [00:00&lt;?, ?B/s]
-100%|██████████| 1.65M/1.65M [00:00&lt;00:00, 78.6MB/s]
+  6%|▌         | 98.3k/1.65M [00:00&lt;00:02, 739kB/s]
+ 24%|██▍       | 393k/1.65M [00:00&lt;00:00, 1.60MB/s]
+ 93%|█████████▎| 1.54M/1.65M [00:00&lt;00:00, 4.80MB/s]
+100%|██████████| 1.65M/1.65M [00:00&lt;00:00, 4.10MB/s]
 Extracting data/MNIST/raw/t10k-images-idx3-ubyte.gz to data/MNIST/raw
 
 Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz
@@ -390,7 +397,7 @@ Downloading https://ossci-datasets.s3.amazonaws.com/mnist/t10k-labels-idx1-ubyte
 Downloading https://ossci-datasets.s3.amazonaws.com/mnist/t10k-labels-idx1-ubyte.gz to data/MNIST/raw/t10k-labels-idx1-ubyte.gz
 
   0%|          | 0.00/4.54k [00:00&lt;?, ?B/s]
-100%|██████████| 4.54k/4.54k [00:00&lt;00:00, 5.30MB/s]
+100%|██████████| 4.54k/4.54k [00:00&lt;00:00, 4.46MB/s]
 Extracting data/MNIST/raw/t10k-labels-idx1-ubyte.gz to data/MNIST/raw
 
 /opt/hostedtoolcache/Python/3.10.15/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The &#39;val_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
@@ -399,24 +406,24 @@ Extracting data/MNIST/raw/t10k-labels-idx1-ubyte.gz to data/MNIST/raw
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          89.87%           │
-│    Brier     │          0.30828          │
-│   Entropy    │          1.42699          │
-│     NLL      │          0.71382          │
+│     Acc      │          83.87%           │
+│    Brier     │          0.44269          │
+│   Entropy    │          1.75003          │
+│     NLL      │          1.00137          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          0.34248          │
-│     aECE     │          0.34248          │
+│     ECE      │          0.40519          │
+│     aECE     │          0.40519          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │           1.59%           │
-│     AURC     │           1.94%           │
-│  Cov@5Risk   │          84.92%           │
-│  Risk@80Cov  │           3.69%           │
+│    AUGRC     │           3.78%           │
+│     AURC     │           4.95%           │
+│  Cov@5Risk   │          58.87%           │
+│  Risk@80Cov  │           9.74%           │
 └──────────────┴───────────────────────────┘
 </pre></div>
 </div>
@@ -425,13 +432,13 @@ Extracting data/MNIST/raw/t10k-labels-idx1-ubyte.gz to data/MNIST/raw
 <h3>5. Testing the Model<a class="headerlink" href="#testing-the-model" title="Permalink to this heading">¶</a></h3>
 <p>Now that the model is trained, let’s test it on MNIST. Don’t forget to call
 .eval() to enable dropout at evaluation and get multiple (here 16) predictions.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torchvision</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torchvision</span>
 
 
-<span class="k">def</span> <span class="nf">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
     <span class="n">npimg</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">npimg</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
@@ -461,17 +468,17 @@ Extracting data/MNIST/raw/t10k-labels-idx1-ubyte.gz to data/MNIST/raw
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_tutorial_mc_dropout_001.png" srcset="../_images/sphx_glr_tutorial_mc_dropout_001.png" alt="tutorial mc dropout" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ground truth labels:  7 2 1 0 4 1
-MC-Dropout predictions for the image 1:  7 7 7 7 7 7 7 7 1 7 7 7 7 7 7 7
-MC-Dropout predictions for the image 2:  6 2 2 2 2 2 2 2 2 2 8 2 6 2 2 4
-MC-Dropout predictions for the image 3:  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-MC-Dropout predictions for the image 4:  8 0 6 0 0 0 0 0 8 0 0 8 0 3 0 1
-MC-Dropout predictions for the image 5:  4 4 3 4 4 4 6 0 0 4 4 4 9 4 0 4
-MC-Dropout predictions for the image 6:  1 1 1 1 1 1 1 1 1 1 4 7 1 1 1 1
+MC-Dropout predictions for the image 1:  7 7 7 7 7 7 7 7 2 7 7 7 7 7 7 2
+MC-Dropout predictions for the image 2:  7 7 2 3 2 2 2 2 2 3 2 2 3 2 3 2
+MC-Dropout predictions for the image 3:  1 1 1 8 1 1 1 9 1 1 1 8 1 1 1 1
+MC-Dropout predictions for the image 4:  9 0 0 0 3 0 0 0 0 9 6 3 7 8 0 0
+MC-Dropout predictions for the image 5:  4 9 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+MC-Dropout predictions for the image 6:  1 1 1 1 1 1 9 1 1 8 1 8 1 1 6 1
 </pre></div>
 </div>
 <p>Most of the time, we see that there is some disagreement between the samples of the dropout
 approximation of the posterior distribution.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 47.251 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 51.641 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-mc-dropout-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/4890df143fe34f5aa2106d4980500a99/tutorial_mc_dropout.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_dropout.ipynb</span></code></a></p>

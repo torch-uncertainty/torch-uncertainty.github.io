@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.layers.packed &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>torch_uncertainty.layers.packed &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -249,17 +249,20 @@
                 
                 
   <h1>Source code for torch_uncertainty.layers.packed</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">einops</span> <span class="kn">import</span> <span class="n">rearrange</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
-<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
-<span class="kn">from</span> <span class="nn">torch.nn.common_types</span> <span class="kn">import</span> <span class="n">_size_1_t</span><span class="p">,</span> <span class="n">_size_2_t</span><span class="p">,</span> <span class="n">_size_3_t</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">einops</span><span class="w"> </span><span class="kn">import</span> <span class="n">rearrange</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn.common_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">_size_1_t</span><span class="p">,</span> <span class="n">_size_2_t</span><span class="p">,</span> <span class="n">_size_3_t</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.functional.packed</span><span class="w"> </span><span class="kn">import</span> <span class="n">packed_linear</span><span class="p">,</span> <span class="n">packed_multi_head_attention_forward</span>
 
 
-<span class="k">def</span> <span class="nf">check_packed_parameters_consistency</span><span class="p">(</span><span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">gamma</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_packed_parameters_consistency</span><span class="p">(</span><span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">gamma</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check the consistency of the parameters of the Packed-Ensembles layers.</span>
 
 <span class="sd">    Args:</span>
@@ -288,8 +291,8 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Attribute `num_estimators` should be &gt;= 1, not &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="PackedLinear"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.PackedLinear.html#torch_uncertainty.layers.PackedLinear">[docs]</a><span class="k">class</span> <span class="nc">PackedLinear</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="PackedLinear"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.PackedLinear.html#torch_uncertainty.layers.PackedLinear">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PackedLinear</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">in_features</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">out_features</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -414,7 +417,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_parameters</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span> <span class="o">==</span> <span class="s2">&quot;legacy&quot;</span><span class="p">:</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">kaiming_uniform_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
@@ -428,7 +431,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span> <span class="o">==</span> <span class="s2">&quot;sparse&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="o">.</span><span class="n">to_sparse</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">_rearrange_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rearrange_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;(m e) c h -&gt; e (m c) h&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">)</span>
@@ -436,27 +439,22 @@
         <span class="n">x</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;e (m c) h -&gt; (m e) c h&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span> <span class="o">==</span> <span class="s2">&quot;legacy&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rearrange</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rearrange_forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">conv1d</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span> <span class="o">==</span> <span class="s2">&quot;full&quot;</span><span class="p">:</span>
-            <span class="n">block_diag</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">block_diag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span> <span class="o">==</span> <span class="s2">&quot;sparse&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">(</span><span class="n">inputs</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span> <span class="o">==</span> <span class="s2">&quot;einsum&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span>
-                <span class="s2">&quot;bki,kij-&gt;bkj&quot;</span><span class="p">,</span>
-                <span class="n">inputs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_features</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">start_dim</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">end_dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown implementation: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">implementation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">packed_linear</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span>
+            <span class="n">num_groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">,</span>
+            <span class="n">implementation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">implementation</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 
-<span class="k">class</span> <span class="nc">PackedConv1d</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PackedConv1d</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">out_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -562,22 +560,22 @@
             <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">weight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">weight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The weight of the underlying convolutional layer.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="o">.</span><span class="n">weight</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">bias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The bias of the underlying convolutional layer.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="o">.</span><span class="n">bias</span>
 
 
-<div class="viewcode-block" id="PackedConv2d"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.PackedConv2d.html#torch_uncertainty.layers.PackedConv2d">[docs]</a><span class="k">class</span> <span class="nc">PackedConv2d</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="PackedConv2d"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.PackedConv2d.html#torch_uncertainty.layers.PackedConv2d">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PackedConv2d</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">out_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -683,22 +681,22 @@
             <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">weight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">weight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The weight of the underlying convolutional layer.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="o">.</span><span class="n">weight</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">bias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The bias of the underlying convolutional layer.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="o">.</span><span class="n">bias</span></div>
 
 
-<span class="k">class</span> <span class="nc">PackedConv3d</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PackedConv3d</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">out_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -804,18 +802,891 @@
             <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">weight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">weight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The weight of the underlying convolutional layer.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="o">.</span><span class="n">weight</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">bias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The bias of the underlying convolutional layer.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="o">.</span><span class="n">bias</span>
+
+
+<div class="viewcode-block" id="PackedLayerNorm"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.PackedLayerNorm.html#torch_uncertainty.layers.PackedLayerNorm">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PackedLayerNorm</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">GroupNorm</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">embed_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span>
+        <span class="n">affine</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Packed-Ensembles-style LayerNorm layer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            embed_dim (int): the number of features in the input tensor.</span>
+<span class="sd">            num_estimators (int): the number of estimators in the ensemble.</span>
+<span class="sd">            alpha (float): the width multiplier of the layer.</span>
+<span class="sd">            eps (float, optional): a value added to the denominator for numerical stability. Defaults</span>
+<span class="sd">                to 1e-5.</span>
+<span class="sd">            affine (bool, optional): a boolean value that when set to ``True``, this module has</span>
+<span class="sd">                learnable per_channel affine parameters initialized to ones (for weights) and zeros</span>
+<span class="sd">                (for biases). Defaults to ``True``.</span>
+<span class="sd">            device (torch.device, optional): the device to use for the layer&#39;s parameters. Defaults</span>
+<span class="sd">                to ``None``.</span>
+<span class="sd">            dtype (torch.dtype, optional): the dtype to use for the layer&#39;s parameters. Defaults to</span>
+<span class="sd">                ``None``.</span>
+
+<span class="sd">        Shape:</span>
+<span class="sd">            - Input: :math:`(B, *)` where :math:`*` means any number of additional dimensions.</span>
+<span class="sd">            - Output: :math:`(B, *)` (same shape as input)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">num_groups</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">num_channels</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">embed_dim</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">),</span>
+            <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span>
+            <span class="n">affine</span><span class="o">=</span><span class="n">affine</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="s2">&quot;b ... h -&gt; b h ...&quot;</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">group_norm</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;b h ... -&gt; b ... h&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PackedMultiheadAttention"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.PackedMultiheadAttention.html#torch_uncertainty.layers.PackedMultiheadAttention">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PackedMultiheadAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;batch_first&quot;</span><span class="p">]</span>
+    <span class="n">bias_k</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">bias_v</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">embed_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">num_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">gamma</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">dropout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">add_bias_kv</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">add_zero_attn</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">kdim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">vdim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">batch_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">last</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Packed-Ensembles-style MultiheadAttention layer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            embed_dim (int): Size of the embedding dimension.</span>
+<span class="sd">            num_heads (int): Number of parallel attention heads.</span>
+<span class="sd">            alpha (float): The width multiplier of the embedding dimension.</span>
+<span class="sd">            num_estimators (int): The number of estimators packed in the layer.</span>
+<span class="sd">            gamma (int, optional): Defaults to ``1``.</span>
+<span class="sd">            dropout (float, optional): Dropout probability on ``attn_output_weights``. Defaults to ``0.0``</span>
+<span class="sd">                (no dropout).</span>
+<span class="sd">            bias (bool, optional): Ì specified, adds bias to input / output projection layers.</span>
+<span class="sd">                Defaults to ``True``.</span>
+<span class="sd">            add_bias_kv (bool, optional): If specified, adds bias to the key and value sequences at</span>
+<span class="sd">                ``dim=0``. Defaults to ``False``.</span>
+<span class="sd">            add_zero_attn (bool, optional): If specified, adds a new batch of zeros to the key and</span>
+<span class="sd">                value sequences at ``dim=1``. Defaults to ``False``.</span>
+<span class="sd">            kdim (int | None, optional): Total number of features for keys. Defaults to ``None``</span>
+<span class="sd">                (uses ``kdim=embed_dim``).</span>
+<span class="sd">            vdim (int | None, optional): Total number of features for values. Defaults to ``None``</span>
+<span class="sd">                (uses ``vdim=embed_dim``).</span>
+<span class="sd">            batch_first (bool, optional): If ``True``, then the input and output tensors are provided</span>
+<span class="sd">                as (batch, seq, feature). Defaults to ``False`` (seq, batch, feature).</span>
+<span class="sd">            first (bool, optional): Whether this is the first layer of the network. Defaults to</span>
+<span class="sd">                ``False``.</span>
+<span class="sd">            last (bool, optional): Whether this is the last layer of the network. Defaults to</span>
+<span class="sd">                ``False``.</span>
+<span class="sd">            device (torch.device, optional): The device to use for the layer&#39;s parameters. Defaults</span>
+<span class="sd">                to ``None``.</span>
+<span class="sd">            dtype (torch.dtype, optional): The dtype to use for the layer&#39;s parameters. Defaults to</span>
+<span class="sd">                ``None``.</span>
+
+<span class="sd">        Reference:</span>
+<span class="sd">            - `Attention Is All You Need &lt;https://arxiv.org/abs/1706.03762&gt;`_: Original Multihead Attention formulation.</span>
+<span class="sd">            - `Hierarchical Light Tranformer Ensembles for Multimodal Trajectory Forecasting &lt;https://arxiv.org/abs/2403.17678&gt;`_</span>
+<span class="sd">              : Packed-Ensembles-style Multihead Attention formulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">factory_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">}</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">kdim</span> <span class="o">=</span> <span class="n">kdim</span> <span class="k">if</span> <span class="n">kdim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">embed_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vdim</span> <span class="o">=</span> <span class="n">vdim</span> <span class="k">if</span> <span class="n">vdim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">embed_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qkv_same_embed_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kdim</span> <span class="o">==</span> <span class="n">embed_dim</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">vdim</span> <span class="o">==</span> <span class="n">embed_dim</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">embed_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">embed_dim</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)</span>
+
+        <span class="n">augmentation</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">first</span> <span class="k">else</span> <span class="n">alpha</span>
+        <span class="n">in_embed_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">embed_dim</span> <span class="o">*</span> <span class="n">augmentation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kdim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kdim</span> <span class="o">*</span> <span class="n">augmentation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vdim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vdim</span> <span class="o">*</span> <span class="n">augmentation</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">first</span> <span class="k">else</span> <span class="n">num_estimators</span> <span class="o">*</span> <span class="n">gamma</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span> <span class="o">=</span> <span class="n">num_heads</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">dropout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_first</span> <span class="o">=</span> <span class="n">batch_first</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embed_dim</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">head_dim</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">embed_dim</span>
+        <span class="p">),</span> <span class="s2">&quot;embed_dim must be divisible by num_heads&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="n">num_estimators</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="n">gamma</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qkv_same_embed_dim</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">q_proj_weight</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">embed_dim</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
+                        <span class="n">in_embed_dim</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">k_proj_weight</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">embed_dim</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">kdim</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v_proj_weight</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">embed_dim</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">vdim</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_parameter</span><span class="p">(</span><span class="s2">&quot;in_proj_weight&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_proj_weight</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
+                        <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">embed_dim</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
+                        <span class="n">in_embed_dim</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_parameter</span><span class="p">(</span><span class="s2">&quot;q_proj_weight&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_parameter</span><span class="p">(</span><span class="s2">&quot;k_proj_weight&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_parameter</span><span class="p">(</span><span class="s2">&quot;v_proj_weight&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">bias</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_proj_bias</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">embed_dim</span><span class="p">,</span> <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_parameter</span><span class="p">(</span><span class="s2">&quot;in_proj_bias&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">add_bias_kv</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bias_k</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">embed_dim</span><span class="p">),</span> <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bias_v</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">embed_dim</span><span class="p">),</span> <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bias_k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_v</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_proj</span> <span class="o">=</span> <span class="n">PackedLinear</span><span class="p">(</span>
+            <span class="n">in_features</span><span class="o">=</span><span class="n">embed_dim</span><span class="p">,</span>
+            <span class="n">out_features</span><span class="o">=</span><span class="n">embed_dim</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span>
+            <span class="n">implementation</span><span class="o">=</span><span class="s2">&quot;einsum&quot;</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">,</span>
+            <span class="n">first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">last</span><span class="o">=</span><span class="n">last</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_zero_attn</span> <span class="o">=</span> <span class="n">add_zero_attn</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_parameters</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qkv_same_embed_dim</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_proj_weight</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_proj_weight</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q_proj_weight</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q_proj_weight</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k_proj_weight</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v_proj_weight</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_proj_bias</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">constant_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_proj_bias</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">constant_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_proj</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PackedMultiheadAttention.forward"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.PackedMultiheadAttention.html#torch_uncertainty.layers.PackedMultiheadAttention.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">query</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">key_padding_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">need_weights</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">attn_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">average_attn_weights</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">is_causal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes attention outputs given query, key, and value tensors.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            query (Tensor): Query embeddings of shape :math:`(L, E_q)` for unbatched input,</span>
+<span class="sd">                :math:`(L, B, E_q)` when ``batch_first=False`` or :math:`(B, L, E_q)` when</span>
+<span class="sd">                ``batch_first=True``, where :math:`L` is the target sequence length, :math:`B` is</span>
+<span class="sd">                the batch size, and :math:`E_q` is the query embedding dimension ``embed_dim``.</span>
+<span class="sd">            key (Tensor): Key embeddingd of shape :math:`(S, E_k)` for unbatched input,</span>
+<span class="sd">                :math:`(S, B, E_k)` when ``batch_first=False`` or :math:`(B, S, E_k)` when</span>
+<span class="sd">                ``batch_first=True``, where :math:`S` is the source sequence length, :math:`B` is</span>
+<span class="sd">                the batch size and :math:`E_k` is the key embedding dimension ``kdim``.</span>
+<span class="sd">            value (Tensor): Value embeddings of shape :math:`(S, E_v)` for unbatched input,</span>
+<span class="sd">                :math:`(S, B, E_v)` when ``batch_first=False`` or :math:`(B, S, E_v)` when</span>
+<span class="sd">                ``batch_first=True``, where :math:`S` is the source sequence length, :math:`B` is</span>
+<span class="sd">                the batch size and :math:`E_v` is the value embedding dimension ``vdim``.</span>
+<span class="sd">            key_padding_mask (Tensor | None, optional): If specified, a mask of shape</span>
+<span class="sd">                :math:`(B, S)` indicating which elements within ``key`` to ignore for the purpose</span>
+<span class="sd">                of attention (i.e. treat as &quot;padding&quot;). For unbatched `query`, shape should be</span>
+<span class="sd">                :math:`(S)`. Binary and float masks are supported. For a binary mask, a ``True``</span>
+<span class="sd">                value indicates that the corresponding ``key`` value will be ignored for the</span>
+<span class="sd">                purpose of attention. For a float mask, it will be directly added to the</span>
+<span class="sd">                corresponding ``key`` value. Defaults to ``None``.</span>
+<span class="sd">            need_weights (bool, optional): If specified, returns ``attn_output_weights`` in</span>
+<span class="sd">                addition to ``attn_outputs``. Set ``need_weights=False`` to use the optimized</span>
+<span class="sd">                ``scale_dot_product_attention`` and achieve the best performance for MHA.</span>
+<span class="sd">                Defaults to ``False``.</span>
+<span class="sd">            attn_mask (Tensor | None, optional): If specified, a 2D or 3D mask preventing attention</span>
+<span class="sd">                to certain positions. Must be of shape :math:`(L,S)` or</span>
+<span class="sd">                :math:`(B \times \text{num_heads}, L, S)`, where :math:`B` is the batch size, :math:`L`</span>
+<span class="sd">                is the target sequence length, and :math:`S` is the source sequence length. A 2D mask</span>
+<span class="sd">                will be broadcasted across the batch while a 3D mask allows for a different mask for</span>
+<span class="sd">                each entry in the batch. Binary and float masks are supported. For a binary mask, a</span>
+<span class="sd">                ``True`` value indicates that the corresponding position is not allowed to attend to.</span>
+<span class="sd">                For a float mask, the mask values will be added to the attention weight. If both</span>
+<span class="sd">                ``attn_mask`` and ``key_padding_mask`` are provided, their types should match.</span>
+<span class="sd">                Defaults to ``None``.</span>
+<span class="sd">            average_attn_weights (bool, optional): If ``True``, indicates that the returned</span>
+<span class="sd">                ``attn_weights`` should be averaged across heads. Otherwise, ``attn_weights`` are</span>
+<span class="sd">                provided separately per head. Note that this flag only has an effect when</span>
+<span class="sd">                ``need_weights=True``. Defaults to ``True``.</span>
+<span class="sd">            is_causal (bool, optional): _description_. Defaults to ``False``.</span>
+
+<span class="sd">        Warning:</span>
+<span class="sd">            ``need_weights=True`` and therefore ``average_attn_weights`` are not supported yet thus</span>
+<span class="sd">            have no effect.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple[Tensor, None]:</span>
+<span class="sd">                - *attn_output* (Tensor): The output tensor of shape :math:`(L, E_q)`, :math:`(L, B, E_q)`</span>
+<span class="sd">                  or :math:`(B, L, E_q)` where :math:`L` is the target sequence length, :math:`B` is</span>
+<span class="sd">                  the batch size, and :math:`E_q` is the embedding dimension ``embed_dim``.</span>
+<span class="sd">                - *attn_output_weights* (None): Always ``None`` has we do not support</span>
+<span class="sd">                  ``need_weights=True`` yet.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">is_batched</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span>
+
+        <span class="n">key_padding_mask</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">_canonical_mask</span><span class="p">(</span>
+            <span class="n">mask</span><span class="o">=</span><span class="n">key_padding_mask</span><span class="p">,</span>
+            <span class="n">mask_name</span><span class="o">=</span><span class="s2">&quot;key_padding_mask&quot;</span><span class="p">,</span>
+            <span class="n">other_type</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">_none_or_dtype</span><span class="p">(</span><span class="n">attn_mask</span><span class="p">),</span>
+            <span class="n">other_name</span><span class="o">=</span><span class="s2">&quot;attn_mask&quot;</span><span class="p">,</span>
+            <span class="n">target_type</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">attn_mask</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">_canonical_mask</span><span class="p">(</span>
+            <span class="n">mask</span><span class="o">=</span><span class="n">attn_mask</span><span class="p">,</span>
+            <span class="n">mask_name</span><span class="o">=</span><span class="s2">&quot;attn_mask&quot;</span><span class="p">,</span>
+            <span class="n">other_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">other_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">target_type</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">check_other</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_first</span> <span class="ow">and</span> <span class="n">is_batched</span><span class="p">:</span>
+            <span class="c1"># make sure that the transpose op does not affect the &quot;is&quot; property</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="n">value</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="n">key</span><span class="p">:</span>
+                    <span class="n">query</span> <span class="o">=</span> <span class="n">key</span> <span class="o">=</span> <span class="n">value</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">query</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">key</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">query</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qkv_same_embed_dim</span><span class="p">:</span>
+            <span class="p">(</span>
+                <span class="n">attn_output</span><span class="p">,</span>
+                <span class="n">_</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="n">packed_multi_head_attention_forward</span><span class="p">(</span>
+                <span class="n">query</span><span class="p">,</span>
+                <span class="n">key</span><span class="p">,</span>
+                <span class="n">value</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">embed_dim</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_proj_weight</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_proj_bias</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bias_k</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bias_v</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_zero_attn</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_proj</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_proj</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span>
+                <span class="n">training</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">,</span>
+                <span class="n">key_padding_mask</span><span class="o">=</span><span class="n">key_padding_mask</span><span class="p">,</span>
+                <span class="n">need_weights</span><span class="o">=</span><span class="n">need_weights</span><span class="p">,</span>
+                <span class="n">attn_mask</span><span class="o">=</span><span class="n">attn_mask</span><span class="p">,</span>
+                <span class="n">use_separate_proj_weight</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">q_proj_weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">q_proj_weight</span><span class="p">,</span>
+                <span class="n">k_proj_weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k_proj_weight</span><span class="p">,</span>
+                <span class="n">v_proj_weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">v_proj_weight</span><span class="p">,</span>
+                <span class="n">average_attn_weights</span><span class="o">=</span><span class="n">average_attn_weights</span><span class="p">,</span>
+                <span class="n">is_causal</span><span class="o">=</span><span class="n">is_causal</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="p">(</span>
+                <span class="n">attn_output</span><span class="p">,</span>
+                <span class="n">_</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="n">packed_multi_head_attention_forward</span><span class="p">(</span>
+                <span class="n">query</span><span class="p">,</span>
+                <span class="n">key</span><span class="p">,</span>
+                <span class="n">value</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">embed_dim</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_proj_weight</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_proj_bias</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bias_k</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bias_v</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_zero_attn</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_proj</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_proj</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span>
+                <span class="n">training</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">,</span>
+                <span class="n">key_padding_mask</span><span class="o">=</span><span class="n">key_padding_mask</span><span class="p">,</span>
+                <span class="n">need_weights</span><span class="o">=</span><span class="n">need_weights</span><span class="p">,</span>
+                <span class="n">attn_mask</span><span class="o">=</span><span class="n">attn_mask</span><span class="p">,</span>
+                <span class="n">average_attn_weights</span><span class="o">=</span><span class="n">average_attn_weights</span><span class="p">,</span>
+                <span class="n">is_causal</span><span class="o">=</span><span class="n">is_causal</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_first</span> <span class="ow">and</span> <span class="n">is_batched</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">attn_output</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">attn_output</span><span class="p">,</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="PackedTransformerEncoderLayer"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.PackedTransformerEncoderLayer.html#torch_uncertainty.layers.PackedTransformerEncoderLayer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PackedTransformerEncoderLayer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;batch_first&quot;</span><span class="p">,</span> <span class="s2">&quot;norm_first&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">nhead</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">gamma</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">dim_feedforward</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2048</span><span class="p">,</span>
+        <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">activation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
+        <span class="n">layer_norm_eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span>
+        <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">batch_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">norm_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Packed-Ensembles-style TransformerEncoderLayer (made up of self-attention followed by a</span>
+<span class="sd">        feedforward network).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            d_model (int): the number of expected features in the input.</span>
+<span class="sd">            nhead (int): the number of heads in the multiheadattention models.</span>
+<span class="sd">            alpha (float): the width multiplier of the layer.</span>
+<span class="sd">            num_estimators (int): the number of estimators packed in the layer.</span>
+<span class="sd">            gamma (int, optional): Defaults to ``1``.</span>
+<span class="sd">            dim_feedforward (int, optional): the dimension of the feedforward network model. Defaults</span>
+<span class="sd">                to ``2048``.</span>
+<span class="sd">            dropout (float, optional): the dropout value. Defaults to ``0.1``.</span>
+<span class="sd">            activation (Callable[[Tensor], Tensor], optional): the activation function of the</span>
+<span class="sd">                intermediate layer, that is a unary callable. Defaults to ``F.relu``.</span>
+<span class="sd">            layer_norm_eps (float, optional): the eps value in layer normalization components. Defaults</span>
+<span class="sd">                to ``1e-5``.</span>
+<span class="sd">            bias (bool, optional): If ``False``, ``Linear`` and ``LayerNorm`` layers will not learn an</span>
+<span class="sd">                additive bias. Defaults to ``True``.</span>
+<span class="sd">            batch_first (bool, optional): If ``True``, then the input and output tensors are provided</span>
+<span class="sd">                as :math:`(\text{batch}, \text{seq}, \text{d_model})`. Defaults to ``False``</span>
+<span class="sd">                :math:`(\text{seq}, \text{batch}, \text{d_model})`.</span>
+<span class="sd">            norm_first (bool, optional): If ``True``, the layer norm is done prior to attention and</span>
+<span class="sd">                feedforward operations, respectively. Otherwise, it is done after. Defaults to</span>
+<span class="sd">                ``False``.</span>
+<span class="sd">            first (bool, optional): Whether this is the first layer of the network. Defaults to</span>
+<span class="sd">                ``False``.</span>
+<span class="sd">            last (bool, optional): Whether this is the last layer of the network. Defaults to</span>
+<span class="sd">                ``False``.</span>
+<span class="sd">            device (torch.device, optional): The device to use for the layer&#39;s parameters. Defaults</span>
+<span class="sd">                to ``None``.</span>
+<span class="sd">            dtype (torch.dtype, optional): The dtype to use for the layer&#39;s parameters. Defaults to</span>
+<span class="sd">                ``None``.</span>
+
+<span class="sd">        Reference:</span>
+<span class="sd">            - `Attention Is All You Need &lt;https://arxiv.org/abs/1706.03762&gt;`_: Original Multihead Attention formulation.</span>
+<span class="sd">            - `Hierarchical Light Tranformer Ensembles for Multimodal Trajectory Forecasting &lt;https://arxiv.org/abs/2403.17678&gt;`_</span>
+<span class="sd">              : Packed-Ensembles-style Multihead Attention formulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">factory_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">}</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">self_attn</span> <span class="o">=</span> <span class="n">PackedMultiheadAttention</span><span class="p">(</span>
+            <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+            <span class="n">num_heads</span><span class="o">=</span><span class="n">nhead</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">,</span>
+            <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span>
+            <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">,</span>
+            <span class="n">batch_first</span><span class="o">=</span><span class="n">batch_first</span><span class="p">,</span>
+            <span class="n">first</span><span class="o">=</span><span class="n">first</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear1</span> <span class="o">=</span> <span class="n">PackedLinear</span><span class="p">(</span>
+            <span class="n">in_features</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+            <span class="n">out_features</span><span class="o">=</span><span class="n">dim_feedforward</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span>
+            <span class="n">implementation</span><span class="o">=</span><span class="s2">&quot;einsum&quot;</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear2</span> <span class="o">=</span> <span class="n">PackedLinear</span><span class="p">(</span>
+            <span class="n">in_features</span><span class="o">=</span><span class="n">dim_feedforward</span><span class="p">,</span>
+            <span class="n">out_features</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span>
+            <span class="n">implementation</span><span class="o">=</span><span class="s2">&quot;einsum&quot;</span><span class="p">,</span>
+            <span class="n">last</span><span class="o">=</span><span class="n">last</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span> <span class="o">=</span> <span class="n">norm_first</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span> <span class="ow">and</span> <span class="n">first</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
+                <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+                <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span> <span class="ow">and</span> <span class="n">last</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
+                <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+                <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
+                <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+                <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">activation</span> <span class="ow">is</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">activation</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activation_relu_or_gelu</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">activation</span> <span class="ow">is</span> <span class="n">F</span><span class="o">.</span><span class="n">gelu</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">activation</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">GELU</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activation_relu_or_gelu</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activation_relu_or_gelu</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activation</span>
+
+<div class="viewcode-block" id="PackedTransformerEncoderLayer.forward"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.PackedTransformerEncoderLayer.html#torch_uncertainty.layers.PackedTransformerEncoderLayer.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">src</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">src_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">src_key_padding_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">is_causal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pass the input through the encoder layer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            src (Tensor): The sequence to the encoder layer. Shape: :math:`(B, L, E)` or</span>
+<span class="sd">                :math:`(L, B, E)`.</span>
+<span class="sd">            src_mask (Tensor | None, optional): The mask for the ``src`` sequence. Defaults to ``None``.</span>
+<span class="sd">            src_key_padding_mask (Tensor | None, optional): The mask for the ``src`` keys per</span>
+<span class="sd">                batch. Defaults to ``None``.</span>
+<span class="sd">            is_causal (bool, optional): If specified, applies a causal mask as ``src_mask``.</span>
+<span class="sd">                Defaults to ``False``. Warning: ``is_causal`` provides a hint the ``src_mask`` is</span>
+<span class="sd">                a causal mask. Providing incorrect hints can result in incorrect execution,</span>
+<span class="sd">                including forward and backward compatibility.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: The output of the encoder layer. Shape: :math:`(B, L, E)` or :math:`(L, B, E)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">src_key_padding_mask</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">_canonical_mask</span><span class="p">(</span>
+            <span class="n">mask</span><span class="o">=</span><span class="n">src_key_padding_mask</span><span class="p">,</span>
+            <span class="n">mask_name</span><span class="o">=</span><span class="s2">&quot;src_key_padding_mask&quot;</span><span class="p">,</span>
+            <span class="n">other_type</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">_none_or_dtype</span><span class="p">(</span><span class="n">src_mask</span><span class="p">),</span>
+            <span class="n">other_name</span><span class="o">=</span><span class="s2">&quot;src_mask&quot;</span><span class="p">,</span>
+            <span class="n">target_type</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">src_mask</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">_canonical_mask</span><span class="p">(</span>
+            <span class="n">mask</span><span class="o">=</span><span class="n">src_mask</span><span class="p">,</span>
+            <span class="n">mask_name</span><span class="o">=</span><span class="s2">&quot;src_mask&quot;</span><span class="p">,</span>
+            <span class="n">other_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">other_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">target_type</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">check_other</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">src</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sa_block</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+                <span class="n">src_mask</span><span class="p">,</span>
+                <span class="n">src_key_padding_mask</span><span class="p">,</span>
+                <span class="n">is_causal</span><span class="o">=</span><span class="n">is_causal</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ff_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norm2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span><span class="p">(</span>
+                <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sa_block</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">src_mask</span><span class="p">,</span> <span class="n">src_key_padding_mask</span><span class="p">,</span> <span class="n">is_causal</span><span class="o">=</span><span class="n">is_causal</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ff_block</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">x</span></div>
+
+    <span class="c1"># self-attention block</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sa_block</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">attn_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">key_padding_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">is_causal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">self_attn</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">attn_mask</span><span class="o">=</span><span class="n">attn_mask</span><span class="p">,</span>
+            <span class="n">key_padding_mask</span><span class="o">=</span><span class="n">key_padding_mask</span><span class="p">,</span>
+            <span class="n">is_causal</span><span class="o">=</span><span class="n">is_causal</span><span class="p">,</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># feed-forward block</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ff_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear1</span><span class="p">(</span><span class="n">x</span><span class="p">))))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PackedTransformerDecoderLayer"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.PackedTransformerDecoderLayer.html#torch_uncertainty.layers.PackedTransformerDecoderLayer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PackedTransformerDecoderLayer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;batch_first&quot;</span><span class="p">,</span> <span class="s2">&quot;norm_first&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">nhead</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">gamma</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">dim_feedforward</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2048</span><span class="p">,</span>
+        <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">activation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span>
+        <span class="n">layer_norm_eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span>
+        <span class="n">batch_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">norm_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Packed-Ensembles-style TransformerDecoderLayer (made up of self-attention, multi-head</span>
+<span class="sd">        attention, and feedforward network).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            d_model (int): the number of expected features in the input.</span>
+<span class="sd">            nhead (int): the number of heads in the multiheadattention models.</span>
+<span class="sd">            alpha (float): the width multiplier of the layer.</span>
+<span class="sd">            num_estimators (int): the number of estimators packed in the layer.</span>
+<span class="sd">            gamma (int, optional): Defaults to ``1``.</span>
+<span class="sd">            dim_feedforward (int, optional): the dimension of the feedforward network model. Defaults</span>
+<span class="sd">                to ``2048``.</span>
+<span class="sd">            dropout (float, optional): the dropout value. Defaults to ``0.1``.</span>
+<span class="sd">            activation (Callable[[Tensor], Tensor], optional): the activation function of the</span>
+<span class="sd">                intermediate layer, that is a unary callable. Defaults to ``F.relu``.</span>
+<span class="sd">            layer_norm_eps (float, optional): the eps value in layer normalization components. Defaults</span>
+<span class="sd">                to ``1e-5``.</span>
+<span class="sd">            bias (bool, optional): If ``False``, ``Linear`` and ``LayerNorm`` layers will not learn an</span>
+<span class="sd">                additive bias. Defaults to ``True``.</span>
+<span class="sd">            batch_first (bool, optional): If ``True``, then the input and output tensors are provided</span>
+<span class="sd">                as :math:`(\text{batch}, \text{seq}, \text{d_model})`. Defaults to ``False``</span>
+<span class="sd">                :math:`(\text{seq}, \text{batch}, \text{d_model})`.</span>
+<span class="sd">            norm_first (bool, optional): If ``True``, the layer norm is done prior to attention and</span>
+<span class="sd">                feedforward operations, respectively. Otherwise, it is done after. Defaults to</span>
+<span class="sd">                ``False``.</span>
+<span class="sd">            first (bool, optional): Whether this is the first layer of the network. Defaults to</span>
+<span class="sd">                ``False``.</span>
+<span class="sd">            last (bool, optional): Whether this is the last layer of the network. Defaults to</span>
+<span class="sd">                ``False``.</span>
+<span class="sd">            device (torch.device, optional): The device to use for the layer&#39;s parameters. Defaults</span>
+<span class="sd">                to ``None``.</span>
+<span class="sd">            dtype (torch.dtype, optional): The dtype to use for the layer&#39;s parameters. Defaults to</span>
+<span class="sd">                ``None``.</span>
+
+<span class="sd">        Reference:</span>
+<span class="sd">            - `Attention Is All You Need &lt;https://arxiv.org/abs/1706.03762&gt;`_: Original Multihead Attention formulation.</span>
+<span class="sd">            - `Hierarchical Light Tranformer Ensembles for Multimodal Trajectory Forecasting &lt;https://arxiv.org/abs/2403.17678&gt;`_</span>
+<span class="sd">              : Packed-Ensembles-style Multihead Attention formulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">factory_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">}</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">self_attn</span> <span class="o">=</span> <span class="n">PackedMultiheadAttention</span><span class="p">(</span>
+            <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+            <span class="n">num_heads</span><span class="o">=</span><span class="n">nhead</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span>
+            <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">,</span>
+            <span class="n">batch_first</span><span class="o">=</span><span class="n">batch_first</span><span class="p">,</span>
+            <span class="n">first</span><span class="o">=</span><span class="n">first</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">multihead_attn</span> <span class="o">=</span> <span class="n">PackedMultiheadAttention</span><span class="p">(</span>
+            <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+            <span class="n">num_heads</span><span class="o">=</span><span class="n">nhead</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span>
+            <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">,</span>
+            <span class="n">batch_first</span><span class="o">=</span><span class="n">batch_first</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear1</span> <span class="o">=</span> <span class="n">PackedLinear</span><span class="p">(</span>
+            <span class="n">in_features</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+            <span class="n">out_features</span><span class="o">=</span><span class="n">dim_feedforward</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span>
+            <span class="n">implementation</span><span class="o">=</span><span class="s2">&quot;einsum&quot;</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear2</span> <span class="o">=</span> <span class="n">PackedLinear</span><span class="p">(</span>
+            <span class="n">in_features</span><span class="o">=</span><span class="n">dim_feedforward</span><span class="p">,</span>
+            <span class="n">out_features</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span>
+            <span class="n">implementation</span><span class="o">=</span><span class="s2">&quot;einsum&quot;</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">,</span>
+            <span class="n">last</span><span class="o">=</span><span class="n">last</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span> <span class="o">=</span> <span class="n">norm_first</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span> <span class="ow">and</span> <span class="n">first</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
+                <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+                <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
+            <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span> <span class="ow">and</span> <span class="n">last</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">norm3</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
+                <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+                <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+                <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">norm3</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
+                <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+                <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">activation</span> <span class="ow">is</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">activation</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activation_relu_or_gelu</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">activation</span> <span class="ow">is</span> <span class="n">F</span><span class="o">.</span><span class="n">gelu</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">activation</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">GELU</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activation_relu_or_gelu</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activation_relu_or_gelu</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activation</span>
+
+<div class="viewcode-block" id="PackedTransformerDecoderLayer.forward"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.PackedTransformerDecoderLayer.html#torch_uncertainty.layers.PackedTransformerDecoderLayer.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">tgt</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">tgt_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">memory_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">tgt_key_padding_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">memory_key_padding_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">tgt_is_causal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">memory_is_causal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pass the input (and mask) through the decoder layer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tgt (Tensor): The sequence to the decoder layer. Shape: :math:`(B, L, E)` or</span>
+<span class="sd">                :math:`(L, B, E)`.</span>
+<span class="sd">            memory (Tensor): The sequence from the last layer of the encoder. Shape:</span>
+<span class="sd">                :math:`(B, S, E)` or :math:`(S, B, E)`.</span>
+<span class="sd">            tgt_mask (Tensor | None, optional): The mask for the ``tgt`` sequence. Defaults to</span>
+<span class="sd">                ``None``.</span>
+<span class="sd">            memory_mask (Tensor | None, optional): The mask for the ``memory`` sequence. Defaults</span>
+<span class="sd">                to ``None``.</span>
+<span class="sd">            tgt_key_padding_mask (Tensor | None, optional): The mask for the ``tgt`` keys per</span>
+<span class="sd">                batch. Defaults to ``None``.</span>
+<span class="sd">            memory_key_padding_mask (Tensor | None, optional): The mask for the ``memory`` keys per</span>
+<span class="sd">                batch. Defaults to ``None``.</span>
+<span class="sd">            tgt_is_causal (bool, optional): If specified, applies a causal mask as ``tgt_mask``.</span>
+<span class="sd">                Defaults to ``False``. Warning: ``tgt_is_causal`` provides a hint the ``tgt_mask``</span>
+<span class="sd">                is a causal mask. Providing incorrect hints can result in incorrect execution,</span>
+<span class="sd">                including forward and backward compatibility.</span>
+<span class="sd">            memory_is_causal (bool, optional): If specified, applies a causal mask as ``memory_mask``.</span>
+<span class="sd">                Defaults to ``False``. Warning: ``memory_is_causal`` provides a hint the ``memory_mask``</span>
+<span class="sd">                is a causal mask. Providing incorrect hints can result in incorrect execution,</span>
+<span class="sd">                including forward and backward compatibility.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: The output of the encoder layer. Shape: :math:`(B, L, E)` or :math:`(L, B, E)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">tgt</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sa_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norm1</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">tgt_mask</span><span class="p">,</span> <span class="n">tgt_key_padding_mask</span><span class="p">,</span> <span class="n">tgt_is_causal</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mha_block</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+                <span class="n">memory</span><span class="p">,</span>
+                <span class="n">memory_mask</span><span class="p">,</span>
+                <span class="n">memory_key_padding_mask</span><span class="p">,</span>
+                <span class="n">memory_is_causal</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ff_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norm3</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sa_block</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tgt_mask</span><span class="p">,</span> <span class="n">tgt_key_padding_mask</span><span class="p">,</span> <span class="n">tgt_is_causal</span><span class="p">))</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span><span class="p">(</span>
+                <span class="n">x</span>
+                <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mha_block</span><span class="p">(</span>
+                    <span class="n">x</span><span class="p">,</span>
+                    <span class="n">memory</span><span class="p">,</span>
+                    <span class="n">memory_mask</span><span class="p">,</span>
+                    <span class="n">memory_key_padding_mask</span><span class="p">,</span>
+                    <span class="n">memory_is_causal</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm3</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ff_block</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">x</span></div>
+
+    <span class="c1"># self-attention block</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sa_block</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">attn_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">key_padding_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">is_causal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">self_attn</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">attn_mask</span><span class="o">=</span><span class="n">attn_mask</span><span class="p">,</span>
+            <span class="n">key_padding_mask</span><span class="o">=</span><span class="n">key_padding_mask</span><span class="p">,</span>
+            <span class="n">is_causal</span><span class="o">=</span><span class="n">is_causal</span><span class="p">,</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># multi-head attention block</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mha_block</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">attn_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">key_padding_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">is_causal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multihead_attn</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">memory</span><span class="p">,</span>
+            <span class="n">memory</span><span class="p">,</span>
+            <span class="n">attn_mask</span><span class="o">=</span><span class="n">attn_mask</span><span class="p">,</span>
+            <span class="n">key_padding_mask</span><span class="o">=</span><span class="n">key_padding_mask</span><span class="p">,</span>
+            <span class="n">is_causal</span><span class="o">=</span><span class="n">is_causal</span><span class="p">,</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># feed-forward block</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ff_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linear1</span><span class="p">(</span><span class="n">x</span><span class="p">))))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout3</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 </pre></div>
 
               </article>

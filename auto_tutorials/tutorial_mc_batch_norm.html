@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Training a LeNet with Monte Carlo Batch Normalization &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>Training a LeNet with Monte Carlo Batch Normalization &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -40,7 +40,7 @@
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Deep Evidential Regression on a Toy Example" href="tutorial_der_cubic.html" />
+  <link rel="next" title="Train a Bayesian Neural Network in Three Minutes" href="tutorial_bayesian.html" />
   <link rel="prev" title="Training a LeNet with Monte-Carlo Dropout" href="tutorial_mc_dropout.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
@@ -281,16 +281,16 @@ to download the full example code.</p>
 <li><p>an optimization recipe in the torch_uncertainty.optim_recipes module.</p></li>
 </ul>
 <p>We also need import the neural network utils within <cite>torch.nn</cite>.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
 
-<span class="kn">from</span> <span class="nn">torch_uncertainty</span> <span class="kn">import</span> <span class="n">TUTrainer</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <span class="n">MNISTDataModule</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.models.lenet</span> <span class="kn">import</span> <span class="n">lenet</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.optim_recipes</span> <span class="kn">import</span> <span class="n">optim_cifar10_resnet18</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.post_processing.mc_batch_norm</span> <span class="kn">import</span> <span class="n">MCBatchNorm</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.routines</span> <span class="kn">import</span> <span class="n">ClassificationRoutine</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty</span><span class="w"> </span><span class="kn">import</span> <span class="n">TUTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.datamodules</span><span class="w"> </span><span class="kn">import</span> <span class="n">MNISTDataModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models.lenet</span><span class="w"> </span><span class="kn">import</span> <span class="n">lenet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.optim_recipes</span><span class="w"> </span><span class="kn">import</span> <span class="n">optim_cifar10_resnet18</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.post_processing.mc_batch_norm</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCBatchNorm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.routines</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassificationRoutine</span>
 </pre></div>
 </div>
 </section>
@@ -343,24 +343,24 @@ and the optimization recipe.</p>
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          98.27%           │
-│    Brier     │          0.02579          │
-│   Entropy    │          0.05501          │
-│     NLL      │          0.05274          │
+│     Acc      │          98.35%           │
+│    Brier     │          0.02649          │
+│   Entropy    │          0.07213          │
+│     NLL      │          0.05632          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          0.00366          │
-│     aECE     │          0.00157          │
+│     ECE      │          0.00486          │
+│     aECE     │          0.00459          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
 │    AUGRC     │           0.06%           │
-│     AURC     │           0.06%           │
+│     AURC     │           0.07%           │
 │  Cov@5Risk   │          100.00%          │
-│  Risk@80Cov  │           0.00%           │
+│  Risk@80Cov  │           0.04%           │
 └──────────────┴───────────────────────────┘
 </pre></div>
 </div>
@@ -391,13 +391,13 @@ the variance of the predictions is the highest.
 Please note that we apply a reshape to the logits to determine the dimension corresponding to the ensemble
 and to the batch. As for TorchUncertainty 2.0, the ensemble dimension is merged with the batch dimension
 in this order (num_estimator x batch, classes).</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torchvision</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torchvision</span>
 
 
-<span class="k">def</span> <span class="nf">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
     <span class="n">npimg</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">npimg</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
@@ -427,17 +427,17 @@ in this order (num_estimator x batch, classes).</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_tutorial_mc_batch_norm_001.png" srcset="../_images/sphx_glr_tutorial_mc_batch_norm_001.png" alt="tutorial mc batch norm" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ground truth:  7 2 1 0
-Predicted digits for the image 6:  4 4 4 4 4 4 4 4
-Predicted digits for the image 18:  3 3 3 3 3 3 3 3
-Predicted digits for the image 65:  4 4 4 4 4 4 4 4
-Predicted digits for the image 79:  7 7 7 7 7 7 7 7
+Predicted digits for the image 18:  3 3 3 3 8 3 3 3
+Predicted digits for the image 92:  9 4 4 9 4 4 4 9
+Predicted digits for the image 111:  7 7 7 7 1 7 7 7
+Predicted digits for the image 124:  7 4 4 4 4 4 7 4
 </pre></div>
 </div>
 <p>The predictions are mostly erroneous, which is expected since we selected
 the most uncertain images. We also see that there stochasticity in the
 predictions, as the predictions for the same image differ depending on the
 stochastic estimator used.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 39.168 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 39.330 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-mc-batch-norm-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/631ac265c1ce7636bf5c4db0e5a4f3c3/tutorial_mc_batch_norm.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_batch_norm.ipynb</span></code></a></p>
@@ -462,7 +462,7 @@ stochastic estimator used.</p>
   
   <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
     
-    <a href="tutorial_der_cubic.html" class="btn btn-neutral float-right" title="Deep Evidential Regression on a Toy Example" accesskey="n"
+    <a href="tutorial_bayesian.html" class="btn btn-neutral float-right" title="Train a Bayesian Neural Network in Three Minutes" accesskey="n"
       rel="next">Next <img src="../_static/images/chevron-right-teal.svg"
         class="next-page"></a>
     

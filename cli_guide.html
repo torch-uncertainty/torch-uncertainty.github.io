@@ -9,7 +9,7 @@
 <meta charset="utf-8"/>
 <meta content="Docutils 0.19: https://docutils.sourceforge.io/" name="generator">
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>CLI Guide — TorchUncertainty 0.3.1 documentation</title>
+<title>CLI Guide — TorchUncertainty 0.4.0 documentation</title>
 <link href="_static/images/logo_torch_uncertainty.png" rel="shortcut icon"/>
 <link href="_static/css/custom.css" rel="stylesheet" type="text/css"/>
 <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
@@ -174,21 +174,21 @@ class from the <code class="docutils literal notranslate"><span class="pre">Ligh
 an evaluation on the test set should be performed after the training phase.</p>
 </div>
 <p>Let’s see how to implement the CLI, by checking out the <code class="docutils literal notranslate"><span class="pre">experiments/classification/cifar10/resnet.py</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">lightning.pytorch.cli</span> <span class="kn">import</span> <span class="n">LightningArgumentParser</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lightning.pytorch.cli</span><span class="w"> </span><span class="kn">import</span> <span class="n">LightningArgumentParser</span>
 
-<span class="kn">from</span> <span class="nn">torch_uncertainty.baselines.classification</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.baselines.classification.ResNetBaseline.html#torch_uncertainty.baselines.classification.ResNetBaseline" title="torch_uncertainty.baselines.classification.resnet.ResNetBaseline"><span class="n">ResNetBaseline</span></a>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.datamodules</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.classification.cifar10.CIFAR10DataModule"><span class="n">CIFAR10DataModule</span></a>
-<span class="kn">from</span> <span class="nn">torch_uncertainty</span> <span class="kn">import</span> <span class="n">TULightningCLI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.baselines.classification</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.baselines.classification.ResNetBaseline.html#torch_uncertainty.baselines.classification.ResNetBaseline" title="torch_uncertainty.baselines.classification.resnet.ResNetBaseline"><span class="n">ResNetBaseline</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.datamodules</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.classification.cifar10.CIFAR10DataModule"><span class="n">CIFAR10DataModule</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty</span><span class="w"> </span><span class="kn">import</span> <span class="n">TULightningCLI</span>
 
 
-<span class="k">class</span> <span class="nc">ResNetCLI</span><span class="p">(</span><span class="n">TULightningCLI</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">add_arguments_to_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">:</span> <span class="n">LightningArgumentParser</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResNetCLI</span><span class="p">(</span><span class="n">TULightningCLI</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_arguments_to_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">:</span> <span class="n">LightningArgumentParser</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_optimizer_args</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">)</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_lr_scheduler_args</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">MultiStepLR</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">cli_main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ResNetCLI</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cli_main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ResNetCLI</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">ResNetCLI</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.baselines.classification.ResNetBaseline.html#torch_uncertainty.baselines.classification.ResNetBaseline" title="torch_uncertainty.baselines.classification.resnet.ResNetBaseline"><span class="n">ResNetBaseline</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.classification.cifar10.CIFAR10DataModule"><span class="n">CIFAR10DataModule</span></a><span class="p">)</span>
 
 
@@ -207,8 +207,8 @@ The <code class="docutils literal notranslate"><span class="pre">ResNetCLI</span
 <code class="docutils literal notranslate"><span class="pre">add_arguments_to_parser</span></code> method to add the optimizer and learning rate scheduler arguments
 into the parser. In this case, we use the <code class="docutils literal notranslate"><span class="pre">torch.optim.SGD</span></code> optimizer and the
 <code class="docutils literal notranslate"><span class="pre">torch.optim.lr_scheduler.MultiStepLR</span></code> learning rate scheduler.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ResNetCLI</span><span class="p">(</span><span class="n">TULightningCLI</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">add_arguments_to_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">:</span> <span class="n">LightningArgumentParser</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ResNetCLI</span><span class="p">(</span><span class="n">TULightningCLI</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_arguments_to_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">:</span> <span class="n">LightningArgumentParser</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_optimizer_args</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">)</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_lr_scheduler_args</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">MultiStepLR</span><span class="p">)</span>
 </pre></div>
@@ -216,7 +216,7 @@ into the parser. In this case, we use the <code class="docutils literal notransl
 <p>The <code class="docutils literal notranslate"><span class="pre">LightningCLI</span></code> takes a <code class="docutils literal notranslate"><span class="pre">LightningModule</span></code> and a <code class="docutils literal notranslate"><span class="pre">LightningDataModule</span></code> as arguments.
 Here the <code class="docutils literal notranslate"><span class="pre">cli_main</span></code> function creates an instance of the <code class="docutils literal notranslate"><span class="pre">ResNetCLI</span></code> class by taking the <code class="docutils literal notranslate"><span class="pre">ResNetBaseline</span></code>
 model and the <code class="docutils literal notranslate"><span class="pre">CIFAR10DataModule</span></code> as arguments.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">cli_main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ResNetCLI</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">cli_main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ResNetCLI</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">ResNetCLI</span><span class="p">(</span><span class="n">ResNetBaseline</span><span class="p">,</span> <span class="n">CIFAR10DataModule</span><span class="p">)</span>
 </pre></div>
 </div>

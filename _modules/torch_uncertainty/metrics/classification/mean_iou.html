@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.metrics.classification.mean_iou &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>torch_uncertainty.metrics.classification.mean_iou &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -249,43 +249,68 @@
                 
                 
   <h1>Source code for torch_uncertainty.metrics.classification.mean_iou</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
-
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.classification.stat_scores</span> <span class="kn">import</span> <span class="n">MulticlassStatScores</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.utilities.compute</span> <span class="kn">import</span> <span class="n">_safe_divide</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.classification.stat_scores</span><span class="w"> </span><span class="kn">import</span> <span class="n">MulticlassStatScores</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.compute</span><span class="w"> </span><span class="kn">import</span> <span class="n">_safe_divide</span>
 
 
-<div class="viewcode-block" id="MeanIntersectionOverUnion"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.MeanIntersectionOverUnion.html#torch_uncertainty.metrics.classification.MeanIntersectionOverUnion">[docs]</a><span class="k">class</span> <span class="nc">MeanIntersectionOverUnion</span><span class="p">(</span><span class="n">MulticlassStatScores</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the MeanIntersection over Union (IoU) score.&quot;&quot;&quot;</span>
-
+<div class="viewcode-block" id="MeanIntersectionOverUnion"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.MeanIntersectionOverUnion.html#torch_uncertainty.metrics.classification.MeanIntersectionOverUnion">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MeanIntersectionOverUnion</span><span class="p">(</span><span class="n">MulticlassStatScores</span><span class="p">):</span>
     <span class="n">is_differentiable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">higher_is_better</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">full_state_update</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">multidim_average</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;global&quot;</span><span class="p">,</span> <span class="s2">&quot;samplewise&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;global&quot;</span><span class="p">,</span>
         <span class="n">ignore_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">validate_args</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes Mean Intersection over Union (IoU) score.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            num_classes (int): Integer specifying the number of classes.</span>
+<span class="sd">            top_k (int, optional): Number of highest probability or logit score predictions</span>
+<span class="sd">                considered to find the correct label. Only works when ``preds`` contain</span>
+<span class="sd">                probabilities/logits. Defaults to ``1``.</span>
+<span class="sd">            ignore_index (int | None, optional): Specifies a target value that is ignored and does</span>
+<span class="sd">                not contribute to the metric calculation. Defaults to ``None``.</span>
+<span class="sd">            validate_args (bool, optional): Bool indicating if input arguments and tensors should</span>
+<span class="sd">                be validated for correctness. Set to ``False`` for faster computations. Defaults to</span>
+<span class="sd">                ``True``.</span>
+<span class="sd">            **kwargs: kwargs: Additional keyword arguments, see</span>
+<span class="sd">                `Advanced metric settings &lt;https://lightning.ai/docs/torchmetrics/stable/pages/overview.html#metric-kwargs&gt;`_</span>
+<span class="sd">                for more info.</span>
+
+<span class="sd">        Shape:</span>
+<span class="sd">            As input to ``forward`` and ``update`` the metric accepts the following input:</span>
+
+<span class="sd">            - ``preds`` (:class:`~torch.Tensor`): An int tensor of shape ``(B, ...)`` or float tensor of shape ``(B, C, ..)``.</span>
+<span class="sd">              If preds is a floating point we apply ``torch.argmax`` along the ``C`` dimension to automatically convert</span>
+<span class="sd">              probabilities/logits into an int tensor.</span>
+<span class="sd">            - ``target`` (:class:`~torch.Tensor`): An int tensor of shape ``(B, ...)``.</span>
+
+<span class="sd">            As output to ``forward`` and ``compute`` the metric returns the following output:</span>
+
+<span class="sd">            - ``mean_iou`` (:class:`~torch.Tensor`): The computed Mean Intersection over Union (IoU) score.</span>
+<span class="sd">              A tensor containing a single float value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">num_classes</span><span class="p">,</span>
             <span class="n">top_k</span><span class="p">,</span>
             <span class="s2">&quot;macro&quot;</span><span class="p">,</span>
-            <span class="n">multidim_average</span><span class="p">,</span>
+            <span class="s2">&quot;global&quot;</span><span class="p">,</span>
             <span class="n">ignore_index</span><span class="p">,</span>
             <span class="n">validate_args</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="MeanIntersectionOverUnion.compute"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.MeanIntersectionOverUnion.html#torch_uncertainty.metrics.classification.MeanIntersectionOverUnion.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="MeanIntersectionOverUnion.compute"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.MeanIntersectionOverUnion.html#torch_uncertainty.metrics.classification.MeanIntersectionOverUnion.compute">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the Means Intersection over Union (MIoU) based on saved inputs.&quot;&quot;&quot;</span>
         <span class="n">tp</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_final_state</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">_safe_divide</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span> <span class="o">+</span> <span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span></div></div>
+
+        <span class="k">return</span> <span class="n">_safe_divide</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span> <span class="o">+</span> <span class="n">fn</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">nanmean</span><span class="p">()</span></div></div>
 </pre></div>
 
               </article>

@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.datasets.classification.cifar.cifar_h &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>torch_uncertainty.datasets.classification.cifar.cifar_h &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../../_static/images/logo_torch_uncertainty.png" />
@@ -249,17 +249,17 @@
                 
                 
   <h1>Source code for torch_uncertainty.datasets.classification.cifar.cifar_h</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torchvision.datasets</span> <span class="kn">import</span> <span class="n">CIFAR10</span>
-<span class="kn">from</span> <span class="nn">torchvision.datasets.utils</span> <span class="kn">import</span> <span class="n">check_integrity</span><span class="p">,</span> <span class="n">download_url</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">CIFAR10</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision.datasets.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_integrity</span><span class="p">,</span> <span class="n">download_url</span>
 
 
-<div class="viewcode-block" id="CIFAR10H"><a class="viewcode-back" href="../../../../../generated/torch_uncertainty.datasets.classification.CIFAR10H.html#torch_uncertainty.datasets.classification.CIFAR10H">[docs]</a><span class="k">class</span> <span class="nc">CIFAR10H</span><span class="p">(</span><span class="n">CIFAR10</span><span class="p">):</span>
+<div class="viewcode-block" id="CIFAR10H"><a class="viewcode-back" href="../../../../../generated/torch_uncertainty.datasets.classification.CIFAR10H.html#torch_uncertainty.datasets.classification.CIFAR10H">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CIFAR10H</span><span class="p">(</span><span class="n">CIFAR10</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;`CIFAR-10H &lt;https://github.com/jcpeterson/cifar-10h&gt;`_ Dataset.</span>
 
 <span class="sd">    Args:</span>
@@ -280,7 +280,7 @@
     <span class="n">h_test_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;cifar-10h-probs.npy&quot;</span><span class="p">,</span> <span class="s2">&quot;7b41f73eee90fdefc73bfc820ab29ba8&quot;</span><span class="p">]</span>
     <span class="n">h_url</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/jcpeterson/cifar-10h/raw/master/data/&quot;</span> <span class="s2">&quot;cifar10h-probs.npy&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
         <span class="n">train</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -309,12 +309,12 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_test_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
 
-    <span class="k">def</span> <span class="nf">_check_specific_integrity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_specific_integrity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="n">filename</span><span class="p">,</span> <span class="n">md5</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_test_list</span>
         <span class="n">fpath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="n">filename</span>
         <span class="k">return</span> <span class="n">check_integrity</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">md5</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">download_h</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">download_h</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">download_url</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">h_url</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>

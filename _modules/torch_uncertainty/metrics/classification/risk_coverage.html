@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.metrics.classification.risk_coverage &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>torch_uncertainty.metrics.classification.risk_coverage &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -249,19 +249,19 @@
                 
                 
   <h1>Source code for torch_uncertainty.metrics.classification.risk_coverage</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torchmetrics</span> <span class="kn">import</span> <span class="n">Metric</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.utilities.compute</span> <span class="kn">import</span> <span class="n">_auc_compute</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.utilities.data</span> <span class="kn">import</span> <span class="n">dim_zero_cat</span>
-<span class="kn">from</span> <span class="nn">torchmetrics.utilities.plot</span> <span class="kn">import</span> <span class="n">_AX_TYPE</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">Metric</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.compute</span><span class="w"> </span><span class="kn">import</span> <span class="n">_auc_compute</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">dim_zero_cat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">_AX_TYPE</span>
 
 
-<div class="viewcode-block" id="AURC"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC">[docs]</a><span class="k">class</span> <span class="nc">AURC</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
+<div class="viewcode-block" id="AURC"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">AURC</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
     <span class="n">is_differentiable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">higher_is_better</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">full_state_update</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -269,7 +269,7 @@
     <span class="n">scores</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span>
     <span class="n">errors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Area Under the Risk-Coverage curve.</span>
 
 <span class="sd">        The Area Under the Risk-Coverage curve (AURC) is the main metric for</span>
@@ -302,7 +302,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;scores&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;cat&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;errors&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;cat&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="AURC.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="AURC.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC.update">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the scores and their associated errors for later computation.</span>
 
 <span class="sd">        Args:</span>
@@ -314,7 +314,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">probs</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">targets</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.0</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AURC.partial_compute"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC.partial_compute">[docs]</a>    <span class="k">def</span> <span class="nf">partial_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="AURC.partial_compute"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC.partial_compute">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">partial_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the error and optimal error rates for the RC curve.</span>
 
 <span class="sd">        Returns:</span>
@@ -325,7 +325,7 @@
         <span class="n">errors</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_aurc_rejection_rate_compute</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AURC.compute"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="AURC.compute"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC.compute">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the Area Under the Risk-Coverage curve (AURC).</span>
 
 <span class="sd">        Normalize the AURC as if its support was between 0 and 1. This has an</span>
@@ -341,7 +341,7 @@
         <span class="n">cov</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_samples</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span>
         <span class="k">return</span> <span class="n">_auc_compute</span><span class="p">(</span><span class="n">cov</span><span class="p">,</span> <span class="n">error_rates</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">num_samples</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AURC.plot"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span>
+<div class="viewcode-block" id="AURC.plot"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC.plot">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">ax</span><span class="p">:</span> <span class="n">_AX_TYPE</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">plot_value</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -402,7 +402,7 @@
         <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div></div>
 
 
-<span class="k">def</span> <span class="nf">_aurc_rejection_rate_compute</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_aurc_rejection_rate_compute</span><span class="p">(</span>
     <span class="n">scores</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">errors</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
@@ -418,7 +418,7 @@
     <span class="p">)</span>
 
 
-<div class="viewcode-block" id="AUGRC"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AUGRC.html#torch_uncertainty.metrics.classification.AUGRC">[docs]</a><span class="k">class</span> <span class="nc">AUGRC</span><span class="p">(</span><span class="n">AURC</span><span class="p">):</span>
+<div class="viewcode-block" id="AUGRC"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AUGRC.html#torch_uncertainty.metrics.classification.AUGRC">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">AUGRC</span><span class="p">(</span><span class="n">AURC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Area Under the Generalized Risk-Coverage curve.</span>
 
 <span class="sd">    The Area Under the Generalized Risk-Coverage curve (AUGRC) for</span>
@@ -446,7 +446,7 @@
 <span class="sd">        Classification Systems. ArXiv.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AUGRC.compute"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AUGRC.html#torch_uncertainty.metrics.classification.AUGRC.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="AUGRC.compute"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AUGRC.html#torch_uncertainty.metrics.classification.AUGRC.compute">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the Area Under the Generalized Risk-Coverage curve (AUGRC).</span>
 
 <span class="sd">        Normalize the AUGRC as if its support was between 0 and 1. This has an</span>
@@ -462,7 +462,7 @@
         <span class="n">cov</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_samples</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span>
         <span class="k">return</span> <span class="n">_auc_compute</span><span class="p">(</span><span class="n">cov</span><span class="p">,</span> <span class="n">error_rates</span> <span class="o">*</span> <span class="n">cov</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">num_samples</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AUGRC.plot"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AUGRC.html#torch_uncertainty.metrics.classification.AUGRC.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span>
+<div class="viewcode-block" id="AUGRC.plot"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.AUGRC.html#torch_uncertainty.metrics.classification.AUGRC.plot">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">ax</span><span class="p">:</span> <span class="n">_AX_TYPE</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">plot_value</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -523,7 +523,7 @@
         <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div></div>
 
 
-<div class="viewcode-block" id="CovAtxRisk"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.CovAtxRisk.html#torch_uncertainty.metrics.classification.CovAtxRisk">[docs]</a><span class="k">class</span> <span class="nc">CovAtxRisk</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
+<div class="viewcode-block" id="CovAtxRisk"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.CovAtxRisk.html#torch_uncertainty.metrics.classification.CovAtxRisk">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CovAtxRisk</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
     <span class="n">is_differentiable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">higher_is_better</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">full_state_update</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -531,7 +531,7 @@
     <span class="n">scores</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span>
     <span class="n">errors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">risk_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">risk_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Coverage at x Risk.</span>
 
 <span class="sd">        If there are multiple coverage values corresponding to the given risk,</span>
@@ -551,7 +551,7 @@
         <span class="n">_risk_coverage_checks</span><span class="p">(</span><span class="n">risk_threshold</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">risk_threshold</span> <span class="o">=</span> <span class="n">risk_threshold</span>
 
-<div class="viewcode-block" id="CovAtxRisk.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.CovAtxRisk.html#torch_uncertainty.metrics.classification.CovAtxRisk.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="CovAtxRisk.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.CovAtxRisk.html#torch_uncertainty.metrics.classification.CovAtxRisk.update">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the scores and their associated errors for later computation.</span>
 
 <span class="sd">        Args:</span>
@@ -563,7 +563,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">probs</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">targets</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.0</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CovAtxRisk.compute"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.CovAtxRisk.html#torch_uncertainty.metrics.classification.CovAtxRisk.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="CovAtxRisk.compute"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.CovAtxRisk.html#torch_uncertainty.metrics.classification.CovAtxRisk.compute">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the coverage at x Risk.</span>
 
 <span class="sd">        Returns:</span>
@@ -585,8 +585,8 @@
         <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">max_cov_at_risk</span> <span class="o">/</span> <span class="n">num_samples</span></div></div>
 
 
-<div class="viewcode-block" id="CovAt5Risk"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.CovAt5Risk.html#torch_uncertainty.metrics.classification.CovAt5Risk">[docs]</a><span class="k">class</span> <span class="nc">CovAt5Risk</span><span class="p">(</span><span class="n">CovAtxRisk</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="CovAt5Risk"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.CovAt5Risk.html#torch_uncertainty.metrics.classification.CovAt5Risk">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CovAt5Risk</span><span class="p">(</span><span class="n">CovAtxRisk</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Coverage at 5% Risk.</span>
 
 <span class="sd">        If there are multiple coverage values corresponding to 5% risk, the</span>
@@ -597,7 +597,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">risk_threshold</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="RiskAtxCov"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.RiskAtxCov.html#torch_uncertainty.metrics.classification.RiskAtxCov">[docs]</a><span class="k">class</span> <span class="nc">RiskAtxCov</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
+<div class="viewcode-block" id="RiskAtxCov"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.RiskAtxCov.html#torch_uncertainty.metrics.classification.RiskAtxCov">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RiskAtxCov</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
     <span class="n">is_differentiable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">higher_is_better</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">full_state_update</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -605,7 +605,7 @@
     <span class="n">scores</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span>
     <span class="n">errors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cov_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cov_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Risk at given Coverage.</span>
 
 <span class="sd">        Args:</span>
@@ -619,7 +619,7 @@
         <span class="n">_risk_coverage_checks</span><span class="p">(</span><span class="n">cov_threshold</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cov_threshold</span> <span class="o">=</span> <span class="n">cov_threshold</span>
 
-<div class="viewcode-block" id="RiskAtxCov.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.RiskAtxCov.html#torch_uncertainty.metrics.classification.RiskAtxCov.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="RiskAtxCov.update"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.RiskAtxCov.html#torch_uncertainty.metrics.classification.RiskAtxCov.update">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the scores and their associated errors for later computation.</span>
 
 <span class="sd">        Args:</span>
@@ -631,7 +631,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">probs</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">targets</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.0</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RiskAtxCov.compute"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.RiskAtxCov.html#torch_uncertainty.metrics.classification.RiskAtxCov.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="RiskAtxCov.compute"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.RiskAtxCov.html#torch_uncertainty.metrics.classification.RiskAtxCov.compute">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the risk at given coverage.</span>
 
 <span class="sd">        Returns:</span>
@@ -643,13 +643,13 @@
         <span class="k">return</span> <span class="n">error_rates</span><span class="p">[</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">scores</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov_threshold</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span></div></div>
 
 
-<div class="viewcode-block" id="RiskAt80Cov"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.RiskAt80Cov.html#torch_uncertainty.metrics.classification.RiskAt80Cov">[docs]</a><span class="k">class</span> <span class="nc">RiskAt80Cov</span><span class="p">(</span><span class="n">RiskAtxCov</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="RiskAt80Cov"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.RiskAt80Cov.html#torch_uncertainty.metrics.classification.RiskAt80Cov">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RiskAt80Cov</span><span class="p">(</span><span class="n">RiskAtxCov</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Risk at 80% Coverage.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">cov_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_risk_coverage_checks</span><span class="p">(</span><span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_risk_coverage_checks</span><span class="p">(</span><span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected threshold to be of type float, but got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">threshold</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">threshold</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">threshold</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>

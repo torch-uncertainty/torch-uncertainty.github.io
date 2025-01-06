@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.baselines.classification.wideresnet &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>torch_uncertainty.baselines.classification.wideresnet &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -249,28 +249,28 @@
                 
                 
   <h1>Source code for torch_uncertainty.baselines.classification.wideresnet</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
-<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Optimizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optimizer</span>
 
-<span class="kn">from</span> <span class="nn">torch_uncertainty.models</span> <span class="kn">import</span> <span class="n">mc_dropout</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.models.wideresnet</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">mc_dropout</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models.wideresnet</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">batched_wideresnet28x10</span><span class="p">,</span>
     <span class="n">masked_wideresnet28x10</span><span class="p">,</span>
     <span class="n">mimo_wideresnet28x10</span><span class="p">,</span>
     <span class="n">packed_wideresnet28x10</span><span class="p">,</span>
     <span class="n">wideresnet28x10</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.routines.classification</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.routines.classification</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ClassificationRoutine</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">torch_uncertainty.transforms</span> <span class="kn">import</span> <span class="n">MIMOBatchFormat</span><span class="p">,</span> <span class="n">RepeatTarget</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.transforms</span><span class="w"> </span><span class="kn">import</span> <span class="n">MIMOBatchFormat</span><span class="p">,</span> <span class="n">RepeatTarget</span>
 
 <span class="n">ENSEMBLE_METHODS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;packed&quot;</span><span class="p">,</span> <span class="s2">&quot;batched&quot;</span><span class="p">,</span> <span class="s2">&quot;masked&quot;</span><span class="p">,</span> <span class="s2">&quot;mimo&quot;</span><span class="p">,</span> <span class="s2">&quot;mc-dropout&quot;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="WideResNetBaseline"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.baselines.classification.WideResNetBaseline.html#torch_uncertainty.baselines.classification.WideResNetBaseline">[docs]</a><span class="k">class</span> <span class="nc">WideResNetBaseline</span><span class="p">(</span><span class="n">ClassificationRoutine</span><span class="p">):</span>
+<div class="viewcode-block" id="WideResNetBaseline"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.baselines.classification.WideResNetBaseline.html#torch_uncertainty.baselines.classification.WideResNetBaseline">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">WideResNetBaseline</span><span class="p">(</span><span class="n">ClassificationRoutine</span><span class="p">):</span>
     <span class="n">versions</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">wideresnet28x10</span><span class="p">],</span>
         <span class="s2">&quot;mc-dropout&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">wideresnet28x10</span><span class="p">],</span>
@@ -280,7 +280,7 @@
         <span class="s2">&quot;mimo&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">mimo_wideresnet28x10</span><span class="p">],</span>
     <span class="p">}</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>

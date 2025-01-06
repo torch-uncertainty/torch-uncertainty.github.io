@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MUAD &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>MUAD &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -262,7 +262,7 @@
 <h1>MUAD<a class="headerlink" href="#muad" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.datasets.MUAD">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.datasets.</span></span><span class="sig-name descname"><span class="pre">MUAD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'semantic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/datasets/muad.html#MUAD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.datasets.MUAD" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.datasets.</span></span><span class="sig-name descname"><span class="pre">MUAD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'semantic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/datasets/muad.html#MUAD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.datasets.MUAD" title="Permalink to this definition">¶</a></dt>
 <dd><p>The MUAD Dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -270,6 +270,8 @@
 <li><p><strong>root</strong> (<em>str</em>) – Root directory of dataset where directory ‘leftImg8bit’
 and ‘leftLabel’ or ‘leftDepth’ are located.</p></li>
 <li><p><strong>split</strong> (<em>str</em><em>, </em><em>optional</em>) – The image split to use, ‘train’ or ‘val’.</p></li>
+<li><p><strong>version</strong> (<em>str</em><em>, </em><em>optional</em>) – The version of the dataset to use, ‘small’
+or ‘full’. Defaults to ‘full’.</p></li>
 <li><p><strong>min_depth</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum depth value to use if
 target_type is ‘depth’. Defaults to None.</p></li>
 <li><p><strong>max_depth</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum depth value to use if
@@ -293,23 +295,6 @@ downloaded, it is not downloaded again.</p></li>
 <p>MUAD cannot be used for commercial purposes. Read MUAD’s license
 carefully before using it and verify that you can comply.</p>
 </div>
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.datasets.MUAD.encode_target">
-<span class="sig-name descname"><span class="pre">encode_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/datasets/muad.html#MUAD.encode_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.datasets.MUAD.encode_target" title="Permalink to this definition">¶</a></dt>
-<dd><p>Encode target image to tensor.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>target</strong> (<em>Image.Image</em>) – Target PIL image.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Encoded target.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>torch.Tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -358,10 +343,7 @@ carefully before using it and verify that you can comply.</p>
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">MUAD</a><ul>
-<li><a class="reference internal" href="#torch_uncertainty.datasets.MUAD"><code class="docutils literal notranslate"><span class="pre">MUAD</span></code></a><ul>
-<li><a class="reference internal" href="#torch_uncertainty.datasets.MUAD.encode_target"><code class="docutils literal notranslate"><span class="pre">MUAD.encode_target()</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#torch_uncertainty.datasets.MUAD"><code class="docutils literal notranslate"><span class="pre">MUAD</span></code></a></li>
 </ul>
 </li>
 </ul>

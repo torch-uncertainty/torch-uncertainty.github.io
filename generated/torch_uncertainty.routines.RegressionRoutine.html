@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>RegressionRoutine &mdash; TorchUncertainty 0.3.1 documentation</title>
+  <title>RegressionRoutine &mdash; TorchUncertainty 0.4.0 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -262,16 +262,19 @@
 <h1>RegressionRoutine<a class="headerlink" href="#regressionroutine" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.routines.RegressionRoutine">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.routines.</span></span><span class="sig-name descname"><span class="pre">RegressionRoutine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probabilistic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_ensemble</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_recipe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_batch_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/regression.html#RegressionRoutine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.RegressionRoutine" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.routines.</span></span><span class="sig-name descname"><span class="pre">RegressionRoutine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_family</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_estimate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_ensemble</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_recipe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_batch_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/regression.html#RegressionRoutine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.RegressionRoutine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Routine for training &amp; testing on <strong>regression</strong> tasks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<em>torch.nn.Module</em>) – Model to train.</p></li>
 <li><p><strong>output_dim</strong> (<em>int</em>) – Number of outputs of the model.</p></li>
-<li><p><strong>probabilistic</strong> (<em>bool</em>) – Whether the model is probabilistic, i.e.,
-outputs a PyTorch distribution.</p></li>
 <li><p><strong>loss</strong> (<em>torch.nn.Module</em>) – Loss function to optimize the <code class="xref py py-attr docutils literal notranslate"><span class="pre">model</span></code>.</p></li>
+<li><p><strong>dist_family</strong> (<em>str</em><em>, </em><em>optional</em>) – The distribution family to use for
+probabilistic regression. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then point-wise regression.
+Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>dist_estimate</strong> (<em>str</em><em>, </em><em>optional</em>) – The estimate to use when computing the
+point-wise metrics. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>.</p></li>
 <li><p><strong>is_ensemble</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the model is an ensemble.
 Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>optim_recipe</strong> (<em>dict</em><em> or </em><em>torch.optim.Optimizer</em><em>, </em><em>optional</em>) – The optimizer and
