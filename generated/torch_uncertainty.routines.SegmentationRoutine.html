@@ -303,7 +303,13 @@ metrics. Defaults to <code class="docutils literal notranslate"><span class="pre
 <dd><p>Forward pass of the model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>inputs</strong> (<em>torch.Tensor</em>) – Input tensor.</p>
+<dd class="field-odd"><p><strong>inputs</strong> (<em>Tensor</em>) – input tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the prediction of the model.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tensor</p>
 </dd>
 </dl>
 </dd></dl>
@@ -311,7 +317,80 @@ metrics. Defaults to <code class="docutils literal notranslate"><span class="pre
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.routines.SegmentationRoutine.log_segmentation_plots">
 <span class="sig-name descname"><span class="pre">log_segmentation_plots</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/segmentation.html#SegmentationRoutine.log_segmentation_plots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.SegmentationRoutine.log_segmentation_plots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Builds and logs examples of segmentation plots from the test set.</p>
+<dd><p>Build and log examples of segmentation plots from the test set.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.SegmentationRoutine.on_test_epoch_end">
+<span class="sig-name descname"><span class="pre">on_test_epoch_end</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/segmentation.html#SegmentationRoutine.on_test_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.SegmentationRoutine.on_test_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute, log, and plot the values of the collected metrics in <cite>test_step</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.SegmentationRoutine.on_validation_epoch_end">
+<span class="sig-name descname"><span class="pre">on_validation_epoch_end</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/segmentation.html#SegmentationRoutine.on_validation_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.SegmentationRoutine.on_validation_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute and log the values of the collected metrics in <cite>validation_step</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.SegmentationRoutine.subsample">
+<span class="sig-name descname"><span class="pre">subsample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/segmentation.html#SegmentationRoutine.subsample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.SegmentationRoutine.subsample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select a random sample of the data to compute the loss onto.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pred</strong> (<em>Tensor</em>) – the prediction tensor.</p></li>
+<li><p><strong>target</strong> (<em>Tensor</em>) – the target tensor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the subsampled prediction and target tensors.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[Tensor, Tensor]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.SegmentationRoutine.test_step">
+<span class="sig-name descname"><span class="pre">test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/segmentation.html#SegmentationRoutine.test_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.SegmentationRoutine.test_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a single test step based on the input tensors.</p>
+<p>Compute the prediction of the model and the value of the metrics on the test batch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>batch</strong> (<em>tuple</em><em>[</em><em>Tensor</em><em>, </em><em>Tensor</em><em>]</em>) – the test images and their corresponding targets</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.SegmentationRoutine.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/segmentation.html#SegmentationRoutine.training_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.SegmentationRoutine.training_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a single training step based on the input tensors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>batch</strong> (<em>tuple</em><em>[</em><em>Tensor</em><em>, </em><em>Tensor</em><em>]</em>) – the training images and their corresponding targets</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the loss corresponding to this training step.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.SegmentationRoutine.validation_step">
+<span class="sig-name descname"><span class="pre">validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/segmentation.html#SegmentationRoutine.validation_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.SegmentationRoutine.validation_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a single validation step based on the input tensors.</p>
+<p>Compute the prediction of the model and the value of the metrics on the validation batch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>batch</strong> (<em>tuple</em><em>[</em><em>Tensor</em><em>, </em><em>Tensor</em><em>]</em>) – the validation images and their corresponding targets</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -365,6 +444,12 @@ metrics. Defaults to <code class="docutils literal notranslate"><span class="pre
 <li><a class="reference internal" href="#torch_uncertainty.routines.SegmentationRoutine"><code class="docutils literal notranslate"><span class="pre">SegmentationRoutine</span></code></a><ul>
 <li><a class="reference internal" href="#torch_uncertainty.routines.SegmentationRoutine.forward"><code class="docutils literal notranslate"><span class="pre">SegmentationRoutine.forward()</span></code></a></li>
 <li><a class="reference internal" href="#torch_uncertainty.routines.SegmentationRoutine.log_segmentation_plots"><code class="docutils literal notranslate"><span class="pre">SegmentationRoutine.log_segmentation_plots()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.SegmentationRoutine.on_test_epoch_end"><code class="docutils literal notranslate"><span class="pre">SegmentationRoutine.on_test_epoch_end()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.SegmentationRoutine.on_validation_epoch_end"><code class="docutils literal notranslate"><span class="pre">SegmentationRoutine.on_validation_epoch_end()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.SegmentationRoutine.subsample"><code class="docutils literal notranslate"><span class="pre">SegmentationRoutine.subsample()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.SegmentationRoutine.test_step"><code class="docutils literal notranslate"><span class="pre">SegmentationRoutine.test_step()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.SegmentationRoutine.training_step"><code class="docutils literal notranslate"><span class="pre">SegmentationRoutine.training_step()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.SegmentationRoutine.validation_step"><code class="docutils literal notranslate"><span class="pre">SegmentationRoutine.validation_step()</span></code></a></li>
 </ul>
 </li>
 </ul>

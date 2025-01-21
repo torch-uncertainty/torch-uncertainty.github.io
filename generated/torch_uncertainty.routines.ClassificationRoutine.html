@@ -320,12 +320,12 @@ metrics. Defaults to <code class="docutils literal notranslate"><span class="pre
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.routines.ClassificationRoutine.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_feats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/classification.html#ClassificationRoutine.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.ClassificationRoutine.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forward pass of the model.</p>
+<dd><p>Forward pass of the inner model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>inputs</strong> (<em>Tensor</em>) – Input tensor.</p></li>
-<li><p><strong>save_feats</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to store the features or
+<li><p><strong>inputs</strong> (<em>Tensor</em>) – input tensor.</p></li>
+<li><p><strong>save_feats</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to store the features or
 not. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
@@ -334,6 +334,97 @@ not. Defaults to <code class="docutils literal notranslate"><span class="pre">Fa
 <p class="admonition-title">Note</p>
 <p>The features are stored in the <code class="xref py py-attr docutils literal notranslate"><span class="pre">self.features</span></code> attribute.</p>
 </div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.ClassificationRoutine.on_test_epoch_end">
+<span class="sig-name descname"><span class="pre">on_test_epoch_end</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/classification.html#ClassificationRoutine.on_test_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.ClassificationRoutine.on_test_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute, log, and plot the values of the collected metrics in <cite>test_step</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.ClassificationRoutine.on_test_start">
+<span class="sig-name descname"><span class="pre">on_test_start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/classification.html#ClassificationRoutine.on_test_start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.ClassificationRoutine.on_test_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare the test step.</p>
+<p>Setup the post-processing dataset and fit the post-processing method if needed, prepares
+the storage lists for logit plotting and update the batchnorms if needed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.ClassificationRoutine.on_train_start">
+<span class="sig-name descname"><span class="pre">on_train_start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/classification.html#ClassificationRoutine.on_train_start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.ClassificationRoutine.on_train_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Put the hyperparameters in tensorboard.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.ClassificationRoutine.on_validation_epoch_end">
+<span class="sig-name descname"><span class="pre">on_validation_epoch_end</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/classification.html#ClassificationRoutine.on_validation_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.ClassificationRoutine.on_validation_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute and log the values of the collected metrics in <cite>validation_step</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.ClassificationRoutine.on_validation_start">
+<span class="sig-name descname"><span class="pre">on_validation_start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/classification.html#ClassificationRoutine.on_validation_start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.ClassificationRoutine.on_validation_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare the validation step.</p>
+<p>Update the model’s wrapper and the batchnorms if needed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.ClassificationRoutine.save_results_to_csv">
+<span class="sig-name descname"><span class="pre">save_results_to_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/classification.html#ClassificationRoutine.save_results_to_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.ClassificationRoutine.save_results_to_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the metric results in a csv.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>) – the dictionary containing all the values of the metrics.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.ClassificationRoutine.test_step">
+<span class="sig-name descname"><span class="pre">test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/classification.html#ClassificationRoutine.test_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.ClassificationRoutine.test_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a single test step based on the input tensors.</p>
+<p>Compute the prediction of the model and the value of the metrics on the test batch. Also
+handle OOD and distribution-shifted images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>tuple</em><em>[</em><em>Tensor</em><em>, </em><em>Tensor</em><em>]</em>) – the test data and their corresponding targets.</p></li>
+<li><p><strong>batch_idx</strong> (<em>int</em>) – the number of the current batch (unused).</p></li>
+<li><p><strong>dataloader_idx</strong> (<em>int</em>) – 0 if in-distribution, 1 if out-of-distribution and 2 if
+distribution-shifted.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.ClassificationRoutine.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/classification.html#ClassificationRoutine.training_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.ClassificationRoutine.training_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a single training step based on the input tensors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>batch</strong> (<em>tuple</em><em>[</em><em>Tensor</em><em>, </em><em>Tensor</em><em>]</em>) – the training data and their corresponding targets</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the loss corresponding to this training step.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.routines.ClassificationRoutine.validation_step">
+<span class="sig-name descname"><span class="pre">validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/routines/classification.html#ClassificationRoutine.validation_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.routines.ClassificationRoutine.validation_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a single validation step based on the input tensors.</p>
+<p>Compute the prediction of the model and the value of the metrics on the validation batch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>batch</strong> (<em>tuple</em><em>[</em><em>Tensor</em><em>, </em><em>Tensor</em><em>]</em>) – the validation data and their corresponding targets</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -386,6 +477,15 @@ not. Defaults to <code class="docutils literal notranslate"><span class="pre">Fa
 <li><a class="reference internal" href="#">ClassificationRoutine</a><ul>
 <li><a class="reference internal" href="#torch_uncertainty.routines.ClassificationRoutine"><code class="docutils literal notranslate"><span class="pre">ClassificationRoutine</span></code></a><ul>
 <li><a class="reference internal" href="#torch_uncertainty.routines.ClassificationRoutine.forward"><code class="docutils literal notranslate"><span class="pre">ClassificationRoutine.forward()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.ClassificationRoutine.on_test_epoch_end"><code class="docutils literal notranslate"><span class="pre">ClassificationRoutine.on_test_epoch_end()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.ClassificationRoutine.on_test_start"><code class="docutils literal notranslate"><span class="pre">ClassificationRoutine.on_test_start()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.ClassificationRoutine.on_train_start"><code class="docutils literal notranslate"><span class="pre">ClassificationRoutine.on_train_start()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.ClassificationRoutine.on_validation_epoch_end"><code class="docutils literal notranslate"><span class="pre">ClassificationRoutine.on_validation_epoch_end()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.ClassificationRoutine.on_validation_start"><code class="docutils literal notranslate"><span class="pre">ClassificationRoutine.on_validation_start()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.ClassificationRoutine.save_results_to_csv"><code class="docutils literal notranslate"><span class="pre">ClassificationRoutine.save_results_to_csv()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.ClassificationRoutine.test_step"><code class="docutils literal notranslate"><span class="pre">ClassificationRoutine.test_step()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.ClassificationRoutine.training_step"><code class="docutils literal notranslate"><span class="pre">ClassificationRoutine.training_step()</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.routines.ClassificationRoutine.validation_step"><code class="docutils literal notranslate"><span class="pre">ClassificationRoutine.validation_step()</span></code></a></li>
 </ul>
 </li>
 </ul>
