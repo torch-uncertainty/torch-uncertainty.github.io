@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Training a LeNet with Monte-Carlo Dropout &mdash; TorchUncertainty 0.4.0 documentation</title>
+  <title>Training a LeNet with Monte-Carlo Dropout &mdash; TorchUncertainty 0.4.1 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -357,11 +357,11 @@ Downloading https://ossci-datasets.s3.amazonaws.com/mnist/train-images-idx3-ubyt
 Downloading https://ossci-datasets.s3.amazonaws.com/mnist/train-images-idx3-ubyte.gz to data/MNIST/raw/train-images-idx3-ubyte.gz
 
   0%|          | 0.00/9.91M [00:00&lt;?, ?B/s]
-  1%|          | 98.3k/9.91M [00:00&lt;00:11, 867kB/s]
-  3%|▎         | 328k/9.91M [00:00&lt;00:06, 1.55MB/s]
- 13%|█▎        | 1.31M/9.91M [00:00&lt;00:01, 4.81MB/s]
- 53%|█████▎    | 5.28M/9.91M [00:00&lt;00:00, 16.7MB/s]
-100%|██████████| 9.91M/9.91M [00:00&lt;00:00, 19.1MB/s]
+  1%|          | 98.3k/9.91M [00:00&lt;00:13, 748kB/s]
+  4%|▎         | 360k/9.91M [00:00&lt;00:06, 1.49MB/s]
+ 15%|█▍        | 1.47M/9.91M [00:00&lt;00:01, 4.68MB/s]
+ 51%|█████     | 5.08M/9.91M [00:00&lt;00:00, 13.7MB/s]
+100%|██████████| 9.91M/9.91M [00:00&lt;00:00, 16.5MB/s]
 Extracting data/MNIST/raw/train-images-idx3-ubyte.gz to data/MNIST/raw
 
 Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz
@@ -372,7 +372,7 @@ Downloading https://ossci-datasets.s3.amazonaws.com/mnist/train-labels-idx1-ubyt
 Downloading https://ossci-datasets.s3.amazonaws.com/mnist/train-labels-idx1-ubyte.gz to data/MNIST/raw/train-labels-idx1-ubyte.gz
 
   0%|          | 0.00/28.9k [00:00&lt;?, ?B/s]
-100%|██████████| 28.9k/28.9k [00:00&lt;00:00, 510kB/s]
+100%|██████████| 28.9k/28.9k [00:00&lt;00:00, 406kB/s]
 Extracting data/MNIST/raw/train-labels-idx1-ubyte.gz to data/MNIST/raw
 
 Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz
@@ -383,10 +383,10 @@ Downloading https://ossci-datasets.s3.amazonaws.com/mnist/t10k-images-idx3-ubyte
 Downloading https://ossci-datasets.s3.amazonaws.com/mnist/t10k-images-idx3-ubyte.gz to data/MNIST/raw/t10k-images-idx3-ubyte.gz
 
   0%|          | 0.00/1.65M [00:00&lt;?, ?B/s]
-  6%|▌         | 98.3k/1.65M [00:00&lt;00:01, 883kB/s]
- 24%|██▍       | 393k/1.65M [00:00&lt;00:00, 1.91MB/s]
- 93%|█████████▎| 1.54M/1.65M [00:00&lt;00:00, 5.72MB/s]
-100%|██████████| 1.65M/1.65M [00:00&lt;00:00, 4.89MB/s]
+  4%|▍         | 65.5k/1.65M [00:00&lt;00:03, 467kB/s]
+ 20%|█▉        | 328k/1.65M [00:00&lt;00:01, 1.29MB/s]
+ 76%|███████▌  | 1.25M/1.65M [00:00&lt;00:00, 3.68MB/s]
+100%|██████████| 1.65M/1.65M [00:00&lt;00:00, 3.88MB/s]
 Extracting data/MNIST/raw/t10k-images-idx3-ubyte.gz to data/MNIST/raw
 
 Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz
@@ -397,7 +397,7 @@ Downloading https://ossci-datasets.s3.amazonaws.com/mnist/t10k-labels-idx1-ubyte
 Downloading https://ossci-datasets.s3.amazonaws.com/mnist/t10k-labels-idx1-ubyte.gz to data/MNIST/raw/t10k-labels-idx1-ubyte.gz
 
   0%|          | 0.00/4.54k [00:00&lt;?, ?B/s]
-100%|██████████| 4.54k/4.54k [00:00&lt;00:00, 5.49MB/s]
+100%|██████████| 4.54k/4.54k [00:00&lt;00:00, 4.66MB/s]
 Extracting data/MNIST/raw/t10k-labels-idx1-ubyte.gz to data/MNIST/raw
 
 /opt/hostedtoolcache/Python/3.10.16/x64/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The &#39;val_dataloader&#39; does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=3` in the `DataLoader` to improve performance.
@@ -406,24 +406,24 @@ Extracting data/MNIST/raw/t10k-labels-idx1-ubyte.gz to data/MNIST/raw
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          90.600%          │
-│    Brier     │          0.29775          │
-│   Entropy    │          1.43473          │
-│     NLL      │          0.69967          │
+│     Acc      │          86.940%          │
+│    Brier     │          0.36353          │
+│   Entropy    │          1.55098          │
+│     NLL      │          0.83486          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          0.34460          │
-│     aECE     │          0.34460          │
+│     ECE      │          0.35912          │
+│     aECE     │          0.35912          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          1.387%           │
-│     AURC     │          1.683%           │
-│  Cov@5Risk   │          87.930%          │
-│  Risk@80Cov  │          3.300%           │
+│    AUGRC     │          2.574%           │
+│     AURC     │          3.345%           │
+│  Cov@5Risk   │          73.600%          │
+│  Risk@80Cov  │          6.125%           │
 └──────────────┴───────────────────────────┘
 </pre></div>
 </div>
@@ -468,17 +468,17 @@ Extracting data/MNIST/raw/t10k-labels-idx1-ubyte.gz to data/MNIST/raw
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_tutorial_mc_dropout_001.png" srcset="../_images/sphx_glr_tutorial_mc_dropout_001.png" alt="tutorial mc dropout" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ground truth labels:  7 2 1 0 4 1
-MC-Dropout predictions for the image 1:  7 2 7 7 7 7 7 7 7 7 7 7 7 7 7 7
-MC-Dropout predictions for the image 2:  7 0 2 6 2 2 6 2 2 2 2 7 2 3 6 2
-MC-Dropout predictions for the image 3:  1 8 1 1 1 8 1 1 1 1 1 1 1 1 8 8
-MC-Dropout predictions for the image 4:  0 0 8 8 6 0 8 8 8 8 0 0 0 0 0 8
-MC-Dropout predictions for the image 5:  4 1 4 4 4 4 4 4 4 4 4 1 4 8 4 4
-MC-Dropout predictions for the image 6:  1 1 1 6 1 1 1 1 1 1 1 1 1 1 8 1
+MC-Dropout predictions for the image 1:  7 7 7 1 7 7 7 7 7 7 7 7 7 7 7 7
+MC-Dropout predictions for the image 2:  2 2 2 2 2 2 2 2 2 2 2 7 2 3 2 0
+MC-Dropout predictions for the image 3:  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+MC-Dropout predictions for the image 4:  0 0 0 0 0 5 0 0 5 5 0 8 8 0 0 0
+MC-Dropout predictions for the image 5:  4 9 1 4 4 1 9 4 4 4 4 1 4 6 4 6
+MC-Dropout predictions for the image 6:  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 </pre></div>
 </div>
 <p>Most of the time, we see that there is some disagreement between the samples of the dropout
 approximation of the posterior distribution.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 49.668 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 49.687 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-mc-dropout-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/4890df143fe34f5aa2106d4980500a99/tutorial_mc_dropout.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_dropout.ipynb</span></code></a></p>
