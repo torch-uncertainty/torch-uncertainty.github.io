@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>BatchLinear &mdash; TorchUncertainty 0.4.1 documentation</title>
+  <title>BatchLinear &mdash; TorchUncertainty 0.4.2 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -325,17 +325,47 @@ initialized from <span class="math notranslate nohighlight">\(\mathcal{U}(-\sqrt
 </dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Make sure that <code class="xref py py-attr docutils literal notranslate"><span class="pre">num_estimators</span></code> divides <code class="xref py py-attr docutils literal notranslate"><span class="pre">out_features</span></code> when calling <code class="xref py py-func docutils literal notranslate"><span class="pre">forward()</span></code>.</p>
+<p>It is advised to ensure that <cite>batch_size</cite> is divisible by <code class="xref py py-attr docutils literal notranslate"><span class="pre">num_estimators</span></code> when
+calling <code class="xref py py-func docutils literal notranslate"><span class="pre">forward()</span></code>, so each estimator receives the same number of examples.
+In a BatchEnsemble architecture, the input is typically <strong>repeated</strong> <cite>num_estimators</cite>
+times along the batch dimension. Incorrect batch size may lead to unexpected results.</p>
+<p>To simplify batch handling, wrap your model with <cite>torch_uncertainty.wrappers.BatchEnsemble</cite>,
+which automatically repeats the batch before passing it through the network.</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># With three estimators</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">LinearBE</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">BatchLinear</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">output</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
 <span class="go">torch.Size([8, 30])</span>
 </pre></div>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.layers.BatchLinear.from_linear">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">linear</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/layers/batch_ensemble.html#BatchLinear.from_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.layers.BatchLinear.from_linear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a BatchEnsemble-style Linear layer from an existing Linear layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>linear</strong> (<em>nn.Linear</em>) – The Linear layer to convert.</p></li>
+<li><p><strong>num_estimators</strong> (<em>int</em>) – Number of ensemble members.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The converted BatchEnsemble-style Linear layer.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#torch_uncertainty.layers.BatchLinear" title="torch_uncertainty.layers.BatchLinear">BatchLinear</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">be_linear</span> <span class="o">=</span> <span class="n">BatchLinear</span><span class="o">.</span><span class="n">from_linear</span><span class="p">(</span><span class="n">linear</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -384,7 +414,10 @@ initialized from <span class="math notranslate nohighlight">\(\mathcal{U}(-\sqrt
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">BatchLinear</a><ul>
-<li><a class="reference internal" href="#torch_uncertainty.layers.BatchLinear"><code class="docutils literal notranslate"><span class="pre">BatchLinear</span></code></a></li>
+<li><a class="reference internal" href="#torch_uncertainty.layers.BatchLinear"><code class="docutils literal notranslate"><span class="pre">BatchLinear</span></code></a><ul>
+<li><a class="reference internal" href="#torch_uncertainty.layers.BatchLinear.from_linear"><code class="docutils literal notranslate"><span class="pre">BatchLinear.from_linear()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.datamodules.classification.mnist &mdash; TorchUncertainty 0.4.1 documentation</title>
+  <title>torch_uncertainty.datamodules.classification.mnist &mdash; TorchUncertainty 0.4.2 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../../_static/images/logo_torch_uncertainty.png" />
@@ -422,12 +422,14 @@
 
 <span class="sd">        Return:</span>
 <span class="sd">            list[DataLoader]: Dataloaders of the MNIST test set (in</span>
-<span class="sd">                distribution data) and FashionMNIST test split</span>
-<span class="sd">                (out-of-distribution data).</span>
+<span class="sd">                distribution data), FashionMNIST or NotMNIST test split</span>
+<span class="sd">                (out-of-distribution data), and/or MNISTC (shifted data).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dataloader</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_loader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">)]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
             <span class="n">dataloader</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_loader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ood</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_shift</span><span class="p">:</span>
+            <span class="n">dataloader</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_loader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shift</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">dataloader</span></div></div>
 </pre></div>
 

@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.layers.batch_ensemble &mdash; TorchUncertainty 0.4.1 documentation</title>
+  <title>torch_uncertainty.layers.batch_ensemble &mdash; TorchUncertainty 0.4.2 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -252,6 +252,7 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">einops</span><span class="w"> </span><span class="kn">import</span> <span class="n">repeat</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn.common_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">_size_2_t</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn.modules.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_pair</span>
@@ -330,11 +331,18 @@
 <span class="sd">              :math:`H_{out} = \text{out_features}`.</span>
 
 <span class="sd">        Warning:</span>
-<span class="sd">            Make sure that :attr:`num_estimators` divides :attr:`out_features` when calling :func:`forward()`.</span>
+<span class="sd">            It is advised to ensure that `batch_size` is divisible by :attr:`num_estimators` when</span>
+<span class="sd">            calling :func:`forward()`, so each estimator receives the same number of examples.</span>
+<span class="sd">            In a BatchEnsemble architecture, the input is typically **repeated** `num_estimators`</span>
+<span class="sd">            times along the batch dimension. Incorrect batch size may lead to unexpected results.</span>
+
+<span class="sd">            To simplify batch handling, wrap your model with `torch_uncertainty.wrappers.BatchEnsemble`,</span>
+<span class="sd">            which automatically repeats the batch before passing it through the network.</span>
+
 
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; # With three estimators</span>
-<span class="sd">            &gt;&gt;&gt; m = LinearBE(20, 30, 3)</span>
+<span class="sd">            &gt;&gt;&gt; m = BatchLinear(20, 30, 3)</span>
 <span class="sd">            &gt;&gt;&gt; input = torch.randn(8, 20)</span>
 <span class="sd">            &gt;&gt;&gt; output = m(input)</span>
 <span class="sd">            &gt;&gt;&gt; print(output.size())</span>
@@ -361,6 +369,30 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">register_parameter</span><span class="p">(</span><span class="s2">&quot;bias&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_parameters</span><span class="p">()</span>
 
+<div class="viewcode-block" id="BatchLinear.from_linear"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.BatchLinear.html#torch_uncertainty.layers.BatchLinear.from_linear">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_linear</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">linear</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BatchLinear&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a BatchEnsemble-style Linear layer from an existing Linear layer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            linear (nn.Linear): The Linear layer to convert.</span>
+<span class="sd">            num_estimators (int): Number of ensemble members.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            BatchLinear: The converted BatchEnsemble-style Linear layer.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; linear = nn.Linear(20, 30)</span>
+<span class="sd">            &gt;&gt;&gt; be_linear = BatchLinear.from_linear(linear, num_estimators=3)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">in_features</span><span class="o">=</span><span class="n">linear</span><span class="o">.</span><span class="n">in_features</span><span class="p">,</span>
+            <span class="n">out_features</span><span class="o">=</span><span class="n">linear</span><span class="o">.</span><span class="n">out_features</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="n">linear</span><span class="o">.</span><span class="n">bias</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">linear</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">linear</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r_group</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
         <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_group</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
@@ -376,16 +408,12 @@
         <span class="p">)</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="n">batch_size</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span>
 
-        <span class="n">r_group</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">repeat_interleave</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r_group</span><span class="p">,</span> <span class="n">examples_per_estimator</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">r_group</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">r_group</span><span class="p">,</span> <span class="n">r_group</span><span class="p">[:</span><span class="n">extra</span><span class="p">]],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># .unsqueeze(-1).unsqueeze(-1)</span>
-        <span class="n">s_group</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">repeat_interleave</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_group</span><span class="p">,</span> <span class="n">examples_per_estimator</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">s_group</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">s_group</span><span class="p">,</span> <span class="n">s_group</span><span class="p">[:</span><span class="n">extra</span><span class="p">]],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># .unsqueeze(-1).unsqueeze(-1)</span>
+        <span class="n">r_group</span> <span class="o">=</span> <span class="n">repeat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r_group</span><span class="p">,</span> <span class="s2">&quot;m h -&gt; (m b) h&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">examples_per_estimator</span><span class="p">)</span>
+        <span class="n">r_group</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">r_group</span><span class="p">,</span> <span class="n">r_group</span><span class="p">[:</span><span class="n">extra</span><span class="p">]],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">s_group</span> <span class="o">=</span> <span class="n">repeat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_group</span><span class="p">,</span> <span class="s2">&quot;m h -&gt; (m b) h&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">examples_per_estimator</span><span class="p">)</span>
+        <span class="n">s_group</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">s_group</span><span class="p">,</span> <span class="n">s_group</span><span class="p">[:</span><span class="n">extra</span><span class="p">]],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">bias</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">repeat_interleave</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span>
-                <span class="n">examples_per_estimator</span><span class="p">,</span>
-                <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="n">bias</span> <span class="o">=</span> <span class="n">repeat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="s2">&quot;m h -&gt; (m b) h&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">examples_per_estimator</span><span class="p">)</span>
             <span class="n">bias</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">bias</span><span class="p">,</span> <span class="n">bias</span><span class="p">[:</span><span class="n">extra</span><span class="p">]],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">bias</span> <span class="o">=</span> <span class="kc">None</span>
@@ -394,7 +422,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">extra_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;in_features=</span><span class="si">{</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">in_features</span><span class="si">}</span><span class="s2">,&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;in_features=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">in_features</span><span class="si">}</span><span class="s2">,&quot;</span>
             <span class="sa">f</span><span class="s2">&quot; out_features=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">out_features</span><span class="si">}</span><span class="s2">,&quot;</span>
             <span class="sa">f</span><span class="s2">&quot; num_estimators=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">,&quot;</span>
             <span class="sa">f</span><span class="s2">&quot; bias=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="kc">None</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -524,12 +552,16 @@
 <span class="sd">                {\text{stride}[1]} + 1\right\rfloor</span>
 
 <span class="sd">        Warning:</span>
-<span class="sd">            Make sure that :attr:`num_estimators` divides :attr:`out_channels` when calling :func:`forward()`.</span>
+<span class="sd">            Ensure that `batch_size` is divisible by :attr:`num_estimators` when calling :func:`forward()`.</span>
+<span class="sd">            In a BatchEnsemble architecture, the input batch is typically **repeated** `num_estimators`</span>
+<span class="sd">            times along the first axis. Incorrect batch size may lead to unexpected results.</span>
 
+<span class="sd">            To simplify batch handling, wrap your model with `BatchEnsembleWrapper`, which automatically</span>
+<span class="sd">            repeats the batch before passing it through the network. See `BatchEnsembleWrapper` for details.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; # With square kernels, four estimators and equal stride</span>
-<span class="sd">            &gt;&gt;&gt; m = Conv2dBE(3, 32, 3, 4, stride=1)</span>
+<span class="sd">            &gt;&gt;&gt; m = BatchConv2d(3, 32, 3, 4, stride=1)</span>
 <span class="sd">            &gt;&gt;&gt; input = torch.randn(8, 3, 16, 16)</span>
 <span class="sd">            &gt;&gt;&gt; output = m(input)</span>
 <span class="sd">            &gt;&gt;&gt; print(output.size())</span>
@@ -566,6 +598,38 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_parameters</span><span class="p">()</span>
 
+<div class="viewcode-block" id="BatchConv2d.from_conv2d"><a class="viewcode-back" href="../../../generated/torch_uncertainty.layers.BatchConv2d.html#torch_uncertainty.layers.BatchConv2d.from_conv2d">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_conv2d</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">conv2d</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BatchConv2d&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a BatchEnsemble-style Conv2d layer from an existing Conv2d layer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            conv2d (nn.Conv2d): The Conv2d layer to convert.</span>
+<span class="sd">            num_estimators (int): Number of ensemble members.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            BatchConv2d: The converted BatchEnsemble-style Conv2d layer.</span>
+
+<span class="sd">        Warning:</span>
+<span class="sd">            All parameters of the original Conv2d layer will be discarded.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; conv2d = nn.Conv2d(3, 32, kernel_size=3)</span>
+<span class="sd">            &gt;&gt;&gt; be_conv2d = BatchConv2d.from_conv2d(conv2d, num_estimators=3)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">in_channels</span><span class="o">=</span><span class="n">conv2d</span><span class="o">.</span><span class="n">in_channels</span><span class="p">,</span>
+            <span class="n">out_channels</span><span class="o">=</span><span class="n">conv2d</span><span class="o">.</span><span class="n">out_channels</span><span class="p">,</span>
+            <span class="n">kernel_size</span><span class="o">=</span><span class="n">conv2d</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">,</span>
+            <span class="n">stride</span><span class="o">=</span><span class="n">conv2d</span><span class="o">.</span><span class="n">stride</span><span class="p">,</span>
+            <span class="n">padding</span><span class="o">=</span><span class="n">conv2d</span><span class="o">.</span><span class="n">padding</span><span class="p">,</span>
+            <span class="n">dilation</span><span class="o">=</span><span class="n">conv2d</span><span class="o">.</span><span class="n">dilation</span><span class="p">,</span>
+            <span class="n">groups</span><span class="o">=</span><span class="n">conv2d</span><span class="o">.</span><span class="n">groups</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="n">conv2d</span><span class="o">.</span><span class="n">bias</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">conv2d</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">conv2d</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r_group</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
         <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_group</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
@@ -579,50 +643,13 @@
         <span class="n">examples_per_estimator</span> <span class="o">=</span> <span class="n">batch_size</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="n">batch_size</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span>
 
-        <span class="n">r_group</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">repeat_interleave</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">r_group</span><span class="p">,</span>
-                <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
-                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">],</span>
-                    <span class="n">examples_per_estimator</span><span class="p">,</span>
-                    <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">r_group</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
-                <span class="p">),</span>
-                <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">r_group</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">r_group</span><span class="p">,</span> <span class="n">r_group</span><span class="p">[:</span><span class="n">extra</span><span class="p">]],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># .unsqueeze(-1).unsqueeze(-1)</span>
-        <span class="n">s_group</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">repeat_interleave</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">s_group</span><span class="p">,</span>
-                <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
-                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">],</span>
-                    <span class="n">examples_per_estimator</span><span class="p">,</span>
-                    <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">s_group</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
-                <span class="p">),</span>
-                <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">s_group</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">s_group</span><span class="p">,</span> <span class="n">s_group</span><span class="p">[:</span><span class="n">extra</span><span class="p">]],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1">#</span>
+        <span class="n">r_group</span> <span class="o">=</span> <span class="n">repeat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r_group</span><span class="p">,</span> <span class="s2">&quot;m h -&gt; (m b) h 1 1&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">examples_per_estimator</span><span class="p">)</span>
+        <span class="n">r_group</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">r_group</span><span class="p">,</span> <span class="n">r_group</span><span class="p">[:</span><span class="n">extra</span><span class="p">]],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">s_group</span> <span class="o">=</span> <span class="n">repeat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_group</span><span class="p">,</span> <span class="s2">&quot;m h -&gt; (m b) h 1 1&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">examples_per_estimator</span><span class="p">)</span>
+        <span class="n">s_group</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">s_group</span><span class="p">,</span> <span class="n">s_group</span><span class="p">[:</span><span class="n">extra</span><span class="p">]],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">bias</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">torch</span><span class="o">.</span><span class="n">repeat_interleave</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span>
-                    <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
-                        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">],</span>
-                        <span class="n">examples_per_estimator</span><span class="p">,</span>
-                        <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
-                    <span class="p">),</span>
-                    <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-                <span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-            <span class="p">)</span>
-
+            <span class="n">bias</span> <span class="o">=</span> <span class="n">repeat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="s2">&quot;m h -&gt; (m b) h 1 1&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">examples_per_estimator</span><span class="p">)</span>
             <span class="n">bias</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">bias</span><span class="p">,</span> <span class="n">bias</span><span class="p">[:</span><span class="n">extra</span><span class="p">]],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">bias</span> <span class="o">=</span> <span class="kc">None</span>
