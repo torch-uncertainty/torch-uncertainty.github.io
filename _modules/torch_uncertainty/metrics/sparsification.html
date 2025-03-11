@@ -249,38 +249,28 @@
                 
                 
   <h1>Source code for torch_uncertainty.metrics.sparsification</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">importlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">util</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-
-<span class="k">if</span> <span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;sklearn&quot;</span><span class="p">):</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">auc</span>
-
-    <span class="n">sklearn_installed</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">else</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
-    <span class="n">sklearn_installed</span> <span class="o">=</span> <span class="kc">False</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.metric</span><span class="w"> </span><span class="kn">import</span> <span class="n">Metric</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.compute</span><span class="w"> </span><span class="kn">import</span> <span class="n">_auc_compute</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">dim_zero_cat</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">_AX_TYPE</span>
 
 
 <div class="viewcode-block" id="AUSE"><a class="viewcode-back" href="../../../generated/torch_uncertainty.metrics.AUSE.html#torch_uncertainty.metrics.AUSE">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">AUSE</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
-    <span class="n">is_differentiable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">higher_is_better</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">full_state_update</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">plot_lower_bound</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
-    <span class="n">plot_upper_bound</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">100.0</span>
-    <span class="n">plot_legend_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Sparsification Curves&quot;</span>
+    <span class="n">is_differentiable</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">higher_is_better</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">full_state_update</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">plot_lower_bound</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">plot_upper_bound</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="n">plot_legend_name</span> <span class="o">=</span> <span class="s2">&quot;Sparsification Curves&quot;</span>
 
     <span class="n">scores</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span>
     <span class="n">errors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The Area Under the Sparsification Error curve (AUSE) metric to estimate</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The Area Under the Sparsification Error curve (AUSE) metric to evaluate</span>
 <span class="sd">        the quality of the uncertainty estimates, i.e., how much they coincide with</span>
 <span class="sd">        the true errors.</span>
 
@@ -307,13 +297,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;scores&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;cat&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;errors&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;cat&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">sklearn_installed</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                <span class="s2">&quot;Please install torch_uncertainty with the image option&quot;</span>
-                <span class="s2">&quot;to use the AUSE:&quot;</span>
-<span class="w">                </span><span class="sd">&quot;&quot;&quot;pip install -U &quot;torch_uncertainty[image]&quot;.&quot;&quot;&quot;</span>
-            <span class="p">)</span>
-
 <div class="viewcode-block" id="AUSE.update"><a class="viewcode-back" href="../../../generated/torch_uncertainty.metrics.AUSE.html#torch_uncertainty.metrics.AUSE.update">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">errors</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the scores and their associated errors for later computation.</span>
 
@@ -327,6 +310,9 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">partial_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
         <span class="n">scores</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">)</span>
         <span class="n">errors</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">scores</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">nan</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)],</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">nan</span><span class="p">,</span> <span class="n">nan</span>
         <span class="n">error_rates</span> <span class="o">=</span> <span class="n">_ause_rejection_rate_compute</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
         <span class="n">optimal_error_rates</span> <span class="o">=</span> <span class="n">_ause_rejection_rate_compute</span><span class="p">(</span><span class="n">errors</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">error_rates</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">optimal_error_rates</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
@@ -339,10 +325,12 @@
 <span class="sd">            Tensor: The AUSE.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">error_rates</span><span class="p">,</span> <span class="n">optimal_error_rates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">partial_compute</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">error_rates</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">item</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)],</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="n">num_samples</span> <span class="o">=</span> <span class="n">error_rates</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_samples</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">error_rates</span> <span class="o">-</span> <span class="n">optimal_error_rates</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">auc</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)])</span></div>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">error_rates</span> <span class="o">-</span> <span class="n">optimal_error_rates</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">_auc_compute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)])</span></div>
 
 <div class="viewcode-block" id="AUSE.plot"><a class="viewcode-back" href="../../../generated/torch_uncertainty.metrics.AUSE.html#torch_uncertainty.metrics.AUSE.plot">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -369,12 +357,12 @@
         <span class="c1"># Computation of AUSEC</span>
         <span class="n">error_rates</span><span class="p">,</span> <span class="n">optimal_error_rates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">partial_compute</span><span class="p">()</span>
         <span class="n">num_samples</span> <span class="o">=</span> <span class="n">error_rates</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">error_rates</span> <span class="o">-</span> <span class="n">optimal_error_rates</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">error_rates</span> <span class="o">-</span> <span class="n">optimal_error_rates</span>
 
-        <span class="n">ausec</span> <span class="o">=</span> <span class="n">auc</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">ausec</span> <span class="o">=</span> <span class="n">_auc_compute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
-        <span class="n">rejection_rates</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+        <span class="n">rejection_rates</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span> <span class="o">*</span> <span class="mi">100</span>
 
         <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
             <span class="n">rejection_rates</span><span class="p">,</span>
@@ -474,9 +462,6 @@
   <script type="text/javascript" id="documentation_options" data-url_root="../../../"
     src="../../../_static/documentation_options.js"></script>
   <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-  <script src="../../../_static/jquery.js"></script>
-  <script src="../../../_static/underscore.js"></script>
-  <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
   <script src="../../../_static/doctools.js"></script>
   <script src="../../../_static/sphinx_highlight.js"></script>
   <script src="../../../_static/clipboard.min.js"></script>

@@ -257,60 +257,6 @@
 
 
 <div class="viewcode-block" id="BatchEnsemble"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.BatchEnsemble.html#torch_uncertainty.models.BatchEnsemble">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">BatchEnsemble</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap a BatchEnsemble model to ensure correct batch replication.</span>
-
-<span class="sd">    In a BatchEnsemble architecture, each estimator operates on a **sub-batch**</span>
-<span class="sd">    of the input. This means that the input batch must be **repeated**</span>
-<span class="sd">    :attr:`num_estimators` times before being processed.</span>
-
-<span class="sd">    This wrapper automatically **duplicates the input batch** along the first axis,</span>
-<span class="sd">    ensuring that each estimator receives the correct data format.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        model (nn.Module): The BatchEnsemble model.</span>
-<span class="sd">        num_estimators (int): Number of ensemble members.</span>
-<span class="sd">        repeat_training_inputs (optional, bool): Whether to repeat the input batch during training.</span>
-<span class="sd">            If `True`, the input batch is repeated during both training and evaluation. If `False`,</span>
-<span class="sd">            the input batch is repeated only during evaluation. Default is `False`.</span>
-<span class="sd">        convert_layers (optional, bool): Whether to convert the model&#39;s layers to BatchEnsemble layers.</span>
-<span class="sd">            If `True`, the wrapper will convert all `nn.Linear` and `nn.Conv2d` layers to their</span>
-<span class="sd">            BatchEnsemble counterparts. Default is `False`.</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        ValueError: If neither ``BatchLinear`` nor ``BatchConv2d`` layers are found in the model at the</span>
-<span class="sd">            end of initialization.</span>
-<span class="sd">        ValueError: If ``num_estimators`` is less than or equal to ``0``.</span>
-<span class="sd">        ValueError: If ``convert_layers=True`` and neither ``nn.Linear`` nor ``nn.Conv2d`` layers are</span>
-<span class="sd">            found in the model.</span>
-
-<span class="sd">    Warning:</span>
-<span class="sd">        If ``convert_layers==True``, the wrapper will attempt to convert all ``nn.Linear`` and ``nn.Conv2d``</span>
-<span class="sd">        layers in the model to their BatchEnsemble counterparts. If the model contains other types of</span>
-<span class="sd">        layers, the conversion won&#39;t happen for these layers. If don&#39;t have any ``nn.Linear`` or ``nn.Conv2d``</span>
-<span class="sd">        layers in the model, the wrapper will raise an error during conversion.</span>
-
-<span class="sd">    Warning:</span>
-<span class="sd">        If ``repeat_training_inputs==True`` and you want to use one of the ``torch_uncertainty.routines``</span>
-<span class="sd">        for training, be sure to set ``format_batch_fn=RepeatTarget(num_repeats=num_estimators)`` when</span>
-<span class="sd">        initializing the routine.</span>
-
-<span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; model = nn.Sequential(</span>
-<span class="sd">        ...     nn.Linear(10, 5),</span>
-<span class="sd">        ...     nn.ReLU(),</span>
-<span class="sd">        ...     nn.Linear(5, 2)</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; model = BatchEnsemble(model, num_estimators=4, convert_layers=True)</span>
-<span class="sd">        &gt;&gt;&gt; model</span>
-<span class="sd">        BatchEnsemble(</span>
-<span class="sd">          (model): Sequential(</span>
-<span class="sd">            (0): BatchLinear(in_features=10, out_features=5, num_estimators=4)</span>
-<span class="sd">            (1): ReLU()</span>
-<span class="sd">            (2): BatchLinear(in_features=5, out_features=2, num_estimators=4)</span>
-<span class="sd">          )</span>
-<span class="sd">        )</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
@@ -318,6 +264,59 @@
         <span class="n">repeat_training_inputs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">convert_layers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Wrap a BatchEnsemble model to ensure correct batch replication.</span>
+
+<span class="sd">        In a BatchEnsemble architecture, each estimator operates on a **sub-batch**</span>
+<span class="sd">        of the input. This means that the input batch must be **repeated**</span>
+<span class="sd">        :attr:`num_estimators` times before being processed.</span>
+
+<span class="sd">        This wrapper automatically **duplicates the input batch** along the first axis,</span>
+<span class="sd">        ensuring that each estimator receives the correct data format.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model (nn.Module): The BatchEnsemble model.</span>
+<span class="sd">            num_estimators (int): Number of ensemble members.</span>
+<span class="sd">            repeat_training_inputs (optional, bool): Whether to repeat the input batch during training.</span>
+<span class="sd">                If ``True``, the input batch is repeated during both training and evaluation. If ``False``,</span>
+<span class="sd">                the input batch is repeated only during evaluation. Default is ``False``.</span>
+<span class="sd">            convert_layers (optional, bool): Whether to convert the model&#39;s layers to BatchEnsemble layers.</span>
+<span class="sd">                If ``True``, the wrapper will convert all ``nn.Linear`` and ``nn.Conv2d`` layers to their</span>
+<span class="sd">                BatchEnsemble counterparts. Default is ``False``.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If neither ``BatchLinear`` nor ``BatchConv2d`` layers are found in the model at the</span>
+<span class="sd">                end of initialization.</span>
+<span class="sd">            ValueError: If ``num_estimators`` is less than or equal to ``0``.</span>
+<span class="sd">            ValueError: If ``convert_layers=True`` and neither ``nn.Linear`` nor ``nn.Conv2d`` layers are</span>
+<span class="sd">                found in the model.</span>
+
+<span class="sd">        Warning:</span>
+<span class="sd">            If ``convert_layers==True``, the wrapper will attempt to convert all ``nn.Linear`` and ``nn.Conv2d``</span>
+<span class="sd">            layers in the model to their BatchEnsemble counterparts. If the model contains other types of</span>
+<span class="sd">            layers, the conversion won&#39;t happen for these layers. If don&#39;t have any ``nn.Linear`` or ``nn.Conv2d``</span>
+<span class="sd">            layers in the model, the wrapper will raise an error during conversion.</span>
+
+<span class="sd">        Warning:</span>
+<span class="sd">            If ``repeat_training_inputs==True`` and you want to use one of the ``torch_uncertainty.routines``</span>
+<span class="sd">            for training, be sure to set ``format_batch_fn=RepeatTarget(num_repeats=num_estimators)`` when</span>
+<span class="sd">            initializing the routine.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; model = nn.Sequential(</span>
+<span class="sd">            ...     nn.Linear(10, 5),</span>
+<span class="sd">            ...     nn.ReLU(),</span>
+<span class="sd">            ...     nn.Linear(5, 2)</span>
+<span class="sd">            ... )</span>
+<span class="sd">            &gt;&gt;&gt; model = BatchEnsemble(model, num_estimators=4, convert_layers=True)</span>
+<span class="sd">            &gt;&gt;&gt; model</span>
+<span class="sd">            BatchEnsemble(</span>
+<span class="sd">            (model): Sequential(</span>
+<span class="sd">                (0): BatchLinear(in_features=10, out_features=5, num_estimators=4)</span>
+<span class="sd">                (1): ReLU()</span>
+<span class="sd">                (2): BatchLinear(in_features=5, out_features=2, num_estimators=4)</span>
+<span class="sd">            )</span>
+<span class="sd">            )</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="n">num_estimators</span>
@@ -334,15 +333,13 @@
         <span class="n">_batch_ensemble_checks</span><span class="p">(</span><span class="n">filtered_modules</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BatchEnsemble.forward"><a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.BatchEnsemble.html#torch_uncertainty.models.BatchEnsemble.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Repeat the input if ``self.training==False`` or ``repeat_training_inputs==True`` and</span>
-<span class="sd">        pass it through the model.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Repeat the input if ``self.training==False`` or ``repeat_training_inputs==True`` and pass it through the model.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeat_training_inputs</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">repeat</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;b ... -&gt; (m b) ...&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_convert_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts the model&#39;s layers to BatchEnsemble layers.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the model&#39;s layers to BatchEnsemble layers.&quot;&quot;&quot;</span>
         <span class="n">no_valid_layers</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">named_modules</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">):</span>
@@ -390,11 +387,11 @@
 <span class="sd">        model (nn.Module): model to wrap</span>
 <span class="sd">        num_estimators (int): number of ensemble members</span>
 <span class="sd">        repeat_training_inputs (bool, optional): whether to repeat the input batch during training.</span>
-<span class="sd">            If `True`, the input batch is repeated during both training and evaluation. If `False`,</span>
-<span class="sd">            the input batch is repeated only during evaluation. Default is `False`.</span>
+<span class="sd">            If ``True``, the input batch is repeated during both training and evaluation. If ``False``,</span>
+<span class="sd">            the input batch is repeated only during evaluation. Default is ``False``.</span>
 <span class="sd">        convert_layers (bool, optional): whether to convert the model&#39;s layers to BatchEnsemble layers.</span>
-<span class="sd">            If `True`, the wrapper will convert all `nn.Linear` and `nn.Conv2d` layers to their</span>
-<span class="sd">            BatchEnsemble counterparts. Default is `False`.</span>
+<span class="sd">            If ``True``, the wrapper will convert all ``nn.Linear`` and ``nn.Conv2d`` layers to their</span>
+<span class="sd">            BatchEnsemble counterparts. Default is ``False``.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        BatchEnsemble: BatchEnsemble wrapper for the model</span>
@@ -452,9 +449,6 @@
   <script type="text/javascript" id="documentation_options" data-url_root="../../../../"
     src="../../../../_static/documentation_options.js"></script>
   <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-  <script src="../../../../_static/jquery.js"></script>
-  <script src="../../../../_static/underscore.js"></script>
-  <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
   <script src="../../../../_static/doctools.js"></script>
   <script src="../../../../_static/sphinx_highlight.js"></script>
   <script src="../../../../_static/clipboard.min.js"></script>
