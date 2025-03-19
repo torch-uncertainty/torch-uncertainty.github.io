@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.post_processing.mc_batch_norm &mdash; TorchUncertainty 0.4.2 documentation</title>
+  <title>torch_uncertainty.post_processing.mc_batch_norm &mdash; TorchUncertainty 0.4.3 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -254,7 +254,7 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.layers.mc_batch_norm</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCBatchNorm2d</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.post_processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">PostProcessing</span>
@@ -278,10 +278,11 @@
 <span class="sd">        Args:</span>
 <span class="sd">            model (nn.Module): model to be converted.</span>
 <span class="sd">            num_estimators (int): number of estimators.</span>
-<span class="sd">            convert (bool): whether to convert the model.</span>
-<span class="sd">            mc_batch_size (int, optional): Monte Carlo batch size. Defaults to 32.</span>
+<span class="sd">            convert (bool): whether to convert the model. Defaults to ``True``.</span>
+<span class="sd">            mc_batch_size (int, optional): Monte Carlo batch size. The smaller the more variability</span>
+<span class="sd">            in the predictions. Defaults to 32.</span>
 <span class="sd">            device (Literal[&quot;cpu&quot;, &quot;cuda&quot;] | torch.device | None, optional): device.</span>
-<span class="sd">                Defaults to None.</span>
+<span class="sd">                Defaults to ``None``.</span>
 
 <span class="sd">        Note:</span>
 <span class="sd">            This wrapper will be stochastic in eval mode only.</span>
@@ -291,9 +292,9 @@
 <span class="sd">            batch normalized deep networks. In ICML 2018.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mc_batch_size</span> <span class="o">=</span> <span class="n">mc_batch_size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">convert</span> <span class="o">=</span> <span class="n">convert</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="n">num_estimators</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">convert</span> <span class="o">=</span> <span class="n">convert</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mc_batch_size</span> <span class="o">=</span> <span class="n">mc_batch_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
 
         <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -301,7 +302,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_setup_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
         <span class="n">_mcbn_checks</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mc_batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>  <span class="c1"># Is it necessary?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>  <span class="c1"># TODO: Is it necessary?</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_convert</span><span class="p">()</span>
@@ -312,22 +313,29 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MCBatchNorm.fit"><a class="viewcode-back" href="../../../generated/torch_uncertainty.post_processing.MCBatchNorm.html#torch_uncertainty.post_processing.MCBatchNorm.fit">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MCBatchNorm.fit"><a class="viewcode-back" href="../../../generated/torch_uncertainty.post_processing.MCBatchNorm.html#torch_uncertainty.post_processing.MCBatchNorm.fit">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataloader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fit the model on the dataset.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            dataset (Dataset): dataset to be used for fitting.</span>
+<span class="sd">            dataloader (DataLoader): DataLoader with the post-processing dataset.</span>
 
 <span class="sd">        Note:</span>
 <span class="sd">            This method is used to populate the MC BatchNorm layers.</span>
-<span class="sd">            Use the training dataset.</span>
+<span class="sd">            Use the post-processing dataset.</span>
+
+<span class="sd">        Warning:</span>
+<span class="sd">            The ``batch_size`` of the DataLoader should be carefully chosen as it</span>
+<span class="sd">            will have an impact on the statistics of the MC BatchNorm layers.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If there are less batches than the number of estimators.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dl</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mc_batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">dataloader</span> <span class="o">=</span> <span class="n">init_dataloader</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mc_batch_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_counters</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_accumulate</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dl</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">raise_counters</span><span class="p">()</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">:</span>
@@ -344,14 +352,14 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trained</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;MCBatchNorm has not been trained. Call .fit() first.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;MCBatchNorm has not been fit. Call .fit() first.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_counters</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_est_forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_est_forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_convert</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert all BatchNorm2d layers to MCBatchNorm2d layers.&quot;&quot;&quot;</span>
@@ -411,6 +419,31 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">has_mcbn</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the model contains any MCBatchNorm2d layers.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">MCBatchNorm2d</span><span class="p">)</span> <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">())</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">init_dataloader</span><span class="p">(</span><span class="n">dataloader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reinitialize dataloader with the chosen batch size.</span>
+
+<span class="sd">    It is impossible to change the ``batch_size`` of an already-instantiated dataloader.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataloader (DataLoader): the dataloader to be reinitialized with</span>
+<span class="sd">        batch_size (int): the given batch_size.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
+        <span class="n">dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+        <span class="n">sampler</span><span class="o">=</span><span class="n">dataloader</span><span class="o">.</span><span class="n">sampler</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="o">=</span><span class="n">dataloader</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
+        <span class="n">pin_memory</span><span class="o">=</span><span class="n">dataloader</span><span class="o">.</span><span class="n">pin_memory</span><span class="p">,</span>
+        <span class="n">drop_last</span><span class="o">=</span><span class="n">dataloader</span><span class="o">.</span><span class="n">drop_last</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="o">=</span><span class="n">dataloader</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="n">worker_init_fn</span><span class="o">=</span><span class="n">dataloader</span><span class="o">.</span><span class="n">worker_init_fn</span><span class="p">,</span>
+        <span class="n">multiprocessing_context</span><span class="o">=</span><span class="n">dataloader</span><span class="o">.</span><span class="n">multiprocessing_context</span><span class="p">,</span>
+        <span class="n">generator</span><span class="o">=</span><span class="n">dataloader</span><span class="o">.</span><span class="n">generator</span><span class="p">,</span>
+        <span class="n">prefetch_factor</span><span class="o">=</span><span class="n">dataloader</span><span class="o">.</span><span class="n">prefetch_factor</span><span class="p">,</span>
+        <span class="n">persistent_workers</span><span class="o">=</span><span class="n">dataloader</span><span class="o">.</span><span class="n">persistent_workers</span><span class="p">,</span>
+    <span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_mcbn_checks</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">num_estimators</span><span class="p">,</span> <span class="n">mc_batch_size</span><span class="p">,</span> <span class="n">convert</span><span class="p">):</span>

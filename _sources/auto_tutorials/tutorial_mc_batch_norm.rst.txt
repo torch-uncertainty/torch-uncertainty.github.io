@@ -153,24 +153,24 @@ You can also save the results in a variable by saving the output of
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃      Classification       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     Acc      │          97.750%          │
-    │    Brier     │          0.03552          │
-    │   Entropy    │          0.06120          │
-    │     NLL      │          0.07529          │
+    │     Acc      │          97.240%          │
+    │    Brier     │          0.04268          │
+    │   Entropy    │          0.08387          │
+    │     NLL      │          0.08887          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          0.00549          │
-    │     aECE     │          0.00298          │
+    │     ECE      │          0.00469          │
+    │     aECE     │          0.00183          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          0.099%           │
-    │     AURC     │          0.107%           │
+    │    AUGRC     │          0.156%           │
+    │     AURC     │          0.176%           │
     │  Cov@5Risk   │         100.000%          │
-    │  Risk@80Cov  │          0.062%           │
+    │  Risk@80Cov  │          0.150%           │
     └──────────────┴───────────────────────────┘
 
 
@@ -185,7 +185,7 @@ predictions. We specify that the BatchNorm layers are to be converted to
 MCBatchNorm layers, and that we want to use 8 stochastic estimators.
 The amount of stochasticity is controlled by the ``mc_batch_size`` argument.
 The larger the ``mc_batch_size``, the more stochastic the predictions will be.
-The authors suggest 32 as a good value for ``mc_batch_size`` but we use 4 here
+The authors suggest 32 as a good value for ``mc_batch_size`` but we use 16 here
 to highlight the effect of stochasticity on the predictions.
 
 .. GENERATED FROM PYTHON SOURCE LINES 91-98
@@ -196,7 +196,7 @@ to highlight the effect of stochasticity on the predictions.
     routine.model = MCBatchNorm(
         routine.model, num_estimators=8, convert=True, mc_batch_size=16
     )
-    routine.model.fit(datamodule.train)
+    routine.model.fit(dataloader=datamodule.postprocess_dataloader())
     routine = routine.eval()  # To avoid prints
 
 
@@ -271,10 +271,10 @@ in this order (num_estimator x batch, classes).
  .. code-block:: none
 
     Ground truth:  7 2 1 0
-    Predicted digits for the image 7:  9 9 8 9 9 9 8 9
-    Predicted digits for the image 18:  3 3 8 3 8 8 8 8
-    Predicted digits for the image 78:  9 9 8 9 8 8 8 8
-    Predicted digits for the image 115:  9 4 9 9 4 9 9 4
+    Predicted digits for the image 18:  3 5 5 3 5 5 3 3
+    Predicted digits for the image 67:  9 9 9 4 4 9 4 4
+    Predicted digits for the image 104:  5 5 9 9 9 5 5 5
+    Predicted digits for the image 116:  9 9 9 4 4 4 4 4
 
 
 
@@ -289,7 +289,7 @@ stochastic estimator used.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 39.697 seconds)
+   **Total running time of the script:** (0 minutes 55.190 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_tutorial_mc_batch_norm.py:

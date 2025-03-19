@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.routines.classification &mdash; TorchUncertainty 0.4.2 documentation</title>
+  <title>torch_uncertainty.routines.classification &mdash; TorchUncertainty 0.4.3 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -325,8 +325,7 @@
         <span class="n">eval_grouping_loss</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">ood_criterion</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;msp&quot;</span><span class="p">,</span> <span class="s2">&quot;logit&quot;</span><span class="p">,</span> <span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="s2">&quot;entropy&quot;</span><span class="p">,</span> <span class="s2">&quot;mi&quot;</span><span class="p">,</span> <span class="s2">&quot;vr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;msp&quot;</span><span class="p">,</span>
         <span class="n">post_processing</span><span class="p">:</span> <span class="n">PostProcessing</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">calibration_set</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;val&quot;</span><span class="p">,</span>
-        <span class="n">num_calibration_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">num_bins_cal_err</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
         <span class="n">log_plots</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">save_in_csv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -362,10 +361,8 @@
 <span class="sd">            post_processing (PostProcessing, optional): Post-processing method</span>
 <span class="sd">                to train on the calibration set. No post-processing if None.</span>
 <span class="sd">                Defaults to ``None``.</span>
-<span class="sd">            calibration_set (str, optional): The post-hoc calibration dataset to</span>
-<span class="sd">                use for the post-processing method. Defaults to ``val``.</span>
-<span class="sd">            num_calibration_bins (int, optional): Number of bins to compute calibration</span>
-<span class="sd">                metrics. Defaults to ``15``.</span>
+<span class="sd">            num_bins_cal_err (int, optional): Number of bins to compute calibration</span>
+<span class="sd">                error metrics. Defaults to ``15``.</span>
 <span class="sd">            log_plots (bool, optional): Indicates whether to log plots from</span>
 <span class="sd">                metrics. Defaults to ``False``.</span>
 <span class="sd">            save_in_csv(bool, optional): Save the results in csv. Defaults to</span>
@@ -401,7 +398,7 @@
             <span class="n">is_ensemble</span><span class="o">=</span><span class="n">is_ensemble</span><span class="p">,</span>
             <span class="n">ood_criterion</span><span class="o">=</span><span class="n">ood_criterion</span><span class="p">,</span>
             <span class="n">eval_grouping_loss</span><span class="o">=</span><span class="n">eval_grouping_loss</span><span class="p">,</span>
-            <span class="n">num_calibration_bins</span><span class="o">=</span><span class="n">num_calibration_bins</span><span class="p">,</span>
+            <span class="n">num_bins_cal_err</span><span class="o">=</span><span class="n">num_bins_cal_err</span><span class="p">,</span>
             <span class="n">mixup_params</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">,</span>
             <span class="n">post_processing</span><span class="o">=</span><span class="n">post_processing</span><span class="p">,</span>
             <span class="n">format_batch_fn</span><span class="o">=</span><span class="n">format_batch_fn</span><span class="p">,</span>
@@ -417,11 +414,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span> <span class="o">=</span> <span class="n">ood_criterion</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_plots</span> <span class="o">=</span> <span class="n">log_plots</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_in_csv</span> <span class="o">=</span> <span class="n">save_in_csv</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">calibration_set</span> <span class="o">=</span> <span class="n">calibration_set</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">binary_cls</span> <span class="o">=</span> <span class="n">num_classes</span> <span class="o">==</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">needs_epoch_update</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">EPOCH_UPDATE_MODEL</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">needs_step_update</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">STEP_UPDATE_MODEL</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_calibration_bins</span> <span class="o">=</span> <span class="n">num_calibration_bins</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_bins_cal_err</span> <span class="o">=</span> <span class="n">num_bins_cal_err</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">format_batch_fn</span> <span class="o">=</span> <span class="n">format_batch_fn</span>
@@ -453,13 +449,13 @@
             <span class="s2">&quot;cls/NLL&quot;</span><span class="p">:</span> <span class="n">CategoricalNLL</span><span class="p">(),</span>
             <span class="s2">&quot;cal/ECE&quot;</span><span class="p">:</span> <span class="n">CalibrationError</span><span class="p">(</span>
                 <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
-                <span class="n">num_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_calibration_bins</span><span class="p">,</span>
+                <span class="n">num_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bins_cal_err</span><span class="p">,</span>
                 <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="s2">&quot;cal/aECE&quot;</span><span class="p">:</span> <span class="n">CalibrationError</span><span class="p">(</span>
                 <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
                 <span class="n">adaptive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">num_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_calibration_bins</span><span class="p">,</span>
+                <span class="n">num_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bins_cal_err</span><span class="p">,</span>
                 <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="s2">&quot;sc/AURC&quot;</span><span class="p">:</span> <span class="n">AURC</span><span class="p">(),</span>
@@ -632,13 +628,8 @@
 <span class="sd">        the storage lists for logit plotting and update the batchnorms if needed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">calibration_dataset</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">datamodule</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">()</span><span class="o">.</span><span class="n">dataset</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibration_set</span> <span class="o">==</span> <span class="s2">&quot;val&quot;</span>
-                <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">datamodule</span><span class="o">.</span><span class="n">test_dataloader</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span>
-            <span class="p">)</span>
             <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">inference_mode</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">calibration_dataset</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">datamodule</span><span class="o">.</span><span class="n">postprocess_dataloader</span><span class="p">())</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_plots</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">Logger</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">id_logit_storage</span> <span class="o">=</span> <span class="p">[]</span>
@@ -950,7 +941,7 @@
     <span class="n">is_ensemble</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">ood_criterion</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">eval_grouping_loss</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-    <span class="n">num_calibration_bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_bins_cal_err</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">mixup_params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">post_processing</span><span class="p">:</span> <span class="n">PostProcessing</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">format_batch_fn</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -963,7 +954,7 @@
 <span class="sd">        is_ensemble (bool): whether the model is an ensemble or a single model.</span>
 <span class="sd">        ood_criterion (str): the criterion for the binary OOD detection task.</span>
 <span class="sd">        eval_grouping_loss (bool): whether to evaluate the grouping loss.</span>
-<span class="sd">        num_calibration_bins (int): the number of bins for the evaluation of the calibration.</span>
+<span class="sd">        num_bins_cal_err (int): the number of bins for the evaluation of the calibration.</span>
 <span class="sd">        mixup_params (dict | None): the dictionary to setup the mixup augmentation.</span>
 <span class="sd">        post_processing (PostProcessing | None): the post-processing module.</span>
 <span class="sd">        format_batch_fn (nn.Module | None): the function for formatting the batch for ensembles.</span>
@@ -1009,8 +1000,8 @@
             <span class="s2">&quot;attribute to compute the grouping loss.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">num_calibration_bins</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;num_calibration_bins must be at least 2, got </span><span class="si">{</span><span class="n">num_calibration_bins</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_bins_cal_err</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;num_bins_cal_err must be at least 2, got </span><span class="si">{</span><span class="n">num_bins_cal_err</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">mixup_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">format_batch_fn</span><span class="p">,</span> <span class="n">RepeatTarget</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>

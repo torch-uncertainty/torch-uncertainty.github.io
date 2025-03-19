@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Training a LeNet with Monte Carlo Batch Normalization &mdash; TorchUncertainty 0.4.2 documentation</title>
+  <title>Training a LeNet with Monte Carlo Batch Normalization &mdash; TorchUncertainty 0.4.3 documentation</title>
   
 
   <link rel="shortcut icon" href="../_static/images/logo_torch_uncertainty.png" />
@@ -41,7 +41,7 @@
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
   <link rel="next" title="Train a Bayesian Neural Network in Three Minutes" href="tutorial_bayesian.html" />
-  <link rel="prev" title="Training a LeNet with Monte-Carlo Dropout" href="tutorial_mc_dropout.html" />
+  <link rel="prev" title="Improve Top-label Calibration with Temperature Scaling" href="tutorial_scaler.html" />
   <!-- Google Analytics -->
   <script type="text/javascript">
     var collapsedSections = [];
@@ -343,24 +343,24 @@ and the optimization recipe.</p>
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          97.750%          │
-│    Brier     │          0.03552          │
-│   Entropy    │          0.06120          │
-│     NLL      │          0.07529          │
+│     Acc      │          97.240%          │
+│    Brier     │          0.04268          │
+│   Entropy    │          0.08387          │
+│     NLL      │          0.08887          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          0.00549          │
-│     aECE     │          0.00298          │
+│     ECE      │          0.00469          │
+│     aECE     │          0.00183          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          0.099%           │
-│     AURC     │          0.107%           │
+│    AUGRC     │          0.156%           │
+│     AURC     │          0.176%           │
 │  Cov@5Risk   │         100.000%          │
-│  Risk@80Cov  │          0.062%           │
+│  Risk@80Cov  │          0.150%           │
 └──────────────┴───────────────────────────┘
 </pre></div>
 </div>
@@ -372,12 +372,12 @@ predictions. We specify that the BatchNorm layers are to be converted to
 MCBatchNorm layers, and that we want to use 8 stochastic estimators.
 The amount of stochasticity is controlled by the <code class="docutils literal notranslate"><span class="pre">mc_batch_size</span></code> argument.
 The larger the <code class="docutils literal notranslate"><span class="pre">mc_batch_size</span></code>, the more stochastic the predictions will be.
-The authors suggest 32 as a good value for <code class="docutils literal notranslate"><span class="pre">mc_batch_size</span></code> but we use 4 here
+The authors suggest 32 as a good value for <code class="docutils literal notranslate"><span class="pre">mc_batch_size</span></code> but we use 16 here
 to highlight the effect of stochasticity on the predictions.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">routine</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">MCBatchNorm</span><span class="p">(</span>
     <span class="n">routine</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mc_batch_size</span><span class="o">=</span><span class="mi">16</span>
 <span class="p">)</span>
-<span class="n">routine</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">train</span><span class="p">)</span>
+<span class="n">routine</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataloader</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">postprocess_dataloader</span><span class="p">())</span>
 <span class="n">routine</span> <span class="o">=</span> <span class="n">routine</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>  <span class="c1"># To avoid prints</span>
 </pre></div>
 </div>
@@ -427,17 +427,17 @@ in this order (num_estimator x batch, classes).</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_tutorial_mc_batch_norm_001.png" srcset="../_images/sphx_glr_tutorial_mc_batch_norm_001.png" alt="tutorial mc batch norm" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ground truth:  7 2 1 0
-Predicted digits for the image 7:  9 9 8 9 9 9 8 9
-Predicted digits for the image 18:  3 3 8 3 8 8 8 8
-Predicted digits for the image 78:  9 9 8 9 8 8 8 8
-Predicted digits for the image 115:  9 4 9 9 4 9 9 4
+Predicted digits for the image 18:  3 5 5 3 5 5 3 3
+Predicted digits for the image 67:  9 9 9 4 4 9 4 4
+Predicted digits for the image 104:  5 5 9 9 9 5 5 5
+Predicted digits for the image 116:  9 9 9 4 4 4 4 4
 </pre></div>
 </div>
 <p>The predictions are mostly erroneous, which is expected since we selected
 the most uncertain images. We also see that there stochasticity in the
 predictions, as the predictions for the same image differ depending on the
 stochastic estimator used.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 39.697 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 55.190 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-tutorial-mc-batch-norm-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/631ac265c1ce7636bf5c4db0e5a4f3c3/tutorial_mc_batch_norm.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_batch_norm.ipynb</span></code></a></p>
@@ -467,7 +467,7 @@ stochastic estimator used.</p>
         class="next-page"></a>
     
     
-    <a href="tutorial_mc_dropout.html" class="btn btn-neutral" title="Training a LeNet with Monte-Carlo Dropout" accesskey="p"
+    <a href="tutorial_scaler.html" class="btn btn-neutral" title="Improve Top-label Calibration with Temperature Scaling" accesskey="p"
       rel="prev"><img src="../_static/images/chevron-right-teal.svg" class="previous-page"> Previous</a>
     
   </div>

@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch_uncertainty.post_processing.laplace &mdash; TorchUncertainty 0.4.2 documentation</title>
+  <title>torch_uncertainty.post_processing.laplace &mdash; TorchUncertainty 0.4.3 documentation</title>
   
 
   <link rel="shortcut icon" href="../../../_static/images/logo_torch_uncertainty.png" />
@@ -253,7 +253,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.abstract</span><span class="w"> </span><span class="kn">import</span> <span class="n">PostProcessing</span>
 
@@ -274,7 +274,6 @@
         <span class="n">hessian_struct</span><span class="o">=</span><span class="s2">&quot;kron&quot;</span><span class="p">,</span>
         <span class="n">pred_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;glm&quot;</span><span class="p">,</span> <span class="s2">&quot;nn&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;glm&quot;</span><span class="p">,</span>
         <span class="n">link_approx</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;mc&quot;</span><span class="p">,</span> <span class="s2">&quot;probit&quot;</span><span class="p">,</span> <span class="s2">&quot;bridge&quot;</span><span class="p">,</span> <span class="s2">&quot;bridge_norm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;probit&quot;</span><span class="p">,</span>
-        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
         <span class="n">optimize_prior_precision</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Laplace approximation for uncertainty estimation.</span>
@@ -293,8 +292,6 @@
 <span class="sd">            link_approx (Literal[&quot;mc&quot;, &quot;probit&quot;, &quot;bridge&quot;, &quot;bridge_norm&quot;], optional):</span>
 <span class="sd">                how to approximate the classification link function for the `&#39;glm&#39;`.</span>
 <span class="sd">                See the Laplace library for more details. Defaults to &quot;probit&quot;.</span>
-<span class="sd">            batch_size (int, optional): batch size for the Laplace approximation.</span>
-<span class="sd">                Defaults to 256.</span>
 <span class="sd">            optimize_prior_precision (bool, optional): whether to optimize the prior</span>
 <span class="sd">                precision. Defaults to True.</span>
 
@@ -302,7 +299,7 @@
 <span class="sd">            Daxberger et al. Laplace Redux - Effortless Bayesian Deep Learning. In NeurIPS 2021.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">laplace_installed</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">laplace_installed</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
                 <span class="s2">&quot;The laplace-torch library is not installed. Please install&quot;</span>
                 <span class="s2">&quot;torch_uncertainty with the all option:&quot;</span>
@@ -314,7 +311,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="n">task</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weight_subset</span> <span class="o">=</span> <span class="n">weight_subset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hessian_struct</span> <span class="o">=</span> <span class="n">hessian_struct</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optimize_prior_precision</span> <span class="o">=</span> <span class="n">optimize_prior_precision</span>
 
         <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -329,17 +325,16 @@
             <span class="n">hessian_structure</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hessian_struct</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">dl</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">la</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_loader</span><span class="o">=</span><span class="n">dl</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataloader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">la</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_loader</span><span class="o">=</span><span class="n">dataloader</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimize_prior_precision</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">la</span><span class="o">.</span><span class="n">optimize_prior_precision</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;marglik&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">la</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pred_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pred_type</span><span class="p">,</span> <span class="n">link_approx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">link_approx</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">la</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">pred_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pred_type</span><span class="p">,</span> <span class="n">link_approx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">link_approx</span><span class="p">)</span></div>
 </pre></div>
 
               </article>
