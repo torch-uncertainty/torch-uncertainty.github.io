@@ -1,262 +1,443 @@
 
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js" lang="en">
-<!--<![endif]-->
 
-<head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Computation times &mdash; TorchUncertainty 0.4.3.rc0 documentation</title>
-  
+<html lang="en" data-content_root="./" >
 
-  <link rel="shortcut icon" href="_static/images/logo_torch_uncertainty.png" />
-  
-  
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  
-
-  
+    <title>Computation times &#8212; TorchUncertainty 0.5.0 documentation</title>
   
   
-
   
-
-  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
-  <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
-  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="_static/sphinx-codeautolink.css" type="text/css" />
-  <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
-  <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
-  <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
-  <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
-  <link rel="index" title="Index" href="genindex.html" />
-  <link rel="search" title="Search" href="search.html" />
-  <!-- Google Analytics -->
-  <script type="text/javascript">
-    var collapsedSections = [];
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
-  <!-- End Google Analytics -->
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-codeautolink.css?v=b2176991" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=1dd76d02"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'sg_execution_times';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
   
 
+<a class="navbar-brand logo" href="index.html">
   
-  <script src="_static/js/modernizr.min.js"></script>
-  <script>
-    MathJax = {
-        chtml: {
-            scale: 1,
-            minScale: 1,
-        },
-        svg: {
-            scale: 1,
-            minScale: 1,
-        }
-    }
-</script>
-
-  <!-- Preload the theme fonts -->
-
-<link rel="preload" href="_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-
-<!-- Preload the katex fonts -->
-
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css"
-    integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
-</head>
-
-<div class="container-fluid header-holder tutorials-header" id="header-holder">
-  <div class="container">
-    <div class="header-container">
-      <a class="header-logo" href="https://torch-uncertainty.github.io/"
-        aria-label="OpenMMLab"></a>
-
-      <div class="main-menu">
-        <ul>
-          <li>
-            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
-          </li>
-        </ul>
-      </div>
-
-      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
-    </div>
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="TorchUncertainty Logo"/>
+    <img src="_static/logo_dark.png" class="logo__image only-dark pst-js-only" alt="TorchUncertainty Logo"/>
+  
+  
+</a></div>
+    
   </div>
-</div>
-
-<body class="pytorch-body">
-
-   
-
   
-
-  <div class="table-of-contents-link-wrapper">
-    <span>Table of Contents</span>
-    <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
-  </div>
-
-  <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
-    <div class="pytorch-side-scroll">
-      <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-        <div class="pytorch-left-menu-search">
-          
-
-          
-          
-          
-          
-
-          
-
-
-
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search Docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        
-        
-        
-        
-        
-        
-        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="auto_tutorials/index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli_guide.html">CLI Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
-</ul>
-
-        
-        
-      </div>
-    </div>
-  </nav>
-
-  <div class="pytorch-container">
-    <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
-      <div class="pytorch-breadcrumbs-wrapper">
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="pytorch-breadcrumbs">
+  <div class="col-lg-9 navbar-header-items">
     
-    <li>
-      <a href="index.html">
-        Docs
-      </a> &gt;
-    </li>
-
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
     
-    <li>Computation times</li>
-    
-    <!-- 
-    <li class="pytorch-breadcrumbs-aside">
-      
-      
-      
-      
-      
-      <a href="/zh_CN//sg_execution_times.html" class="fa fa-language"> 以中文阅读</a>
-      
-      
-    </li>
-    
-     -->
-  </ul>
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
 
-  
-</div>
-      </div>
 
-      <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
-        Shortcuts
-      </div>
-    </div>
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="quickstart.html">
+    Quickstart
+  </a>
+</li>
 
-    <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
-      <div class="pytorch-content-left">
 
-        
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_tutorials/index.html">
+    Tutorials
+  </a>
+</li>
 
-        <div class="pytorch-call-to-action-links">
-          <div id="tutorial-type">sg_execution_times</div>
 
-          <!-- <div id="google-colab-link">
-            <img class="call-to-action-img" src="_static/images/pytorch-colab.svg" />
-            <div class="call-to-action-desktop-view">Run in Google Colab</div>
-            <div class="call-to-action-mobile-view">Colab</div>
-          </div> -->
-          <div id="download-notebook-link">
-            <img class="call-to-action-notebook-img" src="_static/images/pytorch-download.svg" />
-            <div class="call-to-action-desktop-view">Download Notebook</div>
-            <div class="call-to-action-mobile-view">Notebook</div>
-          </div>
-          <div id="github-view-link">
-            <img class="call-to-action-img" src="_static/images/pytorch-github.svg" />
-            <div class="call-to-action-desktop-view">View on GitHub</div>
-            <div class="call-to-action-mobile-view">GitHub</div>
-          </div>
-        </div>
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="cli_guide.html">
+    CLI Guide
+  </a>
+</li>
 
-        
-        
-          <div class="rst-content">
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="references.html">
+    References
+  </a>
+</li>
+
+                </ul>
+            </li>
             
-            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
-              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="references.html">
+    References
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Computation times</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
                 
-                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <section id="computation-times">
-<span id="sphx-glr-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this heading">¶</a></h1>
-<p><strong>05:36.990</strong> total execution time for 10 files <strong>from all galleries</strong>:</p>
+<span id="sphx-glr-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Link to this heading">#</a></h1>
+<p><strong>11:31.832</strong> total execution time for 20 files <strong>from all galleries</strong>:</p>
 <div class="docutils container">
 <style scoped>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
@@ -269,7 +450,7 @@
 $(document).ready( function () {
     $('table.sg-datatable').DataTable({order: [[1, 'desc']]});
 } );
-</script><table class="table table-striped sg-datatable docutils align-default">
+</script><div class="pst-scrollable-table-container"><table class="table table-striped sg-datatable">
 <thead>
 <tr class="row-odd"><th class="head"><p>Example</p></th>
 <th class="head"><p>Time</p></th>
@@ -277,169 +458,159 @@ $(document).ready( function () {
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><a class="reference internal" href="auto_tutorials/tutorial_from_de_to_pe.html#sphx-glr-auto-tutorials-tutorial-from-de-to-pe-py"><span class="std std-ref">Improved Ensemble parameter-efficiency with Packed-Ensembles</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorials_source/tutorial_from_de_to_pe.py</span></code>)</p></td>
-<td><p>01:32.376</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="auto_tutorials/Classification/tutorial_distribution_shift.html#sphx-glr-auto-tutorials-classification-tutorial-distribution-shift-py"><span class="std std-ref">Evaluating Model Performance Under Distribution Shift with TorchUncertainty</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Classification/tutorial_distribution_shift.py</span></code>)</p></td>
+<td><p>04:06.084</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="auto_tutorials/tutorial_pe_cifar10.html#sphx-glr-auto-tutorials-tutorial-pe-cifar10-py"><span class="std std-ref">From a Standard Classifier to a Packed-Ensemble</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorials_source/tutorial_pe_cifar10.py</span></code>)</p></td>
-<td><p>01:00.158</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="auto_tutorials/Post_Hoc_Methods/tutorial_conformal.html#sphx-glr-auto-tutorials-post-hoc-methods-tutorial-conformal-py"><span class="std std-ref">Conformal Prediction on CIFAR-10 with TorchUncertainty</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Post_Hoc_Methods/tutorial_conformal.py</span></code>)</p></td>
+<td><p>01:10.524</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="auto_tutorials/tutorial_bayesian.html#sphx-glr-auto-tutorials-tutorial-bayesian-py"><span class="std std-ref">Train a Bayesian Neural Network in Three Minutes</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorials_source/tutorial_bayesian.py</span></code>)</p></td>
-<td><p>00:41.530</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="auto_tutorials/Segmentation/tutorial_muad_deep_en.html#sphx-glr-auto-tutorials-segmentation-tutorial-muad-deep-en-py"><span class="std std-ref">Deep ensembles Segmentation Tutorial using Muad Dataset</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Segmentation/tutorial_muad_deep_en.py</span></code>)</p></td>
+<td><p>00:58.260</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="auto_tutorials/tutorial_evidential_classification.html#sphx-glr-auto-tutorials-tutorial-evidential-classification-py"><span class="std std-ref">Deep Evidential Classification on a Toy Example</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorials_source/tutorial_evidential_classification.py</span></code>)</p></td>
-<td><p>00:30.330</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="auto_tutorials/Bayesian_Methods/tutorial_muad_mc_drop.html#sphx-glr-auto-tutorials-bayesian-methods-tutorial-muad-mc-drop-py"><span class="std std-ref">Monte Carlo Dropout for Semantic Segmentation on MUAD</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Bayesian_Methods/tutorial_muad_mc_drop.py</span></code>)</p></td>
+<td><p>00:54.788</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="auto_tutorials/tutorial_mc_dropout.html#sphx-glr-auto-tutorials-tutorial-mc-dropout-py"><span class="std std-ref">Training a LeNet with Monte-Carlo Dropout</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorials_source/tutorial_mc_dropout.py</span></code>)</p></td>
-<td><p>00:29.050</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="auto_tutorials/Segmentation/tutorial_muad_packed.html#sphx-glr-auto-tutorials-segmentation-tutorial-muad-packed-py"><span class="std std-ref">Packed ensembles Segmentation Tutorial using Muad Dataset</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Segmentation/tutorial_muad_packed.py</span></code>)</p></td>
+<td><p>00:39.252</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="auto_tutorials/tutorial_mc_batch_norm.html#sphx-glr-auto-tutorials-tutorial-mc-batch-norm-py"><span class="std std-ref">Training a LeNet with Monte Carlo Batch Normalization</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorials_source/tutorial_mc_batch_norm.py</span></code>)</p></td>
-<td><p>00:20.556</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="auto_tutorials/Segmentation/tutorial_muad_seg.html#sphx-glr-auto-tutorials-segmentation-tutorial-muad-seg-py"><span class="std std-ref">Segmentation Tutorial using Muad Dataset</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Segmentation/tutorial_muad_seg.py</span></code>)</p></td>
+<td><p>00:36.542</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="auto_tutorials/tutorial_corruption.html#sphx-glr-auto-tutorials-tutorial-corruption-py"><span class="std std-ref">Corrupting Images with TorchUncertainty to Benchmark Robustness</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorials_source/tutorial_corruption.py</span></code>)</p></td>
-<td><p>00:19.452</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="auto_tutorials/Classification/tutorial_ood_detection.html#sphx-glr-auto-tutorials-classification-tutorial-ood-detection-py"><span class="std std-ref">Out-of-distribution detection with TorchUncertainty</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Classification/tutorial_ood_detection.py</span></code>)</p></td>
+<td><p>00:34.428</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="auto_tutorials/tutorial_probabilistic_regression.html#sphx-glr-auto-tutorials-tutorial-probabilistic-regression-py"><span class="std std-ref">Deep Probabilistic Regression</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorials_source/tutorial_probabilistic_regression.py</span></code>)</p></td>
-<td><p>00:18.857</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="auto_tutorials/Ensemble_Methods/tutorial_from_de_to_pe.html#sphx-glr-auto-tutorials-ensemble-methods-tutorial-from-de-to-pe-py"><span class="std std-ref">Improved Ensemble parameter-efficiency with Packed-Ensembles</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Ensemble_Methods/tutorial_from_de_to_pe.py</span></code>)</p></td>
+<td><p>00:24.234</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="auto_tutorials/tutorial_scaler.html#sphx-glr-auto-tutorials-tutorial-scaler-py"><span class="std std-ref">Improve Top-label Calibration with Temperature Scaling</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorials_source/tutorial_scaler.py</span></code>)</p></td>
-<td><p>00:16.987</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="auto_tutorials/Bayesian_Methods/tutorial_bayesian.html#sphx-glr-auto-tutorials-bayesian-methods-tutorial-bayesian-py"><span class="std std-ref">Train a Bayesian Neural Network in Three Minutes</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Bayesian_Methods/tutorial_bayesian.py</span></code>)</p></td>
+<td><p>00:22.734</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="auto_tutorials/tutorial_der_cubic.html#sphx-glr-auto-tutorials-tutorial-der-cubic-py"><span class="std std-ref">Deep Evidential Regression on a Toy Example</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorials_source/tutorial_der_cubic.py</span></code>)</p></td>
-<td><p>00:07.694</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="auto_tutorials/Classification/tutorial_classification.html#sphx-glr-auto-tutorials-classification-tutorial-classification-py"><span class="std std-ref">Training a LeNet for Image Classification with TorchUncertainty</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Classification/tutorial_classification.py</span></code>)</p></td>
+<td><p>00:17.311</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="auto_tutorials/Bayesian_Methods/tutorial_mc_batch_norm.html#sphx-glr-auto-tutorials-bayesian-methods-tutorial-mc-batch-norm-py"><span class="std std-ref">Training a LeNet with Monte Carlo Batch Normalization</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Bayesian_Methods/tutorial_mc_batch_norm.py</span></code>)</p></td>
+<td><p>00:16.534</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="auto_tutorials/Post_Hoc_Methods/tutorial_scaler.html#sphx-glr-auto-tutorials-post-hoc-methods-tutorial-scaler-py"><span class="std std-ref">Improve Top-label Calibration with Temperature Scaling</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Post_Hoc_Methods/tutorial_scaler.py</span></code>)</p></td>
+<td><p>00:16.252</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="auto_tutorials/Classification/tutorial_bayesian.html#sphx-glr-auto-tutorials-classification-tutorial-bayesian-py"><span class="std std-ref">Train a Bayesian Neural Network in 20 seconds</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Classification/tutorial_bayesian.py</span></code>)</p></td>
+<td><p>00:11.740</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="auto_tutorials/Classification/tutorial_pe_cifar10.html#sphx-glr-auto-tutorials-classification-tutorial-pe-cifar10-py"><span class="std std-ref">From a Standard Classifier to a Packed-Ensemble</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Classification/tutorial_pe_cifar10.py</span></code>)</p></td>
+<td><p>00:11.513</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="auto_tutorials/Regression/tutorial_der_cubic.html#sphx-glr-auto-tutorials-regression-tutorial-der-cubic-py"><span class="std std-ref">Deep Evidential Regression on a Toy Example</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Regression/tutorial_der_cubic.py</span></code>)</p></td>
+<td><p>00:07.828</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="auto_tutorials/Regression/tutorial_probabilistic_regression.html#sphx-glr-auto-tutorials-regression-tutorial-probabilistic-regression-py"><span class="std std-ref">Deep Probabilistic Regression</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Regression/tutorial_probabilistic_regression.py</span></code>)</p></td>
+<td><p>00:06.846</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="auto_tutorials/Classification/tutorial_evidential_classification.html#sphx-glr-auto-tutorials-classification-tutorial-evidential-classification-py"><span class="std std-ref">Deep Evidential Classification on a Toy Example</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Classification/tutorial_evidential_classification.py</span></code>)</p></td>
+<td><p>00:05.991</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="auto_tutorials/Data_Augmentation/tutorial_corruption.html#sphx-glr-auto-tutorials-data-augmentation-tutorial-corruption-py"><span class="std std-ref">Corrupting Images with TorchUncertainty to Benchmark Robustness</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Data_Augmentation/tutorial_corruption.py</span></code>)</p></td>
+<td><p>00:05.081</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="auto_tutorials/Bayesian_Methods/tutorial_mc_dropout.html#sphx-glr-auto-tutorials-bayesian-methods-tutorial-mc-dropout-py"><span class="std std-ref">Training a LeNet with Monte-Carlo Dropout</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Bayesian_Methods/tutorial_mc_dropout.py</span></code>)</p></td>
+<td><p>00:03.207</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="auto_tutorials/Regression/tutorial_regression.html#sphx-glr-auto-tutorials-regression-tutorial-regression-py"><span class="std std-ref">Training an MLP for Tabular Regression with TorchUncertainty</span></a> (<code class="docutils literal notranslate"><span class="pre">../../auto_tutorial_source/Regression/tutorial_regression.py</span></code>)</p></td>
+<td><p>00:02.684</p></td>
 <td><p>0.0</p></td>
 </tr>
 </tbody>
 </table>
 </div>
+</div>
 </section>
 
 
-              </article>
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
               
             </div>
-            <footer>
-  
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-  <hr>
 
-  <div role="contentinfo">
-    <p>
-      &copy; Copyright 2025, Adrien Lafage and Olivier Laurent.
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/sg_execution_times.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
 
-    </p>
-  </div>
-  
-  <div>
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a
-      href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the
-      Docs</a>.
-  </div>
-   
-
-</footer>
+</div></div>
+              
+            
           </div>
-        </div>
-
-        <div class="pytorch-content-right" id="pytorch-content-right">
-          <div class="pytorch-right-menu" id="pytorch-right-menu">
-            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
-              <ul>
-<li><a class="reference internal" href="#">Computation times</a></li>
-</ul>
-
-            </div>
-          </div>
-        </div>
-    </section>
-  </div>
-
-  
-
-
-  
-
-  
-  <script type="text/javascript" id="documentation_options" data-url_root="./"
-    src="_static/documentation_options.js"></script>
-  <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-  <script src="_static/doctools.js"></script>
-  <script src="_static/sphinx_highlight.js"></script>
-  <script src="_static/clipboard.min.js"></script>
-  <script src="_static/copybutton.js"></script>
-  
-
-  
-
-  <script type="text/javascript" src="_static/js/vendor/popper.min.js"></script>
-  <script type="text/javascript" src="_static/js/vendor/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
-  <script type="text/javascript">
-    jQuery(function () {
-      SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-  <!-- Begin Footer -->
-
-  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
-  </div>
-
-  <!-- End Footer -->
-
-  <!-- Begin Mobile Menu -->
-
-  <div class="mobile-main-menu">
-    <div class="container-fluid">
-      <div class="container">
-        <div class="mobile-main-menu-header-container">
-          <a class="header-logo" href="https://torch-uncertainty.github.io/" aria-label="OpenMMLab"></a>
-          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
-        </div>
-      </div>
-    </div>
-
-    <div class="mobile-main-menu-links-container">
-      <div class="main-menu">
-        <ul>
-          <li>
-            <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" target="_blank">GitHub</a>
-          </li>
-      </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
     </div>
   </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
-  <!-- End Mobile Menu -->
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item">
 
-  <script type="text/javascript" src="_static/js/vendor/anchor.min.js"></script>
+  <p class="copyright">
+    
+      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
 
-  <script type="text/javascript">
-    $(document).ready(function () {
-      mobileMenu.bind();
-      mobileTOC.bind();
-      pytorchAnchors.bind();
-      sideMenus.bind();
-      scrollToAnchor.bind();
-      highlightNavigation.bind();
-      mainMenuDropdown.bind();
-      filterTags.bind();
-
-      // Add class to links that have code blocks, since we cannot create links in code blocks
-      $("article.pytorch-article a span.pre").each(function (e) {
-        $(this).closest("a").addClass("has-code");
-      });
-    })
-  </script>
-</body>
-
+  </footer>
+  </body>
 </html>

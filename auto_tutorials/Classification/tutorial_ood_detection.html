@@ -1,0 +1,1281 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Out-of-distribution detection with TorchUncertainty &#8212; TorchUncertainty 0.5.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-codeautolink.css?v=b2176991" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_tutorials/Classification/tutorial_ood_detection';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="From a Standard Classifier to a Packed-Ensemble" href="tutorial_pe_cifar10.html" />
+    <link rel="prev" title="Deep Evidential Classification on a Toy Example" href="tutorial_evidential_classification.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="TorchUncertainty Logo"/>
+    <img src="../../_static/logo_dark.png" class="logo__image only-dark pst-js-only" alt="TorchUncertainty Logo"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../references.html">
+    References
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../references.html">
+    References
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Classification</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tutorial_bayesian.html">Train a Bayesian Neural Network in 20 seconds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_classification.html">Training a LeNet for Image Classification with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_distribution_shift.html">Evaluating Model Performance Under Distribution Shift with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_evidential_classification.html">Deep Evidential Classification on a Toy Example</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Out-of-distribution detection with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_pe_cifar10.html">From a Standard Classifier to a Packed-Ensemble</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Regression/index.html">Regression with Uncertainty</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Regression/tutorial_der_cubic.html">Deep Evidential Regression on a Toy Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Regression/tutorial_probabilistic_regression.html">Deep Probabilistic Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Regression/tutorial_regression.html">Training an MLP for Tabular Regression with TorchUncertainty</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Post_Hoc_Methods/index.html">Post-hoc Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scaler.html">Improve Top-label Calibration with Temperature Scaling</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Bayesian_Methods/index.html">Bayesian Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_bayesian.html">Train a Bayesian Neural Network in Three Minutes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_mc_batch_norm.html">Training a LeNet with Monte Carlo Batch Normalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_mc_dropout.html">Training a LeNet with Monte-Carlo Dropout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_muad_mc_drop.html">Monte Carlo Dropout for Semantic Segmentation on MUAD</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Ensemble_Methods/index.html">Ensemble Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Ensemble_Methods/tutorial_from_de_to_pe.html">Improved Ensemble parameter-efficiency with Packed-Ensembles</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Segmentation/index.html">Segmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Segmentation/tutorial_muad_deep_en.html">Deep ensembles Segmentation Tutorial using Muad Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Segmentation/tutorial_muad_packed.html">Packed ensembles Segmentation Tutorial using Muad Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Segmentation/tutorial_muad_seg.html">Segmentation Tutorial using Muad Dataset</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Data_Augmentation/index.html">Data Augmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Data_Augmentation/tutorial_corruption.html">Corrupting Images with TorchUncertainty to Benchmark Robustness</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+        <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Classification</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Out-of-distribution detection with TorchUncertainty</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-tutorials-classification-tutorial-ood-detection-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="out-of-distribution-detection-with-torchuncertainty">
+<span id="sphx-glr-auto-tutorials-classification-tutorial-ood-detection-py"></span><h1>Out-of-distribution detection with TorchUncertainty<a class="headerlink" href="#out-of-distribution-detection-with-torchuncertainty" title="Link to this heading">#</a></h1>
+<p>This tutorial demonstrates how to perform OOD detection using
+TorchUncertainty’s ClassificationRoutine with a ResNet18 model trained on CIFAR-10,
+evaluating its performance with SVHN as the OOD dataset.</p>
+<p>We will:</p>
+<ul class="simple">
+<li><p>Set up the CIFAR-10 datamodule.</p></li>
+<li><p>Initialize and shortly train a ResNet18 model using the ClassificationRoutine.</p></li>
+<li><p>Evaluate the model’s performance on both in-distribution and out-of-distribution data.</p></li>
+<li><p>Analyze uncertainty metrics for OOD detection.</p></li>
+</ul>
+<section id="imports-and-setup">
+<h2>Imports and Setup<a class="headerlink" href="#imports-and-setup" title="Link to this heading">#</a></h2>
+<p>First, we need to import the necessary libraries and set up our environment.
+This includes importing PyTorch, TorchUncertainty components, and TorchUncertainty’s Trainer (built on top of Lightning’s),
+as well as two criteria for OOD detection, the maximum softmax probability [1] and the Max Logit [2].</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty</span><span class="w"> </span><span class="kn">import</span> <span class="n">TUTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.datamodules</span><span class="w"> </span><span class="kn">import</span> <span class="n">CIFAR10DataModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models.classification.resnet</span><span class="w"> </span><span class="kn">import</span> <span class="n">resnet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.ood_criteria</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaxLogitCriterion</span><span class="p">,</span> <span class="n">MaxSoftmaxCriterion</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.routines.classification</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassificationRoutine</span>
+</pre></div>
+</div>
+</section>
+<section id="datamodule-setup">
+<h2>DataModule Setup<a class="headerlink" href="#datamodule-setup" title="Link to this heading">#</a></h2>
+<p>TorchUncertainty provides convenient DataModules for standard datasets like CIFAR-10.
+DataModules handle data loading, preprocessing, and batching, simplifying the data pipeline. Each datamodule
+also include the corresponding out-of-distribution and distribution shift datasets, which are then used by the routine.
+For CIFAR-10, the corresponding OOD-detection dataset is SVHN as used in the community.
+To enable OOD evaluation, activate the <cite>eval_ood</cite> flag as done below.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">datamodule</span> <span class="o">=</span> <span class="n">CIFAR10DataModule</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">eval_ood</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="model-initialization">
+<h2>Model Initialization<a class="headerlink" href="#model-initialization" title="Link to this heading">#</a></h2>
+<p>We use the ResNet18 architecture, a widely adopted convolutional neural network known for its deep residual learning capabilities.
+The model is initialized with 10 output classes corresponding to the CIFAR-10 dataset categories. When training on CIFAR, do not forget to
+set the style of the resnet to CIFAR, otherwise it will lose more information in the first convolution.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize the ResNet18 model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">resnet</span><span class="p">(</span><span class="n">arch</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">in_channels</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;cifar&quot;</span><span class="p">,</span> <span class="n">conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="define-the-classification-routine">
+<h2>Define the Classification Routine<a class="headerlink" href="#define-the-classification-routine" title="Link to this heading">#</a></h2>
+<p>The <cite>ClassificationRoutine</cite> is one of the most crucial building blocks in TorchUncertainty.
+It streamlines the training and evaluation processes.
+It integrates the model, loss function, and optimizer into a cohesive routine compatible with PyTorch Lightning’s Trainer.
+This abstraction simplifies the implementation of standard training loops and evaluation protocols.
+To come back to what matters in this tutorial, the routine also handles OOD detection. To enable it,
+just activate the <cite>eval_ood</cite> flag. Note that you can also evaluate the distribution-shift performance
+of the model at the same time by also setting <cite>eval_shift</cite> to True.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Loss function</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+
+<span class="c1"># Optimizer</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+
+<span class="c1"># Initialize the ClassificationRoutine, you could replace MaxSoftmaxCriterion by &quot;msp&quot;</span>
+<span class="n">routine</span> <span class="o">=</span> <span class="n">ClassificationRoutine</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">loss</span><span class="o">=</span><span class="n">criterion</span><span class="p">,</span>
+    <span class="n">optim_recipe</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+    <span class="n">eval_ood</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">ood_criterion</span><span class="o">=</span><span class="n">MaxSoftmaxCriterion</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/chocolatine/actions-runner/_work/_tool/Python/3.11.12/x64/lib/python3.11/site-packages/torchmetrics/utilities/prints.py:43: UserWarning: Metric `FPR95` will save all targets and predictions in buffer. For large datasets this may lead to large memory footprint.
+  warnings.warn(*args, **kwargs)
+</pre></div>
+</div>
+</section>
+<section id="test-the-training-of-the-model">
+<h2>Test the Training of the Model<a class="headerlink" href="#test-the-training-of-the-model" title="Link to this heading">#</a></h2>
+<p>With the routine defined, we can now set up the Trainer and commence training.
+The Trainer handles the training loop, including epoch management, logging, and checkpointing.
+We specify the maximum number of epochs, the precision and the device to be used. To reduce the tutorial building time,
+we will train for a single epoch and load a model from <a class="reference external" href="https://huggingface.co/torch-uncertainty">TorchUncertainty’s HuggingFace</a>.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize the TUTrainer</span>
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">TUTrainer</span><span class="p">(</span><span class="n">max_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="s2">&quot;16-mixed&quot;</span><span class="p">,</span> <span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">devices</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Train the model for 1 epoch using the CIFAR-10 DataModule</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/64.3M [00:00&lt;?, ?B/s]
+  0%|          | 32.8k/64.3M [00:00&lt;04:26, 241kB/s]
+  0%|          | 65.5k/64.3M [00:00&lt;04:28, 239kB/s]
+  0%|          | 98.3k/64.3M [00:00&lt;04:28, 239kB/s]
+  0%|          | 131k/64.3M [00:00&lt;04:27, 240kB/s]
+  0%|          | 197k/64.3M [00:00&lt;03:16, 326kB/s]
+  0%|          | 295k/64.3M [00:00&lt;02:19, 459kB/s]
+  1%|          | 426k/64.3M [00:00&lt;01:42, 621kB/s]
+  1%|          | 590k/64.3M [00:01&lt;01:19, 804kB/s]
+  1%|          | 786k/64.3M [00:01&lt;01:03, 1.00MB/s]
+  2%|▏         | 1.05M/64.3M [00:01&lt;00:49, 1.28MB/s]
+  2%|▏         | 1.44M/64.3M [00:01&lt;00:35, 1.77MB/s]
+  3%|▎         | 1.97M/64.3M [00:01&lt;00:26, 2.39MB/s]
+  4%|▍         | 2.72M/64.3M [00:01&lt;00:18, 3.33MB/s]
+  6%|▌         | 3.77M/64.3M [00:01&lt;00:13, 4.63MB/s]
+  8%|▊         | 5.24M/64.3M [00:02&lt;00:09, 6.48MB/s]
+ 11%|█         | 7.18M/64.3M [00:02&lt;00:06, 8.78MB/s]
+ 15%|█▌        | 9.76M/64.3M [00:02&lt;00:04, 12.8MB/s]
+ 20%|█▉        | 12.6M/64.3M [00:02&lt;00:03, 16.5MB/s]
+ 23%|██▎       | 14.9M/64.3M [00:02&lt;00:02, 18.0MB/s]
+ 26%|██▌       | 16.8M/64.3M [00:02&lt;00:02, 17.7MB/s]
+ 29%|██▉       | 18.7M/64.3M [00:02&lt;00:02, 16.6MB/s]
+ 34%|███▍      | 22.1M/64.3M [00:02&lt;00:02, 19.0MB/s]
+ 40%|███▉      | 25.6M/64.3M [00:03&lt;00:01, 20.8MB/s]
+ 46%|████▌     | 29.3M/64.3M [00:03&lt;00:01, 22.2MB/s]
+ 51%|█████     | 32.9M/64.3M [00:03&lt;00:01, 23.1MB/s]
+ 57%|█████▋    | 36.6M/64.3M [00:03&lt;00:01, 23.8MB/s]
+ 61%|██████    | 39.0M/64.3M [00:03&lt;00:01, 21.2MB/s]
+ 65%|██████▌   | 41.9M/64.3M [00:03&lt;00:01, 22.1MB/s]
+ 69%|██████▊   | 44.2M/64.3M [00:03&lt;00:01, 19.6MB/s]
+ 72%|███████▏  | 46.2M/64.3M [00:04&lt;00:01, 18.0MB/s]
+ 75%|███████▍  | 48.0M/64.3M [00:04&lt;00:00, 16.6MB/s]
+ 77%|███████▋  | 49.7M/64.3M [00:04&lt;00:00, 15.4MB/s]
+ 80%|███████▉  | 51.3M/64.3M [00:04&lt;00:00, 14.3MB/s]
+ 82%|████████▏ | 52.7M/64.3M [00:04&lt;00:00, 13.2MB/s]
+ 84%|████████▍ | 54.1M/64.3M [00:04&lt;00:00, 12.4MB/s]
+ 87%|████████▋ | 55.8M/64.3M [00:04&lt;00:00, 13.2MB/s]
+ 90%|████████▉ | 57.7M/64.3M [00:04&lt;00:00, 12.6MB/s]
+ 93%|█████████▎| 59.5M/64.3M [00:05&lt;00:00, 12.9MB/s]
+ 96%|█████████▌| 61.4M/64.3M [00:05&lt;00:00, 14.0MB/s]
+ 99%|█████████▊| 63.3M/64.3M [00:05&lt;00:00, 15.2MB/s]
+100%|██████████| 64.3M/64.3M [00:05&lt;00:00, 11.9MB/s]
+
+Sanity Checking: |          | 0/? [00:00&lt;?, ?it/s]
+Sanity Checking:   0%|          | 0/2 [00:00&lt;?, ?it/s]
+Sanity Checking DataLoader 0:   0%|          | 0/2 [00:00&lt;?, ?it/s]
+Sanity Checking DataLoader 0:  50%|█████     | 1/2 [00:00&lt;00:00, 20.26it/s]
+Sanity Checking DataLoader 0: 100%|██████████| 2/2 [00:00&lt;00:00, 38.19it/s]
+
+
+Training: |          | 0/? [00:00&lt;?, ?it/s]
+Training:   0%|          | 0/98 [00:00&lt;?, ?it/s]
+Epoch 0:   0%|          | 0/98 [00:00&lt;?, ?it/s]
+Epoch 0:   1%|          | 1/98 [00:00&lt;00:21,  4.42it/s]
+Epoch 0:   1%|          | 1/98 [00:00&lt;00:22,  4.36it/s, v_num=4, train_loss=2.430]
+Epoch 0:   2%|▏         | 2/98 [00:00&lt;00:17,  5.50it/s, v_num=4, train_loss=2.430]
+Epoch 0:   2%|▏         | 2/98 [00:00&lt;00:17,  5.45it/s, v_num=4, train_loss=2.950]
+Epoch 0:   3%|▎         | 3/98 [00:00&lt;00:15,  6.03it/s, v_num=4, train_loss=2.950]
+Epoch 0:   3%|▎         | 3/98 [00:00&lt;00:15,  5.99it/s, v_num=4, train_loss=2.660]
+Epoch 0:   4%|▍         | 4/98 [00:00&lt;00:14,  6.34it/s, v_num=4, train_loss=2.660]
+Epoch 0:   4%|▍         | 4/98 [00:00&lt;00:14,  6.30it/s, v_num=4, train_loss=2.430]
+Epoch 0:   5%|▌         | 5/98 [00:00&lt;00:14,  6.54it/s, v_num=4, train_loss=2.430]
+Epoch 0:   5%|▌         | 5/98 [00:00&lt;00:14,  6.51it/s, v_num=4, train_loss=2.610]
+Epoch 0:   6%|▌         | 6/98 [00:00&lt;00:13,  6.68it/s, v_num=4, train_loss=2.610]
+Epoch 0:   6%|▌         | 6/98 [00:00&lt;00:13,  6.65it/s, v_num=4, train_loss=2.170]
+Epoch 0:   7%|▋         | 7/98 [00:01&lt;00:13,  6.79it/s, v_num=4, train_loss=2.170]
+Epoch 0:   7%|▋         | 7/98 [00:01&lt;00:13,  6.76it/s, v_num=4, train_loss=1.940]
+Epoch 0:   8%|▊         | 8/98 [00:01&lt;00:13,  6.87it/s, v_num=4, train_loss=1.940]
+Epoch 0:   8%|▊         | 8/98 [00:01&lt;00:13,  6.85it/s, v_num=4, train_loss=1.950]
+Epoch 0:   9%|▉         | 9/98 [00:01&lt;00:12,  6.93it/s, v_num=4, train_loss=1.950]
+Epoch 0:   9%|▉         | 9/98 [00:01&lt;00:12,  6.91it/s, v_num=4, train_loss=1.960]
+Epoch 0:  10%|█         | 10/98 [00:01&lt;00:12,  6.98it/s, v_num=4, train_loss=1.960]
+Epoch 0:  10%|█         | 10/98 [00:01&lt;00:12,  6.97it/s, v_num=4, train_loss=1.840]
+Epoch 0:  11%|█         | 11/98 [00:01&lt;00:12,  7.03it/s, v_num=4, train_loss=1.840]
+Epoch 0:  11%|█         | 11/98 [00:01&lt;00:12,  7.01it/s, v_num=4, train_loss=1.870]
+Epoch 0:  12%|█▏        | 12/98 [00:01&lt;00:12,  7.06it/s, v_num=4, train_loss=1.870]
+Epoch 0:  12%|█▏        | 12/98 [00:01&lt;00:12,  7.05it/s, v_num=4, train_loss=1.910]
+Epoch 0:  13%|█▎        | 13/98 [00:01&lt;00:11,  7.09it/s, v_num=4, train_loss=1.910]
+Epoch 0:  13%|█▎        | 13/98 [00:01&lt;00:12,  7.08it/s, v_num=4, train_loss=1.900]
+Epoch 0:  14%|█▍        | 14/98 [00:01&lt;00:11,  7.12it/s, v_num=4, train_loss=1.900]
+Epoch 0:  14%|█▍        | 14/98 [00:01&lt;00:11,  7.11it/s, v_num=4, train_loss=1.830]
+Epoch 0:  15%|█▌        | 15/98 [00:02&lt;00:11,  7.14it/s, v_num=4, train_loss=1.830]
+Epoch 0:  15%|█▌        | 15/98 [00:02&lt;00:11,  7.13it/s, v_num=4, train_loss=1.850]
+Epoch 0:  16%|█▋        | 16/98 [00:02&lt;00:11,  7.16it/s, v_num=4, train_loss=1.850]
+Epoch 0:  16%|█▋        | 16/98 [00:02&lt;00:11,  7.15it/s, v_num=4, train_loss=1.810]
+Epoch 0:  17%|█▋        | 17/98 [00:02&lt;00:11,  7.18it/s, v_num=4, train_loss=1.810]
+Epoch 0:  17%|█▋        | 17/98 [00:02&lt;00:11,  7.17it/s, v_num=4, train_loss=1.810]
+Epoch 0:  18%|█▊        | 18/98 [00:02&lt;00:11,  7.20it/s, v_num=4, train_loss=1.810]
+Epoch 0:  18%|█▊        | 18/98 [00:02&lt;00:11,  7.19it/s, v_num=4, train_loss=1.800]
+Epoch 0:  19%|█▉        | 19/98 [00:02&lt;00:10,  7.21it/s, v_num=4, train_loss=1.800]
+Epoch 0:  19%|█▉        | 19/98 [00:02&lt;00:10,  7.20it/s, v_num=4, train_loss=1.770]
+Epoch 0:  20%|██        | 20/98 [00:02&lt;00:10,  7.23it/s, v_num=4, train_loss=1.770]
+Epoch 0:  20%|██        | 20/98 [00:02&lt;00:10,  7.22it/s, v_num=4, train_loss=1.730]
+Epoch 0:  21%|██▏       | 21/98 [00:02&lt;00:10,  7.24it/s, v_num=4, train_loss=1.730]
+Epoch 0:  21%|██▏       | 21/98 [00:02&lt;00:10,  7.23it/s, v_num=4, train_loss=1.760]
+Epoch 0:  22%|██▏       | 22/98 [00:03&lt;00:10,  7.25it/s, v_num=4, train_loss=1.760]
+Epoch 0:  22%|██▏       | 22/98 [00:03&lt;00:10,  7.24it/s, v_num=4, train_loss=1.730]
+Epoch 0:  23%|██▎       | 23/98 [00:03&lt;00:10,  7.26it/s, v_num=4, train_loss=1.730]
+Epoch 0:  23%|██▎       | 23/98 [00:03&lt;00:10,  7.25it/s, v_num=4, train_loss=1.740]
+Epoch 0:  24%|██▍       | 24/98 [00:03&lt;00:10,  7.27it/s, v_num=4, train_loss=1.740]
+Epoch 0:  24%|██▍       | 24/98 [00:03&lt;00:10,  7.26it/s, v_num=4, train_loss=1.800]
+Epoch 0:  26%|██▌       | 25/98 [00:03&lt;00:10,  7.28it/s, v_num=4, train_loss=1.800]
+Epoch 0:  26%|██▌       | 25/98 [00:03&lt;00:10,  7.27it/s, v_num=4, train_loss=1.770]
+Epoch 0:  27%|██▋       | 26/98 [00:03&lt;00:09,  7.28it/s, v_num=4, train_loss=1.770]
+Epoch 0:  27%|██▋       | 26/98 [00:03&lt;00:09,  7.28it/s, v_num=4, train_loss=1.750]
+Epoch 0:  28%|██▊       | 27/98 [00:03&lt;00:09,  7.29it/s, v_num=4, train_loss=1.750]
+Epoch 0:  28%|██▊       | 27/98 [00:03&lt;00:09,  7.28it/s, v_num=4, train_loss=1.770]
+Epoch 0:  29%|██▊       | 28/98 [00:03&lt;00:09,  7.30it/s, v_num=4, train_loss=1.770]
+Epoch 0:  29%|██▊       | 28/98 [00:03&lt;00:09,  7.29it/s, v_num=4, train_loss=1.660]
+Epoch 0:  30%|██▉       | 29/98 [00:03&lt;00:09,  7.30it/s, v_num=4, train_loss=1.660]
+Epoch 0:  30%|██▉       | 29/98 [00:03&lt;00:09,  7.30it/s, v_num=4, train_loss=1.700]
+Epoch 0:  31%|███       | 30/98 [00:04&lt;00:09,  7.31it/s, v_num=4, train_loss=1.700]
+Epoch 0:  31%|███       | 30/98 [00:04&lt;00:09,  7.30it/s, v_num=4, train_loss=1.680]
+Epoch 0:  32%|███▏      | 31/98 [00:04&lt;00:09,  7.32it/s, v_num=4, train_loss=1.680]
+Epoch 0:  32%|███▏      | 31/98 [00:04&lt;00:09,  7.31it/s, v_num=4, train_loss=1.660]
+Epoch 0:  33%|███▎      | 32/98 [00:04&lt;00:09,  7.32it/s, v_num=4, train_loss=1.660]
+Epoch 0:  33%|███▎      | 32/98 [00:04&lt;00:09,  7.31it/s, v_num=4, train_loss=1.710]
+Epoch 0:  34%|███▎      | 33/98 [00:04&lt;00:08,  7.32it/s, v_num=4, train_loss=1.710]
+Epoch 0:  34%|███▎      | 33/98 [00:04&lt;00:08,  7.32it/s, v_num=4, train_loss=1.640]
+Epoch 0:  35%|███▍      | 34/98 [00:04&lt;00:08,  7.33it/s, v_num=4, train_loss=1.640]
+Epoch 0:  35%|███▍      | 34/98 [00:04&lt;00:08,  7.32it/s, v_num=4, train_loss=1.660]
+Epoch 0:  36%|███▌      | 35/98 [00:04&lt;00:08,  7.33it/s, v_num=4, train_loss=1.660]
+Epoch 0:  36%|███▌      | 35/98 [00:04&lt;00:08,  7.33it/s, v_num=4, train_loss=1.680]
+Epoch 0:  37%|███▋      | 36/98 [00:04&lt;00:08,  7.34it/s, v_num=4, train_loss=1.680]
+Epoch 0:  37%|███▋      | 36/98 [00:04&lt;00:08,  7.33it/s, v_num=4, train_loss=1.630]
+Epoch 0:  38%|███▊      | 37/98 [00:05&lt;00:08,  7.34it/s, v_num=4, train_loss=1.630]
+Epoch 0:  38%|███▊      | 37/98 [00:05&lt;00:08,  7.33it/s, v_num=4, train_loss=1.660]
+Epoch 0:  39%|███▉      | 38/98 [00:05&lt;00:08,  7.34it/s, v_num=4, train_loss=1.660]
+Epoch 0:  39%|███▉      | 38/98 [00:05&lt;00:08,  7.34it/s, v_num=4, train_loss=1.620]
+Epoch 0:  40%|███▉      | 39/98 [00:05&lt;00:08,  7.35it/s, v_num=4, train_loss=1.620]
+Epoch 0:  40%|███▉      | 39/98 [00:05&lt;00:08,  7.34it/s, v_num=4, train_loss=1.660]
+Epoch 0:  41%|████      | 40/98 [00:05&lt;00:07,  7.35it/s, v_num=4, train_loss=1.660]
+Epoch 0:  41%|████      | 40/98 [00:05&lt;00:07,  7.34it/s, v_num=4, train_loss=1.640]
+Epoch 0:  42%|████▏     | 41/98 [00:05&lt;00:07,  7.35it/s, v_num=4, train_loss=1.640]
+Epoch 0:  42%|████▏     | 41/98 [00:05&lt;00:07,  7.35it/s, v_num=4, train_loss=1.530]
+Epoch 0:  43%|████▎     | 42/98 [00:05&lt;00:07,  7.35it/s, v_num=4, train_loss=1.530]
+Epoch 0:  43%|████▎     | 42/98 [00:05&lt;00:07,  7.35it/s, v_num=4, train_loss=1.610]
+Epoch 0:  44%|████▍     | 43/98 [00:05&lt;00:07,  7.36it/s, v_num=4, train_loss=1.610]
+Epoch 0:  44%|████▍     | 43/98 [00:05&lt;00:07,  7.35it/s, v_num=4, train_loss=1.630]
+Epoch 0:  45%|████▍     | 44/98 [00:05&lt;00:07,  7.36it/s, v_num=4, train_loss=1.630]
+Epoch 0:  45%|████▍     | 44/98 [00:05&lt;00:07,  7.36it/s, v_num=4, train_loss=1.600]
+Epoch 0:  46%|████▌     | 45/98 [00:06&lt;00:07,  7.36it/s, v_num=4, train_loss=1.600]
+Epoch 0:  46%|████▌     | 45/98 [00:06&lt;00:07,  7.36it/s, v_num=4, train_loss=1.560]
+Epoch 0:  47%|████▋     | 46/98 [00:06&lt;00:07,  7.36it/s, v_num=4, train_loss=1.560]
+Epoch 0:  47%|████▋     | 46/98 [00:06&lt;00:07,  7.36it/s, v_num=4, train_loss=1.630]
+Epoch 0:  48%|████▊     | 47/98 [00:06&lt;00:06,  7.37it/s, v_num=4, train_loss=1.630]
+Epoch 0:  48%|████▊     | 47/98 [00:06&lt;00:06,  7.36it/s, v_num=4, train_loss=1.550]
+Epoch 0:  49%|████▉     | 48/98 [00:06&lt;00:06,  7.37it/s, v_num=4, train_loss=1.550]
+Epoch 0:  49%|████▉     | 48/98 [00:06&lt;00:06,  7.36it/s, v_num=4, train_loss=1.640]
+Epoch 0:  50%|█████     | 49/98 [00:06&lt;00:06,  7.37it/s, v_num=4, train_loss=1.640]
+Epoch 0:  50%|█████     | 49/98 [00:06&lt;00:06,  7.37it/s, v_num=4, train_loss=1.450]
+Epoch 0:  51%|█████     | 50/98 [00:06&lt;00:06,  7.37it/s, v_num=4, train_loss=1.450]
+Epoch 0:  51%|█████     | 50/98 [00:06&lt;00:06,  7.37it/s, v_num=4, train_loss=1.590]
+Epoch 0:  52%|█████▏    | 51/98 [00:06&lt;00:06,  7.37it/s, v_num=4, train_loss=1.590]
+Epoch 0:  52%|█████▏    | 51/98 [00:06&lt;00:06,  7.37it/s, v_num=4, train_loss=1.590]
+Epoch 0:  53%|█████▎    | 52/98 [00:07&lt;00:06,  7.38it/s, v_num=4, train_loss=1.590]
+Epoch 0:  53%|█████▎    | 52/98 [00:07&lt;00:06,  7.37it/s, v_num=4, train_loss=1.490]
+Epoch 0:  54%|█████▍    | 53/98 [00:07&lt;00:06,  7.38it/s, v_num=4, train_loss=1.490]
+Epoch 0:  54%|█████▍    | 53/98 [00:07&lt;00:06,  7.37it/s, v_num=4, train_loss=1.610]
+Epoch 0:  55%|█████▌    | 54/98 [00:07&lt;00:05,  7.38it/s, v_num=4, train_loss=1.610]
+Epoch 0:  55%|█████▌    | 54/98 [00:07&lt;00:05,  7.37it/s, v_num=4, train_loss=1.540]
+Epoch 0:  56%|█████▌    | 55/98 [00:07&lt;00:05,  7.38it/s, v_num=4, train_loss=1.540]
+Epoch 0:  56%|█████▌    | 55/98 [00:07&lt;00:05,  7.38it/s, v_num=4, train_loss=1.520]
+Epoch 0:  57%|█████▋    | 56/98 [00:07&lt;00:05,  7.38it/s, v_num=4, train_loss=1.520]
+Epoch 0:  57%|█████▋    | 56/98 [00:07&lt;00:05,  7.38it/s, v_num=4, train_loss=1.610]
+Epoch 0:  58%|█████▊    | 57/98 [00:07&lt;00:05,  7.38it/s, v_num=4, train_loss=1.610]
+Epoch 0:  58%|█████▊    | 57/98 [00:07&lt;00:05,  7.38it/s, v_num=4, train_loss=1.580]
+Epoch 0:  59%|█████▉    | 58/98 [00:07&lt;00:05,  7.38it/s, v_num=4, train_loss=1.580]
+Epoch 0:  59%|█████▉    | 58/98 [00:07&lt;00:05,  7.38it/s, v_num=4, train_loss=1.500]
+Epoch 0:  60%|██████    | 59/98 [00:07&lt;00:05,  7.39it/s, v_num=4, train_loss=1.500]
+Epoch 0:  60%|██████    | 59/98 [00:07&lt;00:05,  7.38it/s, v_num=4, train_loss=1.480]
+Epoch 0:  61%|██████    | 60/98 [00:08&lt;00:05,  7.39it/s, v_num=4, train_loss=1.480]
+Epoch 0:  61%|██████    | 60/98 [00:08&lt;00:05,  7.38it/s, v_num=4, train_loss=1.490]
+Epoch 0:  62%|██████▏   | 61/98 [00:08&lt;00:05,  7.39it/s, v_num=4, train_loss=1.490]
+Epoch 0:  62%|██████▏   | 61/98 [00:08&lt;00:05,  7.38it/s, v_num=4, train_loss=1.500]
+Epoch 0:  63%|██████▎   | 62/98 [00:08&lt;00:04,  7.39it/s, v_num=4, train_loss=1.500]
+Epoch 0:  63%|██████▎   | 62/98 [00:08&lt;00:04,  7.39it/s, v_num=4, train_loss=1.410]
+Epoch 0:  64%|██████▍   | 63/98 [00:08&lt;00:04,  7.39it/s, v_num=4, train_loss=1.410]
+Epoch 0:  64%|██████▍   | 63/98 [00:08&lt;00:04,  7.39it/s, v_num=4, train_loss=1.530]
+Epoch 0:  65%|██████▌   | 64/98 [00:08&lt;00:04,  7.39it/s, v_num=4, train_loss=1.530]
+Epoch 0:  65%|██████▌   | 64/98 [00:08&lt;00:04,  7.39it/s, v_num=4, train_loss=1.400]
+Epoch 0:  66%|██████▋   | 65/98 [00:08&lt;00:04,  7.39it/s, v_num=4, train_loss=1.400]
+Epoch 0:  66%|██████▋   | 65/98 [00:08&lt;00:04,  7.39it/s, v_num=4, train_loss=1.520]
+Epoch 0:  67%|██████▋   | 66/98 [00:08&lt;00:04,  7.39it/s, v_num=4, train_loss=1.520]
+Epoch 0:  67%|██████▋   | 66/98 [00:08&lt;00:04,  7.39it/s, v_num=4, train_loss=1.500]
+Epoch 0:  68%|██████▊   | 67/98 [00:09&lt;00:04,  7.39it/s, v_num=4, train_loss=1.500]
+Epoch 0:  68%|██████▊   | 67/98 [00:09&lt;00:04,  7.39it/s, v_num=4, train_loss=1.510]
+Epoch 0:  69%|██████▉   | 68/98 [00:09&lt;00:04,  7.40it/s, v_num=4, train_loss=1.510]
+Epoch 0:  69%|██████▉   | 68/98 [00:09&lt;00:04,  7.39it/s, v_num=4, train_loss=1.360]
+Epoch 0:  70%|███████   | 69/98 [00:09&lt;00:03,  7.40it/s, v_num=4, train_loss=1.360]
+Epoch 0:  70%|███████   | 69/98 [00:09&lt;00:03,  7.39it/s, v_num=4, train_loss=1.390]
+Epoch 0:  71%|███████▏  | 70/98 [00:09&lt;00:03,  7.40it/s, v_num=4, train_loss=1.390]
+Epoch 0:  71%|███████▏  | 70/98 [00:09&lt;00:03,  7.40it/s, v_num=4, train_loss=1.500]
+Epoch 0:  72%|███████▏  | 71/98 [00:09&lt;00:03,  7.40it/s, v_num=4, train_loss=1.500]
+Epoch 0:  72%|███████▏  | 71/98 [00:09&lt;00:03,  7.40it/s, v_num=4, train_loss=1.500]
+Epoch 0:  73%|███████▎  | 72/98 [00:09&lt;00:03,  7.40it/s, v_num=4, train_loss=1.500]
+Epoch 0:  73%|███████▎  | 72/98 [00:09&lt;00:03,  7.40it/s, v_num=4, train_loss=1.460]
+Epoch 0:  74%|███████▍  | 73/98 [00:09&lt;00:03,  7.40it/s, v_num=4, train_loss=1.460]
+Epoch 0:  74%|███████▍  | 73/98 [00:09&lt;00:03,  7.40it/s, v_num=4, train_loss=1.400]
+Epoch 0:  76%|███████▌  | 74/98 [00:09&lt;00:03,  7.40it/s, v_num=4, train_loss=1.400]
+Epoch 0:  76%|███████▌  | 74/98 [00:10&lt;00:03,  7.40it/s, v_num=4, train_loss=1.530]
+Epoch 0:  77%|███████▋  | 75/98 [00:10&lt;00:03,  7.40it/s, v_num=4, train_loss=1.530]
+Epoch 0:  77%|███████▋  | 75/98 [00:10&lt;00:03,  7.40it/s, v_num=4, train_loss=1.430]
+Epoch 0:  78%|███████▊  | 76/98 [00:10&lt;00:02,  7.40it/s, v_num=4, train_loss=1.430]
+Epoch 0:  78%|███████▊  | 76/98 [00:10&lt;00:02,  7.40it/s, v_num=4, train_loss=1.410]
+Epoch 0:  79%|███████▊  | 77/98 [00:10&lt;00:02,  7.40it/s, v_num=4, train_loss=1.410]
+Epoch 0:  79%|███████▊  | 77/98 [00:10&lt;00:02,  7.40it/s, v_num=4, train_loss=1.380]
+Epoch 0:  80%|███████▉  | 78/98 [00:10&lt;00:02,  7.40it/s, v_num=4, train_loss=1.380]
+Epoch 0:  80%|███████▉  | 78/98 [00:10&lt;00:02,  7.40it/s, v_num=4, train_loss=1.390]
+Epoch 0:  81%|████████  | 79/98 [00:10&lt;00:02,  7.41it/s, v_num=4, train_loss=1.390]
+Epoch 0:  81%|████████  | 79/98 [00:10&lt;00:02,  7.40it/s, v_num=4, train_loss=1.380]
+Epoch 0:  82%|████████▏ | 80/98 [00:10&lt;00:02,  7.41it/s, v_num=4, train_loss=1.380]
+Epoch 0:  82%|████████▏ | 80/98 [00:10&lt;00:02,  7.40it/s, v_num=4, train_loss=1.360]
+Epoch 0:  83%|████████▎ | 81/98 [00:10&lt;00:02,  7.41it/s, v_num=4, train_loss=1.360]
+Epoch 0:  83%|████████▎ | 81/98 [00:10&lt;00:02,  7.40it/s, v_num=4, train_loss=1.400]
+Epoch 0:  84%|████████▎ | 82/98 [00:11&lt;00:02,  7.41it/s, v_num=4, train_loss=1.400]
+Epoch 0:  84%|████████▎ | 82/98 [00:11&lt;00:02,  7.40it/s, v_num=4, train_loss=1.370]
+Epoch 0:  85%|████████▍ | 83/98 [00:11&lt;00:02,  7.41it/s, v_num=4, train_loss=1.370]
+Epoch 0:  85%|████████▍ | 83/98 [00:11&lt;00:02,  7.40it/s, v_num=4, train_loss=1.360]
+Epoch 0:  86%|████████▌ | 84/98 [00:11&lt;00:01,  7.41it/s, v_num=4, train_loss=1.360]
+Epoch 0:  86%|████████▌ | 84/98 [00:11&lt;00:01,  7.41it/s, v_num=4, train_loss=1.460]
+Epoch 0:  87%|████████▋ | 85/98 [00:11&lt;00:01,  7.41it/s, v_num=4, train_loss=1.460]
+Epoch 0:  87%|████████▋ | 85/98 [00:11&lt;00:01,  7.41it/s, v_num=4, train_loss=1.440]
+Epoch 0:  88%|████████▊ | 86/98 [00:11&lt;00:01,  7.41it/s, v_num=4, train_loss=1.440]
+Epoch 0:  88%|████████▊ | 86/98 [00:11&lt;00:01,  7.41it/s, v_num=4, train_loss=1.350]
+Epoch 0:  89%|████████▉ | 87/98 [00:11&lt;00:01,  7.41it/s, v_num=4, train_loss=1.350]
+Epoch 0:  89%|████████▉ | 87/98 [00:11&lt;00:01,  7.41it/s, v_num=4, train_loss=1.400]
+Epoch 0:  90%|████████▉ | 88/98 [00:11&lt;00:01,  7.41it/s, v_num=4, train_loss=1.400]
+Epoch 0:  90%|████████▉ | 88/98 [00:11&lt;00:01,  7.41it/s, v_num=4, train_loss=1.330]
+Epoch 0:  91%|█████████ | 89/98 [00:12&lt;00:01,  7.41it/s, v_num=4, train_loss=1.330]
+Epoch 0:  91%|█████████ | 89/98 [00:12&lt;00:01,  7.41it/s, v_num=4, train_loss=1.390]
+Epoch 0:  92%|█████████▏| 90/98 [00:12&lt;00:01,  7.41it/s, v_num=4, train_loss=1.390]
+Epoch 0:  92%|█████████▏| 90/98 [00:12&lt;00:01,  7.41it/s, v_num=4, train_loss=1.440]
+Epoch 0:  93%|█████████▎| 91/98 [00:12&lt;00:00,  7.41it/s, v_num=4, train_loss=1.440]
+Epoch 0:  93%|█████████▎| 91/98 [00:12&lt;00:00,  7.41it/s, v_num=4, train_loss=1.360]
+Epoch 0:  94%|█████████▍| 92/98 [00:12&lt;00:00,  7.41it/s, v_num=4, train_loss=1.360]
+Epoch 0:  94%|█████████▍| 92/98 [00:12&lt;00:00,  7.41it/s, v_num=4, train_loss=1.410]
+Epoch 0:  95%|█████████▍| 93/98 [00:12&lt;00:00,  7.41it/s, v_num=4, train_loss=1.410]
+Epoch 0:  95%|█████████▍| 93/98 [00:12&lt;00:00,  7.41it/s, v_num=4, train_loss=1.360]
+Epoch 0:  96%|█████████▌| 94/98 [00:12&lt;00:00,  7.41it/s, v_num=4, train_loss=1.360]
+Epoch 0:  96%|█████████▌| 94/98 [00:12&lt;00:00,  7.41it/s, v_num=4, train_loss=1.510]
+Epoch 0:  97%|█████████▋| 95/98 [00:12&lt;00:00,  7.42it/s, v_num=4, train_loss=1.510]
+Epoch 0:  97%|█████████▋| 95/98 [00:12&lt;00:00,  7.41it/s, v_num=4, train_loss=1.360]
+Epoch 0:  98%|█████████▊| 96/98 [00:12&lt;00:00,  7.42it/s, v_num=4, train_loss=1.360]
+Epoch 0:  98%|█████████▊| 96/98 [00:12&lt;00:00,  7.41it/s, v_num=4, train_loss=1.340]
+Epoch 0:  99%|█████████▉| 97/98 [00:13&lt;00:00,  7.42it/s, v_num=4, train_loss=1.340]
+Epoch 0:  99%|█████████▉| 97/98 [00:13&lt;00:00,  7.41it/s, v_num=4, train_loss=1.340]
+Epoch 0: 100%|██████████| 98/98 [00:13&lt;00:00,  7.44it/s, v_num=4, train_loss=1.340]
+Epoch 0: 100%|██████████| 98/98 [00:13&lt;00:00,  7.44it/s, v_num=4, train_loss=1.200]
+
+Validation: |          | 0/? [00:00&lt;?, ?it/s]
+
+Validation:   0%|          | 0/20 [00:00&lt;?, ?it/s]
+
+Validation DataLoader 0:   0%|          | 0/20 [00:00&lt;?, ?it/s]
+
+Validation DataLoader 0:   5%|▌         | 1/20 [00:00&lt;00:00, 142.30it/s]
+
+Validation DataLoader 0:  10%|█         | 2/20 [00:00&lt;00:00, 77.50it/s]
+
+Validation DataLoader 0:  15%|█▌        | 3/20 [00:00&lt;00:00, 38.21it/s]
+
+Validation DataLoader 0:  20%|██        | 4/20 [00:00&lt;00:00, 48.12it/s]
+
+Validation DataLoader 0:  25%|██▌       | 5/20 [00:00&lt;00:00, 57.17it/s]
+
+Validation DataLoader 0:  30%|███       | 6/20 [00:00&lt;00:00, 65.39it/s]
+
+Validation DataLoader 0:  35%|███▌      | 7/20 [00:00&lt;00:00, 72.91it/s]
+
+Validation DataLoader 0:  40%|████      | 8/20 [00:00&lt;00:00, 63.60it/s]
+
+Validation DataLoader 0:  45%|████▌     | 9/20 [00:00&lt;00:00, 52.95it/s]
+
+Validation DataLoader 0:  50%|█████     | 10/20 [00:00&lt;00:00, 46.68it/s]
+
+Validation DataLoader 0:  55%|█████▌    | 11/20 [00:00&lt;00:00, 42.57it/s]
+
+Validation DataLoader 0:  60%|██████    | 12/20 [00:00&lt;00:00, 39.64it/s]
+
+Validation DataLoader 0:  65%|██████▌   | 13/20 [00:00&lt;00:00, 37.45it/s]
+
+Validation DataLoader 0:  70%|███████   | 14/20 [00:00&lt;00:00, 35.75it/s]
+
+Validation DataLoader 0:  75%|███████▌  | 15/20 [00:00&lt;00:00, 34.40it/s]
+
+Validation DataLoader 0:  80%|████████  | 16/20 [00:00&lt;00:00, 33.30it/s]
+
+Validation DataLoader 0:  85%|████████▌ | 17/20 [00:00&lt;00:00, 32.39it/s]
+
+Validation DataLoader 0:  90%|█████████ | 18/20 [00:00&lt;00:00, 31.62it/s]
+
+Validation DataLoader 0:  95%|█████████▌| 19/20 [00:00&lt;00:00, 30.96it/s]
+
+Validation DataLoader 0: 100%|██████████| 20/20 [00:00&lt;00:00, 23.44it/s]
+
+
+Epoch 0: 100%|██████████| 98/98 [00:14&lt;00:00,  6.95it/s, v_num=4, train_loss=1.200, Acc=50.20]
+Epoch 0: 100%|██████████| 98/98 [00:14&lt;00:00,  6.95it/s, v_num=4, train_loss=1.200, Acc=50.20]
+Epoch 0: 100%|██████████| 98/98 [00:14&lt;00:00,  6.84it/s, v_num=4, train_loss=1.200, Acc=50.20]
+</pre></div>
+</div>
+</section>
+<section id="load-the-model-from-huggingface">
+<h2>Load the model from HuggingFace<a class="headerlink" href="#load-the-model-from-huggingface" title="Link to this heading">#</a></h2>
+<p>We simply download a ResNet-18 trained on CIFAR-10 from <a class="reference external" href="https://huggingface.co/torch-uncertainty">TorchUncertainty’s HuggingFace</a> and load it with
+the <cite>load_from_checkpoint</cite> method.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">huggingface_hub</span><span class="w"> </span><span class="kn">import</span> <span class="n">hf_hub_download</span>
+
+<span class="n">path</span> <span class="o">=</span> <span class="n">hf_hub_download</span><span class="p">(</span>
+    <span class="n">repo_id</span><span class="o">=</span><span class="s2">&quot;torch-uncertainty/resnet18_c10&quot;</span><span class="p">,</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;resnet18_c10.ckpt&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">state_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">weights_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">routine</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;All keys matched successfully&gt;
+</pre></div>
+</div>
+</section>
+<section id="evaluating-on-in-distribution-and-out-of-distribution-data">
+<h2>Evaluating on In-Distribution and Out-of-distribution Data<a class="headerlink" href="#evaluating-on-in-distribution-and-out-of-distribution-data" title="Link to this heading">#</a></h2>
+<p>Now that the model is trained, we can evaluate its performance on the original in-distribution test set,
+as well as the OOD set. Typing the next line will automatically compute the in-distribution and OOD detection metrics.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Evaluate the model on the CIFAR-10 (IID) and SVHN (OOD) test sets</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Testing: |          | 0/? [00:00&lt;?, ?it/s]
+Testing:   0%|          | 0/20 [00:00&lt;?, ?it/s]
+Testing DataLoader 0:   0%|          | 0/20 [00:00&lt;?, ?it/s]
+Testing DataLoader 0:   5%|▌         | 1/20 [00:00&lt;00:00, 21.44it/s]
+Testing DataLoader 0:  10%|█         | 2/20 [00:00&lt;00:00, 40.66it/s]
+Testing DataLoader 0:  15%|█▌        | 3/20 [00:00&lt;00:00, 58.53it/s]
+Testing DataLoader 0:  20%|██        | 4/20 [00:00&lt;00:00, 75.26it/s]
+Testing DataLoader 0:  25%|██▌       | 5/20 [00:00&lt;00:00, 91.11it/s]
+Testing DataLoader 0:  30%|███       | 6/20 [00:00&lt;00:00, 106.01it/s]
+Testing DataLoader 0:  35%|███▌      | 7/20 [00:00&lt;00:00, 70.40it/s]
+Testing DataLoader 0:  40%|████      | 8/20 [00:00&lt;00:00, 55.13it/s]
+Testing DataLoader 0:  45%|████▌     | 9/20 [00:00&lt;00:00, 47.18it/s]
+Testing DataLoader 0:  50%|█████     | 10/20 [00:00&lt;00:00, 42.30it/s]
+Testing DataLoader 0:  55%|█████▌    | 11/20 [00:00&lt;00:00, 39.08it/s]
+Testing DataLoader 0:  60%|██████    | 12/20 [00:00&lt;00:00, 36.83it/s]
+Testing DataLoader 0:  65%|██████▌   | 13/20 [00:00&lt;00:00, 35.15it/s]
+Testing DataLoader 0:  70%|███████   | 14/20 [00:00&lt;00:00, 33.83it/s]
+Testing DataLoader 0:  75%|███████▌  | 15/20 [00:00&lt;00:00, 32.76it/s]
+Testing DataLoader 0:  80%|████████  | 16/20 [00:00&lt;00:00, 31.88it/s]
+Testing DataLoader 0:  85%|████████▌ | 17/20 [00:00&lt;00:00, 31.14it/s]
+Testing DataLoader 0:  90%|█████████ | 18/20 [00:00&lt;00:00, 30.51it/s]
+Testing DataLoader 0:  95%|█████████▌| 19/20 [00:00&lt;00:00, 29.97it/s]
+Testing DataLoader 0: 100%|██████████| 20/20 [00:00&lt;00:00, 29.59it/s]
+Testing DataLoader 0:   0%|          | 0/51 [00:00&lt;?, ?it/s]
+Testing DataLoader 1:   0%|          | 0/51 [00:00&lt;?, ?it/s]
+Testing DataLoader 1:   2%|▏         | 1/51 [00:00&lt;00:00, 113.04it/s]
+Testing DataLoader 1:   4%|▍         | 2/51 [00:00&lt;00:00, 62.25it/s]
+Testing DataLoader 1:   6%|▌         | 3/51 [00:00&lt;00:00, 81.54it/s]
+Testing DataLoader 1:   8%|▊         | 4/51 [00:00&lt;00:00, 96.76it/s]
+Testing DataLoader 1:  10%|▉         | 5/51 [00:00&lt;00:00, 114.39it/s]
+Testing DataLoader 1:  12%|█▏        | 6/51 [00:00&lt;00:00, 76.52it/s]
+Testing DataLoader 1:  14%|█▎        | 7/51 [00:00&lt;00:00, 86.13it/s]
+Testing DataLoader 1:  16%|█▌        | 8/51 [00:00&lt;00:00, 96.55it/s]
+Testing DataLoader 1:  18%|█▊        | 9/51 [00:00&lt;00:00, 75.69it/s]
+Testing DataLoader 1:  20%|█▉        | 10/51 [00:00&lt;00:00, 61.43it/s]
+Testing DataLoader 1:  22%|██▏       | 11/51 [00:00&lt;00:00, 53.24it/s]
+Testing DataLoader 1:  24%|██▎       | 12/51 [00:00&lt;00:00, 47.91it/s]
+Testing DataLoader 1:  25%|██▌       | 13/51 [00:00&lt;00:00, 44.16it/s]
+Testing DataLoader 1:  27%|██▋       | 14/51 [00:00&lt;00:00, 41.38it/s]
+Testing DataLoader 1:  29%|██▉       | 15/51 [00:00&lt;00:00, 39.23it/s]
+Testing DataLoader 1:  31%|███▏      | 16/51 [00:00&lt;00:00, 37.53it/s]
+Testing DataLoader 1:  33%|███▎      | 17/51 [00:00&lt;00:00, 36.15it/s]
+Testing DataLoader 1:  35%|███▌      | 18/51 [00:00&lt;00:00, 35.00it/s]
+Testing DataLoader 1:  37%|███▋      | 19/51 [00:00&lt;00:00, 34.04it/s]
+Testing DataLoader 1:  39%|███▉      | 20/51 [00:00&lt;00:00, 33.21it/s]
+Testing DataLoader 1:  41%|████      | 21/51 [00:00&lt;00:00, 32.50it/s]
+Testing DataLoader 1:  43%|████▎     | 22/51 [00:00&lt;00:00, 31.88it/s]
+Testing DataLoader 1:  45%|████▌     | 23/51 [00:00&lt;00:00, 31.33it/s]
+Testing DataLoader 1:  47%|████▋     | 24/51 [00:00&lt;00:00, 30.85it/s]
+Testing DataLoader 1:  49%|████▉     | 25/51 [00:00&lt;00:00, 30.41it/s]
+Testing DataLoader 1:  51%|█████     | 26/51 [00:00&lt;00:00, 30.02it/s]
+Testing DataLoader 1:  53%|█████▎    | 27/51 [00:00&lt;00:00, 29.67it/s]
+Testing DataLoader 1:  55%|█████▍    | 28/51 [00:00&lt;00:00, 29.35it/s]
+Testing DataLoader 1:  57%|█████▋    | 29/51 [00:00&lt;00:00, 29.06it/s]
+Testing DataLoader 1:  59%|█████▉    | 30/51 [00:01&lt;00:00, 28.79it/s]
+Testing DataLoader 1:  61%|██████    | 31/51 [00:01&lt;00:00, 28.55it/s]
+Testing DataLoader 1:  63%|██████▎   | 32/51 [00:01&lt;00:00, 28.32it/s]
+Testing DataLoader 1:  65%|██████▍   | 33/51 [00:01&lt;00:00, 28.12it/s]
+Testing DataLoader 1:  67%|██████▋   | 34/51 [00:01&lt;00:00, 27.92it/s]
+Testing DataLoader 1:  69%|██████▊   | 35/51 [00:01&lt;00:00, 27.74it/s]
+Testing DataLoader 1:  71%|███████   | 36/51 [00:01&lt;00:00, 27.57it/s]
+Testing DataLoader 1:  73%|███████▎  | 37/51 [00:01&lt;00:00, 27.42it/s]
+Testing DataLoader 1:  75%|███████▍  | 38/51 [00:01&lt;00:00, 27.27it/s]
+Testing DataLoader 1:  76%|███████▋  | 39/51 [00:01&lt;00:00, 27.13it/s]
+Testing DataLoader 1:  78%|███████▊  | 40/51 [00:01&lt;00:00, 27.00it/s]
+Testing DataLoader 1:  80%|████████  | 41/51 [00:01&lt;00:00, 26.88it/s]
+Testing DataLoader 1:  82%|████████▏ | 42/51 [00:01&lt;00:00, 26.76it/s]
+Testing DataLoader 1:  84%|████████▍ | 43/51 [00:01&lt;00:00, 26.65it/s]
+Testing DataLoader 1:  86%|████████▋ | 44/51 [00:01&lt;00:00, 26.55it/s]
+Testing DataLoader 1:  88%|████████▊ | 45/51 [00:01&lt;00:00, 26.45it/s]
+Testing DataLoader 1:  90%|█████████ | 46/51 [00:01&lt;00:00, 26.35it/s]
+Testing DataLoader 1:  92%|█████████▏| 47/51 [00:01&lt;00:00, 26.27it/s]
+Testing DataLoader 1:  94%|█████████▍| 48/51 [00:01&lt;00:00, 26.18it/s]
+Testing DataLoader 1:  96%|█████████▌| 49/51 [00:01&lt;00:00, 26.10it/s]
+Testing DataLoader 1:  98%|█████████▊| 50/51 [00:01&lt;00:00, 26.02it/s]
+Testing DataLoader 1: 100%|██████████| 51/51 [00:01&lt;00:00, 25.95it/s]
+Testing DataLoader 1: 100%|██████████| 51/51 [00:02&lt;00:00, 22.69it/s]
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃      Classification       ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     Acc      │          93.380%          │
+│    Brier     │          0.10812          │
+│   Entropy    │          0.08849          │
+│     NLL      │          0.26408          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃        Calibration        ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     ECE      │          3.546%           │
+│     aECE     │          3.499%           │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃       OOD Detection       ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     AUPR     │          90.244%          │
+│    AUROC     │          82.968%          │
+│   Entropy    │          0.08849          │
+│    FPR95     │          56.060%          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃ Selective Classification  ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│    AUGRC     │          0.779%           │
+│     AURC     │          0.960%           │
+│  Cov@5Risk   │          96.520%          │
+│  Risk@80Cov  │          1.200%           │
+└──────────────┴───────────────────────────┘
+</pre></div>
+</div>
+</section>
+<section id="changing-the-ood-criterion">
+<h2>Changing the OOD Criterion<a class="headerlink" href="#changing-the-ood-criterion" title="Link to this heading">#</a></h2>
+<p>The previous metrics for Out-of-distribution detection have been computed using the maximum softmax probability score [1],
+which corresponds to the likelihood of the prediction. We could use other scores such as the maximum logit [2]. To do this,
+just change the routine’s <cite>ood_criterion</cite> and perform a second test.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">routine</span><span class="o">.</span><span class="n">ood_criterion</span> <span class="o">=</span> <span class="n">MaxLogitCriterion</span><span class="p">()</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Testing: |          | 0/? [00:00&lt;?, ?it/s]
+Testing:   0%|          | 0/20 [00:00&lt;?, ?it/s]
+Testing DataLoader 0:   0%|          | 0/20 [00:00&lt;?, ?it/s]
+Testing DataLoader 0:   5%|▌         | 1/20 [00:00&lt;00:00, 102.07it/s]
+Testing DataLoader 0:  10%|█         | 2/20 [00:00&lt;00:00, 128.69it/s]
+Testing DataLoader 0:  15%|█▌        | 3/20 [00:00&lt;00:00, 169.65it/s]
+Testing DataLoader 0:  20%|██        | 4/20 [00:00&lt;00:00, 47.99it/s]
+Testing DataLoader 0:  25%|██▌       | 5/20 [00:00&lt;00:00, 56.24it/s]
+Testing DataLoader 0:  30%|███       | 6/20 [00:00&lt;00:00, 63.73it/s]
+Testing DataLoader 0:  35%|███▌      | 7/20 [00:00&lt;00:00, 68.96it/s]
+Testing DataLoader 0:  40%|████      | 8/20 [00:00&lt;00:00, 54.32it/s]
+Testing DataLoader 0:  45%|████▌     | 9/20 [00:00&lt;00:00, 46.65it/s]
+Testing DataLoader 0:  50%|█████     | 10/20 [00:00&lt;00:00, 41.91it/s]
+Testing DataLoader 0:  55%|█████▌    | 11/20 [00:00&lt;00:00, 38.73it/s]
+Testing DataLoader 0:  60%|██████    | 12/20 [00:00&lt;00:00, 36.53it/s]
+Testing DataLoader 0:  65%|██████▌   | 13/20 [00:00&lt;00:00, 34.88it/s]
+Testing DataLoader 0:  70%|███████   | 14/20 [00:00&lt;00:00, 33.59it/s]
+Testing DataLoader 0:  75%|███████▌  | 15/20 [00:00&lt;00:00, 32.55it/s]
+Testing DataLoader 0:  80%|████████  | 16/20 [00:00&lt;00:00, 31.69it/s]
+Testing DataLoader 0:  85%|████████▌ | 17/20 [00:00&lt;00:00, 30.96it/s]
+Testing DataLoader 0:  90%|█████████ | 18/20 [00:00&lt;00:00, 30.36it/s]
+Testing DataLoader 0:  95%|█████████▌| 19/20 [00:00&lt;00:00, 29.83it/s]
+Testing DataLoader 0: 100%|██████████| 20/20 [00:00&lt;00:00, 29.46it/s]
+Testing DataLoader 0:   0%|          | 0/51 [00:00&lt;?, ?it/s]
+Testing DataLoader 1:   0%|          | 0/51 [00:00&lt;?, ?it/s]
+Testing DataLoader 1:   2%|▏         | 1/51 [00:00&lt;00:00, 155.44it/s]
+Testing DataLoader 1:   4%|▍         | 2/51 [00:00&lt;00:00, 216.07it/s]
+Testing DataLoader 1:   6%|▌         | 3/51 [00:00&lt;00:01, 43.41it/s]
+Testing DataLoader 1:   8%|▊         | 4/51 [00:00&lt;00:00, 56.44it/s]
+Testing DataLoader 1:  10%|▉         | 5/51 [00:00&lt;00:00, 69.06it/s]
+Testing DataLoader 1:  12%|█▏        | 6/51 [00:00&lt;00:00, 81.17it/s]
+Testing DataLoader 1:  14%|█▎        | 7/51 [00:00&lt;00:00, 89.42it/s]
+Testing DataLoader 1:  16%|█▌        | 8/51 [00:00&lt;00:00, 96.72it/s]
+Testing DataLoader 1:  18%|█▊        | 9/51 [00:00&lt;00:00, 75.28it/s]
+Testing DataLoader 1:  20%|█▉        | 10/51 [00:00&lt;00:00, 61.23it/s]
+Testing DataLoader 1:  22%|██▏       | 11/51 [00:00&lt;00:00, 53.03it/s]
+Testing DataLoader 1:  24%|██▎       | 12/51 [00:00&lt;00:00, 47.76it/s]
+Testing DataLoader 1:  25%|██▌       | 13/51 [00:00&lt;00:00, 44.05it/s]
+Testing DataLoader 1:  27%|██▋       | 14/51 [00:00&lt;00:00, 41.29it/s]
+Testing DataLoader 1:  29%|██▉       | 15/51 [00:00&lt;00:00, 39.16it/s]
+Testing DataLoader 1:  31%|███▏      | 16/51 [00:00&lt;00:00, 37.47it/s]
+Testing DataLoader 1:  33%|███▎      | 17/51 [00:00&lt;00:00, 36.09it/s]
+Testing DataLoader 1:  35%|███▌      | 18/51 [00:00&lt;00:00, 34.96it/s]
+Testing DataLoader 1:  37%|███▋      | 19/51 [00:00&lt;00:00, 34.00it/s]
+Testing DataLoader 1:  39%|███▉      | 20/51 [00:00&lt;00:00, 33.17it/s]
+Testing DataLoader 1:  41%|████      | 21/51 [00:00&lt;00:00, 32.47it/s]
+Testing DataLoader 1:  43%|████▎     | 22/51 [00:00&lt;00:00, 31.85it/s]
+Testing DataLoader 1:  45%|████▌     | 23/51 [00:00&lt;00:00, 31.30it/s]
+Testing DataLoader 1:  47%|████▋     | 24/51 [00:00&lt;00:00, 30.82it/s]
+Testing DataLoader 1:  49%|████▉     | 25/51 [00:00&lt;00:00, 30.38it/s]
+Testing DataLoader 1:  51%|█████     | 26/51 [00:00&lt;00:00, 30.00it/s]
+Testing DataLoader 1:  53%|█████▎    | 27/51 [00:00&lt;00:00, 29.65it/s]
+Testing DataLoader 1:  55%|█████▍    | 28/51 [00:00&lt;00:00, 29.33it/s]
+Testing DataLoader 1:  57%|█████▋    | 29/51 [00:00&lt;00:00, 29.04it/s]
+Testing DataLoader 1:  59%|█████▉    | 30/51 [00:01&lt;00:00, 28.77it/s]
+Testing DataLoader 1:  61%|██████    | 31/51 [00:01&lt;00:00, 28.53it/s]
+Testing DataLoader 1:  63%|██████▎   | 32/51 [00:01&lt;00:00, 28.30it/s]
+Testing DataLoader 1:  65%|██████▍   | 33/51 [00:01&lt;00:00, 28.10it/s]
+Testing DataLoader 1:  67%|██████▋   | 34/51 [00:01&lt;00:00, 27.90it/s]
+Testing DataLoader 1:  69%|██████▊   | 35/51 [00:01&lt;00:00, 27.72it/s]
+Testing DataLoader 1:  71%|███████   | 36/51 [00:01&lt;00:00, 27.55it/s]
+Testing DataLoader 1:  73%|███████▎  | 37/51 [00:01&lt;00:00, 27.40it/s]
+Testing DataLoader 1:  75%|███████▍  | 38/51 [00:01&lt;00:00, 27.25it/s]
+Testing DataLoader 1:  76%|███████▋  | 39/51 [00:01&lt;00:00, 27.11it/s]
+Testing DataLoader 1:  78%|███████▊  | 40/51 [00:01&lt;00:00, 26.98it/s]
+Testing DataLoader 1:  80%|████████  | 41/51 [00:01&lt;00:00, 26.86it/s]
+Testing DataLoader 1:  82%|████████▏ | 42/51 [00:01&lt;00:00, 26.75it/s]
+Testing DataLoader 1:  84%|████████▍ | 43/51 [00:01&lt;00:00, 26.64it/s]
+Testing DataLoader 1:  86%|████████▋ | 44/51 [00:01&lt;00:00, 26.53it/s]
+Testing DataLoader 1:  88%|████████▊ | 45/51 [00:01&lt;00:00, 26.44it/s]
+Testing DataLoader 1:  90%|█████████ | 46/51 [00:01&lt;00:00, 26.34it/s]
+Testing DataLoader 1:  92%|█████████▏| 47/51 [00:01&lt;00:00, 26.25it/s]
+Testing DataLoader 1:  94%|█████████▍| 48/51 [00:01&lt;00:00, 26.17it/s]
+Testing DataLoader 1:  96%|█████████▌| 49/51 [00:01&lt;00:00, 26.09it/s]
+Testing DataLoader 1:  98%|█████████▊| 50/51 [00:01&lt;00:00, 26.01it/s]
+Testing DataLoader 1: 100%|██████████| 51/51 [00:01&lt;00:00, 25.94it/s]
+Testing DataLoader 1: 100%|██████████| 51/51 [00:02&lt;00:00, 22.73it/s]
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃      Classification       ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     Acc      │          93.380%          │
+│    Brier     │          0.10812          │
+│   Entropy    │          0.08849          │
+│     NLL      │          0.26408          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃        Calibration        ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     ECE      │          3.546%           │
+│     aECE     │          3.499%           │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃       OOD Detection       ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     AUPR     │          85.143%          │
+│    AUROC     │          73.895%          │
+│   Entropy    │          0.08849          │
+│    FPR95     │          79.620%          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃ Selective Classification  ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│    AUGRC     │          0.779%           │
+│     AURC     │          0.960%           │
+│  Cov@5Risk   │          96.520%          │
+│  Risk@80Cov  │          1.200%           │
+└──────────────┴───────────────────────────┘
+</pre></div>
+</div>
+<p>Note that you could create your own class if you want to implement a custom OOD detection score. When changing the
+Out-of-distribution criterion, all the In-distribution metrics remain the same. The only values that change
+are those of the regrouped in the OOD Detection category. Here we see that the AUPR, AUROC and FPR95 are worse using the maximum
+logit score compared to the maximum softmax probability but it could depend on the model you are using.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<p>[1] Hendrycks, D., &amp; Gimpel, K. (2016). A baseline for detecting misclassified and out-of-distribution examples in neural networks. In ICLR 2017.
+[2] Hendrycks, D., Basart, S., Mazeika, M., Zou, A., Kwon, J., Mostajabi, M., … &amp; Song, D. (2019). Scaling out-of-distribution detection for real-world settings. In ICML 2022.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 34.428 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-classification-tutorial-ood-detection-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/36ef1fded00eb519b0338678b78aa0f9/tutorial_ood_detection.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_ood_detection.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/3665aaef6c09b3ceb537220641e0ce36/tutorial_ood_detection.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_ood_detection.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/bc56ae199173f8458c17f080f3d31154/tutorial_ood_detection.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">tutorial_ood_detection.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="tutorial_evidential_classification.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Deep Evidential Classification on a Toy Example</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="tutorial_pe_cifar10.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">From a Standard Classifier to a Packed-Ensemble</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports-and-setup">Imports and Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#datamodule-setup">DataModule Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#model-initialization">Model Initialization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#define-the-classification-routine">Define the Classification Routine</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-the-training-of-the-model">Test the Training of the Model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-model-from-huggingface">Load the model from HuggingFace</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluating-on-in-distribution-and-out-of-distribution-data">Evaluating on In-Distribution and Out-of-distribution Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#changing-the-ood-criterion">Changing the OOD Criterion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/auto_tutorials/Classification/tutorial_ood_detection.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

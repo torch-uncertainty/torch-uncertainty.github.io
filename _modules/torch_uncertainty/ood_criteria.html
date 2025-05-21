@@ -1,0 +1,830 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>torch_uncertainty.ood_criteria &#8212; TorchUncertainty 0.5.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-codeautolink.css?v=b2176991" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/torch_uncertainty/ood_criteria';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="TorchUncertainty Logo"/>
+    <img src="../../_static/logo_dark.png" class="logo__image only-dark pst-js-only" alt="TorchUncertainty Logo"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../references.html">
+    References
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../references.html">
+    References
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">torch_uncertainty.ood_criteria</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for torch_uncertainty.ood_criteria</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">MutualInformation</span><span class="p">,</span> <span class="n">VariationRatio</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">OODCriterionInputType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enum representing the type of input expected by the OOD (Out-of-Distribution) criteria.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        LOGIT (int): The input of the OOD Criterion is in the form of logits (pre-softmax values).</span>
+<span class="sd">        PROB (int): The input is in the form of probabilities (post-softmax values), also called</span>
+<span class="sd">            likelihoods.</span>
+<span class="sd">        ESTIMATOR_PROB (int): The input is in the form of estimated probabilities from an ensemble</span>
+<span class="sd">            or another probabilistic model.</span>
+<span class="sd">        POST_PROCESSING (int): The input is the prediction score given by the post-processing</span>
+<span class="sd">            method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">LOGIT</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">PROB</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">ESTIMATOR_PROB</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">POST_PROCESSING</span> <span class="o">=</span> <span class="mi">4</span>
+
+
+<div class="viewcode-block" id="TUOODCriterion">
+<a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.TUOODCriterion.html#torch_uncertainty.ood_criteria.TUOODCriterion">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TUOODCriterion</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="n">input_type</span><span class="p">:</span> <span class="n">OODCriterionInputType</span>
+    <span class="n">single_only</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">ensemble_only</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Abstract base class for Out-of-Distribution (OOD) criteria.</span>
+
+<span class="sd">        This class defines a common interface for implementing various OOD detection</span>
+<span class="sd">        criteria. Subclasses must implement the `forward` method.</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">            input_type (OODCriterionInputType): Type of input expected by the criterion.</span>
+<span class="sd">            ensemble_only (bool): Whether the criterion requires ensemble outputs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TUOODCriterion.forward">
+<a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.TUOODCriterion.html#torch_uncertainty.ood_criteria.TUOODCriterion.forward">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass for the OOD criterion.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputs (Tensor): The input tensor representing model outputs.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: OOD score computed according to the criterion.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MaxLogitCriterion">
+<a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.MaxLogitCriterion.html#torch_uncertainty.ood_criteria.MaxLogitCriterion">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MaxLogitCriterion</span><span class="p">(</span><span class="n">TUOODCriterion</span><span class="p">):</span>
+    <span class="n">single_only</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">input_type</span> <span class="o">=</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">LOGIT</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;OOD criterion based on the maximum logit value.</span>
+
+<span class="sd">        This criterion computes the negative of the highest logit value across</span>
+<span class="sd">        the output dimensions. Lower maximum logits indicate greater uncertainty.</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">            input_type (OODCriterionInputType): Expected input type is logits.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MaxLogitCriterion.forward">
+<a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.MaxLogitCriterion.html#torch_uncertainty.ood_criteria.MaxLogitCriterion.forward">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the negative of the maximum logit value.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputs (Tensor): Tensor of logits with shape (batch_size, num_classes).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: Negative of the maximum logit value for each sample.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">inputs</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="EnergyCriterion">
+<a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.EnergyCriterion.html#torch_uncertainty.ood_criteria.EnergyCriterion">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyCriterion</span><span class="p">(</span><span class="n">TUOODCriterion</span><span class="p">):</span>
+    <span class="n">single_only</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">input_type</span> <span class="o">=</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">LOGIT</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;OOD criterion based on the energy function.</span>
+
+<span class="sd">        This criterion computes the negative log-sum-exp of the logits.</span>
+<span class="sd">        Higher energy values indicate greater uncertainty.</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            E(\mathbf{z}) = -\log\left(\sum_{i=1}^{C} \exp(z_i)\right)</span>
+
+<span class="sd">        where :math:`\mathbf{z} = [z_1, z_2, \dots, z_C]` is the logit vector.</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">            input_type (OODCriterionInputType): Expected input type is logits.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="EnergyCriterion.forward">
+<a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.EnergyCriterion.html#torch_uncertainty.ood_criteria.EnergyCriterion.forward">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the negative energy score.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputs (Tensor): Tensor of logits with shape (batch_size, num_classes).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: Negative energy score for each sample.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">inputs</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MaxSoftmaxCriterion">
+<a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.MaxSoftmaxCriterion.html#torch_uncertainty.ood_criteria.MaxSoftmaxCriterion">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MaxSoftmaxCriterion</span><span class="p">(</span><span class="n">TUOODCriterion</span><span class="p">):</span>
+    <span class="n">input_type</span> <span class="o">=</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">PROB</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;OOD criterion based on maximum softmax probability.</span>
+
+<span class="sd">        This criterion computes the negative of the highest softmax probability.</span>
+<span class="sd">        Lower maximum probabilities indicate greater uncertainty. Probabilities are also called*</span>
+<span class="sd">        likelihoods in a more formal context.</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \text{score} = -\max_{i}(p_i)</span>
+
+<span class="sd">        where :math:`\mathbf{p} = [p_1, p_2, \dots, p_C]` is the probability vector.</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">            input_type (OODCriterionInputType): Expected input type is probabilities.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MaxSoftmaxCriterion.forward">
+<a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.MaxSoftmaxCriterion.html#torch_uncertainty.ood_criteria.MaxSoftmaxCriterion.forward">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the negative of the maximum softmax probability.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputs (Tensor): Tensor of probabilities with shape (batch_size, num_classes).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: Negative of the highest softmax probability for each sample.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">inputs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PostProcessingCriterion">
+<a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.PostProcessingCriterion.html#torch_uncertainty.ood_criteria.PostProcessingCriterion">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PostProcessingCriterion</span><span class="p">(</span><span class="n">MaxSoftmaxCriterion</span><span class="p">):</span>
+    <span class="n">input_type</span> <span class="o">=</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">POST_PROCESSING</span></div>
+
+
+
+<div class="viewcode-block" id="EntropyCriterion">
+<a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.EntropyCriterion.html#torch_uncertainty.ood_criteria.EntropyCriterion">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EntropyCriterion</span><span class="p">(</span><span class="n">TUOODCriterion</span><span class="p">):</span>
+    <span class="n">input_type</span> <span class="o">=</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">ESTIMATOR_PROB</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;OOD criterion based on entropy.</span>
+
+<span class="sd">        This criterion computes the mean entropy of the predicted probability distribution.</span>
+<span class="sd">        Higher entropy values indicate greater uncertainty.</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            H(\mathbf{p}) = -\sum_{i=1}^{C} p_i \log(p_i)</span>
+
+<span class="sd">        where :math:`\mathbf{p} = [p_1, p_2, \dots, p_C]` is the probability vector.</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">            input_type (OODCriterionInputType): Expected input type is estimated probabilities.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="EntropyCriterion.forward">
+<a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.EntropyCriterion.html#torch_uncertainty.ood_criteria.EntropyCriterion.forward">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the entropy of the predicted probability distribution.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputs (Tensor): Tensor of estimated probabilities with shape (batch_size, num_classes).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: Mean entropy value for each sample.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">entr</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MutualInformationCriterion">
+<a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.MutualInformationCriterion.html#torch_uncertainty.ood_criteria.MutualInformationCriterion">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MutualInformationCriterion</span><span class="p">(</span><span class="n">TUOODCriterion</span><span class="p">):</span>
+    <span class="n">ensemble_only</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">input_type</span> <span class="o">=</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">ESTIMATOR_PROB</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;OOD criterion based on mutual information.</span>
+
+<span class="sd">        This criterion computes the mutual information between ensemble predictions.</span>
+<span class="sd">        Higher mutual information values indicate lower uncertainty.</span>
+
+<span class="sd">        Given ensemble predictions :math:`\{\mathbf{p}^{(k)}\}_{k=1}^{K}`, the mutual information is computed as:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            I(y, \theta) = H\Big(\frac{1}{K}\sum_{k=1}^{K} \mathbf{p}^{(k)}\Big) - \frac{1}{K}\sum_{k=1}^{K} H(\mathbf{p}^{(k)})</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">            ensemble_only (bool): Requires ensemble predictions.</span>
+<span class="sd">            input_type (OODCriterionInputType): Expected input type is estimated probabilities.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mi_metric</span> <span class="o">=</span> <span class="n">MutualInformation</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MutualInformationCriterion.forward">
+<a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.MutualInformationCriterion.html#torch_uncertainty.ood_criteria.MutualInformationCriterion.forward">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute mutual information from ensemble predictions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputs (Tensor): Tensor of ensemble probabilities with shape</span>
+<span class="sd">                (ensemble_size, batch_size, num_classes).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: Mutual information for each sample.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mi_metric</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="VariationRatioCriterion">
+<a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.VariationRatioCriterion.html#torch_uncertainty.ood_criteria.VariationRatioCriterion">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">VariationRatioCriterion</span><span class="p">(</span><span class="n">TUOODCriterion</span><span class="p">):</span>
+    <span class="n">ensemble_only</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">input_type</span> <span class="o">=</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">ESTIMATOR_PROB</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;OOD criterion based on variation ratio.</span>
+
+<span class="sd">        This criterion computes the variation ratio from ensemble predictions.</span>
+<span class="sd">        Higher variation ratio values indicate greater uncertainty.</span>
+
+<span class="sd">        Given ensemble predictions where :math:`n_{\text{mode}}` is the count of the most frequently</span>
+<span class="sd">        predicted class among :math:`K` predictions, the variation ratio is computed as:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \text{VR} = 1 - \frac{n_{\text{mode}}}{K}</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">            ensemble_only (bool): Requires ensemble predictions.</span>
+<span class="sd">            input_type (OODCriterionInputType): Expected input type is estimated probabilities.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vr_metric</span> <span class="o">=</span> <span class="n">VariationRatio</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">probabilistic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<div class="viewcode-block" id="VariationRatioCriterion.forward">
+<a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.VariationRatioCriterion.html#torch_uncertainty.ood_criteria.VariationRatioCriterion.forward">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute variation ratio from ensemble predictions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputs (Tensor): Tensor of ensemble probabilities with shape</span>
+<span class="sd">                (ensemble_size, batch_size, num_classes).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: Variation ratio for each sample.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vr_metric</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span></div>
+</div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_ood_criterion</span><span class="p">(</span><span class="n">ood_criterion</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TUOODCriterion</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TUOODCriterion</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get an OOD criterion instance based on a string identifier or class type.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ood_criterion (str or type): A string identifier for a predefined OOD criterion</span>
+<span class="sd">            or a subclass of `TUOODCriterion`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        TUOODCriterion: An instance of the requested OOD criterion.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the input string or class type is invalid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ood_criterion</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ood_criterion</span> <span class="o">==</span> <span class="s2">&quot;logit&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MaxLogitCriterion</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ood_criterion</span> <span class="o">==</span> <span class="s2">&quot;energy&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">EnergyCriterion</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ood_criterion</span> <span class="o">==</span> <span class="s2">&quot;msp&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MaxSoftmaxCriterion</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ood_criterion</span> <span class="o">==</span> <span class="s2">&quot;post_processing&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">PostProcessingCriterion</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ood_criterion</span> <span class="o">==</span> <span class="s2">&quot;entropy&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">EntropyCriterion</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ood_criterion</span> <span class="o">==</span> <span class="s2">&quot;mutual_information&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MutualInformationCriterion</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ood_criterion</span> <span class="o">==</span> <span class="s2">&quot;variation_ratio&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">VariationRatioCriterion</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The OOD criterion must be one of &#39;msp&#39;, &#39;logit&#39;, &#39;energy&#39;, &#39;entropy&#39;,&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; &#39;mutual_information&#39; or &#39;variation_ratio&#39;. Got </span><span class="si">{</span><span class="n">ood_criterion</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ood_criterion</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ood_criterion</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ood_criterion</span><span class="p">,</span> <span class="n">TUOODCriterion</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ood_criterion</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;The OOD criterion should be a string or a subclass of TUOODCriterion. Got </span><span class="si">{</span><span class="n">ood_criterion</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="p">)</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

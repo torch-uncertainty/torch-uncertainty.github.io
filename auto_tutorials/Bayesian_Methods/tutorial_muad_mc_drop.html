@@ -1,0 +1,1229 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Monte Carlo Dropout for Semantic Segmentation on MUAD &#8212; TorchUncertainty 0.5.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-codeautolink.css?v=b2176991" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_tutorials/Bayesian_Methods/tutorial_muad_mc_drop';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Ensemble Methods" href="../Ensemble_Methods/index.html" />
+    <link rel="prev" title="Training a LeNet with Monte-Carlo Dropout" href="tutorial_mc_dropout.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="TorchUncertainty Logo"/>
+    <img src="../../_static/logo_dark.png" class="logo__image only-dark pst-js-only" alt="TorchUncertainty Logo"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../references.html">
+    References
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../references.html">
+    References
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Classification/index.html">Classification</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_bayesian.html">Train a Bayesian Neural Network in 20 seconds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_classification.html">Training a LeNet for Image Classification with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_distribution_shift.html">Evaluating Model Performance Under Distribution Shift with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_evidential_classification.html">Deep Evidential Classification on a Toy Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_ood_detection.html">Out-of-distribution detection with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_pe_cifar10.html">From a Standard Classifier to a Packed-Ensemble</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Regression/index.html">Regression with Uncertainty</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Regression/tutorial_der_cubic.html">Deep Evidential Regression on a Toy Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Regression/tutorial_probabilistic_regression.html">Deep Probabilistic Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Regression/tutorial_regression.html">Training an MLP for Tabular Regression with TorchUncertainty</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Post_Hoc_Methods/index.html">Post-hoc Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scaler.html">Improve Top-label Calibration with Temperature Scaling</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Bayesian Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tutorial_bayesian.html">Train a Bayesian Neural Network in Three Minutes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_mc_batch_norm.html">Training a LeNet with Monte Carlo Batch Normalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_mc_dropout.html">Training a LeNet with Monte-Carlo Dropout</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Monte Carlo Dropout for Semantic Segmentation on MUAD</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Ensemble_Methods/index.html">Ensemble Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Ensemble_Methods/tutorial_from_de_to_pe.html">Improved Ensemble parameter-efficiency with Packed-Ensembles</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Segmentation/index.html">Segmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Segmentation/tutorial_muad_deep_en.html">Deep ensembles Segmentation Tutorial using Muad Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Segmentation/tutorial_muad_packed.html">Packed ensembles Segmentation Tutorial using Muad Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Segmentation/tutorial_muad_seg.html">Segmentation Tutorial using Muad Dataset</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Data_Augmentation/index.html">Data Augmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Data_Augmentation/tutorial_corruption.html">Corrupting Images with TorchUncertainty to Benchmark Robustness</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+        <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Bayesian Methods</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Monte Carlo Dropout for Semantic Segmentation on MUAD</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-tutorials-bayesian-methods-tutorial-muad-mc-drop-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="monte-carlo-dropout-for-semantic-segmentation-on-muad">
+<span id="sphx-glr-auto-tutorials-bayesian-methods-tutorial-muad-mc-drop-py"></span><h1>Monte Carlo Dropout for Semantic Segmentation on MUAD<a class="headerlink" href="#monte-carlo-dropout-for-semantic-segmentation-on-muad" title="Link to this heading">#</a></h1>
+<p>This tutorial demonstrates how to train a segmentation model on the MUAD dataset using TorchUncertainty.
+MUAD is a synthetic dataset designed for evaluating autonomous driving under diverse uncertainties.
+It includes <strong>10,413 images</strong> across training, validation, and test sets, featuring adverse weather,
+lighting conditions, and out-of-distribution (OOD) objects. The dataset supports tasks like semantic segmentation,
+depth estimation, and object detection.</p>
+<p>For details and access, visit the <a class="reference external" href="https://muad-dataset.github.io/">MUAD Website</a>.</p>
+<section id="loading-the-utilities">
+<h2>1. Loading the utilities<a class="headerlink" href="#loading-the-utilities" title="Link to this heading">#</a></h2>
+<p>First, we load the following utilities from TorchUncertainty:</p>
+<ul class="simple">
+<li><p>the TUTrainer which mostly handles the link with the hardware (accelerators, precision, etc)</p></li>
+<li><p>the segmentation training &amp; evaluation routine from torch_uncertainty.routines</p></li>
+<li><p>the datamodule handling dataloaders: MUADDataModule from torch_uncertainty.datamodules</p></li>
+<li><p>the model: small_unet from torch_uncertainty.models.segmentation.unet</p></li>
+<li><p>the MC Dropout wrapper from torch_uncertainty.models</p></li>
+</ul>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torchvision.transforms.v2.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">huggingface_hub</span><span class="w"> </span><span class="kn">import</span> <span class="n">hf_hub_download</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">optim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="kn">import</span> <span class="n">lr_scheduler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision</span><span class="w"> </span><span class="kn">import</span> <span class="n">tv_tensors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision.transforms</span><span class="w"> </span><span class="kn">import</span> <span class="n">v2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw_segmentation_masks</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty</span><span class="w"> </span><span class="kn">import</span> <span class="n">TUTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.datamodules.segmentation</span><span class="w"> </span><span class="kn">import</span> <span class="n">MUADDataModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">mc_dropout</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models.segmentation.unet</span><span class="w"> </span><span class="kn">import</span> <span class="n">small_unet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.routines</span><span class="w"> </span><span class="kn">import</span> <span class="n">SegmentationRoutine</span>
+</pre></div>
+</div>
+</section>
+<section id="initializing-the-datamodule">
+<h2>2. Initializing the DataModule<a class="headerlink" href="#initializing-the-datamodule" title="Link to this heading">#</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">muad_mean</span> <span class="o">=</span> <span class="n">MUADDataModule</span><span class="o">.</span><span class="n">mean</span>
+<span class="n">muad_std</span> <span class="o">=</span> <span class="n">MUADDataModule</span><span class="o">.</span><span class="n">std</span>
+
+<span class="n">train_transform</span> <span class="o">=</span> <span class="n">v2</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">v2</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span> <span class="n">antialias</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">v2</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
+        <span class="n">v2</span><span class="o">.</span><span class="n">ToDtype</span><span class="p">(</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="p">{</span>
+                <span class="n">tv_tensors</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                <span class="n">tv_tensors</span><span class="o">.</span><span class="n">Mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+                <span class="s2">&quot;others&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">v2</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">muad_mean</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="n">muad_std</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">test_transform</span> <span class="o">=</span> <span class="n">v2</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">v2</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span> <span class="n">antialias</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">v2</span><span class="o">.</span><span class="n">ToDtype</span><span class="p">(</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="p">{</span>
+                <span class="n">tv_tensors</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                <span class="n">tv_tensors</span><span class="o">.</span><span class="n">Mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+                <span class="s2">&quot;others&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">v2</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">muad_mean</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="n">muad_std</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="c1"># datamodule providing the dataloaders to the trainer</span>
+<span class="n">datamodule</span> <span class="o">=</span> <span class="n">MUADDataModule</span><span class="p">(</span>
+    <span class="n">root</span><span class="o">=</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;small&quot;</span><span class="p">,</span>
+    <span class="n">train_transform</span><span class="o">=</span><span class="n">train_transform</span><span class="p">,</span>
+    <span class="n">test_transform</span><span class="o">=</span><span class="n">test_transform</span><span class="p">,</span>
+    <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">datamodule</span><span class="o">.</span><span class="n">prepare_data</span><span class="p">()</span>
+<span class="n">datamodule</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="s2">&quot;fit&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Visualize a validation input sample (and RGB image)</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Undo normalization on the image and convert to uint8.</span>
+<span class="n">img</span><span class="p">,</span> <span class="n">tgt</span> <span class="o">=</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">train</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">t_muad_mean</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">muad_mean</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">img</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+<span class="n">t_muad_std</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">muad_std</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">img</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">img</span> <span class="o">*</span> <span class="n">t_muad_std</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">t_muad_mean</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_dtype</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">img_pil</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_pil_image</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img_pil</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_tutorial_muad_mc_drop_001.png" srcset="../../_images/sphx_glr_tutorial_muad_mc_drop_001.png" alt="tutorial muad mc drop" class = "sphx-glr-single-img"/><p>Visualize the same image above but segmented.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tmp_tgt</span> <span class="o">=</span> <span class="n">tgt</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">tgt</span> <span class="o">==</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>
+<span class="n">tgt_masks</span> <span class="o">=</span> <span class="n">tmp_tgt</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">tgt</span><span class="o">.</span><span class="n">device</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">img_segmented</span> <span class="o">=</span> <span class="n">draw_segmentation_masks</span><span class="p">(</span>
+    <span class="n">img</span><span class="p">,</span> <span class="n">tgt_masks</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">color_palette</span>
+<span class="p">)</span>
+<span class="n">img_pil</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_pil_image</span><span class="p">(</span><span class="n">img_segmented</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img_pil</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_tutorial_muad_mc_drop_002.png" srcset="../../_images/sphx_glr_tutorial_muad_mc_drop_002.png" alt="tutorial muad mc drop" class = "sphx-glr-single-img"/></section>
+<section id="instantiating-the-model">
+<h2>3. Instantiating the Model<a class="headerlink" href="#instantiating-the-model" title="Link to this heading">#</a></h2>
+<p>We create the model easily using the blueprint from torch_uncertainty.models.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">small_unet</span><span class="p">(</span>
+    <span class="n">in_channels</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span>
+    <span class="n">num_classes</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+    <span class="n">bilinear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">dropout_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># We use dropout to enable MC Dropout later</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="compute-class-weights-to-mitigate-class-inbalance">
+<h2>4. Compute class weights to mitigate class inbalance<a class="headerlink" href="#compute-class-weights-to-mitigate-class-inbalance" title="Link to this heading">#</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">enet_weighing</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">1.02</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes class weights as described in the ENet paper.</span>
+
+<span class="sd">        w_class = 1 / (ln(c + p_class)),</span>
+
+<span class="sd">    where c is usually 1.02 and p_class is the propensity score of that</span>
+<span class="sd">    class:</span>
+
+<span class="sd">        propensity_score = freq_class / total_pixels.</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        https://arxiv.org/abs/1606.02147</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataloader (``data.Dataloader``): A data loader to iterate over the</span>
+<span class="sd">            dataset.</span>
+<span class="sd">        num_classes (``int``): The number of classes.</span>
+<span class="sd">        c (``int``, optional): AN additional hyper-parameter which restricts</span>
+<span class="sd">            the interval of values for the weights. Default: 1.02.</span>
+<span class="sd">        ignore_indexes (``list``, optional): A list of indexes to ignore</span>
+<span class="sd">            when computing the weights. Default to `None`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">class_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+        <span class="c1"># Flatten label</span>
+        <span class="n">flat_label</span> <span class="o">=</span> <span class="n">label</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">flat_label</span> <span class="o">=</span> <span class="n">flat_label</span><span class="p">[</span><span class="n">flat_label</span> <span class="o">!=</span> <span class="mi">255</span><span class="p">]</span>
+        <span class="n">flat_label</span> <span class="o">=</span> <span class="n">flat_label</span><span class="p">[</span><span class="n">flat_label</span> <span class="o">&lt;</span> <span class="n">num_classes</span><span class="p">]</span>
+
+        <span class="c1"># Sum up the number of pixels of each class and the total pixel</span>
+        <span class="c1"># counts for each label</span>
+        <span class="n">class_count</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">flat_label</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">num_classes</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">+=</span> <span class="n">flat_label</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Compute propensity score and then the weights for each class</span>
+    <span class="n">propensity_score</span> <span class="o">=</span> <span class="n">class_count</span> <span class="o">/</span> <span class="n">total</span>
+
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="n">propensity_score</span><span class="p">))</span>
+
+
+<span class="n">class_weights</span> <span class="o">=</span> <span class="n">enet_weighing</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">(),</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">class_weights</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([ 4.3817, 19.7927,  3.3011, 48.8031, 36.2141, 33.0049, 47.5130, 48.8560,
+        12.4401, 48.0600, 14.4807, 30.8762,  4.7467, 19.3913, 50.4984])
+</pre></div>
+</div>
+<p>Let’s define the training parameters.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">LEARNING_RATE</span> <span class="o">=</span> <span class="mf">1e-3</span>
+<span class="n">WEIGHT_DECAY</span> <span class="o">=</span> <span class="mf">2e-4</span>
+<span class="n">LR_DECAY_EPOCHS</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">LR_DECAY</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">NB_EPOCHS</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</section>
+<section id="the-loss-the-routine-and-the-trainer">
+<h2>5. The Loss, the Routine, and the Trainer<a class="headerlink" href="#the-loss-the-routine-and-the-trainer" title="Link to this heading">#</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># We build the optimizer</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">LEARNING_RATE</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="n">WEIGHT_DECAY</span><span class="p">)</span>
+
+<span class="c1"># Learning rate decay scheduler</span>
+<span class="n">lr_updater</span> <span class="o">=</span> <span class="n">lr_scheduler</span><span class="o">.</span><span class="n">StepLR</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="n">LR_DECAY_EPOCHS</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">LR_DECAY</span><span class="p">)</span>
+
+<span class="c1"># Segmentation Routine</span>
+<span class="n">seg_routine</span> <span class="o">=</span> <span class="n">SegmentationRoutine</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">num_classes</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+    <span class="n">loss</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">(</span><span class="n">weight</span><span class="o">=</span><span class="n">class_weights</span><span class="p">),</span>
+    <span class="n">optim_recipe</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="n">optimizer</span><span class="p">,</span> <span class="s2">&quot;lr_scheduler&quot;</span><span class="p">:</span> <span class="n">lr_updater</span><span class="p">},</span>
+<span class="p">)</span>
+
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">TUTrainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="n">devices</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="n">NB_EPOCHS</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="training-the-model">
+<h2>6. Training the model<a class="headerlink" href="#training-the-model" title="Link to this heading">#</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">seg_routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Sanity Checking: |          | 0/? [00:00&lt;?, ?it/s]
+Sanity Checking:   0%|          | 0/2 [00:00&lt;?, ?it/s]
+Sanity Checking DataLoader 0:   0%|          | 0/2 [00:00&lt;?, ?it/s]
+Sanity Checking DataLoader 0:  50%|█████     | 1/2 [00:00&lt;00:00, 10.28it/s]
+Sanity Checking DataLoader 0: 100%|██████████| 2/2 [00:00&lt;00:00, 10.84it/s]
+
+
+Training: |          | 0/? [00:00&lt;?, ?it/s]
+Training:   0%|          | 0/40 [00:00&lt;?, ?it/s]
+Epoch 0:   0%|          | 0/40 [00:00&lt;?, ?it/s]
+Epoch 0:   2%|▎         | 1/40 [00:01&lt;01:11,  0.54it/s]
+Epoch 0:   2%|▎         | 1/40 [00:01&lt;01:14,  0.53it/s, v_num=3, train_loss=2.780]
+Epoch 0:   5%|▌         | 2/40 [00:02&lt;00:38,  0.98it/s, v_num=3, train_loss=2.780]
+Epoch 0:   5%|▌         | 2/40 [00:02&lt;00:41,  0.91it/s, v_num=3, train_loss=2.480]
+Epoch 0:   8%|▊         | 3/40 [00:02&lt;00:28,  1.28it/s, v_num=3, train_loss=2.480]
+Epoch 0:   8%|▊         | 3/40 [00:02&lt;00:31,  1.19it/s, v_num=3, train_loss=2.540]
+Epoch 0:  10%|█         | 4/40 [00:02&lt;00:23,  1.51it/s, v_num=3, train_loss=2.540]
+Epoch 0:  10%|█         | 4/40 [00:02&lt;00:25,  1.42it/s, v_num=3, train_loss=2.420]
+Epoch 0:  12%|█▎        | 5/40 [00:03&lt;00:22,  1.58it/s, v_num=3, train_loss=2.420]
+Epoch 0:  12%|█▎        | 5/40 [00:03&lt;00:23,  1.50it/s, v_num=3, train_loss=2.350]
+Epoch 0:  15%|█▌        | 6/40 [00:03&lt;00:19,  1.73it/s, v_num=3, train_loss=2.350]
+Epoch 0:  15%|█▌        | 6/40 [00:03&lt;00:20,  1.64it/s, v_num=3, train_loss=2.180]
+Epoch 0:  18%|█▊        | 7/40 [00:03&lt;00:17,  1.85it/s, v_num=3, train_loss=2.180]
+Epoch 0:  18%|█▊        | 7/40 [00:03&lt;00:18,  1.77it/s, v_num=3, train_loss=2.190]
+Epoch 0:  20%|██        | 8/40 [00:04&lt;00:16,  1.96it/s, v_num=3, train_loss=2.190]
+Epoch 0:  20%|██        | 8/40 [00:04&lt;00:17,  1.88it/s, v_num=3, train_loss=2.220]
+Epoch 0:  22%|██▎       | 9/40 [00:04&lt;00:15,  1.94it/s, v_num=3, train_loss=2.220]
+Epoch 0:  22%|██▎       | 9/40 [00:04&lt;00:16,  1.87it/s, v_num=3, train_loss=2.100]
+Epoch 0:  25%|██▌       | 10/40 [00:04&lt;00:14,  2.02it/s, v_num=3, train_loss=2.100]
+Epoch 0:  25%|██▌       | 10/40 [00:05&lt;00:15,  1.96it/s, v_num=3, train_loss=2.170]
+Epoch 0:  28%|██▊       | 11/40 [00:05&lt;00:13,  2.10it/s, v_num=3, train_loss=2.170]
+Epoch 0:  28%|██▊       | 11/40 [00:05&lt;00:14,  2.03it/s, v_num=3, train_loss=2.230]
+Epoch 0:  30%|███       | 12/40 [00:05&lt;00:12,  2.16it/s, v_num=3, train_loss=2.230]
+Epoch 0:  30%|███       | 12/40 [00:05&lt;00:13,  2.10it/s, v_num=3, train_loss=2.220]
+Epoch 0:  32%|███▎      | 13/40 [00:06&lt;00:12,  2.13it/s, v_num=3, train_loss=2.220]
+Epoch 0:  32%|███▎      | 13/40 [00:06&lt;00:13,  2.07it/s, v_num=3, train_loss=2.070]
+Epoch 0:  35%|███▌      | 14/40 [00:06&lt;00:11,  2.18it/s, v_num=3, train_loss=2.070]
+Epoch 0:  35%|███▌      | 14/40 [00:06&lt;00:12,  2.12it/s, v_num=3, train_loss=2.020]
+Epoch 0:  38%|███▊      | 15/40 [00:06&lt;00:11,  2.23it/s, v_num=3, train_loss=2.020]
+Epoch 0:  38%|███▊      | 15/40 [00:06&lt;00:11,  2.17it/s, v_num=3, train_loss=2.030]
+Epoch 0:  40%|████      | 16/40 [00:07&lt;00:10,  2.27it/s, v_num=3, train_loss=2.030]
+Epoch 0:  40%|████      | 16/40 [00:07&lt;00:10,  2.22it/s, v_num=3, train_loss=2.000]
+Epoch 0:  42%|████▎     | 17/40 [00:07&lt;00:10,  2.24it/s, v_num=3, train_loss=2.000]
+Epoch 0:  42%|████▎     | 17/40 [00:07&lt;00:10,  2.19it/s, v_num=3, train_loss=2.080]
+Epoch 0:  45%|████▌     | 18/40 [00:07&lt;00:09,  2.28it/s, v_num=3, train_loss=2.080]
+Epoch 0:  45%|████▌     | 18/40 [00:08&lt;00:09,  2.23it/s, v_num=3, train_loss=2.030]
+Epoch 0:  48%|████▊     | 19/40 [00:08&lt;00:09,  2.32it/s, v_num=3, train_loss=2.030]
+Epoch 0:  48%|████▊     | 19/40 [00:08&lt;00:09,  2.27it/s, v_num=3, train_loss=1.990]
+Epoch 0:  50%|█████     | 20/40 [00:08&lt;00:08,  2.35it/s, v_num=3, train_loss=1.990]
+Epoch 0:  50%|█████     | 20/40 [00:08&lt;00:08,  2.31it/s, v_num=3, train_loss=2.150]
+Epoch 0:  52%|█████▎    | 21/40 [00:09&lt;00:08,  2.32it/s, v_num=3, train_loss=2.150]
+Epoch 0:  52%|█████▎    | 21/40 [00:09&lt;00:08,  2.28it/s, v_num=3, train_loss=1.950]
+Epoch 0:  55%|█████▌    | 22/40 [00:09&lt;00:07,  2.35it/s, v_num=3, train_loss=1.950]
+Epoch 0:  55%|█████▌    | 22/40 [00:09&lt;00:07,  2.31it/s, v_num=3, train_loss=1.810]
+Epoch 0:  57%|█████▊    | 23/40 [00:09&lt;00:07,  2.38it/s, v_num=3, train_loss=1.810]
+Epoch 0:  57%|█████▊    | 23/40 [00:09&lt;00:07,  2.34it/s, v_num=3, train_loss=1.870]
+Epoch 0:  60%|██████    | 24/40 [00:09&lt;00:06,  2.40it/s, v_num=3, train_loss=1.870]
+Epoch 0:  60%|██████    | 24/40 [00:10&lt;00:06,  2.36it/s, v_num=3, train_loss=2.130]
+Epoch 0:  62%|██████▎   | 25/40 [00:10&lt;00:06,  2.37it/s, v_num=3, train_loss=2.130]
+Epoch 0:  62%|██████▎   | 25/40 [00:10&lt;00:06,  2.33it/s, v_num=3, train_loss=2.040]
+Epoch 0:  65%|██████▌   | 26/40 [00:10&lt;00:05,  2.40it/s, v_num=3, train_loss=2.040]
+Epoch 0:  65%|██████▌   | 26/40 [00:11&lt;00:05,  2.36it/s, v_num=3, train_loss=1.840]
+Epoch 0:  68%|██████▊   | 27/40 [00:11&lt;00:05,  2.42it/s, v_num=3, train_loss=1.840]
+Epoch 0:  68%|██████▊   | 27/40 [00:11&lt;00:05,  2.38it/s, v_num=3, train_loss=1.890]
+Epoch 0:  70%|███████   | 28/40 [00:11&lt;00:04,  2.44it/s, v_num=3, train_loss=1.890]
+Epoch 0:  70%|███████   | 28/40 [00:11&lt;00:04,  2.41it/s, v_num=3, train_loss=1.900]
+Epoch 0:  72%|███████▎  | 29/40 [00:11&lt;00:04,  2.43it/s, v_num=3, train_loss=1.900]
+Epoch 0:  72%|███████▎  | 29/40 [00:12&lt;00:04,  2.39it/s, v_num=3, train_loss=1.840]
+Epoch 0:  75%|███████▌  | 30/40 [00:12&lt;00:04,  2.45it/s, v_num=3, train_loss=1.840]
+Epoch 0:  75%|███████▌  | 30/40 [00:12&lt;00:04,  2.41it/s, v_num=3, train_loss=1.960]
+Epoch 0:  78%|███████▊  | 31/40 [00:12&lt;00:03,  2.47it/s, v_num=3, train_loss=1.960]
+Epoch 0:  78%|███████▊  | 31/40 [00:12&lt;00:03,  2.43it/s, v_num=3, train_loss=1.890]
+Epoch 0:  80%|████████  | 32/40 [00:12&lt;00:03,  2.49it/s, v_num=3, train_loss=1.890]
+Epoch 0:  80%|████████  | 32/40 [00:13&lt;00:03,  2.45it/s, v_num=3, train_loss=1.840]
+Epoch 0:  82%|████████▎ | 33/40 [00:13&lt;00:02,  2.46it/s, v_num=3, train_loss=1.840]
+Epoch 0:  82%|████████▎ | 33/40 [00:13&lt;00:02,  2.43it/s, v_num=3, train_loss=1.710]
+Epoch 0:  85%|████████▌ | 34/40 [00:13&lt;00:02,  2.48it/s, v_num=3, train_loss=1.710]
+Epoch 0:  85%|████████▌ | 34/40 [00:13&lt;00:02,  2.45it/s, v_num=3, train_loss=1.890]
+Epoch 0:  88%|████████▊ | 35/40 [00:14&lt;00:02,  2.50it/s, v_num=3, train_loss=1.890]
+Epoch 0:  88%|████████▊ | 35/40 [00:14&lt;00:02,  2.47it/s, v_num=3, train_loss=1.790]
+Epoch 0:  90%|█████████ | 36/40 [00:14&lt;00:01,  2.51it/s, v_num=3, train_loss=1.790]
+Epoch 0:  90%|█████████ | 36/40 [00:14&lt;00:01,  2.49it/s, v_num=3, train_loss=1.720]
+Epoch 0:  92%|█████████▎| 37/40 [00:14&lt;00:01,  2.49it/s, v_num=3, train_loss=1.720]
+Epoch 0:  92%|█████████▎| 37/40 [00:15&lt;00:01,  2.46it/s, v_num=3, train_loss=1.720]
+Epoch 0:  95%|█████████▌| 38/40 [00:15&lt;00:00,  2.50it/s, v_num=3, train_loss=1.720]
+Epoch 0:  95%|█████████▌| 38/40 [00:15&lt;00:00,  2.48it/s, v_num=3, train_loss=1.900]
+Epoch 0:  98%|█████████▊| 39/40 [00:15&lt;00:00,  2.52it/s, v_num=3, train_loss=1.900]
+Epoch 0:  98%|█████████▊| 39/40 [00:15&lt;00:00,  2.49it/s, v_num=3, train_loss=1.800]
+Epoch 0: 100%|██████████| 40/40 [00:15&lt;00:00,  2.53it/s, v_num=3, train_loss=1.800]
+Epoch 0: 100%|██████████| 40/40 [00:15&lt;00:00,  2.51it/s, v_num=3, train_loss=1.750]
+
+Validation: |          | 0/? [00:00&lt;?, ?it/s]
+
+Validation:   0%|          | 0/6 [00:00&lt;?, ?it/s]
+
+Validation DataLoader 0:   0%|          | 0/6 [00:00&lt;?, ?it/s]
+
+Validation DataLoader 0:  17%|█▋        | 1/6 [00:00&lt;00:00, 11.73it/s]
+
+Validation DataLoader 0:  33%|███▎      | 2/6 [00:00&lt;00:00, 11.67it/s]
+
+Validation DataLoader 0:  50%|█████     | 3/6 [00:00&lt;00:00, 11.65it/s]
+
+Validation DataLoader 0:  67%|██████▋   | 4/6 [00:00&lt;00:00, 11.63it/s]
+
+Validation DataLoader 0:  83%|████████▎ | 5/6 [00:01&lt;00:00,  3.40it/s]
+
+Validation DataLoader 0: 100%|██████████| 6/6 [00:01&lt;00:00,  4.00it/s]
+
+
+Epoch 0: 100%|██████████| 40/40 [00:18&lt;00:00,  2.11it/s, v_num=3, train_loss=1.750, mIoU%=14.80]
+Epoch 0: 100%|██████████| 40/40 [00:18&lt;00:00,  2.11it/s, v_num=3, train_loss=1.750, mIoU%=14.80]
+Epoch 0: 100%|██████████| 40/40 [00:19&lt;00:00,  2.10it/s, v_num=3, train_loss=1.750, mIoU%=14.80]
+</pre></div>
+</div>
+</section>
+<section id="testing-the-model">
+<h2>7. Testing the model<a class="headerlink" href="#testing-the-model" title="Link to this heading">#</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">,</span> <span class="n">ckpt_path</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Testing: |          | 0/? [00:00&lt;?, ?it/s]
+Testing:   0%|          | 0/12 [00:00&lt;?, ?it/s]
+Testing DataLoader 0:   0%|          | 0/12 [00:00&lt;?, ?it/s]
+Testing DataLoader 0:   8%|▊         | 1/12 [00:00&lt;00:00, 11.32it/s]
+Testing DataLoader 0:  17%|█▋        | 2/12 [00:00&lt;00:00, 11.22it/s]
+Testing DataLoader 0:  25%|██▌       | 3/12 [00:00&lt;00:00, 11.18it/s]
+Testing DataLoader 0:  33%|███▎      | 4/12 [00:00&lt;00:00, 11.15it/s]
+Testing DataLoader 0:  42%|████▏     | 5/12 [00:01&lt;00:02,  3.27it/s]
+Testing DataLoader 0:  50%|█████     | 6/12 [00:01&lt;00:01,  3.71it/s]
+Testing DataLoader 0:  58%|█████▊    | 7/12 [00:01&lt;00:01,  4.10it/s]
+Testing DataLoader 0:  67%|██████▋   | 8/12 [00:01&lt;00:00,  4.45it/s]
+Testing DataLoader 0:  75%|███████▌  | 9/12 [00:02&lt;00:00,  3.05it/s]
+Testing DataLoader 0:  83%|████████▎ | 10/12 [00:03&lt;00:00,  3.29it/s]
+Testing DataLoader 0:  92%|█████████▏| 11/12 [00:03&lt;00:00,  3.51it/s]
+Testing DataLoader 0: 100%|██████████| 12/12 [00:03&lt;00:00,  3.81it/s]
+Testing DataLoader 0: 100%|██████████| 12/12 [00:03&lt;00:00,  3.80it/s]
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃       Segmentation        ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│    Brier     │          0.67128          │
+│     NLL      │          1.68033          │
+│     mAcc     │          24.389%          │
+│     mIoU     │          15.281%          │
+│    pixAcc    │          52.086%          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃        Calibration        ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     ECE      │          17.128%          │
+│     aECE     │          17.162%          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃ Selective Classification  ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│    AUGRC     │          19.039%          │
+│     AURC     │          30.484%          │
+│  Cov@5Risk   │           nan%            │
+│  Risk@80Cov  │          41.707%          │
+└──────────────┴───────────────────────────┘
+</pre></div>
+</div>
+</section>
+<section id="loading-a-pre-trained-model">
+<h2>8. Loading a pre-trained model<a class="headerlink" href="#loading-a-pre-trained-model" title="Link to this heading">#</a></h2>
+<p>Let’s now load a fully trained model to continue this tutorial</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">model_path</span> <span class="o">=</span> <span class="n">hf_hub_download</span><span class="p">(</span><span class="n">repo_id</span><span class="o">=</span><span class="s2">&quot;torch-uncertainty/muad_tutorials&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;small_unet.pth&quot;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_path</span><span class="p">))</span>
+<span class="c1"># Replace the model in the routine</span>
+<span class="n">seg_routine</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+<span class="c1"># Test the model</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">seg_routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Testing: |          | 0/? [00:00&lt;?, ?it/s]
+Testing:   0%|          | 0/12 [00:00&lt;?, ?it/s]
+Testing DataLoader 0:   0%|          | 0/12 [00:00&lt;?, ?it/s]
+Testing DataLoader 0:   8%|▊         | 1/12 [00:00&lt;00:01, 10.93it/s]
+Testing DataLoader 0:  17%|█▋        | 2/12 [00:00&lt;00:00, 10.86it/s]
+Testing DataLoader 0:  25%|██▌       | 3/12 [00:00&lt;00:00, 10.92it/s]
+Testing DataLoader 0:  33%|███▎      | 4/12 [00:00&lt;00:00, 10.96it/s]
+Testing DataLoader 0:  42%|████▏     | 5/12 [00:01&lt;00:02,  3.22it/s]
+Testing DataLoader 0:  50%|█████     | 6/12 [00:01&lt;00:01,  3.66it/s]
+Testing DataLoader 0:  58%|█████▊    | 7/12 [00:01&lt;00:01,  4.04it/s]
+Testing DataLoader 0:  67%|██████▋   | 8/12 [00:01&lt;00:00,  4.39it/s]
+Testing DataLoader 0:  75%|███████▌  | 9/12 [00:02&lt;00:00,  3.03it/s]
+Testing DataLoader 0:  83%|████████▎ | 10/12 [00:03&lt;00:00,  3.27it/s]
+Testing DataLoader 0:  92%|█████████▏| 11/12 [00:03&lt;00:00,  3.50it/s]
+Testing DataLoader 0: 100%|██████████| 12/12 [00:03&lt;00:00,  3.79it/s]
+Testing DataLoader 0: 100%|██████████| 12/12 [00:03&lt;00:00,  3.79it/s]
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃       Segmentation        ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│    Brier     │          0.20463          │
+│     NLL      │          0.39873          │
+│     mAcc     │          68.773%          │
+│     mIoU     │          50.739%          │
+│    pixAcc    │          85.701%          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃        Calibration        ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     ECE      │          1.700%           │
+│     aECE     │          1.749%           │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃ Selective Classification  ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│    AUGRC     │          2.695%           │
+│     AURC     │          3.319%           │
+│  Cov@5Risk   │          72.408%          │
+│  Risk@80Cov  │          7.016%           │
+└──────────────┴───────────────────────────┘
+</pre></div>
+</div>
+</section>
+<section id="uncertainty-evaluations-with-mcp">
+<h2>9. Uncertainty evaluations with MCP<a class="headerlink" href="#uncertainty-evaluations-with-mcp" title="Link to this heading">#</a></h2>
+<p>Here we will just use as confidence score the Maximum class probability (MCP)</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">sample_idx</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">img</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">test</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">]</span>
+
+<span class="n">batch_img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">batch_target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="c1"># Forward propagation</span>
+    <span class="n">output_probs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">batch_img</span><span class="p">)</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># remove the batch dimension</span>
+    <span class="n">output_probs</span> <span class="o">=</span> <span class="n">output_probs</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">confidence</span><span class="p">,</span> <span class="n">pred</span> <span class="o">=</span> <span class="n">output_probs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Undo normalization on the image and convert to uint8.</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">img</span> <span class="o">*</span> <span class="n">t_muad_std</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">t_muad_mean</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_dtype</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">tmp_target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">target</span> <span class="o">==</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>
+<span class="n">target_masks</span> <span class="o">=</span> <span class="n">tmp_target</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">target</span><span class="o">.</span><span class="n">device</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">img_segmented</span> <span class="o">=</span> <span class="n">draw_segmentation_masks</span><span class="p">(</span>
+    <span class="n">img</span><span class="p">,</span> <span class="n">target_masks</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">color_palette</span>
+<span class="p">)</span>
+
+<span class="n">pred_masks</span> <span class="o">=</span> <span class="n">pred</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">pred</span><span class="o">.</span><span class="n">device</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+<span class="n">pred_img</span> <span class="o">=</span> <span class="n">draw_segmentation_masks</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">pred_masks</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">color_palette</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">confidence</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="n">confidence</span> <span class="o">=</span> <span class="n">confidence</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">img</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_pil_image</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="mi">1024</span><span class="p">))</span>
+<span class="n">img_segmented</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_pil_image</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img_segmented</span><span class="p">,</span> <span class="mi">1024</span><span class="p">))</span>
+<span class="n">pred_img</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_pil_image</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">pred_img</span><span class="p">,</span> <span class="mi">1024</span><span class="p">))</span>
+<span class="n">confidence_img</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_pil_image</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">confidence</span><span class="p">,</span> <span class="mi">1024</span><span class="p">))</span>
+
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+<span class="n">images</span> <span class="o">=</span> <span class="p">[</span><span class="n">img</span><span class="p">,</span> <span class="n">img_segmented</span><span class="p">,</span> <span class="n">pred_img</span><span class="p">,</span> <span class="n">confidence_img</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">im</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axs</span><span class="p">,</span> <span class="n">images</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_tutorial_muad_mc_drop_003.png" srcset="../../_images/sphx_glr_tutorial_muad_mc_drop_003.png" alt="tutorial muad mc drop" class = "sphx-glr-single-img"/></section>
+<section id="apply-the-mc-dropout-wrapper">
+<h2>10. Apply the MC Dropout wrapper<a class="headerlink" href="#apply-the-mc-dropout-wrapper" title="Link to this heading">#</a></h2>
+<p>This technique decribed in this <a class="reference external" href="https://arxiv.org/abs/1506.02142/">paper</a>
+allow us to have a better confidence score by using the dropout during test time.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># We wrap the model with the MC Dropout wrapper from torch_uncertainty.models.mc_dropout</span>
+<span class="n">num_estimators</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">mc_model</span> <span class="o">=</span> <span class="n">mc_dropout</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+    <span class="n">last_layer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># We do not want to apply dropout on the last layer</span>
+    <span class="n">on_batch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># To reduce memory usage, we execute the forward passes sequentially</span>
+<span class="p">)</span>
+
+<span class="n">seg_routine</span> <span class="o">=</span> <span class="n">SegmentationRoutine</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">mc_model</span><span class="p">,</span>
+    <span class="n">num_classes</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+    <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># No loss needed for testing</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="testing-the-mc-dropout-model">
+<h2>11. Testing the MC Dropout model<a class="headerlink" href="#testing-the-mc-dropout-model" title="Link to this heading">#</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">seg_routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Testing: |          | 0/? [00:00&lt;?, ?it/s]
+Testing:   0%|          | 0/12 [00:00&lt;?, ?it/s]
+Testing DataLoader 0:   0%|          | 0/12 [00:00&lt;?, ?it/s]
+Testing DataLoader 0:   8%|▊         | 1/12 [00:00&lt;00:09,  1.15it/s]
+Testing DataLoader 0:  17%|█▋        | 2/12 [00:01&lt;00:08,  1.16it/s]
+Testing DataLoader 0:  25%|██▌       | 3/12 [00:02&lt;00:07,  1.16it/s]
+Testing DataLoader 0:  33%|███▎      | 4/12 [00:03&lt;00:06,  1.16it/s]
+Testing DataLoader 0:  42%|████▏     | 5/12 [00:04&lt;00:06,  1.16it/s]
+Testing DataLoader 0:  50%|█████     | 6/12 [00:05&lt;00:05,  1.16it/s]
+Testing DataLoader 0:  58%|█████▊    | 7/12 [00:06&lt;00:04,  1.16it/s]
+Testing DataLoader 0:  67%|██████▋   | 8/12 [00:06&lt;00:03,  1.16it/s]
+Testing DataLoader 0:  75%|███████▌  | 9/12 [00:07&lt;00:02,  1.16it/s]
+Testing DataLoader 0:  83%|████████▎ | 10/12 [00:08&lt;00:01,  1.16it/s]
+Testing DataLoader 0:  92%|█████████▏| 11/12 [00:09&lt;00:00,  1.16it/s]
+Testing DataLoader 0: 100%|██████████| 12/12 [00:09&lt;00:00,  1.24it/s]
+Testing DataLoader 0: 100%|██████████| 12/12 [00:09&lt;00:00,  1.24it/s]
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃       Segmentation        ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│    Brier     │          0.20640          │
+│     NLL      │          0.40304          │
+│     mAcc     │          68.337%          │
+│     mIoU     │          50.539%          │
+│    pixAcc    │          85.647%          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃        Calibration        ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     ECE      │          2.675%           │
+│     aECE     │          2.675%           │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃ Selective Classification  ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│    AUGRC     │          2.727%           │
+│     AURC     │          3.358%           │
+│  Cov@5Risk   │          72.245%          │
+│  Risk@80Cov  │          7.110%           │
+└──────────────┴───────────────────────────┘
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h2>9. Uncertainty evaluations with MCP<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<p>Here the confidence score is the Maximum class probability on the averaged probabilities
+of the different estimators.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">sample_idx</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">img</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">test</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">]</span>
+
+<span class="n">batch_img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">batch_target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">mc_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="c1"># Forward propagation</span>
+    <span class="n">output_probs_per_est</span> <span class="o">=</span> <span class="n">mc_model</span><span class="p">(</span><span class="n">batch_img</span><span class="p">)</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">output_probs</span> <span class="o">=</span> <span class="n">output_probs_per_est</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Average over the estimators</span>
+    <span class="c1"># remove the batch dimension</span>
+    <span class="n">confidence</span><span class="p">,</span> <span class="n">pred</span> <span class="o">=</span> <span class="n">output_probs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Undo normalization on the image and convert to uint8.</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">img</span> <span class="o">*</span> <span class="n">t_muad_std</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">t_muad_mean</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_dtype</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">tmp_target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">target</span> <span class="o">==</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>
+<span class="n">target_masks</span> <span class="o">=</span> <span class="n">tmp_target</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">target</span><span class="o">.</span><span class="n">device</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">img_segmented</span> <span class="o">=</span> <span class="n">draw_segmentation_masks</span><span class="p">(</span>
+    <span class="n">img</span><span class="p">,</span> <span class="n">target_masks</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">color_palette</span>
+<span class="p">)</span>
+
+<span class="n">pred_masks</span> <span class="o">=</span> <span class="n">pred</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">pred</span><span class="o">.</span><span class="n">device</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+<span class="n">pred_img</span> <span class="o">=</span> <span class="n">draw_segmentation_masks</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">pred_masks</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">color_palette</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">confidence</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="n">confidence</span> <span class="o">=</span> <span class="n">confidence</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">img</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_pil_image</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="mi">1024</span><span class="p">))</span>
+<span class="n">img_segmented</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_pil_image</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img_segmented</span><span class="p">,</span> <span class="mi">1024</span><span class="p">))</span>
+<span class="n">pred_img</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_pil_image</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">pred_img</span><span class="p">,</span> <span class="mi">1024</span><span class="p">))</span>
+<span class="n">confidence_img</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_pil_image</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">confidence</span><span class="p">,</span> <span class="mi">1024</span><span class="p">))</span>
+
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+<span class="n">images</span> <span class="o">=</span> <span class="p">[</span><span class="n">img</span><span class="p">,</span> <span class="n">img_segmented</span><span class="p">,</span> <span class="n">pred_img</span><span class="p">,</span> <span class="n">confidence_img</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">im</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axs</span><span class="p">,</span> <span class="n">images</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" srcset="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" alt="tutorial muad mc drop" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 54.788 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-bayesian-methods-tutorial-muad-mc-drop-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/3cc96ba0ee86ad145779685dc1a694fe/tutorial_muad_mc_drop.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_muad_mc_drop.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/f943b2ad7ede37f9317c7788b9830a27/tutorial_muad_mc_drop.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_muad_mc_drop.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/2c2187e713abb0e408b019fb869b90eb/tutorial_muad_mc_drop.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">tutorial_muad_mc_drop.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="tutorial_mc_dropout.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Training a LeNet with Monte-Carlo Dropout</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../Ensemble_Methods/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Ensemble Methods</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-the-utilities">1. Loading the utilities</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#initializing-the-datamodule">2. Initializing the DataModule</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#instantiating-the-model">3. Instantiating the Model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compute-class-weights-to-mitigate-class-inbalance">4. Compute class weights to mitigate class inbalance</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-loss-the-routine-and-the-trainer">5. The Loss, the Routine, and the Trainer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training-the-model">6. Training the model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-the-model">7. Testing the model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-a-pre-trained-model">8. Loading a pre-trained model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#uncertainty-evaluations-with-mcp">9. Uncertainty evaluations with MCP</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#apply-the-mc-dropout-wrapper">10. Apply the MC Dropout wrapper</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-the-mc-dropout-model">11. Testing the MC Dropout model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">9. Uncertainty evaluations with MCP</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/auto_tutorials/Bayesian_Methods/tutorial_muad_mc_drop.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,837 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Improve Top-label Calibration with Temperature Scaling &#8212; TorchUncertainty 0.5.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-codeautolink.css?v=b2176991" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_tutorials/Post_Hoc_Methods/tutorial_scaler';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Bayesian Methods" href="../Bayesian_Methods/index.html" />
+    <link rel="prev" title="Conformal Prediction on CIFAR-10 with TorchUncertainty" href="tutorial_conformal.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="TorchUncertainty Logo"/>
+    <img src="../../_static/logo_dark.png" class="logo__image only-dark pst-js-only" alt="TorchUncertainty Logo"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../references.html">
+    References
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../references.html">
+    References
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Classification/index.html">Classification</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_bayesian.html">Train a Bayesian Neural Network in 20 seconds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_classification.html">Training a LeNet for Image Classification with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_distribution_shift.html">Evaluating Model Performance Under Distribution Shift with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_evidential_classification.html">Deep Evidential Classification on a Toy Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_ood_detection.html">Out-of-distribution detection with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_pe_cifar10.html">From a Standard Classifier to a Packed-Ensemble</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Regression/index.html">Regression with Uncertainty</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Regression/tutorial_der_cubic.html">Deep Evidential Regression on a Toy Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Regression/tutorial_probabilistic_regression.html">Deep Probabilistic Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Regression/tutorial_regression.html">Training an MLP for Tabular Regression with TorchUncertainty</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Post-hoc Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Improve Top-label Calibration with Temperature Scaling</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Bayesian_Methods/index.html">Bayesian Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_bayesian.html">Train a Bayesian Neural Network in Three Minutes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_mc_batch_norm.html">Training a LeNet with Monte Carlo Batch Normalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_mc_dropout.html">Training a LeNet with Monte-Carlo Dropout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_muad_mc_drop.html">Monte Carlo Dropout for Semantic Segmentation on MUAD</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Ensemble_Methods/index.html">Ensemble Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Ensemble_Methods/tutorial_from_de_to_pe.html">Improved Ensemble parameter-efficiency with Packed-Ensembles</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Segmentation/index.html">Segmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Segmentation/tutorial_muad_deep_en.html">Deep ensembles Segmentation Tutorial using Muad Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Segmentation/tutorial_muad_packed.html">Packed ensembles Segmentation Tutorial using Muad Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Segmentation/tutorial_muad_seg.html">Segmentation Tutorial using Muad Dataset</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Data_Augmentation/index.html">Data Augmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Data_Augmentation/tutorial_corruption.html">Corrupting Images with TorchUncertainty to Benchmark Robustness</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+        <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Post-hoc Methods</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Improve Top-label Calibration with Temperature Scaling</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-tutorials-post-hoc-methods-tutorial-scaler-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="improve-top-label-calibration-with-temperature-scaling">
+<span id="sphx-glr-auto-tutorials-post-hoc-methods-tutorial-scaler-py"></span><h1>Improve Top-label Calibration with Temperature Scaling<a class="headerlink" href="#improve-top-label-calibration-with-temperature-scaling" title="Link to this heading">#</a></h1>
+<p>In this tutorial, we use <em>TorchUncertainty</em> to improve the calibration
+of the top-label predictions and the reliability of the underlying neural network.</p>
+<p>This tutorial provides extensive details on how to use the TemperatureScaler
+class, however, this is done automatically in the datamodule when setting
+the <cite>postprocess_set</cite> to val or test.</p>
+<p>Through this tutorial, we also see how to use the datamodules outside any Lightning trainers,
+and how to use TorchUncertainty’s models.</p>
+<section id="loading-the-utilities">
+<h2>1. Loading the Utilities<a class="headerlink" href="#loading-the-utilities" title="Link to this heading">#</a></h2>
+<p>In this tutorial, we will need:</p>
+<ul class="simple">
+<li><p>TorchUncertainty’s Calibration Error metric to compute to evaluate the top-label calibration with ECE and plot the reliability diagrams</p></li>
+<li><p>the CIFAR-100 datamodule to handle the data</p></li>
+<li><p>a ResNet 18 as starting model</p></li>
+<li><p>the temperature scaler to improve the top-label calibration</p></li>
+<li><p>a utility function to download HF models easily</p></li>
+</ul>
+<p>If you use the classification routine, the plots will be automatically available in the tensorboard logs if you use the <cite>log_plots</cite> flag.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.datamodules</span><span class="w"> </span><span class="kn">import</span> <span class="n">CIFAR100DataModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">CalibrationError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models.classification</span><span class="w"> </span><span class="kn">import</span> <span class="n">resnet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.post_processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemperatureScaler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_hf</span>
+</pre></div>
+</div>
+</section>
+<section id="loading-a-model-from-torchuncertainty-s-hf">
+<h2>2. Loading a model from TorchUncertainty’s HF<a class="headerlink" href="#loading-a-model-from-torchuncertainty-s-hf" title="Link to this heading">#</a></h2>
+<p>To avoid training a model on CIFAR-100 from scratch, we load a model from Hugging Face.
+This can be done in a one liner:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build the model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">resnet</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;cifar&quot;</span><span class="p">,</span> <span class="n">conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Download the weights (the config is not used here)</span>
+<span class="n">weights</span><span class="p">,</span> <span class="n">config</span> <span class="o">=</span> <span class="n">load_hf</span><span class="p">(</span><span class="s2">&quot;resnet18_c100&quot;</span><span class="p">)</span>
+
+<span class="c1"># Load the weights in the pre-built model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;All keys matched successfully&gt;
+</pre></div>
+</div>
+</section>
+<section id="setting-up-the-datamodule-and-dataloaders">
+<h2>3. Setting up the Datamodule and Dataloaders<a class="headerlink" href="#setting-up-the-datamodule-and-dataloaders" title="Link to this heading">#</a></h2>
+<p>To get the dataloader from the datamodule, just call prepare_data, setup, and
+extract the first element of the test dataloader list. There are more than one
+element if eval_ood is True: the dataloader of in-distribution data and the dataloader
+of out-of-distribution data. Otherwise, it is a list of 1 element.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dm</span> <span class="o">=</span> <span class="n">CIFAR100DataModule</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">eval_ood</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">postprocess_set</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="n">dm</span><span class="o">.</span><span class="n">prepare_data</span><span class="p">()</span>
+<span class="n">dm</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+
+<span class="c1"># Get the full post-processing dataloader (unused in this tutorial)</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">dm</span><span class="o">.</span><span class="n">postprocess_dataloader</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/169M [00:00&lt;?, ?B/s]
+  0%|          | 65.5k/169M [00:00&lt;07:08, 395kB/s]
+  0%|          | 229k/169M [00:00&lt;03:47, 740kB/s]
+  0%|          | 623k/169M [00:00&lt;01:53, 1.48MB/s]
+  1%|          | 1.38M/169M [00:00&lt;00:56, 2.99MB/s]
+  1%|          | 2.10M/169M [00:00&lt;00:42, 3.93MB/s]
+  3%|▎         | 4.26M/169M [00:00&lt;00:20, 8.05MB/s]
+  4%|▎         | 6.13M/169M [00:00&lt;00:15, 10.4MB/s]
+  6%|▌         | 10.5M/169M [00:01&lt;00:08, 19.1MB/s]
+  9%|▊         | 14.6M/169M [00:01&lt;00:06, 25.3MB/s]
+ 11%|█         | 17.9M/169M [00:01&lt;00:06, 24.5MB/s]
+ 13%|█▎        | 22.6M/169M [00:01&lt;00:04, 30.4MB/s]
+ 16%|█▌        | 26.9M/169M [00:01&lt;00:04, 34.0MB/s]
+ 18%|█▊        | 30.9M/169M [00:01&lt;00:04, 31.1MB/s]
+ 21%|██        | 35.6M/169M [00:01&lt;00:03, 35.2MB/s]
+ 24%|██▎       | 40.0M/169M [00:01&lt;00:03, 37.5MB/s]
+ 26%|██▌       | 43.9M/169M [00:02&lt;00:03, 33.1MB/s]
+ 29%|██▉       | 48.6M/169M [00:02&lt;00:03, 36.6MB/s]
+ 31%|███       | 52.5M/169M [00:02&lt;00:03, 37.0MB/s]
+ 34%|███▎      | 56.7M/169M [00:02&lt;00:03, 33.9MB/s]
+ 36%|███▌      | 60.3M/169M [00:02&lt;00:03, 34.3MB/s]
+ 39%|███▉      | 66.2M/169M [00:02&lt;00:02, 40.8MB/s]
+ 42%|████▏     | 70.5M/169M [00:02&lt;00:02, 35.7MB/s]
+ 44%|████▍     | 75.0M/169M [00:02&lt;00:02, 38.3MB/s]
+ 47%|████▋     | 79.2M/169M [00:03&lt;00:02, 34.3MB/s]
+ 50%|████▉     | 83.9M/169M [00:03&lt;00:02, 37.4MB/s]
+ 52%|█████▏    | 88.4M/169M [00:03&lt;00:02, 39.2MB/s]
+ 55%|█████▍    | 92.5M/169M [00:03&lt;00:02, 34.7MB/s]
+ 57%|█████▋    | 96.9M/169M [00:03&lt;00:01, 37.1MB/s]
+ 60%|██████    | 102M/169M [00:03&lt;00:01, 39.6MB/s]
+ 63%|██████▎   | 106M/169M [00:03&lt;00:01, 34.9MB/s]
+ 65%|██████▌   | 110M/169M [00:03&lt;00:01, 37.4MB/s]
+ 68%|██████▊   | 115M/169M [00:03&lt;00:01, 34.1MB/s]
+ 70%|██████▉   | 118M/169M [00:05&lt;00:05, 10.1MB/s]
+ 76%|███████▌  | 129M/169M [00:05&lt;00:02, 19.0MB/s]
+ 79%|███████▉  | 134M/169M [00:05&lt;00:01, 22.1MB/s]
+ 82%|████████▏ | 138M/169M [00:05&lt;00:01, 24.2MB/s]
+ 84%|████████▍ | 143M/169M [00:05&lt;00:00, 26.7MB/s]
+ 87%|████████▋ | 147M/169M [00:05&lt;00:00, 27.8MB/s]
+ 90%|████████▉ | 152M/169M [00:05&lt;00:00, 31.5MB/s]
+ 92%|█████████▏| 156M/169M [00:05&lt;00:00, 32.8MB/s]
+ 95%|█████████▍| 160M/169M [00:06&lt;00:00, 31.6MB/s]
+ 97%|█████████▋| 165M/169M [00:06&lt;00:00, 34.8MB/s]
+100%|█████████▉| 169M/169M [00:06&lt;00:00, 35.4MB/s]
+100%|██████████| 169M/169M [00:06&lt;00:00, 27.1MB/s]
+</pre></div>
+</div>
+</section>
+<section id="iterating-on-the-dataloader-and-computing-the-ece">
+<h2>4. Iterating on the Dataloader and Computing the ECE<a class="headerlink" href="#iterating-on-the-dataloader-and-computing-the-ece" title="Link to this heading">#</a></h2>
+<p>We first split the original test set into a calibration set and a test set for proper evaluation.</p>
+<p>When computing the ECE, you need to provide the likelihoods associated with the inputs.
+To do this, just call PyTorch’s softmax.</p>
+<p>To avoid lengthy computations (without GPU), we restrict the calibration computation to a subset
+of the test set.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">random_split</span>
+
+<span class="c1"># Split datasets</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">dm</span><span class="o">.</span><span class="n">test</span>
+<span class="n">cal_dataset</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">,</span> <span class="n">other</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="p">[</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2000</span><span class="p">])</span>
+<span class="n">test_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">calibration_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">cal_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+
+<span class="c1"># Initialize the ECE</span>
+<span class="n">ece</span> <span class="o">=</span> <span class="n">CalibrationError</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="s2">&quot;multiclass&quot;</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># Iterate on the calibration dataloader</span>
+<span class="k">for</span> <span class="n">sample</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">test_dataloader</span><span class="p">:</span>
+    <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+    <span class="n">probs</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ece</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+
+<span class="c1"># Compute &amp; print the calibration error</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ECE before scaling - </span><span class="si">{</span><span class="n">ece</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span><span class="si">:</span><span class="s2">.3%</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE before scaling - 11.293%.
+</pre></div>
+</div>
+<p>We also compute and plot the top-label calibration figure. We see that the
+model is not well calibrated.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ece</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_tutorial_scaler_001.png" srcset="../../_images/sphx_glr_tutorial_scaler_001.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/></section>
+<section id="fitting-the-scaler-to-improve-the-calibration">
+<h2>5. Fitting the Scaler to Improve the Calibration<a class="headerlink" href="#fitting-the-scaler-to-improve-the-calibration" title="Link to this heading">#</a></h2>
+<p>The TemperatureScaler has one parameter that can be used to temper the softmax.
+We minimize the tempered cross-entropy on a calibration set that we define here as
+a subset of the test set and containing 1000 data. Look at the code run by TemperatureScaler
+<cite>fit</cite> method for more details.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fit the scaler on the calibration dataset</span>
+<span class="n">scaled_model</span> <span class="o">=</span> <span class="n">TemperatureScaler</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
+<span class="n">scaled_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataloader</span><span class="o">=</span><span class="n">calibration_dataloader</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/32 [00:00&lt;?, ?it/s]
+  6%|▋         | 2/32 [00:00&lt;00:02, 14.25it/s]
+ 12%|█▎        | 4/32 [00:00&lt;00:01, 14.25it/s]
+ 19%|█▉        | 6/32 [00:00&lt;00:01, 14.25it/s]
+ 25%|██▌       | 8/32 [00:00&lt;00:01, 14.22it/s]
+ 31%|███▏      | 10/32 [00:00&lt;00:01, 14.20it/s]
+ 38%|███▊      | 12/32 [00:00&lt;00:01, 14.18it/s]
+ 44%|████▍     | 14/32 [00:00&lt;00:01, 14.16it/s]
+ 50%|█████     | 16/32 [00:01&lt;00:01, 14.13it/s]
+ 56%|█████▋    | 18/32 [00:01&lt;00:00, 14.15it/s]
+ 62%|██████▎   | 20/32 [00:01&lt;00:00, 14.09it/s]
+ 69%|██████▉   | 22/32 [00:01&lt;00:00, 14.09it/s]
+ 75%|███████▌  | 24/32 [00:01&lt;00:00, 14.09it/s]
+ 81%|████████▏ | 26/32 [00:01&lt;00:00, 14.09it/s]
+ 88%|████████▊ | 28/32 [00:01&lt;00:00, 14.07it/s]
+ 94%|█████████▍| 30/32 [00:02&lt;00:00, 14.08it/s]
+100%|██████████| 32/32 [00:02&lt;00:00, 14.45it/s]
+</pre></div>
+</div>
+</section>
+<section id="iterating-again-to-compute-the-improved-ece">
+<h2>6. Iterating Again to Compute the Improved ECE<a class="headerlink" href="#iterating-again-to-compute-the-improved-ece" title="Link to this heading">#</a></h2>
+<p>We can directly use the scaler as a calibrated model.</p>
+<p>Note that you will need to first reset the ECE metric to avoid mixing the scores of
+the previous and current iterations.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reset the ECE</span>
+<span class="n">ece</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+<span class="c1"># Iterate on the test dataloader</span>
+<span class="k">for</span> <span class="n">sample</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">test_dataloader</span><span class="p">:</span>
+    <span class="n">logits</span> <span class="o">=</span> <span class="n">scaled_model</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+    <span class="n">probs</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ece</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ECE after scaling - </span><span class="si">{</span><span class="n">ece</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span><span class="si">:</span><span class="s2">.3%</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE after scaling - 30.083%.
+</pre></div>
+</div>
+<p>We finally compute and plot the scaled top-label calibration figure. We see
+that the model is now better calibrated.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ece</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_tutorial_scaler_002.png" srcset="../../_images/sphx_glr_tutorial_scaler_002.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/><p>The top-label calibration should be improved.</p>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading">#</a></h2>
+<p>Temperature scaling is very efficient when the calibration set is representative of the test set.
+In this case, we say that the calibration and test set are drawn from the same distribution.
+However, this may not hold true in real-world cases where dataset shift could happen.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Expected Calibration Error:</strong> Naeini, M. P., Cooper, G. F., &amp; Hauskrecht, M. (2015). Obtaining Well Calibrated Probabilities Using Bayesian Binning. In <a class="reference external" href="https://arxiv.org/pdf/1411.0160.pdf">AAAI 2015</a>.</p></li>
+<li><p><strong>Temperature Scaling:</strong> Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. (2017). On calibration of modern neural networks. In <a class="reference external" href="https://arxiv.org/pdf/1706.04599.pdf">ICML 2017</a>.</p></li>
+</ul>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 16.252 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-post-hoc-methods-tutorial-scaler-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/e49b61c049b24568b49b8b662e1434ef/tutorial_scaler.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_scaler.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/df3f2bce6e9525475e905756bef1935f/tutorial_scaler.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_scaler.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/f069aa5125941cb41fbd7adac4facc0c/tutorial_scaler.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">tutorial_scaler.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="tutorial_conformal.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Conformal Prediction on CIFAR-10 with TorchUncertainty</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../Bayesian_Methods/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Bayesian Methods</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-the-utilities">1. Loading the Utilities</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-a-model-from-torchuncertainty-s-hf">2. Loading a model from TorchUncertainty’s HF</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-the-datamodule-and-dataloaders">3. Setting up the Datamodule and Dataloaders</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-on-the-dataloader-and-computing-the-ece">4. Iterating on the Dataloader and Computing the ECE</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fitting-the-scaler-to-improve-the-calibration">5. Fitting the Scaler to Improve the Calibration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iterating-again-to-compute-the-improved-ece">6. Iterating Again to Compute the Improved ECE</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes">Notes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/auto_tutorials/Post_Hoc_Methods/tutorial_scaler.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

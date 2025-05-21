@@ -1,0 +1,867 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>CheckpointCollector &#8212; TorchUncertainty 0.5.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-codeautolink.css?v=b2176991" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1dd76d02"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.models.CheckpointCollector';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="EMA" href="torch_uncertainty.models.EMA.html" />
+    <link rel="prev" title="BatchEnsemble" href="torch_uncertainty.models.BatchEnsemble.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="TorchUncertainty Logo"/>
+    <img src="../_static/logo_dark.png" class="logo__image only-dark pst-js-only" alt="TorchUncertainty Logo"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../references.html">
+    References
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../references.html">
+    References
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.routines.ClassificationRoutine.html">ClassificationRoutine</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.routines.SegmentationRoutine.html">SegmentationRoutine</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.routines.RegressionRoutine.html">RegressionRoutine</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.routines.PixelRegressionRoutine.html">PixelRegressionRoutine</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.classification.ResNetBaseline.html">ResNetBaseline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.classification.VGGBaseline.html">VGGBaseline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.classification.WideResNetBaseline.html">WideResNetBaseline</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.regression.MLPBaseline.html">MLPBaseline</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.segmentation.DeepLabBaseline.html">DeepLabBaseline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.segmentation.SegFormerBaseline.html">SegFormerBaseline</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.depth.BTSBaseline.html">BTSBaseline</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.PackedLinear.html">PackedLinear</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.PackedConv2d.html">PackedConv2d</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.PackedMultiheadAttention.html">PackedMultiheadAttention</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.PackedLayerNorm.html">PackedLayerNorm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.PackedTransformerEncoderLayer.html">PackedTransformerEncoderLayer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.PackedTransformerDecoderLayer.html">PackedTransformerDecoderLayer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.BatchLinear.html">BatchLinear</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.BatchConv2d.html">BatchConv2d</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.MaskedLinear.html">MaskedLinear</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.MaskedConv2d.html">MaskedConv2d</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.bayesian.BayesLinear.html">BayesLinear</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.bayesian.BayesConv1d.html">BayesConv1d</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.bayesian.BayesConv2d.html">BayesConv2d</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.bayesian.BayesConv3d.html">BayesConv3d</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.bayesian.LPBNNLinear.html">LPBNNLinear</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.bayesian.LPBNNConv2d.html">LPBNNConv2d</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.distributions.NormalLinear.html">NormalLinear</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.distributions.LaplaceLinear.html">LaplaceLinear</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.distributions.CauchyLinear.html">CauchyLinear</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.distributions.StudentTLinear.html">StudentTLinear</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.distributions.NormalInverseGammaLinear.html">NormalInverseGammaLinear</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.distributions.NormalConvNd.html">NormalConvNd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.distributions.LaplaceConvNd.html">LaplaceConvNd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.distributions.CauchyConvNd.html">CauchyConvNd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.distributions.StudentTConvNd.html">StudentTConvNd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.distributions.NormalInverseGammaConvNd.html">NormalInverseGammaConvNd</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.batch_ensemble.html">batch_ensemble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.deep_ensembles.html">deep_ensembles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.mc_dropout.html">mc_dropout</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.BatchEnsemble.html">BatchEnsemble</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">CheckpointCollector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.EMA.html">EMA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.MCDropout.html">MCDropout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.StochasticModel.html">StochasticModel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.SWA.html">SWA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.SWAG.html">SWAG</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.BrierScore.html">BrierScore</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.CategoricalNLL.html">CategoricalNLL</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.FPRx.html">FPRx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.FPR95.html">FPR95</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.AUGRC.html">AUGRC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.AURC.html">AURC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.CovAtxRisk.html">CovAtxRisk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.CovAt5Risk.html">CovAt5Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.RiskAtxCov.html">RiskAtxCov</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.RiskAt80Cov.html">RiskAt80Cov</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.AdaptiveCalibrationError.html">AdaptiveCalibrationError</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.CalibrationError.html">CalibrationError</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.CoverageRate.html">CoverageRate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.SetSize.html">SetSize</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.Disagreement.html">Disagreement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.Entropy.html">Entropy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.MutualInformation.html">MutualInformation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.VariationRatio.html">VariationRatio</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.GroupingLoss.html">GroupingLoss</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.regression.DistributionNLL.html">DistributionNLL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.regression.Log10.html">Log10</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.regression.MeanAbsoluteErrorInverse.html">MeanAbsoluteErrorInverse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.regression.MeanGTRelativeAbsoluteError.html">MeanGTRelativeAbsoluteError</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.regression.MeanGTRelativeSquaredError.html">MeanGTRelativeSquaredError</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.regression.MeanSquaredErrorInverse.html">MeanSquaredErrorInverse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.regression.MeanSquaredLogError.html">MeanSquaredLogError</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.regression.SILog.html">SILog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.regression.ThresholdAccuracy.html">ThresholdAccuracy</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.segmentation.MeanIntersectionOverUnion.html">MeanIntersectionOverUnion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.segmentation.SegmentationBinaryAUROC.html">SegmentationBinaryAUROC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.segmentation.SegmentationBinaryAveragePrecision.html">SegmentationBinaryAveragePrecision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.segmentation.SegmentationFPR95.html">SegmentationFPR95</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.AUSE.html">AUSE</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.losses.BCEWithLogitsLSLoss.html">BCEWithLogitsLSLoss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.losses.BetaNLL.html">BetaNLL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.losses.ConflictualLoss.html">ConflictualLoss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.losses.ConfidencePenaltyLoss.html">ConfidencePenaltyLoss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.losses.DECLoss.html">DECLoss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.losses.DERLoss.html">DERLoss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.losses.DistributionNLLLoss.html">DistributionNLLLoss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.losses.ELBOLoss.html">ELBOLoss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.losses.FocalLoss.html">FocalLoss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.losses.KLDiv.html">KLDiv</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.LaplaceApprox.html">LaplaceApprox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.MCBatchNorm.html">MCBatchNorm</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.MatrixScaler.html">MatrixScaler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.TemperatureScaler.html">TemperatureScaler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.VectorScaler.html">VectorScaler</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.ood_criteria.TUOODCriterion.html">TUOODCriterion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.ood_criteria.MaxLogitCriterion.html">MaxLogitCriterion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.ood_criteria.EnergyCriterion.html">EnergyCriterion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.ood_criteria.MaxSoftmaxCriterion.html">MaxSoftmaxCriterion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.ood_criteria.EntropyCriterion.html">EntropyCriterion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.ood_criteria.MutualInformationCriterion.html">MutualInformationCriterion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.ood_criteria.PostProcessingCriterion.html">PostProcessingCriterion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.ood_criteria.VariationRatioCriterion.html">VariationRatioCriterion</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datamodules.CIFAR10DataModule.html">CIFAR10DataModule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datamodules.CIFAR100DataModule.html">CIFAR100DataModule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datamodules.ImageNetDataModule.html">ImageNetDataModule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datamodules.MNISTDataModule.html">MNISTDataModule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datamodules.TinyImageNetDataModule.html">TinyImageNetDataModule</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datamodules.BankMarketingDataModule.html">BankMarketingDataModule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datamodules.DOTA2GamesDataModule.html">DOTA2GamesDataModule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datamodules.HTRU2DataModule.html">HTRU2DataModule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datamodules.OnlineShoppersDataModule.html">OnlineShoppersDataModule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datamodules.SpamBaseDataModule.html">SpamBaseDataModule</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datamodules.UCIRegressionDataModule.html">UCIRegressionDataModule</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datamodules.segmentation.CamVidDataModule.html">CamVidDataModule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datamodules.segmentation.CityscapesDataModule.html">CityscapesDataModule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datamodules.segmentation.MUADDataModule.html">MUADDataModule</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.MNISTC.html">MNISTC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.NotMNIST.html">NotMNIST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.CIFAR10C.html">CIFAR10C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.CIFAR100C.html">CIFAR100C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.CIFAR10H.html">CIFAR10H</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.CIFAR10N.html">CIFAR10N</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.CIFAR100N.html">CIFAR100N</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.ImageNetA.html">ImageNetA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.ImageNetC.html">ImageNetC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.ImageNetO.html">ImageNetO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.ImageNetR.html">ImageNetR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.TinyImageNet.html">TinyImageNet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.TinyImageNetC.html">TinyImageNetC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.OpenImageO.html">OpenImageO</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.uci.BankMarketing.html">BankMarketing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.uci.DOTA2Games.html">DOTA2Games</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.uci.HTRU2.html">HTRU2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.uci.OnlineShoppers.html">OnlineShoppers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.classification.uci.SpamBase.html">SpamBase</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.regression.UCIRegression.html">UCIRegression</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.segmentation.CamVid.html">CamVid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.segmentation.Cityscapes.html">Cityscapes</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.Fractals.html">Fractals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.FrostImages.html">FrostImages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.KITTIDepth.html">KITTIDepth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.MUAD.html">MUAD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.datasets.NYUv2.html">NYUv2</a></li>
+</ul>
+</div>
+</nav></div>
+        <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API Reference</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">CheckpointCollector</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="checkpointcollector">
+<h1>CheckpointCollector<a class="headerlink" href="#checkpointcollector" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="torch_uncertainty.models.CheckpointCollector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.models.</span></span><span class="sig-name descname"><span class="pre">CheckpointCollector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cycle_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cycle_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_schedule</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_final_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_on_cpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/models/wrappers/checkpoint_collector.html#CheckpointCollector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.models.CheckpointCollector" title="Link to this definition">#</a></dt>
+<dd><p>Ensemble of models at different points in the training trajectory.</p>
+<p>CheckpointCollector can be used to collect samples of the posterior distribution,
+either using classical stochastic gradient optimization methods, or SGLD and SGHMC
+as implemented in TorchUncertainty.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>nn.Module</em>) – The model to train and ensemble.</p></li>
+<li><p><strong>cycle_start</strong> (<em>int</em>) – Epoch to start ensembling. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>cycle_length</strong> (<em>int</em>) – Number of epochs between model collections. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>save_schedule</strong> (<em>list</em><em>[</em><em>int</em><em>] </em><em>| </em><em>None</em>) – The epochs at which to save the model. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>use_final_model</strong> (<em>bool</em>) – Whether to use the final model as a checkpoint. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>store_on_cpu</strong> (<em>bool</em>) – Whether to put the models on the CPU when unused. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The models are saved at the end of the specified epochs.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If <code class="xref py py-attr docutils literal notranslate"><span class="pre">cycle_start</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">cycle_length</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">save_schedule</span></code> are <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+the wrapper will save the models at each epoch.</p>
+</div>
+<dl class="simple">
+<dt>Reference:</dt><dd><p>Checkpoint Ensembles: Ensemble Methods from a Single Training Process.
+Hugh Chen, Scott Lundberg, Su-In Lee. In ArXiv 2018.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.models.CheckpointCollector.eval_forward">
+<span class="sig-name descname"><span class="pre">eval_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/models/wrappers/checkpoint_collector.html#CheckpointCollector.eval_forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.models.CheckpointCollector.eval_forward" title="Link to this definition">#</a></dt>
+<dd><p>Forward pass for evaluation.</p>
+<p>This method will return the ensemble prediction if models have already been collected.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – The input tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The ensemble output.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.models.CheckpointCollector.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/models/wrappers/checkpoint_collector.html#CheckpointCollector.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.models.CheckpointCollector.forward" title="Link to this definition">#</a></dt>
+<dd><p>Forward pass for training and evaluation mode.</p>
+<p>If the model is in evaluation mode, this method will return the
+ensemble prediction. Otherwise, it will return the prediction of the
+current model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – The input tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The model or ensemble output.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.models.CheckpointCollector.to">
+<span class="sig-name descname"><span class="pre">to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/models/wrappers/checkpoint_collector.html#CheckpointCollector.to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.models.CheckpointCollector.to" title="Link to this definition">#</a></dt>
+<dd><p>Move the model and change its type.</p>
+<p>If <code class="xref py py-attr docutils literal notranslate"><span class="pre">store_on_cpu</span></code> is set to True, we force device to “cpu” to avoid filling the VRAM.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="torch_uncertainty.models.CheckpointCollector.update_wrapper">
+<span class="sig-name descname"><span class="pre">update_wrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/models/wrappers/checkpoint_collector.html#CheckpointCollector.update_wrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.models.CheckpointCollector.update_wrapper" title="Link to this definition">#</a></dt>
+<dd><p>Save the model at the end of the epoch, if included in the schedule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>epoch</strong> (<em>int</em>) – The current epoch.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="torch_uncertainty.models.BatchEnsemble.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">BatchEnsemble</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="torch_uncertainty.models.EMA.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">EMA</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.models.CheckpointCollector"><code class="docutils literal notranslate"><span class="pre">CheckpointCollector</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.models.CheckpointCollector.eval_forward"><code class="docutils literal notranslate"><span class="pre">CheckpointCollector.eval_forward()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.models.CheckpointCollector.forward"><code class="docutils literal notranslate"><span class="pre">CheckpointCollector.forward()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.models.CheckpointCollector.to"><code class="docutils literal notranslate"><span class="pre">CheckpointCollector.to()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.models.CheckpointCollector.update_wrapper"><code class="docutils literal notranslate"><span class="pre">CheckpointCollector.update_wrapper()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/generated/torch_uncertainty.models.CheckpointCollector.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>
