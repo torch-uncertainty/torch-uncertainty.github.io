@@ -55,7 +55,7 @@ We also need to define an optimizer using torch.optim, the neural network utils 
     from pathlib import Path
 
     import torch
-    from torch import nn, optim
+    from torch import optim
 
     from torch_uncertainty import TUTrainer
     from torch_uncertainty.datamodules import MNISTDataModule
@@ -163,27 +163,27 @@ with the default learning rate of 0.002 and a weight decay of 0.005.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃      Classification       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     Acc      │          94.140%          │
-    │    Brier     │          0.11267          │
-    │   Entropy    │          0.00832          │
+    │     Acc      │          75.690%          │
+    │    Brier     │          0.47406          │
+    │   Entropy    │          0.02278          │
     │     NLL      │            inf            │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          5.512%           │
-    │     aECE     │          5.510%           │
+    │     ECE      │          23.377%          │
+    │     aECE     │          23.377%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          1.508%           │
-    │     AURC     │          3.044%           │
-    │  Cov@5Risk   │          98.120%          │
-    │  Risk@80Cov  │          2.500%           │
+    │    AUGRC     │          8.597%           │
+    │     AURC     │          16.336%          │
+    │  Cov@5Risk   │           nan%            │
+    │  Risk@80Cov  │          15.975%          │
     └──────────────┴───────────────────────────┘
 
-    [{'test/cal/ECE': 0.05511810630559921, 'test/cal/aECE': 0.0550990030169487, 'test/cls/Acc': 0.9413999915122986, 'test/cls/Brier': 0.11267015337944031, 'test/cls/NLL': inf, 'test/sc/AUGRC': 0.015081148594617844, 'test/sc/AURC': 0.030442357063293457, 'test/sc/Cov@5Risk': 0.9811999797821045, 'test/sc/Risk@80Cov': 0.02500000037252903, 'test/cls/Entropy': 0.008316105231642723}]
+    [{'test/cal/ECE': 0.2337719053030014, 'test/cal/aECE': 0.23377138376235962, 'test/cls/Acc': 0.7569000124931335, 'test/cls/Brier': 0.474063515663147, 'test/cls/NLL': inf, 'test/sc/AUGRC': 0.08596877008676529, 'test/sc/AURC': 0.16336287558078766, 'test/sc/Cov@5Risk': nan, 'test/sc/Risk@80Cov': 0.15974999964237213, 'test/cls/Entropy': 0.02278098650276661}]
 
 
 
@@ -258,20 +258,20 @@ Now that the model is trained, let's test it on MNIST.
  .. code-block:: none
 
     Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 7 with strength 109.922 and entropy 0.463.
-    Predicted digits for the image 1: 2 with strength 111.903 and entropy 0.883.
-    Predicted digits for the image 2: 1 with strength 98.146 and entropy 0.508.
-    Predicted digits for the image 3: 0 with strength 53.834 and entropy 1.354.
+    Predicted digits for the image 0: 7 with strength 64.775 and entropy 0.708.
+    Predicted digits for the image 1: 0 with strength 10.000 and entropy 2.303.
+    Predicted digits for the image 2: 1 with strength 72.634 and entropy 0.647.
+    Predicted digits for the image 3: 8 with strength 69.377 and entropy 1.385.
     Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 1 with strength 15.496 and entropy 2.059.
-    Predicted digits for the image 1: 1 with strength 33.639 and entropy 1.550.
-    Predicted digits for the image 2: 1 with strength 37.449 and entropy 1.490.
-    Predicted digits for the image 3: 0 with strength 33.312 and entropy 1.276.
+    Predicted digits for the image 0: 4 with strength 40.651 and entropy 1.459.
+    Predicted digits for the image 1: 8 with strength 33.392 and entropy 1.560.
+    Predicted digits for the image 2: 8 with strength 31.694 and entropy 1.221.
+    Predicted digits for the image 3: 8 with strength 72.453 and entropy 1.086.
     Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 5 with strength 33.267 and entropy 1.771.
-    Predicted digits for the image 1: 4 with strength 47.373 and entropy 1.381.
-    Predicted digits for the image 2: 7 with strength 43.095 and entropy 0.971.
-    Predicted digits for the image 3: 8 with strength 43.095 and entropy 1.628.
+    Predicted digits for the image 0: 0 with strength 77.592 and entropy 1.024.
+    Predicted digits for the image 1: 0 with strength 10.000 and entropy 2.303.
+    Predicted digits for the image 2: 7 with strength 35.714 and entropy 1.118.
+    Predicted digits for the image 3: 8 with strength 61.596 and entropy 0.737.
 
 
 
@@ -286,7 +286,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 5.991 seconds)
+   **Total running time of the script:** (0 minutes 6.078 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Classification_tutorial_evidential_classification.py:

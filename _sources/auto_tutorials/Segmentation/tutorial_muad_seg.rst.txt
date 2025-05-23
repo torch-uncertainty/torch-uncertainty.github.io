@@ -319,7 +319,7 @@ Let's define the training parameters.
 5. The Loss, the Routine, and the Trainer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-214
+.. GENERATED FROM PYTHON SOURCE LINES 198-220
 
 .. code-block:: Python
 
@@ -338,7 +338,13 @@ Let's define the training parameters.
         optim_recipe={"optimizer": optimizer, "lr_scheduler": lr_updater},
     )
 
-    trainer = TUTrainer(accelerator="gpu", devices=1, max_epochs=NB_EPOCHS, enable_progress_bar=True)
+    trainer = TUTrainer(
+        accelerator="gpu",
+        devices=1,
+        max_epochs=NB_EPOCHS,
+        enable_progress_bar=False,
+        precision="16-mixed",
+    )
 
 
 
@@ -346,12 +352,12 @@ Let's define the training parameters.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 215-217
+.. GENERATED FROM PYTHON SOURCE LINES 221-223
 
 6. Training the model
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 217-218
+.. GENERATED FROM PYTHON SOURCE LINES 223-224
 
 .. code-block:: Python
 
@@ -360,31 +366,15 @@ Let's define the training parameters.
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Sanity Checking: |          | 0/? [00:00<?, ?it/s]    Sanity Checking:   0%|          | 0/2 [00:00<?, ?it/s]    Sanity Checking DataLoader 0:   0%|          | 0/2 [00:00<?, ?it/s]    Sanity Checking DataLoader 0:  50%|█████     | 1/2 [00:00<00:00, 11.53it/s]    Sanity Checking DataLoader 0: 100%|██████████| 2/2 [00:00<00:00, 11.47it/s]                                                                               Training: |          | 0/? [00:00<?, ?it/s]    Training:   0%|          | 0/40 [00:00<?, ?it/s]    Epoch 0:   0%|          | 0/40 [00:00<?, ?it/s]     Epoch 0:   2%|▎         | 1/40 [00:01<01:07,  0.58it/s]    Epoch 0:   2%|▎         | 1/40 [00:01<01:13,  0.53it/s, v_num=2, train_loss=2.720]    Epoch 0:   5%|▌         | 2/40 [00:02<00:38,  0.98it/s, v_num=2, train_loss=2.720]    Epoch 0:   5%|▌         | 2/40 [00:02<00:41,  0.91it/s, v_num=2, train_loss=2.580]    Epoch 0:   8%|▊         | 3/40 [00:02<00:28,  1.28it/s, v_num=2, train_loss=2.580]    Epoch 0:   8%|▊         | 3/40 [00:02<00:30,  1.20it/s, v_num=2, train_loss=2.510]    Epoch 0:  10%|█         | 4/40 [00:02<00:23,  1.51it/s, v_num=2, train_loss=2.510]    Epoch 0:  10%|█         | 4/40 [00:02<00:25,  1.42it/s, v_num=2, train_loss=2.380]    Epoch 0:  12%|█▎        | 5/40 [00:03<00:22,  1.52it/s, v_num=2, train_loss=2.380]    Epoch 0:  12%|█▎        | 5/40 [00:03<00:24,  1.45it/s, v_num=2, train_loss=2.370]    Epoch 0:  15%|█▌        | 6/40 [00:03<00:20,  1.67it/s, v_num=2, train_loss=2.370]    Epoch 0:  15%|█▌        | 6/40 [00:03<00:21,  1.60it/s, v_num=2, train_loss=2.430]    Epoch 0:  18%|█▊        | 7/40 [00:03<00:18,  1.80it/s, v_num=2, train_loss=2.430]    Epoch 0:  18%|█▊        | 7/40 [00:04<00:19,  1.72it/s, v_num=2, train_loss=2.360]    Epoch 0:  20%|██        | 8/40 [00:04<00:16,  1.91it/s, v_num=2, train_loss=2.360]    Epoch 0:  20%|██        | 8/40 [00:04<00:17,  1.83it/s, v_num=2, train_loss=2.200]    Epoch 0:  22%|██▎       | 9/40 [00:04<00:16,  1.88it/s, v_num=2, train_loss=2.200]    Epoch 0:  22%|██▎       | 9/40 [00:04<00:17,  1.82it/s, v_num=2, train_loss=2.080]    Epoch 0:  25%|██▌       | 10/40 [00:05<00:15,  1.96it/s, v_num=2, train_loss=2.080]    Epoch 0:  25%|██▌       | 10/40 [00:05<00:15,  1.90it/s, v_num=2, train_loss=2.150]    Epoch 0:  28%|██▊       | 11/40 [00:05<00:14,  2.04it/s, v_num=2, train_loss=2.150]    Epoch 0:  28%|██▊       | 11/40 [00:05<00:14,  1.97it/s, v_num=2, train_loss=2.160]    Epoch 0:  30%|███       | 12/40 [00:05<00:13,  2.10it/s, v_num=2, train_loss=2.160]    Epoch 0:  30%|███       | 12/40 [00:05<00:13,  2.04it/s, v_num=2, train_loss=2.110]    Epoch 0:  32%|███▎      | 13/40 [00:06<00:13,  2.06it/s, v_num=2, train_loss=2.110]    Epoch 0:  32%|███▎      | 13/40 [00:06<00:13,  2.01it/s, v_num=2, train_loss=2.100]    Epoch 0:  35%|███▌      | 14/40 [00:06<00:12,  2.12it/s, v_num=2, train_loss=2.100]    Epoch 0:  35%|███▌      | 14/40 [00:06<00:12,  2.06it/s, v_num=2, train_loss=2.130]    Epoch 0:  38%|███▊      | 15/40 [00:06<00:11,  2.17it/s, v_num=2, train_loss=2.130]    Epoch 0:  38%|███▊      | 15/40 [00:07<00:11,  2.12it/s, v_num=2, train_loss=2.140]    Epoch 0:  40%|████      | 16/40 [00:07<00:10,  2.21it/s, v_num=2, train_loss=2.140]    Epoch 0:  40%|████      | 16/40 [00:07<00:11,  2.16it/s, v_num=2, train_loss=1.970]    Epoch 0:  42%|████▎     | 17/40 [00:07<00:10,  2.16it/s, v_num=2, train_loss=1.970]    Epoch 0:  42%|████▎     | 17/40 [00:08<00:10,  2.12it/s, v_num=2, train_loss=1.990]    Epoch 0:  45%|████▌     | 18/40 [00:08<00:09,  2.21it/s, v_num=2, train_loss=1.990]    Epoch 0:  45%|████▌     | 18/40 [00:08<00:10,  2.16it/s, v_num=2, train_loss=1.980]    Epoch 0:  48%|████▊     | 19/40 [00:08<00:09,  2.24it/s, v_num=2, train_loss=1.980]    Epoch 0:  48%|████▊     | 19/40 [00:08<00:09,  2.20it/s, v_num=2, train_loss=2.030]    Epoch 0:  50%|█████     | 20/40 [00:08<00:08,  2.28it/s, v_num=2, train_loss=2.030]    Epoch 0:  50%|█████     | 20/40 [00:08<00:08,  2.24it/s, v_num=2, train_loss=1.870]    Epoch 0:  52%|█████▎    | 21/40 [00:09<00:08,  2.24it/s, v_num=2, train_loss=1.870]    Epoch 0:  52%|█████▎    | 21/40 [00:09<00:08,  2.20it/s, v_num=2, train_loss=1.800]    Epoch 0:  55%|█████▌    | 22/40 [00:09<00:07,  2.27it/s, v_num=2, train_loss=1.800]    Epoch 0:  55%|█████▌    | 22/40 [00:09<00:08,  2.23it/s, v_num=2, train_loss=1.820]    Epoch 0:  57%|█████▊    | 23/40 [00:09<00:07,  2.30it/s, v_num=2, train_loss=1.820]    Epoch 0:  57%|█████▊    | 23/40 [00:10<00:07,  2.26it/s, v_num=2, train_loss=1.900]    Epoch 0:  60%|██████    | 24/40 [00:10<00:06,  2.33it/s, v_num=2, train_loss=1.900]    Epoch 0:  60%|██████    | 24/40 [00:10<00:06,  2.29it/s, v_num=2, train_loss=1.840]    Epoch 0:  62%|██████▎   | 25/40 [00:10<00:06,  2.30it/s, v_num=2, train_loss=1.840]    Epoch 0:  62%|██████▎   | 25/40 [00:11<00:06,  2.26it/s, v_num=2, train_loss=1.910]    Epoch 0:  65%|██████▌   | 26/40 [00:11<00:06,  2.32it/s, v_num=2, train_loss=1.910]    Epoch 0:  65%|██████▌   | 26/40 [00:11<00:06,  2.29it/s, v_num=2, train_loss=1.750]    Epoch 0:  68%|██████▊   | 27/40 [00:11<00:05,  2.35it/s, v_num=2, train_loss=1.750]    Epoch 0:  68%|██████▊   | 27/40 [00:11<00:05,  2.31it/s, v_num=2, train_loss=1.710]    Epoch 0:  70%|███████   | 28/40 [00:11<00:05,  2.37it/s, v_num=2, train_loss=1.710]    Epoch 0:  70%|███████   | 28/40 [00:11<00:05,  2.34it/s, v_num=2, train_loss=1.770]    Epoch 0:  72%|███████▎  | 29/40 [00:12<00:04,  2.32it/s, v_num=2, train_loss=1.770]    Epoch 0:  72%|███████▎  | 29/40 [00:12<00:04,  2.29it/s, v_num=2, train_loss=1.830]    Epoch 0:  75%|███████▌  | 30/40 [00:12<00:04,  2.34it/s, v_num=2, train_loss=1.830]    Epoch 0:  75%|███████▌  | 30/40 [00:12<00:04,  2.31it/s, v_num=2, train_loss=1.740]    Epoch 0:  78%|███████▊  | 31/40 [00:13<00:03,  2.36it/s, v_num=2, train_loss=1.740]    Epoch 0:  78%|███████▊  | 31/40 [00:13<00:03,  2.33it/s, v_num=2, train_loss=1.740]    Epoch 0:  80%|████████  | 32/40 [00:13<00:03,  2.38it/s, v_num=2, train_loss=1.740]    Epoch 0:  80%|████████  | 32/40 [00:13<00:03,  2.35it/s, v_num=2, train_loss=1.750]    Epoch 0:  82%|████████▎ | 33/40 [00:14<00:03,  2.33it/s, v_num=2, train_loss=1.750]    Epoch 0:  82%|████████▎ | 33/40 [00:14<00:03,  2.30it/s, v_num=2, train_loss=1.560]    Epoch 0:  85%|████████▌ | 34/40 [00:14<00:02,  2.35it/s, v_num=2, train_loss=1.560]    Epoch 0:  85%|████████▌ | 34/40 [00:14<00:02,  2.32it/s, v_num=2, train_loss=1.740]    Epoch 0:  88%|████████▊ | 35/40 [00:14<00:02,  2.37it/s, v_num=2, train_loss=1.740]    Epoch 0:  88%|████████▊ | 35/40 [00:14<00:02,  2.34it/s, v_num=2, train_loss=1.720]    Epoch 0:  90%|█████████ | 36/40 [00:15<00:01,  2.39it/s, v_num=2, train_loss=1.720]    Epoch 0:  90%|█████████ | 36/40 [00:15<00:01,  2.36it/s, v_num=2, train_loss=1.730]    Epoch 0:  92%|█████████▎| 37/40 [00:15<00:01,  2.33it/s, v_num=2, train_loss=1.730]    Epoch 0:  92%|█████████▎| 37/40 [00:16<00:01,  2.31it/s, v_num=2, train_loss=1.730]    Epoch 0:  95%|█████████▌| 38/40 [00:16<00:00,  2.35it/s, v_num=2, train_loss=1.730]    Epoch 0:  95%|█████████▌| 38/40 [00:16<00:00,  2.33it/s, v_num=2, train_loss=1.760]    Epoch 0:  98%|█████████▊| 39/40 [00:16<00:00,  2.37it/s, v_num=2, train_loss=1.760]    Epoch 0:  98%|█████████▊| 39/40 [00:16<00:00,  2.34it/s, v_num=2, train_loss=1.570]    Epoch 0: 100%|██████████| 40/40 [00:16<00:00,  2.39it/s, v_num=2, train_loss=1.570]    Epoch 0: 100%|██████████| 40/40 [00:16<00:00,  2.36it/s, v_num=2, train_loss=1.980]
-    Validation: |          | 0/? [00:00<?, ?it/s]
-    Validation:   0%|          | 0/6 [00:00<?, ?it/s]
-    Validation DataLoader 0:   0%|          | 0/6 [00:00<?, ?it/s]
-    Validation DataLoader 0:  17%|█▋        | 1/6 [00:00<00:00, 11.73it/s]
-    Validation DataLoader 0:  33%|███▎      | 2/6 [00:00<00:00, 11.63it/s]
-    Validation DataLoader 0:  50%|█████     | 3/6 [00:00<00:00, 11.60it/s]
-    Validation DataLoader 0:  67%|██████▋   | 4/6 [00:00<00:00, 11.58it/s]
-    Validation DataLoader 0:  83%|████████▎ | 5/6 [00:01<00:00,  3.39it/s]
-    Validation DataLoader 0: 100%|██████████| 6/6 [00:01<00:00,  3.98it/s]
-                                                                              Epoch 0: 100%|██████████| 40/40 [00:19<00:00,  2.00it/s, v_num=2, train_loss=1.980, mIoU%=18.10]    Epoch 0: 100%|██████████| 40/40 [00:19<00:00,  2.00it/s, v_num=2, train_loss=1.980, mIoU%=18.10]    Epoch 0: 100%|██████████| 40/40 [00:20<00:00,  1.99it/s, v_num=2, train_loss=1.980, mIoU%=18.10]
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 219-221
+.. GENERATED FROM PYTHON SOURCE LINES 225-227
 
 7. Testing the model
 ~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 221-222
+.. GENERATED FROM PYTHON SOURCE LINES 227-228
 
 .. code-block:: Python
 
@@ -397,41 +387,40 @@ Let's define the training parameters.
 
  .. code-block:: none
 
-    Testing: |          | 0/? [00:00<?, ?it/s]    Testing:   0%|          | 0/12 [00:00<?, ?it/s]    Testing DataLoader 0:   0%|          | 0/12 [00:00<?, ?it/s]    Testing DataLoader 0:   8%|▊         | 1/12 [00:00<00:00, 11.29it/s]    Testing DataLoader 0:  17%|█▋        | 2/12 [00:00<00:00, 11.20it/s]    Testing DataLoader 0:  25%|██▌       | 3/12 [00:00<00:00, 11.14it/s]    Testing DataLoader 0:  33%|███▎      | 4/12 [00:00<00:00, 11.09it/s]    Testing DataLoader 0:  42%|████▏     | 5/12 [00:01<00:02,  2.94it/s]    Testing DataLoader 0:  50%|█████     | 6/12 [00:01<00:01,  3.35it/s]    Testing DataLoader 0:  58%|█████▊    | 7/12 [00:01<00:01,  3.72it/s]    Testing DataLoader 0:  67%|██████▋   | 8/12 [00:01<00:00,  4.06it/s]    Testing DataLoader 0:  75%|███████▌  | 9/12 [00:03<00:01,  2.79it/s]    Testing DataLoader 0:  83%|████████▎ | 10/12 [00:03<00:00,  3.01it/s]    Testing DataLoader 0:  92%|█████████▏| 11/12 [00:03<00:00,  3.23it/s]    Testing DataLoader 0: 100%|██████████| 12/12 [00:03<00:00,  3.50it/s]    Testing DataLoader 0: 100%|██████████| 12/12 [00:03<00:00,  3.49it/s]
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       Segmentation        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    Brier     │          0.60313          │
-    │     NLL      │          1.56210          │
-    │     mAcc     │          26.099%          │
-    │     mIoU     │          18.403%          │
-    │    pixAcc    │          60.468%          │
+    │    Brier     │          0.73010          │
+    │     NLL      │          1.87702          │
+    │     mAcc     │          19.912%          │
+    │     mIoU     │          12.396%          │
+    │    pixAcc    │          45.984%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          16.451%          │
-    │     aECE     │          16.687%          │
+    │     ECE      │          15.667%          │
+    │     aECE     │          15.838%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          14.818%          │
-    │     AURC     │          23.070%          │
+    │    AUGRC     │          22.719%          │
+    │     AURC     │          36.100%          │
     │  Cov@5Risk   │           nan%            │
-    │  Risk@80Cov  │          33.304%          │
+    │  Risk@80Cov  │          51.687%          │
     └──────────────┴───────────────────────────┘
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 223-226
+.. GENERATED FROM PYTHON SOURCE LINES 229-232
 
 8. Loading a pre-trained model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Let's now load a fully trained model to continue this tutorial
 
-.. GENERATED FROM PYTHON SOURCE LINES 226-233
+.. GENERATED FROM PYTHON SOURCE LINES 232-239
 
 .. code-block:: Python
 
@@ -450,41 +439,40 @@ Let's now load a fully trained model to continue this tutorial
 
  .. code-block:: none
 
-    Testing: |          | 0/? [00:00<?, ?it/s]    Testing:   0%|          | 0/12 [00:00<?, ?it/s]    Testing DataLoader 0:   0%|          | 0/12 [00:00<?, ?it/s]    Testing DataLoader 0:   8%|▊         | 1/12 [00:00<00:01, 11.00it/s]    Testing DataLoader 0:  17%|█▋        | 2/12 [00:00<00:00, 10.84it/s]    Testing DataLoader 0:  25%|██▌       | 3/12 [00:00<00:00, 10.88it/s]    Testing DataLoader 0:  33%|███▎      | 4/12 [00:00<00:00, 10.91it/s]    Testing DataLoader 0:  42%|████▏     | 5/12 [00:01<00:02,  3.00it/s]    Testing DataLoader 0:  50%|█████     | 6/12 [00:01<00:01,  3.41it/s]    Testing DataLoader 0:  58%|█████▊    | 7/12 [00:01<00:01,  3.79it/s]    Testing DataLoader 0:  67%|██████▋   | 8/12 [00:01<00:00,  4.12it/s]    Testing DataLoader 0:  75%|███████▌  | 9/12 [00:03<00:01,  2.82it/s]    Testing DataLoader 0:  83%|████████▎ | 10/12 [00:03<00:00,  3.05it/s]    Testing DataLoader 0:  92%|█████████▏| 11/12 [00:03<00:00,  3.26it/s]    Testing DataLoader 0: 100%|██████████| 12/12 [00:03<00:00,  3.54it/s]    Testing DataLoader 0: 100%|██████████| 12/12 [00:03<00:00,  3.53it/s]
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       Segmentation        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    Brier     │          0.20550          │
-    │     NLL      │          0.39975          │
-    │     mAcc     │          68.773%          │
+    │    Brier     │          0.20426          │
+    │     NLL      │          0.39866          │
+    │     mAcc     │          68.768%          │
     │     mIoU     │          50.739%          │
-    │    pixAcc    │          85.701%          │
+    │    pixAcc    │          85.704%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          1.767%           │
-    │     aECE     │          1.841%           │
+    │     ECE      │          1.561%           │
+    │     aECE     │          1.662%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          2.721%           │
-    │     AURC     │          3.350%           │
-    │  Cov@5Risk   │          72.161%          │
-    │  Risk@80Cov  │          7.144%           │
+    │    AUGRC     │          2.695%           │
+    │     AURC     │          3.318%           │
+    │  Cov@5Risk   │          72.396%          │
+    │  Risk@80Cov  │          7.014%           │
     └──────────────┴───────────────────────────┘
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 234-237
+.. GENERATED FROM PYTHON SOURCE LINES 240-243
 
 9. Uncertainty evaluations with MCP
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Here we will just use as confidence score the Maximum class probability (MCP)
 
-.. GENERATED FROM PYTHON SOURCE LINES 237-286
+.. GENERATED FROM PYTHON SOURCE LINES 243-292
 
 .. code-block:: Python
 
@@ -552,7 +540,7 @@ Here we will just use as confidence score the Maximum class probability (MCP)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 36.542 seconds)
+   **Total running time of the script:** (0 minutes 35.958 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Segmentation_tutorial_muad_seg.py:

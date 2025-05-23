@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Segmentation Tutorial using Muad Dataset &#8212; TorchUncertainty 0.5.0 documentation</title>
+    <title>Segmentation Tutorial using Muad Dataset &#8212; TorchUncertainty 0.5.1 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
+    <script src="../../_static/documentation_options.js?v=b9afe91b"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -380,7 +380,6 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Classification/index.html">Classification</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_bayesian.html">Train a Bayesian Neural Network in 20 seconds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_classification.html">Training a LeNet for Image Classification with TorchUncertainty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_distribution_shift.html">Evaluating Model Performance Under Distribution Shift with TorchUncertainty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_evidential_classification.html">Deep Evidential Classification on a Toy Example</a></li>
@@ -400,7 +399,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Bayesian_Methods/index.html">Bayesian Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_bayesian.html">Train a Bayesian Neural Network in Three Minutes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_bayesian.html">Training a Bayesian Neural Network in 20 seconds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_mc_batch_norm.html">Training a LeNet with Monte Carlo Batch Normalization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_mc_dropout.html">Training a LeNet with Monte-Carlo Dropout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_muad_mc_drop.html">Monte Carlo Dropout for Semantic Segmentation on MUAD</a></li>
@@ -698,7 +697,13 @@ depth estimation, and object detection.</p>
     <span class="n">optim_recipe</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="n">optimizer</span><span class="p">,</span> <span class="s2">&quot;lr_scheduler&quot;</span><span class="p">:</span> <span class="n">lr_updater</span><span class="p">},</span>
 <span class="p">)</span>
 
-<span class="n">trainer</span> <span class="o">=</span> <span class="n">TUTrainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="n">devices</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="n">NB_EPOCHS</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">TUTrainer</span><span class="p">(</span>
+    <span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span>
+    <span class="n">devices</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_epochs</span><span class="o">=</span><span class="n">NB_EPOCHS</span><span class="p">,</span>
+    <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">precision</span><span class="o">=</span><span class="s2">&quot;16-mixed&quot;</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -707,165 +712,34 @@ depth estimation, and object detection.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">seg_routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Sanity Checking: |          | 0/? [00:00&lt;?, ?it/s]
-Sanity Checking:   0%|          | 0/2 [00:00&lt;?, ?it/s]
-Sanity Checking DataLoader 0:   0%|          | 0/2 [00:00&lt;?, ?it/s]
-Sanity Checking DataLoader 0:  50%|█████     | 1/2 [00:00&lt;00:00, 11.53it/s]
-Sanity Checking DataLoader 0: 100%|██████████| 2/2 [00:00&lt;00:00, 11.47it/s]
-
-
-Training: |          | 0/? [00:00&lt;?, ?it/s]
-Training:   0%|          | 0/40 [00:00&lt;?, ?it/s]
-Epoch 0:   0%|          | 0/40 [00:00&lt;?, ?it/s]
-Epoch 0:   2%|▎         | 1/40 [00:01&lt;01:07,  0.58it/s]
-Epoch 0:   2%|▎         | 1/40 [00:01&lt;01:13,  0.53it/s, v_num=2, train_loss=2.720]
-Epoch 0:   5%|▌         | 2/40 [00:02&lt;00:38,  0.98it/s, v_num=2, train_loss=2.720]
-Epoch 0:   5%|▌         | 2/40 [00:02&lt;00:41,  0.91it/s, v_num=2, train_loss=2.580]
-Epoch 0:   8%|▊         | 3/40 [00:02&lt;00:28,  1.28it/s, v_num=2, train_loss=2.580]
-Epoch 0:   8%|▊         | 3/40 [00:02&lt;00:30,  1.20it/s, v_num=2, train_loss=2.510]
-Epoch 0:  10%|█         | 4/40 [00:02&lt;00:23,  1.51it/s, v_num=2, train_loss=2.510]
-Epoch 0:  10%|█         | 4/40 [00:02&lt;00:25,  1.42it/s, v_num=2, train_loss=2.380]
-Epoch 0:  12%|█▎        | 5/40 [00:03&lt;00:22,  1.52it/s, v_num=2, train_loss=2.380]
-Epoch 0:  12%|█▎        | 5/40 [00:03&lt;00:24,  1.45it/s, v_num=2, train_loss=2.370]
-Epoch 0:  15%|█▌        | 6/40 [00:03&lt;00:20,  1.67it/s, v_num=2, train_loss=2.370]
-Epoch 0:  15%|█▌        | 6/40 [00:03&lt;00:21,  1.60it/s, v_num=2, train_loss=2.430]
-Epoch 0:  18%|█▊        | 7/40 [00:03&lt;00:18,  1.80it/s, v_num=2, train_loss=2.430]
-Epoch 0:  18%|█▊        | 7/40 [00:04&lt;00:19,  1.72it/s, v_num=2, train_loss=2.360]
-Epoch 0:  20%|██        | 8/40 [00:04&lt;00:16,  1.91it/s, v_num=2, train_loss=2.360]
-Epoch 0:  20%|██        | 8/40 [00:04&lt;00:17,  1.83it/s, v_num=2, train_loss=2.200]
-Epoch 0:  22%|██▎       | 9/40 [00:04&lt;00:16,  1.88it/s, v_num=2, train_loss=2.200]
-Epoch 0:  22%|██▎       | 9/40 [00:04&lt;00:17,  1.82it/s, v_num=2, train_loss=2.080]
-Epoch 0:  25%|██▌       | 10/40 [00:05&lt;00:15,  1.96it/s, v_num=2, train_loss=2.080]
-Epoch 0:  25%|██▌       | 10/40 [00:05&lt;00:15,  1.90it/s, v_num=2, train_loss=2.150]
-Epoch 0:  28%|██▊       | 11/40 [00:05&lt;00:14,  2.04it/s, v_num=2, train_loss=2.150]
-Epoch 0:  28%|██▊       | 11/40 [00:05&lt;00:14,  1.97it/s, v_num=2, train_loss=2.160]
-Epoch 0:  30%|███       | 12/40 [00:05&lt;00:13,  2.10it/s, v_num=2, train_loss=2.160]
-Epoch 0:  30%|███       | 12/40 [00:05&lt;00:13,  2.04it/s, v_num=2, train_loss=2.110]
-Epoch 0:  32%|███▎      | 13/40 [00:06&lt;00:13,  2.06it/s, v_num=2, train_loss=2.110]
-Epoch 0:  32%|███▎      | 13/40 [00:06&lt;00:13,  2.01it/s, v_num=2, train_loss=2.100]
-Epoch 0:  35%|███▌      | 14/40 [00:06&lt;00:12,  2.12it/s, v_num=2, train_loss=2.100]
-Epoch 0:  35%|███▌      | 14/40 [00:06&lt;00:12,  2.06it/s, v_num=2, train_loss=2.130]
-Epoch 0:  38%|███▊      | 15/40 [00:06&lt;00:11,  2.17it/s, v_num=2, train_loss=2.130]
-Epoch 0:  38%|███▊      | 15/40 [00:07&lt;00:11,  2.12it/s, v_num=2, train_loss=2.140]
-Epoch 0:  40%|████      | 16/40 [00:07&lt;00:10,  2.21it/s, v_num=2, train_loss=2.140]
-Epoch 0:  40%|████      | 16/40 [00:07&lt;00:11,  2.16it/s, v_num=2, train_loss=1.970]
-Epoch 0:  42%|████▎     | 17/40 [00:07&lt;00:10,  2.16it/s, v_num=2, train_loss=1.970]
-Epoch 0:  42%|████▎     | 17/40 [00:08&lt;00:10,  2.12it/s, v_num=2, train_loss=1.990]
-Epoch 0:  45%|████▌     | 18/40 [00:08&lt;00:09,  2.21it/s, v_num=2, train_loss=1.990]
-Epoch 0:  45%|████▌     | 18/40 [00:08&lt;00:10,  2.16it/s, v_num=2, train_loss=1.980]
-Epoch 0:  48%|████▊     | 19/40 [00:08&lt;00:09,  2.24it/s, v_num=2, train_loss=1.980]
-Epoch 0:  48%|████▊     | 19/40 [00:08&lt;00:09,  2.20it/s, v_num=2, train_loss=2.030]
-Epoch 0:  50%|█████     | 20/40 [00:08&lt;00:08,  2.28it/s, v_num=2, train_loss=2.030]
-Epoch 0:  50%|█████     | 20/40 [00:08&lt;00:08,  2.24it/s, v_num=2, train_loss=1.870]
-Epoch 0:  52%|█████▎    | 21/40 [00:09&lt;00:08,  2.24it/s, v_num=2, train_loss=1.870]
-Epoch 0:  52%|█████▎    | 21/40 [00:09&lt;00:08,  2.20it/s, v_num=2, train_loss=1.800]
-Epoch 0:  55%|█████▌    | 22/40 [00:09&lt;00:07,  2.27it/s, v_num=2, train_loss=1.800]
-Epoch 0:  55%|█████▌    | 22/40 [00:09&lt;00:08,  2.23it/s, v_num=2, train_loss=1.820]
-Epoch 0:  57%|█████▊    | 23/40 [00:09&lt;00:07,  2.30it/s, v_num=2, train_loss=1.820]
-Epoch 0:  57%|█████▊    | 23/40 [00:10&lt;00:07,  2.26it/s, v_num=2, train_loss=1.900]
-Epoch 0:  60%|██████    | 24/40 [00:10&lt;00:06,  2.33it/s, v_num=2, train_loss=1.900]
-Epoch 0:  60%|██████    | 24/40 [00:10&lt;00:06,  2.29it/s, v_num=2, train_loss=1.840]
-Epoch 0:  62%|██████▎   | 25/40 [00:10&lt;00:06,  2.30it/s, v_num=2, train_loss=1.840]
-Epoch 0:  62%|██████▎   | 25/40 [00:11&lt;00:06,  2.26it/s, v_num=2, train_loss=1.910]
-Epoch 0:  65%|██████▌   | 26/40 [00:11&lt;00:06,  2.32it/s, v_num=2, train_loss=1.910]
-Epoch 0:  65%|██████▌   | 26/40 [00:11&lt;00:06,  2.29it/s, v_num=2, train_loss=1.750]
-Epoch 0:  68%|██████▊   | 27/40 [00:11&lt;00:05,  2.35it/s, v_num=2, train_loss=1.750]
-Epoch 0:  68%|██████▊   | 27/40 [00:11&lt;00:05,  2.31it/s, v_num=2, train_loss=1.710]
-Epoch 0:  70%|███████   | 28/40 [00:11&lt;00:05,  2.37it/s, v_num=2, train_loss=1.710]
-Epoch 0:  70%|███████   | 28/40 [00:11&lt;00:05,  2.34it/s, v_num=2, train_loss=1.770]
-Epoch 0:  72%|███████▎  | 29/40 [00:12&lt;00:04,  2.32it/s, v_num=2, train_loss=1.770]
-Epoch 0:  72%|███████▎  | 29/40 [00:12&lt;00:04,  2.29it/s, v_num=2, train_loss=1.830]
-Epoch 0:  75%|███████▌  | 30/40 [00:12&lt;00:04,  2.34it/s, v_num=2, train_loss=1.830]
-Epoch 0:  75%|███████▌  | 30/40 [00:12&lt;00:04,  2.31it/s, v_num=2, train_loss=1.740]
-Epoch 0:  78%|███████▊  | 31/40 [00:13&lt;00:03,  2.36it/s, v_num=2, train_loss=1.740]
-Epoch 0:  78%|███████▊  | 31/40 [00:13&lt;00:03,  2.33it/s, v_num=2, train_loss=1.740]
-Epoch 0:  80%|████████  | 32/40 [00:13&lt;00:03,  2.38it/s, v_num=2, train_loss=1.740]
-Epoch 0:  80%|████████  | 32/40 [00:13&lt;00:03,  2.35it/s, v_num=2, train_loss=1.750]
-Epoch 0:  82%|████████▎ | 33/40 [00:14&lt;00:03,  2.33it/s, v_num=2, train_loss=1.750]
-Epoch 0:  82%|████████▎ | 33/40 [00:14&lt;00:03,  2.30it/s, v_num=2, train_loss=1.560]
-Epoch 0:  85%|████████▌ | 34/40 [00:14&lt;00:02,  2.35it/s, v_num=2, train_loss=1.560]
-Epoch 0:  85%|████████▌ | 34/40 [00:14&lt;00:02,  2.32it/s, v_num=2, train_loss=1.740]
-Epoch 0:  88%|████████▊ | 35/40 [00:14&lt;00:02,  2.37it/s, v_num=2, train_loss=1.740]
-Epoch 0:  88%|████████▊ | 35/40 [00:14&lt;00:02,  2.34it/s, v_num=2, train_loss=1.720]
-Epoch 0:  90%|█████████ | 36/40 [00:15&lt;00:01,  2.39it/s, v_num=2, train_loss=1.720]
-Epoch 0:  90%|█████████ | 36/40 [00:15&lt;00:01,  2.36it/s, v_num=2, train_loss=1.730]
-Epoch 0:  92%|█████████▎| 37/40 [00:15&lt;00:01,  2.33it/s, v_num=2, train_loss=1.730]
-Epoch 0:  92%|█████████▎| 37/40 [00:16&lt;00:01,  2.31it/s, v_num=2, train_loss=1.730]
-Epoch 0:  95%|█████████▌| 38/40 [00:16&lt;00:00,  2.35it/s, v_num=2, train_loss=1.730]
-Epoch 0:  95%|█████████▌| 38/40 [00:16&lt;00:00,  2.33it/s, v_num=2, train_loss=1.760]
-Epoch 0:  98%|█████████▊| 39/40 [00:16&lt;00:00,  2.37it/s, v_num=2, train_loss=1.760]
-Epoch 0:  98%|█████████▊| 39/40 [00:16&lt;00:00,  2.34it/s, v_num=2, train_loss=1.570]
-Epoch 0: 100%|██████████| 40/40 [00:16&lt;00:00,  2.39it/s, v_num=2, train_loss=1.570]
-Epoch 0: 100%|██████████| 40/40 [00:16&lt;00:00,  2.36it/s, v_num=2, train_loss=1.980]
-
-Validation: |          | 0/? [00:00&lt;?, ?it/s]
-
-Validation:   0%|          | 0/6 [00:00&lt;?, ?it/s]
-
-Validation DataLoader 0:   0%|          | 0/6 [00:00&lt;?, ?it/s]
-
-Validation DataLoader 0:  17%|█▋        | 1/6 [00:00&lt;00:00, 11.73it/s]
-
-Validation DataLoader 0:  33%|███▎      | 2/6 [00:00&lt;00:00, 11.63it/s]
-
-Validation DataLoader 0:  50%|█████     | 3/6 [00:00&lt;00:00, 11.60it/s]
-
-Validation DataLoader 0:  67%|██████▋   | 4/6 [00:00&lt;00:00, 11.58it/s]
-
-Validation DataLoader 0:  83%|████████▎ | 5/6 [00:01&lt;00:00,  3.39it/s]
-
-Validation DataLoader 0: 100%|██████████| 6/6 [00:01&lt;00:00,  3.98it/s]
-
-
-Epoch 0: 100%|██████████| 40/40 [00:19&lt;00:00,  2.00it/s, v_num=2, train_loss=1.980, mIoU%=18.10]
-Epoch 0: 100%|██████████| 40/40 [00:19&lt;00:00,  2.00it/s, v_num=2, train_loss=1.980, mIoU%=18.10]
-Epoch 0: 100%|██████████| 40/40 [00:20&lt;00:00,  1.99it/s, v_num=2, train_loss=1.980, mIoU%=18.10]
-</pre></div>
-</div>
 </section>
 <section id="testing-the-model">
 <h2>7. Testing the model<a class="headerlink" href="#testing-the-model" title="Link to this heading">#</a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">,</span> <span class="n">ckpt_path</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Testing: |          | 0/? [00:00&lt;?, ?it/s]
-Testing:   0%|          | 0/12 [00:00&lt;?, ?it/s]
-Testing DataLoader 0:   0%|          | 0/12 [00:00&lt;?, ?it/s]
-Testing DataLoader 0:   8%|▊         | 1/12 [00:00&lt;00:00, 11.29it/s]
-Testing DataLoader 0:  17%|█▋        | 2/12 [00:00&lt;00:00, 11.20it/s]
-Testing DataLoader 0:  25%|██▌       | 3/12 [00:00&lt;00:00, 11.14it/s]
-Testing DataLoader 0:  33%|███▎      | 4/12 [00:00&lt;00:00, 11.09it/s]
-Testing DataLoader 0:  42%|████▏     | 5/12 [00:01&lt;00:02,  2.94it/s]
-Testing DataLoader 0:  50%|█████     | 6/12 [00:01&lt;00:01,  3.35it/s]
-Testing DataLoader 0:  58%|█████▊    | 7/12 [00:01&lt;00:01,  3.72it/s]
-Testing DataLoader 0:  67%|██████▋   | 8/12 [00:01&lt;00:00,  4.06it/s]
-Testing DataLoader 0:  75%|███████▌  | 9/12 [00:03&lt;00:01,  2.79it/s]
-Testing DataLoader 0:  83%|████████▎ | 10/12 [00:03&lt;00:00,  3.01it/s]
-Testing DataLoader 0:  92%|█████████▏| 11/12 [00:03&lt;00:00,  3.23it/s]
-Testing DataLoader 0: 100%|██████████| 12/12 [00:03&lt;00:00,  3.50it/s]
-Testing DataLoader 0: 100%|██████████| 12/12 [00:03&lt;00:00,  3.49it/s]
-┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.60313          │
-│     NLL      │          1.56210          │
-│     mAcc     │          26.099%          │
-│     mIoU     │          18.403%          │
-│    pixAcc    │          60.468%          │
+│    Brier     │          0.73010          │
+│     NLL      │          1.87702          │
+│     mAcc     │          19.912%          │
+│     mIoU     │          12.396%          │
+│    pixAcc    │          45.984%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          16.451%          │
-│     aECE     │          16.687%          │
+│     ECE      │          15.667%          │
+│     aECE     │          15.838%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          14.818%          │
-│     AURC     │          23.070%          │
+│    AUGRC     │          22.719%          │
+│     AURC     │          36.100%          │
 │  Cov@5Risk   │           nan%            │
-│  Risk@80Cov  │          33.304%          │
+│  Risk@80Cov  │          51.687%          │
 └──────────────┴───────────────────────────┘
 </pre></div>
 </div>
@@ -881,44 +755,28 @@ Testing DataLoader 0: 100%|██████████| 12/12 [00:03&lt;00:00
 <span class="n">results</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">seg_routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Testing: |          | 0/? [00:00&lt;?, ?it/s]
-Testing:   0%|          | 0/12 [00:00&lt;?, ?it/s]
-Testing DataLoader 0:   0%|          | 0/12 [00:00&lt;?, ?it/s]
-Testing DataLoader 0:   8%|▊         | 1/12 [00:00&lt;00:01, 11.00it/s]
-Testing DataLoader 0:  17%|█▋        | 2/12 [00:00&lt;00:00, 10.84it/s]
-Testing DataLoader 0:  25%|██▌       | 3/12 [00:00&lt;00:00, 10.88it/s]
-Testing DataLoader 0:  33%|███▎      | 4/12 [00:00&lt;00:00, 10.91it/s]
-Testing DataLoader 0:  42%|████▏     | 5/12 [00:01&lt;00:02,  3.00it/s]
-Testing DataLoader 0:  50%|█████     | 6/12 [00:01&lt;00:01,  3.41it/s]
-Testing DataLoader 0:  58%|█████▊    | 7/12 [00:01&lt;00:01,  3.79it/s]
-Testing DataLoader 0:  67%|██████▋   | 8/12 [00:01&lt;00:00,  4.12it/s]
-Testing DataLoader 0:  75%|███████▌  | 9/12 [00:03&lt;00:01,  2.82it/s]
-Testing DataLoader 0:  83%|████████▎ | 10/12 [00:03&lt;00:00,  3.05it/s]
-Testing DataLoader 0:  92%|█████████▏| 11/12 [00:03&lt;00:00,  3.26it/s]
-Testing DataLoader 0: 100%|██████████| 12/12 [00:03&lt;00:00,  3.54it/s]
-Testing DataLoader 0: 100%|██████████| 12/12 [00:03&lt;00:00,  3.53it/s]
-┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.20550          │
-│     NLL      │          0.39975          │
-│     mAcc     │          68.773%          │
+│    Brier     │          0.20426          │
+│     NLL      │          0.39866          │
+│     mAcc     │          68.768%          │
 │     mIoU     │          50.739%          │
-│    pixAcc    │          85.701%          │
+│    pixAcc    │          85.704%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          1.767%           │
-│     aECE     │          1.841%           │
+│     ECE      │          1.561%           │
+│     aECE     │          1.662%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          2.721%           │
-│     AURC     │          3.350%           │
-│  Cov@5Risk   │          72.161%          │
-│  Risk@80Cov  │          7.144%           │
+│    AUGRC     │          2.695%           │
+│     AURC     │          3.318%           │
+│  Cov@5Risk   │          72.396%          │
+│  Risk@80Cov  │          7.014%           │
 └──────────────┴───────────────────────────┘
 </pre></div>
 </div>
@@ -977,7 +835,7 @@ Testing DataLoader 0: 100%|██████████| 12/12 [00:03&lt;00:00
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_muad_seg_003.png" srcset="../../_images/sphx_glr_tutorial_muad_seg_003.png" alt="tutorial muad seg" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 36.542 seconds)</p>
+<img src="../../_images/sphx_glr_tutorial_muad_seg_003.png" srcset="../../_images/sphx_glr_tutorial_muad_seg_003.png" alt="tutorial muad seg" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 35.958 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-segmentation-tutorial-muad-seg-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ab91300a901b0b50ec4f140c171dae8d/tutorial_muad_seg.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_muad_seg.ipynb</span></code></a></p>

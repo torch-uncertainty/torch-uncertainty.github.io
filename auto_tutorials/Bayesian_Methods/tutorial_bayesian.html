@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Train a Bayesian Neural Network in Three Minutes &#8212; TorchUncertainty 0.5.0 documentation</title>
+    <title>Training a Bayesian Neural Network in 20 seconds &#8212; TorchUncertainty 0.5.1 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
+    <script src="../../_static/documentation_options.js?v=b9afe91b"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -380,7 +380,6 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Classification/index.html">Classification</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_bayesian.html">Train a Bayesian Neural Network in 20 seconds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_classification.html">Training a LeNet for Image Classification with TorchUncertainty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_distribution_shift.html">Evaluating Model Performance Under Distribution Shift with TorchUncertainty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_evidential_classification.html">Deep Evidential Classification on a Toy Example</a></li>
@@ -400,7 +399,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Bayesian Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Train a Bayesian Neural Network in Three Minutes</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Training a Bayesian Neural Network in 20 seconds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_mc_batch_norm.html">Training a LeNet with Monte Carlo Batch Normalization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_mc_dropout.html">Training a LeNet with Monte-Carlo Dropout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_muad_mc_drop.html">Monte Carlo Dropout for Semantic Segmentation on MUAD</a></li>
@@ -473,7 +472,7 @@
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">Bayesian Methods</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Train a Bayesian Neural Network in Three Minutes</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Training a Bayesian Neural Network in 20 seconds</span></li>
   </ul>
 </nav>
 </div>
@@ -495,31 +494,35 @@
 <p><a class="reference internal" href="#sphx-glr-download-auto-tutorials-bayesian-methods-tutorial-bayesian-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code.</p>
 </div>
-<section class="sphx-glr-example-title" id="train-a-bayesian-neural-network-in-three-minutes">
-<span id="sphx-glr-auto-tutorials-bayesian-methods-tutorial-bayesian-py"></span><h1>Train a Bayesian Neural Network in Three Minutes<a class="headerlink" href="#train-a-bayesian-neural-network-in-three-minutes" title="Link to this heading">#</a></h1>
-<p>In this tutorial, we will train a variational inference Bayesian Neural Network (BNN) LeNet classifier on the MNIST dataset.</p>
+<section class="sphx-glr-example-title" id="training-a-bayesian-neural-network-in-20-seconds">
+<span id="sphx-glr-auto-tutorials-bayesian-methods-tutorial-bayesian-py"></span><h1>Training a Bayesian Neural Network in 20 seconds<a class="headerlink" href="#training-a-bayesian-neural-network-in-20-seconds" title="Link to this heading">#</a></h1>
+<p>In this tutorial, we will train a variational inference Bayesian Neural Network (viBNN) LeNet classifier on the MNIST dataset.</p>
 <section id="foreword-on-bayesian-neural-networks">
 <h2>Foreword on Bayesian Neural Networks<a class="headerlink" href="#foreword-on-bayesian-neural-networks" title="Link to this heading">#</a></h2>
 <p>Bayesian Neural Networks (BNNs) are a class of neural networks that estimate the uncertainty on their predictions via uncertainty
 on their weights. This is achieved by considering the weights of the neural network as random variables, and by learning their
-posterior distribution. This is in contrast to standard neural networks, which only learn a single set of weights, which can be
-seen as Dirac distributions on the weights.</p>
-<p>For more information on Bayesian Neural Networks, we refer the reader to the following resources:</p>
+posterior distribution. This is in contrast to standard neural networks, which only learn a single set of weights (this can be
+seen as Dirac distributions on the weights).</p>
+<p>For more information on Bayesian Neural Networks, we refer to the following resources:</p>
 <ul class="simple">
 <li><p>Weight Uncertainty in Neural Networks <a class="reference external" href="https://arxiv.org/pdf/1505.05424.pdf">ICML2015</a></p></li>
-<li><p>Hands-on Bayesian Neural Networks - a Tutorial for Deep Learning Users <a class="reference external" href="https://arxiv.org/pdf/2007.06823.pdf">IEEE Computational Intelligence Magazine</a></p></li>
+<li><dl class="simple">
+<dt>Hands-on Bayesian Neural Networks - a Tutorial for Deep Learning Users <a href="#id1"><span class="problematic" id="id2">`</span></a>IEEE Computational Intelligence Magazine</dt><dd><p>&lt;<a class="reference external" href="https://arxiv.org/pdf/2007.06823.pdf">https://arxiv.org/pdf/2007.06823.pdf</a>&gt;`_</p>
+</dd>
+</dl>
+</li>
 </ul>
 </section>
 <section id="training-a-bayesian-lenet-using-torchuncertainty-models-and-lightning">
 <h2>Training a Bayesian LeNet using TorchUncertainty models and Lightning<a class="headerlink" href="#training-a-bayesian-lenet-using-torchuncertainty-models-and-lightning" title="Link to this heading">#</a></h2>
-<p>In this part, we train a Bayesian LeNet, based on the model and routines already implemented in TU.</p>
+<p>In this first part, we train a Bayesian LeNet, based on the model and routines already implemented in TU.</p>
 <section id="loading-the-utilities">
 <h3>1. Loading the utilities<a class="headerlink" href="#loading-the-utilities" title="Link to this heading">#</a></h3>
 <p>To train a BNN using TorchUncertainty, we have to load the following modules:</p>
 <ul class="simple">
-<li><p>our TUTrainer</p></li>
-<li><p>the model: bayesian_lenet, which lies in the torch_uncertainty.model</p></li>
-<li><p>the classification training routine from torch_uncertainty.routines</p></li>
+<li><p>our TUTrainer to improve the display of our metrics</p></li>
+<li><p>the model: bayesian_lenet, which lies in the torch_uncertainty.model.classification.lenet module</p></li>
+<li><p>the classification training routine from torch_uncertainty.routines module</p></li>
 <li><p>the Bayesian objective: the ELBOLoss, which lies in the torch_uncertainty.losses file</p></li>
 <li><p>the datamodule that handles dataloaders: MNISTDataModule from torch_uncertainty.datamodules</p></li>
 </ul>
@@ -532,8 +535,12 @@ neural network utils from torch.nn.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty</span><span class="w"> </span><span class="kn">import</span> <span class="n">TUTrainer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.datamodules</span><span class="w"> </span><span class="kn">import</span> <span class="n">MNISTDataModule</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.losses</span><span class="w"> </span><span class="kn">import</span> <span class="n">ELBOLoss</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models.classification</span><span class="w"> </span><span class="kn">import</span> <span class="n">bayesian_lenet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models.classification.lenet</span><span class="w"> </span><span class="kn">import</span> <span class="n">bayesian_lenet</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.routines</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassificationRoutine</span>
+
+<span class="c1"># We also define the main hyperparameters, with just one epoch for the sake of time</span>
+<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">MAX_EPOCHS</span> <span class="o">=</span> <span class="mi">2</span>
 </pre></div>
 </div>
 </section>
@@ -541,13 +548,14 @@ neural network utils from torch.nn.</p>
 <h3>2. Creating the necessary variables<a class="headerlink" href="#creating-the-necessary-variables" title="Link to this heading">#</a></h3>
 <p>In the following, we instantiate our trainer, define the root of the datasets and the logs.
 We also create the datamodule that handles the MNIST dataset, dataloaders and transforms.
-Please note that the datamodules can also handle OOD detection by setting the eval_ood
-parameter to True. Finally, we create the model using the blueprint from torch_uncertainty.models.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">TUTrainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="n">devices</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+Please note that the datamodules can also handle OOD detection by setting the <cite>eval_ood</cite>
+parameter to True, as well as distribution shift with <cite>eval_shift</cite>.
+Finally, we create the model using the blueprint from torch_uncertainty.models.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">TUTrainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="n">devices</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="n">MAX_EPOCHS</span><span class="p">)</span>
 
 <span class="c1"># datamodule</span>
 <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
-<span class="n">datamodule</span> <span class="o">=</span> <span class="n">MNISTDataModule</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">eval_ood</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">datamodule</span> <span class="o">=</span> <span class="n">MNISTDataModule</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 
 <span class="c1"># model</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">bayesian_lenet</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">)</span>
@@ -556,15 +564,13 @@ parameter to True. Finally, we create the model using the blueprint from torch_u
 </section>
 <section id="the-loss-and-the-training-routine">
 <h3>3. The Loss and the Training Routine<a class="headerlink" href="#the-loss-and-the-training-routine" title="Link to this heading">#</a></h3>
-<p>Then, we just have to define the loss to be used during training. To do this,
-we redefine the default parameters from the ELBO loss using the partial
-function from functools. We use the hyperparameters proposed in the blitz
-library. As we are train a classification model, we use the CrossEntropyLoss
-as the likelihood.
-We then define the training routine using the classification training routine
-from torch_uncertainty.classification. We provide the model, the ELBO
+<p>Then, we just define the loss to be used during training, which is a bit special and called
+the evidence lower bound. We use the hyperparameters proposed in the blitz
+library. As we are training a classification model, we use the CrossEntropyLoss
+as the negative log likelihood. We then define the training routine using the classification
+training routine from torch_uncertainty.classification. We provide the model, the ELBO
 loss and the optimizer to the routine.
-We will use the Adam optimizer with the default learning rate of 0.001.</p>
+We use an Adam optimizer with a learning rate of 0.02.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">loss</span> <span class="o">=</span> <span class="n">ELBOLoss</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
     <span class="n">inner_loss</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">(),</span>
@@ -576,10 +582,7 @@ We will use the Adam optimizer with the default learning rate of 0.001.</p>
     <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
     <span class="n">num_classes</span><span class="o">=</span><span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
     <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
-    <span class="n">optim_recipe</span><span class="o">=</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span>
-        <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
-    <span class="p">),</span>
+    <span class="n">optim_recipe</span><span class="o">=</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">2e-2</span><span class="p">),</span>
     <span class="n">is_ensemble</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
@@ -590,7 +593,7 @@ We will use the Adam optimizer with the default learning rate of 0.001.</p>
 <p>Now that we have prepared all of this, we just have to gather everything in
 the main function and to train the model using our wrapper of Lightning Trainer.
 Specifically, it needs the routine, that includes the model as well as the
-training/eval logic and the datamodule
+training/eval logic and the datamodule.
 The dataset will be downloaded automatically in the root/data folder, and the
 logs will be saved in the root/logs folder.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
@@ -598,50 +601,51 @@ logs will be saved in the root/logs folder.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/9.91M [00:00&lt;?, ?B/s]
-  1%|          | 98.3k/9.91M [00:00&lt;00:15, 626kB/s]
-  4%|▎         | 360k/9.91M [00:00&lt;00:07, 1.24MB/s]
- 10%|█         | 1.02M/9.91M [00:00&lt;00:03, 2.90MB/s]
- 15%|█▍        | 1.44M/9.91M [00:00&lt;00:02, 3.17MB/s]
- 33%|███▎      | 3.24M/9.91M [00:00&lt;00:00, 7.31MB/s]
- 62%|██████▏   | 6.19M/9.91M [00:00&lt;00:00, 13.0MB/s]
-100%|██████████| 9.91M/9.91M [00:00&lt;00:00, 11.3MB/s]
+  1%|          | 98.3k/9.91M [00:00&lt;00:15, 622kB/s]
+  4%|▎         | 360k/9.91M [00:00&lt;00:07, 1.23MB/s]
+ 10%|█         | 1.02M/9.91M [00:00&lt;00:03, 2.56MB/s]
+ 21%|██        | 2.06M/9.91M [00:00&lt;00:01, 4.14MB/s]
+ 35%|███▌      | 3.51M/9.91M [00:00&lt;00:01, 5.92MB/s]
+ 60%|██████    | 5.96M/9.91M [00:00&lt;00:00, 9.16MB/s]
+ 98%|█████████▊| 9.67M/9.91M [00:01&lt;00:00, 14.8MB/s]
+100%|██████████| 9.91M/9.91M [00:01&lt;00:00, 8.91MB/s]
 
   0%|          | 0.00/28.9k [00:00&lt;?, ?B/s]
-100%|██████████| 28.9k/28.9k [00:00&lt;00:00, 373kB/s]
+100%|██████████| 28.9k/28.9k [00:00&lt;00:00, 370kB/s]
 
   0%|          | 0.00/1.65M [00:00&lt;?, ?B/s]
-  4%|▍         | 65.5k/1.65M [00:00&lt;00:03, 419kB/s]
- 22%|██▏       | 360k/1.65M [00:00&lt;00:01, 1.28MB/s]
- 52%|█████▏    | 852k/1.65M [00:00&lt;00:00, 2.43MB/s]
- 93%|█████████▎| 1.54M/1.65M [00:00&lt;00:00, 3.61MB/s]
-100%|██████████| 1.65M/1.65M [00:00&lt;00:00, 2.99MB/s]
+  6%|▌         | 98.3k/1.65M [00:00&lt;00:02, 626kB/s]
+ 22%|██▏       | 360k/1.65M [00:00&lt;00:00, 1.50MB/s]
+ 42%|████▏     | 688k/1.65M [00:00&lt;00:00, 2.01MB/s]
+ 78%|███████▊  | 1.28M/1.65M [00:00&lt;00:00, 3.20MB/s]
+100%|██████████| 1.65M/1.65M [00:00&lt;00:00, 3.00MB/s]
 
   0%|          | 0.00/4.54k [00:00&lt;?, ?B/s]
-100%|██████████| 4.54k/4.54k [00:00&lt;00:00, 9.87MB/s]
+100%|██████████| 4.54k/4.54k [00:00&lt;00:00, 10.6MB/s]
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          95.210%          │
-│    Brier     │          0.07424          │
-│   Entropy    │          0.20762          │
-│     NLL      │          0.16047          │
+│     Acc      │          84.840%          │
+│    Brier     │          0.22111          │
+│   Entropy    │          0.56906          │
+│     NLL      │          0.47510          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          1.728%           │
-│     aECE     │          1.728%           │
+│     ECE      │          3.549%           │
+│     aECE     │          3.268%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          0.412%           │
-│     AURC     │          0.467%           │
-│  Cov@5Risk   │         100.000%          │
-│  Risk@80Cov  │          0.600%           │
+│    AUGRC     │          2.794%           │
+│     AURC     │          3.487%           │
+│  Cov@5Risk   │          72.460%          │
+│  Risk@80Cov  │          6.912%           │
 └──────────────┴───────────────────────────┘
 
-[{&#39;test/cal/ECE&#39;: 0.017277222126722336, &#39;test/cal/aECE&#39;: 0.017277222126722336, &#39;test/cls/Acc&#39;: 0.9520999789237976, &#39;test/cls/Brier&#39;: 0.074241504073143, &#39;test/cls/NLL&#39;: 0.1604684740304947, &#39;test/sc/AUGRC&#39;: 0.004121227655559778, &#39;test/sc/AURC&#39;: 0.004667955916374922, &#39;test/sc/Cov@5Risk&#39;: 1.0, &#39;test/sc/Risk@80Cov&#39;: 0.006000000052154064, &#39;test/cls/Entropy&#39;: 0.20761831104755402, &#39;test/ens_Disagreement&#39;: 0.00745416572317481, &#39;test/ens_Entropy&#39;: 0.20662963390350342, &#39;test/ens_MI&#39;: 0.0009886363986879587}]
+[{&#39;test/cal/ECE&#39;: 0.035491231828927994, &#39;test/cal/aECE&#39;: 0.032683443278074265, &#39;test/cls/Acc&#39;: 0.8483999967575073, &#39;test/cls/Brier&#39;: 0.22110968828201294, &#39;test/cls/NLL&#39;: 0.4751049280166626, &#39;test/sc/AUGRC&#39;: 0.02794443629682064, &#39;test/sc/AURC&#39;: 0.03487147390842438, &#39;test/sc/Cov@5Risk&#39;: 0.7246000170707703, &#39;test/sc/Risk@80Cov&#39;: 0.06912499666213989, &#39;test/cls/Entropy&#39;: 0.5690603256225586, &#39;test/ens_Disagreement&#39;: 0.0606958270072937, &#39;test/ens_Entropy&#39;: 0.5500904321670532, &#39;test/ens_MI&#39;: 0.018969934433698654}]
 </pre></div>
 </div>
 </section>
@@ -649,12 +653,13 @@ logs will be saved in the root/logs folder.</p>
 <h3>5. Testing the Model<a class="headerlink" href="#testing-the-model" title="Link to this heading">#</a></h3>
 <p>Now that the model is trained, let’s test it on MNIST.
 Please note that we apply a reshape to the logits to determine the dimension corresponding to the ensemble
-and to the batch. As for TorchUncertainty 0.2.0, the ensemble dimension is merged with the batch dimension
+and to the batch. As for TorchUncertainty 0.5.1, the ensemble dimension is merged with the batch dimension
 in this order (num_estimator x batch, classes).</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torchvision</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">einops</span><span class="w"> </span><span class="kn">import</span> <span class="n">rearrange</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -665,38 +670,40 @@ in this order (num_estimator x batch, classes).</p>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 
-<span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">())</span>
-<span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">dataiter</span><span class="p">)</span>
+<span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">()))</span>
 
 <span class="c1"># print images</span>
 <span class="n">imshow</span><span class="p">(</span><span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span><span class="n">images</span><span class="p">[:</span><span class="mi">4</span><span class="p">,</span> <span class="o">...</span><span class="p">]))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ground truth: &quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
 
 <span class="c1"># Put the model in eval mode to use several samples</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
-<span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">images</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>  <span class="c1"># num_estimators, batch_size, num_classes</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">routine</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">logits</span> <span class="o">=</span> <span class="n">routine</span><span class="p">(</span><span class="n">images</span><span class="p">[:</span><span class="mi">4</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Output logit shape (Num predictions x Batch) x Classes: &quot;</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">logits</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="s2">&quot;(m b) c -&gt; b m c&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>  <span class="c1"># batch_size, num_estimators, num_classes</span>
 
-<span class="c1"># We apply the softmax on the classes and average over the estimators</span>
+<span class="c1"># We apply the softmax on the classes then average over the estimators</span>
 <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">avg_probs</span> <span class="o">=</span> <span class="n">probs</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">var_probs</span> <span class="o">=</span> <span class="n">probs</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">avg_probs</span> <span class="o">=</span> <span class="n">probs</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">var_probs</span> <span class="o">=</span> <span class="n">probs</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="n">_</span><span class="p">,</span> <span class="n">predicted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">avg_probs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">predicted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">avg_probs</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Predicted digits: &quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">predicted</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="s2">&quot;Std. dev. of the scores over the posterior samples&quot;</span><span class="p">,</span>
-    <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var_probs</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">predicted</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s2">.3</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)),</span>
+    <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var_probs</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">predicted</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)),</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_tutorial_bayesian_001.png" srcset="../../_images/sphx_glr_tutorial_bayesian_001.png" alt="tutorial bayesian" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ground truth:  7 2 1 0
+Output logit shape (Num predictions x Batch) x Classes:  torch.Size([64, 10])
 Predicted digits:  7 2 1 0
-Std. dev. of the scores over the posterior samples 0.000456 0.000133 0.00123 0.00767
+Std. dev. of the scores over the posterior samples 0.019 0.026 0.012 0.017
 </pre></div>
 </div>
 <p>Here, we show the variance of the top prediction. This is a non-standard but intuitive way to show the diversity of the predictions
-of the ensemble. Ideally, the variance should be high when the average top prediction is incorrect.</p>
+of the ensemble. Ideally, the variance should be high when the prediction is incorrect.</p>
 </section>
 </section>
 <section id="references">
@@ -707,7 +714,7 @@ of the ensemble. Ideally, the variance should be high when the average top predi
 <li><p><strong>The Adam optimizer:</strong> Kingma, D. P., &amp; Ba, J. (2014). “Adam: A method for stochastic optimization.” <a class="reference external" href="https://arxiv.org/pdf/1412.6980.pdf">ICLR 2015</a>.</p></li>
 <li><p><strong>The Blitz</strong> <a class="reference external" href="https://github.com/piEsposito/blitz-bayesian-deep-learning">library</a> (for the hyperparameters).</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 22.734 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 15.398 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-bayesian-methods-tutorial-bayesian-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/cae7b1d5e1f76f661d2ba21fd89024a3/tutorial_bayesian.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_bayesian.ipynb</span></code></a></p>

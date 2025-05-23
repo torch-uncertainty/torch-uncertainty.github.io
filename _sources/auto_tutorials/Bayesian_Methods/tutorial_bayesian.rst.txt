@@ -18,44 +18,45 @@
 .. _sphx_glr_auto_tutorials_Bayesian_Methods_tutorial_bayesian.py:
 
 
-Train a Bayesian Neural Network in Three Minutes
+Training a Bayesian Neural Network in 20 seconds
 ================================================
 
-In this tutorial, we will train a variational inference Bayesian Neural Network (BNN) LeNet classifier on the MNIST dataset.
+In this tutorial, we will train a variational inference Bayesian Neural Network (viBNN) LeNet classifier on the MNIST dataset.
 
 Foreword on Bayesian Neural Networks
 ------------------------------------
 
 Bayesian Neural Networks (BNNs) are a class of neural networks that estimate the uncertainty on their predictions via uncertainty
 on their weights. This is achieved by considering the weights of the neural network as random variables, and by learning their
-posterior distribution. This is in contrast to standard neural networks, which only learn a single set of weights, which can be
-seen as Dirac distributions on the weights.
+posterior distribution. This is in contrast to standard neural networks, which only learn a single set of weights (this can be
+seen as Dirac distributions on the weights).
 
-For more information on Bayesian Neural Networks, we refer the reader to the following resources:
+For more information on Bayesian Neural Networks, we refer to the following resources:
 
 - Weight Uncertainty in Neural Networks `ICML2015 <https://arxiv.org/pdf/1505.05424.pdf>`_
-- Hands-on Bayesian Neural Networks - a Tutorial for Deep Learning Users `IEEE Computational Intelligence Magazine <https://arxiv.org/pdf/2007.06823.pdf>`_
+- Hands-on Bayesian Neural Networks - a Tutorial for Deep Learning Users `IEEE Computational Intelligence Magazine
+    <https://arxiv.org/pdf/2007.06823.pdf>`_
 
 Training a Bayesian LeNet using TorchUncertainty models and Lightning
 ---------------------------------------------------------------------
 
-In this part, we train a Bayesian LeNet, based on the model and routines already implemented in TU.
+In this first part, we train a Bayesian LeNet, based on the model and routines already implemented in TU.
 
 1. Loading the utilities
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 To train a BNN using TorchUncertainty, we have to load the following modules:
 
-- our TUTrainer
-- the model: bayesian_lenet, which lies in the torch_uncertainty.model
-- the classification training routine from torch_uncertainty.routines
+- our TUTrainer to improve the display of our metrics
+- the model: bayesian_lenet, which lies in the torch_uncertainty.model.classification.lenet module
+- the classification training routine from torch_uncertainty.routines module
 - the Bayesian objective: the ELBOLoss, which lies in the torch_uncertainty.losses file
 - the datamodule that handles dataloaders: MNISTDataModule from torch_uncertainty.datamodules
 
 We will also need to define an optimizer using torch.optim and Pytorch's
 neural network utils from torch.nn.
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-52
+.. GENERATED FROM PYTHON SOURCE LINES 43-57
 
 .. code-block:: Python
 
@@ -66,9 +67,12 @@ neural network utils from torch.nn.
     from torch_uncertainty import TUTrainer
     from torch_uncertainty.datamodules import MNISTDataModule
     from torch_uncertainty.losses import ELBOLoss
-    from torch_uncertainty.models.classification import bayesian_lenet
+    from torch_uncertainty.models.classification.lenet import bayesian_lenet
     from torch_uncertainty.routines import ClassificationRoutine
 
+    # We also define the main hyperparameters, with just one epoch for the sake of time
+    BATCH_SIZE = 512
+    MAX_EPOCHS = 2
 
 
 
@@ -76,26 +80,28 @@ neural network utils from torch.nn.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-60
+
+.. GENERATED FROM PYTHON SOURCE LINES 58-66
 
 2. Creating the necessary variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the following, we instantiate our trainer, define the root of the datasets and the logs.
 We also create the datamodule that handles the MNIST dataset, dataloaders and transforms.
-Please note that the datamodules can also handle OOD detection by setting the eval_ood
-parameter to True. Finally, we create the model using the blueprint from torch_uncertainty.models.
+Please note that the datamodules can also handle OOD detection by setting the `eval_ood`
+parameter to True, as well as distribution shift with `eval_shift`.
+Finally, we create the model using the blueprint from torch_uncertainty.models.
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-70
+.. GENERATED FROM PYTHON SOURCE LINES 66-76
 
 .. code-block:: Python
 
 
-    trainer = TUTrainer(accelerator="gpu", devices=1, enable_progress_bar=False, max_epochs=1)
+    trainer = TUTrainer(accelerator="gpu", devices=1, enable_progress_bar=False, max_epochs=MAX_EPOCHS)
 
     # datamodule
     root = Path("data")
-    datamodule = MNISTDataModule(root=root, batch_size=128, eval_ood=False)
+    datamodule = MNISTDataModule(root=root, batch_size=BATCH_SIZE, num_workers=8)
 
     # model
     model = bayesian_lenet(datamodule.num_channels, datamodule.num_classes)
@@ -107,21 +113,20 @@ parameter to True. Finally, we create the model using the blueprint from torch_u
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-82
+.. GENERATED FROM PYTHON SOURCE LINES 77-87
 
 3. The Loss and the Training Routine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Then, we just have to define the loss to be used during training. To do this,
-we redefine the default parameters from the ELBO loss using the partial
-function from functools. We use the hyperparameters proposed in the blitz
-library. As we are train a classification model, we use the CrossEntropyLoss
-as the likelihood.
-We then define the training routine using the classification training routine
-from torch_uncertainty.classification. We provide the model, the ELBO
-loss and the optimizer to the routine.
-We will use the Adam optimizer with the default learning rate of 0.001.
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-101
+Then, we just define the loss to be used during training, which is a bit special and called
+the evidence lower bound. We use the hyperparameters proposed in the blitz
+library. As we are training a classification model, we use the CrossEntropyLoss
+as the negative log likelihood. We then define the training routine using the classification
+training routine from torch_uncertainty.classification. We provide the model, the ELBO
+loss and the optimizer to the routine.
+We use an Adam optimizer with a learning rate of 0.02.
+
+.. GENERATED FROM PYTHON SOURCE LINES 87-103
 
 .. code-block:: Python
 
@@ -137,10 +142,7 @@ We will use the Adam optimizer with the default learning rate of 0.001.
         model=model,
         num_classes=datamodule.num_classes,
         loss=loss,
-        optim_recipe=optim.Adam(
-            model.parameters(),
-            lr=1e-3,
-        ),
+        optim_recipe=optim.Adam(model.parameters(), lr=2e-2),
         is_ensemble=True,
     )
 
@@ -151,7 +153,7 @@ We will use the Adam optimizer with the default learning rate of 0.001.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-111
+.. GENERATED FROM PYTHON SOURCE LINES 104-113
 
 4. Gathering Everything and Training the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -159,11 +161,11 @@ We will use the Adam optimizer with the default learning rate of 0.001.
 Now that we have prepared all of this, we just have to gather everything in
 the main function and to train the model using our wrapper of Lightning Trainer.
 Specifically, it needs the routine, that includes the model as well as the
-training/eval logic and the datamodule
+training/eval logic and the datamodule.
 The dataset will be downloaded automatically in the root/data folder, and the
 logs will be saved in the root/logs folder.
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-115
+.. GENERATED FROM PYTHON SOURCE LINES 113-116
 
 .. code-block:: Python
 
@@ -174,60 +176,61 @@ logs will be saved in the root/logs folder.
 
 
 
-
 .. rst-class:: sphx-glr-script-out
 
  .. code-block:: none
 
-      0%|          | 0.00/9.91M [00:00<?, ?B/s]      1%|          | 98.3k/9.91M [00:00<00:15, 626kB/s]      4%|▎         | 360k/9.91M [00:00<00:07, 1.24MB/s]     10%|█         | 1.02M/9.91M [00:00<00:03, 2.90MB/s]     15%|█▍        | 1.44M/9.91M [00:00<00:02, 3.17MB/s]     33%|███▎      | 3.24M/9.91M [00:00<00:00, 7.31MB/s]     62%|██████▏   | 6.19M/9.91M [00:00<00:00, 13.0MB/s]    100%|██████████| 9.91M/9.91M [00:00<00:00, 11.3MB/s]
-      0%|          | 0.00/28.9k [00:00<?, ?B/s]    100%|██████████| 28.9k/28.9k [00:00<00:00, 373kB/s]
-      0%|          | 0.00/1.65M [00:00<?, ?B/s]      4%|▍         | 65.5k/1.65M [00:00<00:03, 419kB/s]     22%|██▏       | 360k/1.65M [00:00<00:01, 1.28MB/s]     52%|█████▏    | 852k/1.65M [00:00<00:00, 2.43MB/s]     93%|█████████▎| 1.54M/1.65M [00:00<00:00, 3.61MB/s]    100%|██████████| 1.65M/1.65M [00:00<00:00, 2.99MB/s]
-      0%|          | 0.00/4.54k [00:00<?, ?B/s]    100%|██████████| 4.54k/4.54k [00:00<00:00, 9.87MB/s]
+      0%|          | 0.00/9.91M [00:00<?, ?B/s]      1%|          | 98.3k/9.91M [00:00<00:15, 622kB/s]      4%|▎         | 360k/9.91M [00:00<00:07, 1.23MB/s]     10%|█         | 1.02M/9.91M [00:00<00:03, 2.56MB/s]     21%|██        | 2.06M/9.91M [00:00<00:01, 4.14MB/s]     35%|███▌      | 3.51M/9.91M [00:00<00:01, 5.92MB/s]     60%|██████    | 5.96M/9.91M [00:00<00:00, 9.16MB/s]     98%|█████████▊| 9.67M/9.91M [00:01<00:00, 14.8MB/s]    100%|██████████| 9.91M/9.91M [00:01<00:00, 8.91MB/s]
+      0%|          | 0.00/28.9k [00:00<?, ?B/s]    100%|██████████| 28.9k/28.9k [00:00<00:00, 370kB/s]
+      0%|          | 0.00/1.65M [00:00<?, ?B/s]      6%|▌         | 98.3k/1.65M [00:00<00:02, 626kB/s]     22%|██▏       | 360k/1.65M [00:00<00:00, 1.50MB/s]     42%|████▏     | 688k/1.65M [00:00<00:00, 2.01MB/s]     78%|███████▊  | 1.28M/1.65M [00:00<00:00, 3.20MB/s]    100%|██████████| 1.65M/1.65M [00:00<00:00, 3.00MB/s]
+      0%|          | 0.00/4.54k [00:00<?, ?B/s]    100%|██████████| 4.54k/4.54k [00:00<00:00, 10.6MB/s]
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃      Classification       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     Acc      │          95.210%          │
-    │    Brier     │          0.07424          │
-    │   Entropy    │          0.20762          │
-    │     NLL      │          0.16047          │
+    │     Acc      │          84.840%          │
+    │    Brier     │          0.22111          │
+    │   Entropy    │          0.56906          │
+    │     NLL      │          0.47510          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          1.728%           │
-    │     aECE     │          1.728%           │
+    │     ECE      │          3.549%           │
+    │     aECE     │          3.268%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          0.412%           │
-    │     AURC     │          0.467%           │
-    │  Cov@5Risk   │         100.000%          │
-    │  Risk@80Cov  │          0.600%           │
+    │    AUGRC     │          2.794%           │
+    │     AURC     │          3.487%           │
+    │  Cov@5Risk   │          72.460%          │
+    │  Risk@80Cov  │          6.912%           │
     └──────────────┴───────────────────────────┘
 
-    [{'test/cal/ECE': 0.017277222126722336, 'test/cal/aECE': 0.017277222126722336, 'test/cls/Acc': 0.9520999789237976, 'test/cls/Brier': 0.074241504073143, 'test/cls/NLL': 0.1604684740304947, 'test/sc/AUGRC': 0.004121227655559778, 'test/sc/AURC': 0.004667955916374922, 'test/sc/Cov@5Risk': 1.0, 'test/sc/Risk@80Cov': 0.006000000052154064, 'test/cls/Entropy': 0.20761831104755402, 'test/ens_Disagreement': 0.00745416572317481, 'test/ens_Entropy': 0.20662963390350342, 'test/ens_MI': 0.0009886363986879587}]
+    [{'test/cal/ECE': 0.035491231828927994, 'test/cal/aECE': 0.032683443278074265, 'test/cls/Acc': 0.8483999967575073, 'test/cls/Brier': 0.22110968828201294, 'test/cls/NLL': 0.4751049280166626, 'test/sc/AUGRC': 0.02794443629682064, 'test/sc/AURC': 0.03487147390842438, 'test/sc/Cov@5Risk': 0.7246000170707703, 'test/sc/Risk@80Cov': 0.06912499666213989, 'test/cls/Entropy': 0.5690603256225586, 'test/ens_Disagreement': 0.0606958270072937, 'test/ens_Entropy': 0.5500904321670532, 'test/ens_MI': 0.018969934433698654}]
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-123
+.. GENERATED FROM PYTHON SOURCE LINES 117-124
 
 5. Testing the Model
 ~~~~~~~~~~~~~~~~~~~~
 
 Now that the model is trained, let's test it on MNIST.
 Please note that we apply a reshape to the logits to determine the dimension corresponding to the ensemble
-and to the batch. As for TorchUncertainty 0.2.0, the ensemble dimension is merged with the batch dimension
+and to the batch. As for TorchUncertainty 0.5.1, the ensemble dimension is merged with the batch dimension
 in this order (num_estimator x batch, classes).
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-160
+.. GENERATED FROM PYTHON SOURCE LINES 124-164
 
 .. code-block:: Python
+
 
     import matplotlib.pyplot as plt
     import numpy as np
     import torch
     import torchvision
+    from einops import rearrange
 
 
     def imshow(img) -> None:
@@ -238,28 +241,29 @@ in this order (num_estimator x batch, classes).
         plt.show()
 
 
-    dataiter = iter(datamodule.val_dataloader())
-    images, labels = next(dataiter)
+    images, labels = next(iter(datamodule.val_dataloader()))
 
     # print images
     imshow(torchvision.utils.make_grid(images[:4, ...]))
     print("Ground truth: ", " ".join(f"{labels[j]}" for j in range(4)))
 
     # Put the model in eval mode to use several samples
-    model = model.eval()
-    logits = model(images).reshape(16, 128, 10)  # num_estimators, batch_size, num_classes
+    model = routine.eval()
+    logits = routine(images[:4, ...])
+    print("Output logit shape (Num predictions x Batch) x Classes: ", logits.shape)
+    logits = rearrange(logits, "(m b) c -> b m c", b=4)  # batch_size, num_estimators, num_classes
 
-    # We apply the softmax on the classes and average over the estimators
+    # We apply the softmax on the classes then average over the estimators
     probs = torch.nn.functional.softmax(logits, dim=-1)
-    avg_probs = probs.mean(dim=0)
-    var_probs = probs.std(dim=0)
+    avg_probs = probs.mean(dim=1)
+    var_probs = probs.std(dim=1)
 
-    _, predicted = torch.max(avg_probs, 1)
+    predicted = torch.argmax(avg_probs, -1)
 
     print("Predicted digits: ", " ".join(f"{predicted[j]}" for j in range(4)))
     print(
         "Std. dev. of the scores over the posterior samples",
-        " ".join(f"{var_probs[j][predicted[j]]:.3}" for j in range(4)),
+        " ".join(f"{var_probs[j][predicted[j]]:.3f}" for j in range(4)),
     )
 
 
@@ -275,16 +279,17 @@ in this order (num_estimator x batch, classes).
  .. code-block:: none
 
     Ground truth:  7 2 1 0
+    Output logit shape (Num predictions x Batch) x Classes:  torch.Size([64, 10])
     Predicted digits:  7 2 1 0
-    Std. dev. of the scores over the posterior samples 0.000456 0.000133 0.00123 0.00767
+    Std. dev. of the scores over the posterior samples 0.019 0.026 0.012 0.017
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-171
+.. GENERATED FROM PYTHON SOURCE LINES 165-175
 
 Here, we show the variance of the top prediction. This is a non-standard but intuitive way to show the diversity of the predictions
-of the ensemble. Ideally, the variance should be high when the average top prediction is incorrect.
+of the ensemble. Ideally, the variance should be high when the prediction is incorrect.
 
 References
 ----------
@@ -297,7 +302,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 22.734 seconds)
+   **Total running time of the script:** (0 minutes 15.398 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Bayesian_Methods_tutorial_bayesian.py:

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Deep Evidential Classification on a Toy Example &#8212; TorchUncertainty 0.5.0 documentation</title>
+    <title>Deep Evidential Classification on a Toy Example &#8212; TorchUncertainty 0.5.1 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
+    <script src="../../_static/documentation_options.js?v=b9afe91b"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -380,7 +380,6 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Classification</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="tutorial_bayesian.html">Train a Bayesian Neural Network in 20 seconds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_classification.html">Training a LeNet for Image Classification with TorchUncertainty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_distribution_shift.html">Evaluating Model Performance Under Distribution Shift with TorchUncertainty</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Deep Evidential Classification on a Toy Example</a></li>
@@ -400,7 +399,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Bayesian_Methods/index.html">Bayesian Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_bayesian.html">Train a Bayesian Neural Network in Three Minutes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_bayesian.html">Training a Bayesian Neural Network in 20 seconds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_mc_batch_norm.html">Training a LeNet with Monte Carlo Batch Normalization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_mc_dropout.html">Training a LeNet with Monte-Carlo Dropout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_muad_mc_drop.html">Monte Carlo Dropout for Semantic Segmentation on MUAD</a></li>
@@ -521,7 +520,7 @@ parameters of the evidential distribution.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">optim</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty</span><span class="w"> </span><span class="kn">import</span> <span class="n">TUTrainer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.datamodules</span><span class="w"> </span><span class="kn">import</span> <span class="n">MNISTDataModule</span>
@@ -584,27 +583,27 @@ with the default learning rate of 0.002 and a weight decay of 0.005.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          94.140%          │
-│    Brier     │          0.11267          │
-│   Entropy    │          0.00832          │
+│     Acc      │          75.690%          │
+│    Brier     │          0.47406          │
+│   Entropy    │          0.02278          │
 │     NLL      │            inf            │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          5.512%           │
-│     aECE     │          5.510%           │
+│     ECE      │          23.377%          │
+│     aECE     │          23.377%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          1.508%           │
-│     AURC     │          3.044%           │
-│  Cov@5Risk   │          98.120%          │
-│  Risk@80Cov  │          2.500%           │
+│    AUGRC     │          8.597%           │
+│     AURC     │          16.336%          │
+│  Cov@5Risk   │           nan%            │
+│  Risk@80Cov  │          15.975%          │
 └──────────────┴───────────────────────────┘
 
-[{&#39;test/cal/ECE&#39;: 0.05511810630559921, &#39;test/cal/aECE&#39;: 0.0550990030169487, &#39;test/cls/Acc&#39;: 0.9413999915122986, &#39;test/cls/Brier&#39;: 0.11267015337944031, &#39;test/cls/NLL&#39;: inf, &#39;test/sc/AUGRC&#39;: 0.015081148594617844, &#39;test/sc/AURC&#39;: 0.030442357063293457, &#39;test/sc/Cov@5Risk&#39;: 0.9811999797821045, &#39;test/sc/Risk@80Cov&#39;: 0.02500000037252903, &#39;test/cls/Entropy&#39;: 0.008316105231642723}]
+[{&#39;test/cal/ECE&#39;: 0.2337719053030014, &#39;test/cal/aECE&#39;: 0.23377138376235962, &#39;test/cls/Acc&#39;: 0.7569000124931335, &#39;test/cls/Brier&#39;: 0.474063515663147, &#39;test/cls/NLL&#39;: inf, &#39;test/sc/AUGRC&#39;: 0.08596877008676529, &#39;test/sc/AURC&#39;: 0.16336287558078766, &#39;test/sc/Cov@5Risk&#39;: nan, &#39;test/sc/Risk@80Cov&#39;: 0.15974999964237213, &#39;test/cls/Entropy&#39;: 0.02278098650276661}]
 </pre></div>
 </div>
 </section>
@@ -659,20 +658,20 @@ with the default learning rate of 0.002 and a weight decay of 0.005.</p>
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_tutorial_evidential_classification_001.png" srcset="../../_images/sphx_glr_tutorial_evidential_classification_001.png" alt="tutorial evidential classification" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ground truth:  7 2 1 0
-Predicted digits for the image 0: 7 with strength 109.922 and entropy 0.463.
-Predicted digits for the image 1: 2 with strength 111.903 and entropy 0.883.
-Predicted digits for the image 2: 1 with strength 98.146 and entropy 0.508.
-Predicted digits for the image 3: 0 with strength 53.834 and entropy 1.354.
+Predicted digits for the image 0: 7 with strength 64.775 and entropy 0.708.
+Predicted digits for the image 1: 0 with strength 10.000 and entropy 2.303.
+Predicted digits for the image 2: 1 with strength 72.634 and entropy 0.647.
+Predicted digits for the image 3: 8 with strength 69.377 and entropy 1.385.
 Ground truth:  7 2 1 0
-Predicted digits for the image 0: 1 with strength 15.496 and entropy 2.059.
-Predicted digits for the image 1: 1 with strength 33.639 and entropy 1.550.
-Predicted digits for the image 2: 1 with strength 37.449 and entropy 1.490.
-Predicted digits for the image 3: 0 with strength 33.312 and entropy 1.276.
+Predicted digits for the image 0: 4 with strength 40.651 and entropy 1.459.
+Predicted digits for the image 1: 8 with strength 33.392 and entropy 1.560.
+Predicted digits for the image 2: 8 with strength 31.694 and entropy 1.221.
+Predicted digits for the image 3: 8 with strength 72.453 and entropy 1.086.
 Ground truth:  7 2 1 0
-Predicted digits for the image 0: 5 with strength 33.267 and entropy 1.771.
-Predicted digits for the image 1: 4 with strength 47.373 and entropy 1.381.
-Predicted digits for the image 2: 7 with strength 43.095 and entropy 0.971.
-Predicted digits for the image 3: 8 with strength 43.095 and entropy 1.628.
+Predicted digits for the image 0: 0 with strength 77.592 and entropy 1.024.
+Predicted digits for the image 1: 0 with strength 10.000 and entropy 2.303.
+Predicted digits for the image 2: 7 with strength 35.714 and entropy 1.118.
+Predicted digits for the image 3: 8 with strength 61.596 and entropy 0.737.
 </pre></div>
 </div>
 </section>
@@ -682,7 +681,7 @@ Predicted digits for the image 3: 8 with strength 43.095 and entropy 1.628.
 <ul class="simple">
 <li><p><strong>Deep Evidential Classification:</strong> Murat Sensoy, Lance Kaplan, &amp; Melih Kandemir (2018). Evidential Deep Learning to Quantify Classification Uncertainty <a class="reference external" href="https://arxiv.org/pdf/1806.01768">NeurIPS 2018</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 5.991 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 6.078 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-classification-tutorial-evidential-classification-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/911fedea902d5fd5148110aa3641e71c/tutorial_evidential_classification.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_evidential_classification.ipynb</span></code></a></p>
