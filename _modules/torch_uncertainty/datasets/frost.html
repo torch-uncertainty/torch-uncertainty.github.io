@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>torch_uncertainty.datasets.frost &#8212; TorchUncertainty 0.5.1 documentation</title>
+    <title>torch_uncertainty.datasets.frost &#8212; TorchUncertainty 0.5.2 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=b9afe91b"></script>
+    <script src="../../../_static/documentation_options.js?v=8e576371"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -434,21 +434,21 @@
                 <article class="bd-article">
                   
   <h1>Source code for torch_uncertainty.datasets.frost</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">importlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">util</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">importlib.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Traversable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">importlib.resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">files</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchvision.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">VisionDataset</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision.datasets.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">check_integrity</span><span class="p">,</span>
-    <span class="n">download_and_extract_archive</span><span class="p">,</span>
-<span class="p">)</span>
+
+<span class="n">FROST_ASSETS_MOD</span> <span class="o">=</span> <span class="s2">&quot;torch_uncertainty_assets.frost&quot;</span>
+<span class="n">tu_assets_installed</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;torch_uncertainty_assets&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">pil_loader</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span>
-    <span class="c1"># open path as file to avoid ResourceWarning (https://github.com/python-pillow/Pillow/issues/835)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pil_loader</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="n">Traversable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">img</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
@@ -456,61 +456,26 @@
 
 <div class="viewcode-block" id="FrostImages">
 <a class="viewcode-back" href="../../../generated/torch_uncertainty.datasets.FrostImages.html#torch_uncertainty.datasets.FrostImages">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">FrostImages</span><span class="p">(</span><span class="n">VisionDataset</span><span class="p">):</span>  <span class="c1"># TODO: Use ImageFolder</span>
-    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://zenodo.org/records/10438904/files/frost.zip&quot;</span>
-    <span class="n">zip_md5</span> <span class="o">=</span> <span class="s2">&quot;d82f29f620d43a68e71e34b28f7c35cb&quot;</span>
-    <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;frost.zip&quot;</span>
-    <span class="n">samples</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;frost1.png&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;frost2.png&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;frost3.jpg&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;frost4.jpg&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;frost5.jpg&quot;</span><span class="p">,</span>
-    <span class="p">]</span>
-
+<span class="k">class</span><span class="w"> </span><span class="nc">FrostImages</span><span class="p">(</span><span class="n">VisionDataset</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
-        <span class="n">transform</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">transform</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">target_transform</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_integrity</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="s2">&quot;Dataset not found or corrupted. You can use download=True to download it.&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tu_assets_installed</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+                <span class="s2">&quot;The torch-uncertainty-assets library is not installed. Please install&quot;</span>
+                <span class="s2">&quot;torch_uncertainty with the image option:&quot;</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;pip install -U &quot;torch_uncertainty[image]&quot;.&quot;&quot;&quot;</span>
             <span class="p">)</span>
-
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;frost&quot;</span><span class="p">,</span>
+            <span class="n">FROST_ASSETS_MOD</span><span class="p">,</span>
             <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
             <span class="n">target_transform</span><span class="o">=</span><span class="n">target_transform</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loader</span> <span class="o">=</span> <span class="n">pil_loader</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_check_integrity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="n">fpath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span>
-        <span class="k">return</span> <span class="n">check_integrity</span><span class="p">(</span>
-            <span class="n">fpath</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">zip_md5</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_integrity</span><span class="p">():</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Files already downloaded and verified&quot;</span><span class="p">)</span>
-            <span class="k">return</span>
-
-        <span class="n">download_and_extract_archive</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
-            <span class="n">download_root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
-            <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
-            <span class="n">md5</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zip_md5</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Downloaded </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+        <span class="n">sample_path</span> <span class="o">=</span> <span class="n">files</span><span class="p">(</span><span class="n">FROST_ASSETS_MOD</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">sample_path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;frost</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.jpg&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the samples of the dataset.</span>
@@ -521,8 +486,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple: (sample, target) where target is class_index of the target class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-        <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sample</span>
