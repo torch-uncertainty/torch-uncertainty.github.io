@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>torch_uncertainty.routines.regression &#8212; TorchUncertainty 0.5.2.post0 documentation</title>
+    <title>torch_uncertainty.routines.regression &#8212; TorchUncertainty 0.6.0 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=0e7ff300"></script>
+    <script src="../../../_static/documentation_options.js?v=8fa8b3e9"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -434,18 +434,17 @@
                 <article class="bd-article">
                   
   <h1>Source code for torch_uncertainty.routines.regression</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">einops</span><span class="w"> </span><span class="kn">import</span> <span class="n">rearrange</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">lightning.pytorch</span><span class="w"> </span><span class="kn">import</span> <span class="n">LightningModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lightning.pytorch.loggers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">lightning.pytorch.utilities.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">STEP_OUTPUT</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.distributions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Categorical</span><span class="p">,</span>
     <span class="n">Distribution</span><span class="p">,</span>
     <span class="n">Independent</span><span class="p">,</span>
-    <span class="n">MixtureSameFamily</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optimizer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeanAbsoluteError</span><span class="p">,</span> <span class="n">MeanSquaredError</span><span class="p">,</span> <span class="n">MetricCollection</span>
@@ -453,6 +452,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.losses</span><span class="w"> </span><span class="kn">import</span> <span class="n">ELBOLoss</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DistributionNLL</span><span class="p">,</span>
+    <span class="n">QuantileCalibrationError</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">EPOCH_UPDATE_MODEL</span><span class="p">,</span>
@@ -479,6 +479,8 @@
         <span class="n">optim_recipe</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">Optimizer</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">eval_shift</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">format_batch_fn</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">log_plots</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">num_bins_cal_err</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
         <span class="n">save_in_csv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">csv_filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;results.csv&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -495,6 +497,10 @@
 <span class="sd">            optim_recipe (dict or torch.optim.Optimizer, optional): The optimizer and optionally the scheduler to use. Defaults to ``None``.</span>
 <span class="sd">            eval_shift (bool, optional): Indicates whether to evaluate the Distribution shift performance. Defaults to ``False``.</span>
 <span class="sd">            format_batch_fn (torch.nn.Module, optional): The function to format the batch. Defaults to ``None``.</span>
+<span class="sd">            log_plots (bool, optional): Indicates whether to log figures in the logger.</span>
+<span class="sd">                Defaults to ``False``.</span>
+<span class="sd">            num_bins_cal_err (int, optional): Number of bins to compute calibration</span>
+<span class="sd">                error metrics. Defaults to ``15``.</span>
 <span class="sd">            save_in_csv (bool, optional): Save the results in csv. Defaults to ``False``.</span>
 <span class="sd">            csv_filename (str, optional): Name of the csv file. Defaults to ``&quot;results.csv&quot;``. Note that this is only used if</span>
 <span class="sd">                :attr:`save_in_csv` is ``True``.</span>
@@ -526,13 +532,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span> <span class="o">=</span> <span class="n">output_dim</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span> <span class="o">=</span> <span class="n">is_ensemble</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_plots</span> <span class="o">=</span> <span class="n">log_plots</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_in_csv</span> <span class="o">=</span> <span class="n">save_in_csv</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">csv_filename</span> <span class="o">=</span> <span class="n">csv_filename</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">needs_epoch_update</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">EPOCH_UPDATE_MODEL</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">needs_step_update</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">STEP_UPDATE_MODEL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_bins_cal_err</span> <span class="o">=</span> <span class="n">num_bins_cal_err</span>
 
         <span class="k">if</span> <span class="n">format_batch_fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">format_batch_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_elbo</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">ELBOLoss</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_elbo</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">optim_recipe</span> <span class="o">=</span> <span class="n">optim_recipe</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">format_batch_fn</span> <span class="o">=</span> <span class="n">format_batch_fn</span>
@@ -547,14 +559,21 @@
                 <span class="s2">&quot;reg/MSE&quot;</span><span class="p">:</span> <span class="n">MeanSquaredError</span><span class="p">(</span><span class="n">squared</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
                 <span class="s2">&quot;reg/RMSE&quot;</span><span class="p">:</span> <span class="n">MeanSquaredError</span><span class="p">(</span><span class="n">squared</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="p">},</span>
-            <span class="n">compute_groups</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">compute_groups</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;reg/MAE&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;reg/MSE&quot;</span><span class="p">,</span> <span class="s2">&quot;reg/RMSE&quot;</span><span class="p">]],</span>
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">val_metrics</span> <span class="o">=</span> <span class="n">reg_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;val/&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_metrics</span> <span class="o">=</span> <span class="n">reg_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test/&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">probabilistic</span><span class="p">:</span>
-            <span class="n">reg_prob_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">({</span><span class="s2">&quot;reg/NLL&quot;</span><span class="p">:</span> <span class="n">DistributionNLL</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)})</span>
+            <span class="n">reg_prob_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;reg/NLL&quot;</span><span class="p">:</span> <span class="n">DistributionNLL</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;cal/QCE&quot;</span><span class="p">:</span> <span class="n">QuantileCalibrationError</span><span class="p">(</span>
+                        <span class="n">num_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bins_cal_err</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">val_prob_metrics</span> <span class="o">=</span> <span class="n">reg_prob_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;val/&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_prob_metrics</span> <span class="o">=</span> <span class="n">reg_prob_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test/&quot;</span><span class="p">)</span>
 
@@ -686,14 +705,10 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">probabilistic</span><span class="p">:</span>
             <span class="n">dist_params</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">k</span><span class="p">:</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;(m b) c -&gt; b m c&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">preds</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="n">k</span><span class="p">:</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;(m b) c -&gt; b m c&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">preds</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="p">}</span>
-            <span class="c1"># Adding the Independent wrapper to the distribution to create a MixtureSameFamily.</span>
-            <span class="c1"># As required by the torch.distributions API, the last dimension is the event dimension.</span>
-            <span class="n">comp</span> <span class="o">=</span> <span class="n">Independent</span><span class="p">(</span><span class="n">get_dist_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_family</span><span class="p">)(</span><span class="o">**</span><span class="n">dist_params</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">mix</span> <span class="o">=</span> <span class="n">Categorical</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">batch_shape</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">))</span>
-            <span class="n">dist</span> <span class="o">=</span> <span class="n">MixtureSameFamily</span><span class="p">(</span><span class="n">mix</span><span class="p">,</span> <span class="n">comp</span><span class="p">)</span>
-            <span class="n">preds</span> <span class="o">=</span> <span class="n">get_dist_estimate</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_estimate</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="n">Independent</span><span class="p">(</span><span class="n">get_dist_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_family</span><span class="p">)(</span><span class="o">**</span><span class="n">dist_params</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">preds</span> <span class="o">=</span> <span class="n">get_dist_estimate</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_estimate</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">preds</span><span class="p">,</span> <span class="n">dist</span>
 
         <span class="n">preds</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="s2">&quot;(m b) c -&gt; b m c&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
@@ -781,6 +796,21 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">probabilistic</span><span class="p">:</span>
             <span class="n">result_dict</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_prob_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">Logger</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_plots</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
+                        <span class="s2">&quot;Calibration/Reliability diagram&quot;</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">test_prob_metrics</span><span class="p">[</span><span class="s2">&quot;cal/QCE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="p">)</span>
+                <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="s2">&quot;The distribution does not support the `icdf()` method. &quot;</span>
+                        <span class="s2">&quot;This metric will therefore return `nan` values. &quot;</span>
+                        <span class="s2">&quot;Please use a distribution that implements `icdf()`.&quot;</span><span class="p">,</span>
+                        <span class="ne">UserWarning</span><span class="p">,</span>
+                        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
