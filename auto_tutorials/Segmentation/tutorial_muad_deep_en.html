@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Deep ensembles Segmentation Tutorial using Muad Dataset &#8212; TorchUncertainty 0.7.0.post1 documentation</title>
+    <title>Deep ensembles Segmentation Tutorial using Muad Dataset &#8212; TorchUncertainty 0.8.0 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=707ba2b3"></script>
+    <script src="../../_static/documentation_options.js?v=486e5634"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -722,6 +722,27 @@ depth estimation, and object detection.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">ens_routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃   ┃ Name                    ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
+┡━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ 0 │ model                   │ _DeepEnsembles      │ 17.3 M │ train │     0 │
+│ 1 │ loss                    │ CrossEntropyLoss    │      0 │ train │     0 │
+│ 2 │ format_batch_fn         │ RepeatTarget        │      0 │ train │     0 │
+│ 3 │ ood_criterion           │ MaxSoftmaxCriterion │      0 │ train │     0 │
+│ 4 │ val_seg_metrics         │ MetricCollection    │      0 │ train │     0 │
+│ 5 │ val_sbsmpl_seg_metrics  │ MetricCollection    │      0 │ train │     0 │
+│ 6 │ test_seg_metrics        │ MetricCollection    │      0 │ train │     0 │
+│ 7 │ test_sbsmpl_seg_metrics │ MetricCollection    │      0 │ train │     0 │
+└───┴─────────────────────────┴─────────────────────┴────────┴───────┴───────┘
+Trainable params: 17.3 M
+Non-trainable params: 0
+Total params: 17.3 M
+Total estimated model params size (MB): 69
+Modules in train mode: 415
+Modules in eval mode: 0
+Total FLOPs: 0
+</pre></div>
+</div>
 </section>
 <section id="testing-the-model">
 <h2>7. Testing the model<a class="headerlink" href="#testing-the-model" title="Link to this heading">#</a></h2>
@@ -731,25 +752,25 @@ depth estimation, and object detection.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.67399          │
-│     NLL      │          1.56804          │
-│     mAcc     │          22.525%          │
-│     mIoU     │          13.194%          │
-│    pixAcc    │          55.883%          │
+│    Brier     │          0.68786          │
+│     NLL      │          1.56901          │
+│     mAcc     │          20.305%          │
+│     mIoU     │          12.240%          │
+│    pixAcc    │          49.008%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          22.556%          │
-│     aECE     │          21.983%          │
+│     ECE      │          10.241%          │
+│     aECE     │          10.357%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          17.814%          │
-│     AURC     │          32.201%          │
+│    AUGRC     │          22.485%          │
+│     AURC     │          39.377%          │
 │  Cov@5Risk   │           nan%            │
-│  Risk@80Cov  │          38.549%          │
+│  Risk@80Cov  │          47.321%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -816,7 +837,7 @@ depth estimation, and object detection.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_muad_deep_en_003.png" srcset="../../_images/sphx_glr_tutorial_muad_deep_en_003.png" alt="tutorial muad deep en" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 58.667 seconds)</p>
+<img src="../../_images/sphx_glr_tutorial_muad_deep_en_003.png" srcset="../../_images/sphx_glr_tutorial_muad_deep_en_003.png" alt="tutorial muad deep en" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 49.898 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-segmentation-tutorial-muad-deep-en-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c600403fd848d50cfcc5f80a21319f6b/tutorial_muad_deep_en.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_muad_deep_en.ipynb</span></code></a></p>
@@ -925,7 +946,7 @@ depth estimation, and object detection.</p>
 
   <p class="copyright">
     
-      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      © Copyright 2026, Adrien Lafage and Olivier Laurent.
       <br/>
     
   </p>

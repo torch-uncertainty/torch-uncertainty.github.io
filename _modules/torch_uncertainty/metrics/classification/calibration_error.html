@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>torch_uncertainty.metrics.classification.calibration_error &#8212; TorchUncertainty 0.7.0.post1 documentation</title>
+    <title>torch_uncertainty.metrics.classification.calibration_error &#8212; TorchUncertainty 0.8.0 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=707ba2b3"></script>
+    <script src="../../../../_static/documentation_options.js?v=486e5634"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -451,7 +451,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.metric</span><span class="w"> </span><span class="kn">import</span> <span class="n">Metric</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">dim_zero_cat</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassificationTaskNoMultilabel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">_PLOT_OUT_TYPE</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.adaptive_calibration_error</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdaptiveCalibrationError</span>
 
@@ -577,9 +576,13 @@
     <span class="n">bin_sizes</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">bins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Reliability Diagram&quot;</span><span class="p">,</span>
+    <span class="n">rd_xlabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Top-class Confidence (%)&quot;</span><span class="p">,</span>
+    <span class="n">rd_ylabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Success Rate (%)&quot;</span><span class="p">,</span>
+    <span class="n">ch_xlabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Top-class Confidence (%)&quot;</span><span class="p">,</span>
+    <span class="n">ch_ylabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Density (%)&quot;</span><span class="p">,</span>
     <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
     <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">150</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PLOT_OUT_TYPE</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Builds Reliability Diagram</span>
 <span class="sd">    `Source &lt;https://github.com/hollance/reliability-diagrams&gt;`_.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -605,15 +608,26 @@
         <span class="n">bin_sizes</span><span class="p">,</span>
         <span class="n">bins</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+        <span class="n">xlabel</span><span class="o">=</span><span class="n">rd_xlabel</span><span class="p">,</span>
+        <span class="n">ylabel</span><span class="o">=</span><span class="n">rd_ylabel</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="c1"># confidence histogram subplot</span>
-    <span class="n">_confidence_histogram_subplot</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">accuracies</span><span class="p">,</span> <span class="n">confidences</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">_confidence_histogram_subplot</span><span class="p">(</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">accuracies</span><span class="p">,</span> <span class="n">confidences</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="n">ch_xlabel</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="n">ch_ylabel</span>
+    <span class="p">)</span>
     <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">mticker</span><span class="o">.</span><span class="n">PercentFormatter</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">custom_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PLOT_OUT_TYPE</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">custom_plot</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Reliability Diagram&quot;</span><span class="p">,</span>
+    <span class="n">rd_xlabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Top-class Confidence (%)&quot;</span><span class="p">,</span>
+    <span class="n">rd_ylabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Success Rate (%)&quot;</span><span class="p">,</span>
+    <span class="n">ch_xlabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Top-class Confidence (%)&quot;</span><span class="p">,</span>
+    <span class="n">ch_ylabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Density (%)&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
     <span class="n">confidences</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confidences</span><span class="p">)</span>
     <span class="n">accuracies</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracies</span><span class="p">)</span>
 
@@ -640,6 +654,11 @@
         <span class="n">bin_confidences</span><span class="o">=</span><span class="n">np_conf_bin</span><span class="p">,</span>
         <span class="n">bin_sizes</span><span class="o">=</span><span class="n">np_prop_bin</span><span class="p">,</span>
         <span class="n">bins</span><span class="o">=</span><span class="n">np_bin_boundaries</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+        <span class="n">rd_xlabel</span><span class="o">=</span><span class="n">rd_xlabel</span><span class="p">,</span>
+        <span class="n">rd_ylabel</span><span class="o">=</span><span class="n">rd_ylabel</span><span class="p">,</span>
+        <span class="n">ch_xlabel</span><span class="o">=</span><span class="n">ch_xlabel</span><span class="p">,</span>
+        <span class="n">ch_ylabel</span><span class="o">=</span><span class="n">ch_ylabel</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -749,7 +768,7 @@
 <span class="sd">            for details. Our version of the metric is a wrapper around the original metric providing a plotting functionality.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;n_bins&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`n_bins` does not exist, use `num_bins`.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`n_bins` does not exist in TorchUncertainty, use `num_bins`.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">adaptive</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">AdaptiveCalibrationError</span><span class="p">(</span>
                 <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
@@ -820,7 +839,7 @@
 
   <p class="copyright">
     
-      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      © Copyright 2026, Adrien Lafage and Olivier Laurent.
       <br/>
     
   </p>

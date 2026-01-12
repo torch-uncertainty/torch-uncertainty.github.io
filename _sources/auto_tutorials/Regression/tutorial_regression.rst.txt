@@ -164,13 +164,29 @@ metrics that you will find in the table below.
 
  .. code-block:: none
 
-    0.00B [00:00, ?B/s]    11.6kB [00:00, 19.2MB/s]
+    0.00B [00:00, ?B/s]    11.6kB [00:00, 21.3MB/s]
+    ┏━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+    ┃   ┃ Name            ┃ Type             ┃ Params ┃ Mode  ┃ FLOPs ┃
+    ┡━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+    │ 0 │ model           │ _MLP             │    191 │ train │     0 │
+    │ 1 │ loss            │ MSELoss          │      0 │ train │     0 │
+    │ 2 │ format_batch_fn │ Identity         │      0 │ train │     0 │
+    │ 3 │ val_metrics     │ MetricCollection │      0 │ train │     0 │
+    │ 4 │ test_metrics    │ MetricCollection │      0 │ train │     0 │
+    └───┴─────────────────┴──────────────────┴────────┴───────┴───────┘
+    Trainable params: 191                                                           
+    Non-trainable params: 0                                                         
+    Total params: 191                                                               
+    Total estimated model params size (MB): 0                                       
+    Modules in train mode: 17                                                       
+    Modules in eval mode: 0                                                         
+    Total FLOPs: 0                                                                  
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Regression         ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     MAE      │          0.05910          │
-    │     MSE      │          0.00759          │
-    │     RMSE     │          0.08710          │
+    │     MAE      │          0.06094          │
+    │     MSE      │          0.00940          │
+    │     RMSE     │          0.09696          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -245,18 +261,36 @@ we state that we want to predict a Laplace distribution.
 
  .. code-block:: none
 
+    ┏━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+    ┃   ┃ Name              ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
+    ┡━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+    │ 0 │ model             │ _MLP                │    202 │ train │     0 │
+    │ 1 │ loss              │ DistributionNLLLoss │      0 │ train │     0 │
+    │ 2 │ format_batch_fn   │ Identity            │      0 │ train │     0 │
+    │ 3 │ val_metrics       │ MetricCollection    │      0 │ train │     0 │
+    │ 4 │ test_metrics      │ MetricCollection    │      0 │ train │     0 │
+    │ 5 │ val_prob_metrics  │ MetricCollection    │      0 │ train │     0 │
+    │ 6 │ test_prob_metrics │ MetricCollection    │      0 │ train │     0 │
+    └───┴───────────────────┴─────────────────────┴────────┴───────┴───────┘
+    Trainable params: 202                                                           
+    Non-trainable params: 0                                                         
+    Total params: 202                                                               
+    Total estimated model params size (MB): 0                                       
+    Modules in train mode: 24                                                       
+    Modules in eval mode: 0                                                         
+    Total FLOPs: 0                                                                  
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Regression         ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     MAE      │          0.08746          │
-    │     MSE      │          0.03524          │
-    │     NLL      │         -1.27875          │
-    │     RMSE     │          0.18773          │
+    │     MAE      │          0.04977          │
+    │     MSE      │          0.00806          │
+    │     NLL      │         -1.62509          │
+    │     RMSE     │          0.08977          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     QCE      │          0.08402          │
+    │     QCE      │          0.08990          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -278,7 +312,7 @@ You will get more information on probabilistic regression in the dedicated tutor
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.952 seconds)
+   **Total running time of the script:** (0 minutes 3.809 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Regression_tutorial_regression.py:

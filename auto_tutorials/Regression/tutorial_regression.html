@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Training an MLP for Tabular Regression with TorchUncertainty &#8212; TorchUncertainty 0.7.0.post1 documentation</title>
+    <title>Training an MLP for Tabular Regression with TorchUncertainty &#8212; TorchUncertainty 0.8.0 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=707ba2b3"></script>
+    <script src="../../_static/documentation_options.js?v=486e5634"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -572,13 +572,29 @@ metrics that you will find in the table below.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0.00B [00:00, ?B/s]
-11.6kB [00:00, 19.2MB/s]
+11.6kB [00:00, 21.3MB/s]
+┏━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃   ┃ Name            ┃ Type             ┃ Params ┃ Mode  ┃ FLOPs ┃
+┡━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ 0 │ model           │ _MLP             │    191 │ train │     0 │
+│ 1 │ loss            │ MSELoss          │      0 │ train │     0 │
+│ 2 │ format_batch_fn │ Identity         │      0 │ train │     0 │
+│ 3 │ val_metrics     │ MetricCollection │      0 │ train │     0 │
+│ 4 │ test_metrics    │ MetricCollection │      0 │ train │     0 │
+└───┴─────────────────┴──────────────────┴────────┴───────┴───────┘
+Trainable params: 191
+Non-trainable params: 0
+Total params: 191
+Total estimated model params size (MB): 0
+Modules in train mode: 17
+Modules in eval mode: 0
+Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Regression         ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     MAE      │          0.05910          │
-│     MSE      │          0.00759          │
-│     RMSE     │          0.08710          │
+│     MAE      │          0.06094          │
+│     MSE      │          0.00940          │
+│     RMSE     │          0.09696          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -623,18 +639,36 @@ we state that we want to predict a Laplace distribution.</p>
 <span class="n">results</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">prob_routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃   ┃ Name              ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
+┡━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ 0 │ model             │ _MLP                │    202 │ train │     0 │
+│ 1 │ loss              │ DistributionNLLLoss │      0 │ train │     0 │
+│ 2 │ format_batch_fn   │ Identity            │      0 │ train │     0 │
+│ 3 │ val_metrics       │ MetricCollection    │      0 │ train │     0 │
+│ 4 │ test_metrics      │ MetricCollection    │      0 │ train │     0 │
+│ 5 │ val_prob_metrics  │ MetricCollection    │      0 │ train │     0 │
+│ 6 │ test_prob_metrics │ MetricCollection    │      0 │ train │     0 │
+└───┴───────────────────┴─────────────────────┴────────┴───────┴───────┘
+Trainable params: 202
+Non-trainable params: 0
+Total params: 202
+Total estimated model params size (MB): 0
+Modules in train mode: 24
+Modules in eval mode: 0
+Total FLOPs: 0
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Regression         ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     MAE      │          0.08746          │
-│     MSE      │          0.03524          │
-│     NLL      │         -1.27875          │
-│     RMSE     │          0.18773          │
+│     MAE      │          0.04977          │
+│     MSE      │          0.00806          │
+│     NLL      │         -1.62509          │
+│     RMSE     │          0.08977          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     QCE      │          0.08402          │
+│     QCE      │          0.08990          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -648,7 +682,7 @@ we state that we want to predict a Laplace distribution.</p>
 represents how likely it would be to obtain the evaluation set with the parameters of the Laplace
 distribution predicted by the model.
 You will get more information on probabilistic regression in the dedicated tutorial.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.952 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.809 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-regression-tutorial-regression-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/921c4e1cc58846e0222ca3904621f504/tutorial_regression.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_regression.ipynb</span></code></a></p>
@@ -756,7 +790,7 @@ You will get more information on probabilistic regression in the dedicated tutor
 
   <p class="copyright">
     
-      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      © Copyright 2026, Adrien Lafage and Olivier Laurent.
       <br/>
     
   </p>

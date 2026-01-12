@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>torch_uncertainty.models.wrappers.deep_ensembles &#8212; TorchUncertainty 0.7.0.post1 documentation</title>
+    <title>torch_uncertainty.models.wrappers.deep_ensembles &#8212; TorchUncertainty 0.8.0 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=707ba2b3"></script>
+    <script src="../../../../_static/documentation_options.js?v=486e5634"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -445,13 +445,13 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">_DeepEnsembles</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
+        <span class="n">core_models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
         <span class="n">store_on_cpu</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a classification deep ensembles from a list of models.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">core_models</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">core_models</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span><span class="n">core_models</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">core_models</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">store_on_cpu</span> <span class="o">=</span> <span class="n">store_on_cpu</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
@@ -488,11 +488,11 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">probabilistic</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-        <span class="n">models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
+        <span class="n">core_models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
         <span class="n">store_on_cpu</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a regression deep ensembles from a list of models.&quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">models</span><span class="o">=</span><span class="n">models</span><span class="p">,</span> <span class="n">store_on_cpu</span><span class="o">=</span><span class="n">store_on_cpu</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">core_models</span><span class="o">=</span><span class="n">core_models</span><span class="p">,</span> <span class="n">store_on_cpu</span><span class="o">=</span><span class="n">store_on_cpu</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">probabilistic</span> <span class="o">=</span> <span class="n">probabilistic</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
@@ -525,7 +525,7 @@
 <div class="viewcode-block" id="deep_ensembles">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.deep_ensembles.html#torch_uncertainty.models.deep_ensembles">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">deep_ensembles</span><span class="p">(</span>
-    <span class="n">models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">|</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+    <span class="n">core_models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">|</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
     <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">task</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
         <span class="s2">&quot;classification&quot;</span><span class="p">,</span> <span class="s2">&quot;regression&quot;</span><span class="p">,</span> <span class="s2">&quot;segmentation&quot;</span><span class="p">,</span> <span class="s2">&quot;pixel_regression&quot;</span>
@@ -539,12 +539,12 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a Deep Ensembles out of the original models.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        models (list[nn.Module] | nn.Module): The model to be ensembled.</span>
+<span class="sd">        core_models (list[nn.Module] | nn.Module): The model to be ensembled.</span>
 <span class="sd">        num_estimators (int | None): The number of estimators in the ensemble.</span>
 <span class="sd">        task (Literal[``&quot;classification&quot;``, ``&quot;regression&quot;``, ``&quot;segmentation&quot;``, ``&quot;pixel_regression&quot;``]): The model task. Defaults to ``&quot;classification&quot;``.</span>
 <span class="sd">        probabilistic (bool): Whether the regression model is probabilistic.</span>
 <span class="sd">        reset_model_parameters (bool): Whether to reset the model parameters</span>
-<span class="sd">            when :attr:models is a module or a list of length 1. Defaults to ``True``.</span>
+<span class="sd">            when :attr:core_models is a module or a list of length 1. Defaults to ``True``.</span>
 <span class="sd">        store_on_cpu (bool): Whether to store the models on CPU. Defaults to ``False``.</span>
 <span class="sd">            This is useful for large models that do not fit in GPU memory. Only one</span>
 <span class="sd">            model will be stored on GPU at a time during forward. The rest will be stored on CPU.</span>
@@ -578,26 +578,28 @@
 <span class="sd">            &lt;https://arxiv.org/abs/1612.01474&gt;`_.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">models</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">core_models</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">core_models</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Models must not be an empty list.&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">models</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">core_models</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">core_models</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+        <span class="n">core_models</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span>
+    <span class="p">):</span>
         <span class="k">if</span> <span class="n">num_estimators</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;if models is a module, num_estimators must be specified.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">num_estimators</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;num_estimators must be at least 2. Got </span><span class="si">{</span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">models</span> <span class="o">=</span> <span class="n">models</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">core_models</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">core_models</span> <span class="o">=</span> <span class="n">core_models</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">models</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_estimators</span><span class="p">)]</span>
+        <span class="n">core_models</span> <span class="o">=</span> <span class="p">[</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">core_models</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_estimators</span><span class="p">)]</span>
 
         <span class="k">if</span> <span class="n">reset_model_parameters</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">core_models</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
                     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="s2">&quot;reset_parameters&quot;</span><span class="p">):</span>
                         <span class="n">layer</span><span class="o">.</span><span class="n">reset_parameters</span><span class="p">()</span>
 
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">models</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">num_estimators</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">core_models</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">core_models</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">num_estimators</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;num_estimators must be None if you provided a non-singleton list.&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">ckpt_paths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
@@ -613,11 +615,11 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ckpt_paths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No checkpoint files found in the directory.&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">models</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ckpt_paths</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">core_models</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ckpt_paths</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;The number of models and the number of checkpoint paths must be the same.&quot;</span>
             <span class="p">)</span>
-        <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">ckpt_path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="n">ckpt_paths</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">ckpt_path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">core_models</span><span class="p">,</span> <span class="n">ckpt_paths</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ckpt_path</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">):</span>
                 <span class="n">loaded_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ckpt_path</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="s2">&quot;state_dict&quot;</span> <span class="ow">in</span> <span class="n">loaded_data</span><span class="p">:</span>
@@ -636,12 +638,12 @@
 
     <span class="k">match</span> <span class="n">task</span><span class="p">:</span>
         <span class="k">case</span> <span class="s2">&quot;classification&quot;</span> <span class="o">|</span> <span class="s2">&quot;segmentation&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_DeepEnsembles</span><span class="p">(</span><span class="n">models</span><span class="o">=</span><span class="n">models</span><span class="p">,</span> <span class="n">store_on_cpu</span><span class="o">=</span><span class="n">store_on_cpu</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_DeepEnsembles</span><span class="p">(</span><span class="n">core_models</span><span class="o">=</span><span class="n">core_models</span><span class="p">,</span> <span class="n">store_on_cpu</span><span class="o">=</span><span class="n">store_on_cpu</span><span class="p">)</span>
         <span class="k">case</span> <span class="s2">&quot;regression&quot;</span> <span class="o">|</span> <span class="s2">&quot;pixel_regression&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">probabilistic</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;probabilistic must be specified for regression models.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">_RegDeepEnsembles</span><span class="p">(</span>
-                <span class="n">probabilistic</span><span class="o">=</span><span class="n">probabilistic</span><span class="p">,</span> <span class="n">models</span><span class="o">=</span><span class="n">models</span><span class="p">,</span> <span class="n">store_on_cpu</span><span class="o">=</span><span class="n">store_on_cpu</span>
+                <span class="n">probabilistic</span><span class="o">=</span><span class="n">probabilistic</span><span class="p">,</span> <span class="n">core_models</span><span class="o">=</span><span class="n">core_models</span><span class="p">,</span> <span class="n">store_on_cpu</span><span class="o">=</span><span class="n">store_on_cpu</span>
             <span class="p">)</span>
         <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown task: </span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
@@ -688,7 +690,7 @@
 
   <p class="copyright">
     
-      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      © Copyright 2026, Adrien Lafage and Olivier Laurent.
       <br/>
     
   </p>

@@ -160,27 +160,46 @@ with the default learning rate of 0.002 and a weight decay of 0.005.
 
  .. code-block:: none
 
+    ┏━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+    ┃   ┃ Name             ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
+    ┡━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+    │ 0 │ ood_criterion    │ MaxSoftmaxCriterion │      0 │ train │     0 │
+    │ 1 │ model            │ _LeNet              │ 44.4 K │ train │     0 │
+    │ 2 │ loss             │ DECLoss             │      0 │ train │     0 │
+    │ 3 │ format_batch_fn  │ Identity            │      0 │ train │     0 │
+    │ 4 │ val_cls_metrics  │ MetricCollection    │      0 │ train │     0 │
+    │ 5 │ test_cls_metrics │ MetricCollection    │      0 │ train │     0 │
+    │ 6 │ test_id_entropy  │ Entropy             │      0 │ train │     0 │
+    │ 7 │ mixup            │ Identity            │      0 │ train │     0 │
+    └───┴──────────────────┴─────────────────────┴────────┴───────┴───────┘
+    Trainable params: 44.4 K                                                        
+    Non-trainable params: 0                                                         
+    Total params: 44.4 K                                                            
+    Total estimated model params size (MB): 0                                       
+    Modules in train mode: 37                                                       
+    Modules in eval mode: 0                                                         
+    Total FLOPs: 0                                                                  
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃      Classification       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     Acc      │          67.620%          │
-    │    Brier     │          0.51249          │
-    │   Entropy    │          0.20731          │
-    │     NLL      │          2.40091          │
+    │     Acc      │          11.350%          │
+    │    Brier     │          0.90000          │
+    │   Entropy    │          2.29996          │
+    │     NLL      │          2.30266          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          23.052%          │
-    │     aECE     │          23.052%          │
+    │     ECE      │          0.392%           │
+    │     aECE     │          0.662%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          7.660%           │
-    │     AURC     │          11.023%          │
-    │  Cov@5Risk   │          56.750%          │
-    │  Risk@80Cov  │          20.350%          │
+    │    AUGRC     │          44.312%          │
+    │     AURC     │          88.383%          │
+    │  Cov@5Risk   │           nan%            │
+    │  Risk@80Cov  │          88.687%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -189,7 +208,7 @@ with the default learning rate of 0.002 and a weight decay of 0.005.
     │    params    │          44.43 K          │
     └──────────────┴───────────────────────────┘
 
-    [{'test/cal/ECE': 0.23052017390727997, 'test/cal/aECE': 0.23051974177360535, 'test/cls/Acc': 0.6761999726295471, 'test/cls/Brier': 0.5124949216842651, 'test/cls/NLL': 2.4009127616882324, 'test/sc/AUGRC': 0.0765976533293724, 'test/sc/AURC': 0.11022715270519257, 'test/sc/Cov@5Risk': 0.5674999952316284, 'test/sc/Risk@80Cov': 0.20350000262260437, 'test/cls/Entropy': 0.207307830452919, 'test/cplx/flops': 288399360.0, 'test/cplx/params': 44426.0}]
+    [{'test/cal/ECE': 0.003920994699001312, 'test/cal/aECE': 0.006621518637984991, 'test/cls/Acc': 0.11349999904632568, 'test/cls/Brier': 0.8999959230422974, 'test/cls/NLL': 2.3026630878448486, 'test/sc/AUGRC': 0.4431174397468567, 'test/sc/AURC': 0.8838279843330383, 'test/sc/Cov@5Risk': nan, 'test/sc/Risk@80Cov': 0.8868749737739563, 'test/cls/Entropy': 2.299959897994995, 'test/cplx/flops': 288399360.0, 'test/cplx/params': 44426.0}]
 
 
 
@@ -264,20 +283,20 @@ Now that the model is trained, let's test it on MNIST.
  .. code-block:: none
 
     Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 7 with strength 49.682 and entropy 0.871.
-    Predicted digits for the image 1: 2 with strength 54.707 and entropy 1.257.
-    Predicted digits for the image 2: 1 with strength 64.140 and entropy 0.714.
-    Predicted digits for the image 3: 0 with strength 41.927 and entropy 1.217.
+    Predicted digits for the image 0: 1 with strength 10.136 and entropy 2.302.
+    Predicted digits for the image 1: 1 with strength 10.136 and entropy 2.302.
+    Predicted digits for the image 2: 1 with strength 10.136 and entropy 2.302.
+    Predicted digits for the image 3: 1 with strength 10.136 and entropy 2.302.
     Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 9 with strength 25.163 and entropy 1.463.
-    Predicted digits for the image 1: 0 with strength 10.000 and entropy 2.303.
-    Predicted digits for the image 2: 3 with strength 10.778 and entropy 2.283.
-    Predicted digits for the image 3: 0 with strength 29.989 and entropy 1.270.
+    Predicted digits for the image 0: 1 with strength 10.136 and entropy 2.302.
+    Predicted digits for the image 1: 1 with strength 10.136 and entropy 2.302.
+    Predicted digits for the image 2: 1 with strength 10.136 and entropy 2.302.
+    Predicted digits for the image 3: 1 with strength 10.136 and entropy 2.302.
     Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 0 with strength 24.346 and entropy 1.471.
-    Predicted digits for the image 1: 2 with strength 28.415 and entropy 1.320.
-    Predicted digits for the image 2: 2 with strength 39.471 and entropy 1.370.
-    Predicted digits for the image 3: 0 with strength 31.508 and entropy 1.226.
+    Predicted digits for the image 0: 1 with strength 10.136 and entropy 2.302.
+    Predicted digits for the image 1: 1 with strength 10.136 and entropy 2.302.
+    Predicted digits for the image 2: 1 with strength 10.136 and entropy 2.302.
+    Predicted digits for the image 3: 1 with strength 10.136 and entropy 2.302.
 
 
 
@@ -292,7 +311,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 6.085 seconds)
+   **Total running time of the script:** (0 minutes 6.134 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Classification_tutorial_evidential_classification.py:

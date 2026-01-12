@@ -202,16 +202,34 @@ test the model using the same trainer
 
  .. code-block:: none
 
-    /home/chocolatine/actions-runner/_work/_tool/Python/3.11.12/x64/lib/python3.11/site-packages/torchmetrics/metric.py:549: UserWarning: The distribution does not support the `icdf()` method. This metric will therefore return `nan` values. Please use a distribution that implements `icdf()`.
+    ┏━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+    ┃   ┃ Name              ┃ Type             ┃ Params ┃ Mode  ┃ FLOPs ┃
+    ┡━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+    │ 0 │ model             │ _MLP             │  4.5 K │ train │     0 │
+    │ 1 │ loss              │ DERLoss          │      0 │ train │     0 │
+    │ 2 │ format_batch_fn   │ Identity         │      0 │ train │     0 │
+    │ 3 │ val_metrics       │ MetricCollection │      0 │ train │     0 │
+    │ 4 │ test_metrics      │ MetricCollection │      0 │ train │     0 │
+    │ 5 │ val_prob_metrics  │ MetricCollection │      0 │ train │     0 │
+    │ 6 │ test_prob_metrics │ MetricCollection │      0 │ train │     0 │
+    └───┴───────────────────┴──────────────────┴────────┴───────┴───────┘
+    Trainable params: 4.5 K                                                         
+    Non-trainable params: 0                                                         
+    Total params: 4.5 K                                                             
+    Total estimated model params size (MB): 0                                       
+    Modules in train mode: 24                                                       
+    Modules in eval mode: 0                                                         
+    Total FLOPs: 0                                                                  
+    /home/chocolatine/actions-runner/_work/torch-uncertainty/torch-uncertainty/.venv/lib/python3.13/site-packages/torchmetrics/metric.py:549: UserWarning: The distribution does not support the `icdf()` method. This metric will therefore return `nan` values. Please use a distribution that implements `icdf()`.
       update(*args, **kwargs)
-    /home/chocolatine/actions-runner/_work/_tool/Python/3.11.12/x64/lib/python3.11/site-packages/lightning/pytorch/loops/fit_loop.py:310: The number of training batches (16) is smaller than the logging interval Trainer(log_every_n_steps=50). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
+    /home/chocolatine/actions-runner/_work/torch-uncertainty/torch-uncertainty/.venv/lib/python3.13/site-packages/lightning/pytorch/loops/fit_loop.py:317: The number of training batches (16) is smaller than the logging interval Trainer(log_every_n_steps=50). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Regression         ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     MAE      │          2.49631          │
-    │     MSE      │          9.70285          │
-    │     NLL      │          2.60881          │
-    │     RMSE     │          3.11494          │
+    │     MAE      │          2.43813          │
+    │     MSE      │          9.42809          │
+    │     NLL      │          2.62212          │
+    │     RMSE     │          3.07052          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
@@ -225,7 +243,7 @@ test the model using the same trainer
     │    params    │          4.55 K           │
     └──────────────┴───────────────────────────┘
 
-    [{'test/reg/MAE': 2.496307134628296, 'test/reg/MSE': 9.702850341796875, 'test/reg/RMSE': 3.1149399280548096, 'test/cplx/flops': 565248.0, 'test/cplx/params': 4548.0, 'test/cal/QCE': nan, 'test/reg/NLL': 2.608811140060425}]
+    [{'test/reg/MAE': 2.438131093978882, 'test/reg/MSE': 9.428093910217285, 'test/reg/RMSE': 3.0705201625823975, 'test/cplx/flops': 565248.0, 'test/cplx/params': 4548.0, 'test/cal/QCE': nan, 'test/reg/NLL': 2.622122287750244}]
 
 
 
@@ -293,7 +311,7 @@ Reference
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 7.816 seconds)
+   **Total running time of the script:** (0 minutes 7.538 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Regression_tutorial_der_cubic.py:

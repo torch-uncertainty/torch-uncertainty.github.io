@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>torch_uncertainty.layers.distributions &#8212; TorchUncertainty 0.7.0.post1 documentation</title>
+    <title>torch_uncertainty.layers.distributions &#8212; TorchUncertainty 0.8.0 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=707ba2b3"></script>
+    <script src="../../../_static/documentation_options.js?v=486e5634"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -448,6 +448,8 @@
         <span class="k">return</span> <span class="n">LaplaceLinear</span>
     <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;cauchy&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">CauchyLinear</span>
+    <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;gamma&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">GammaLinear</span>
     <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;student&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">StudentTLinear</span>
     <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;nig&quot;</span><span class="p">:</span>
@@ -464,6 +466,8 @@
         <span class="k">return</span> <span class="n">LaplaceConvNd</span>
     <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;cauchy&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">CauchyConvNd</span>
+    <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;gamma&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">GammaConvNd</span>
     <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;student&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">StudentTConvNd</span>
     <span class="k">if</span> <span class="n">dist_family</span> <span class="o">==</span> <span class="s2">&quot;nig&quot;</span><span class="p">:</span>
@@ -754,6 +758,84 @@
 <span class="sd">            :math:`(\ast, C_{out}, \ast)`.</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
 
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">GammaLinear</span><span class="p">(</span><span class="n">_ExpandOutputLinear</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gamma distribution Linear Density Layer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
+<span class="sd">        event_dim (int): The number of event dimensions.</span>
+<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        You should avoid null targets when using the Gamma distribution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">base_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
+        <span class="n">event_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">min_concentration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+        <span class="n">min_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">base_layer</span><span class="o">=</span><span class="n">base_layer</span><span class="p">,</span>
+            <span class="n">event_dim</span><span class="o">=</span><span class="n">event_dim</span><span class="p">,</span>
+            <span class="n">num_params</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_concentration</span> <span class="o">=</span> <span class="n">min_concentration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_rate</span> <span class="o">=</span> <span class="n">min_rate</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">concentration</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span>
+            <span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_concentration</span>
+        <span class="p">)</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span>
+            <span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_rate</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="n">concentration</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="n">rate</span><span class="p">}</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">GammaConvNd</span><span class="p">(</span><span class="n">_ExpandOutputConvNd</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gamma distribution Convolutional Density Layer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
+<span class="sd">        event_dim (int): The number of event dimensions.</span>
+<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        You should avoid null targets when using the Gamma distribution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">base_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
+        <span class="n">event_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">min_concentration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+        <span class="n">min_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">base_layer</span><span class="o">=</span><span class="n">base_layer</span><span class="p">,</span>
+            <span class="n">event_dim</span><span class="o">=</span><span class="n">event_dim</span><span class="p">,</span>
+            <span class="n">num_params</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_concentration</span> <span class="o">=</span> <span class="n">min_concentration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_rate</span> <span class="o">=</span> <span class="n">min_rate</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">concentration</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_concentration</span><span class="p">)</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_dim</span><span class="p">]),</span> <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_rate</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="n">concentration</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="n">rate</span><span class="p">}</span>
 
 
 <div class="viewcode-block" id="StudentTLinear">
@@ -1059,7 +1141,7 @@
 
   <p class="copyright">
     
-      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      © Copyright 2026, Adrien Lafage and Olivier Laurent.
       <br/>
     
   </p>

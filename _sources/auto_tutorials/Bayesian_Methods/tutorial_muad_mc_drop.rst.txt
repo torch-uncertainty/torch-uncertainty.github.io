@@ -362,6 +362,30 @@ Let's define the training parameters.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    ┏━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+    ┃   ┃ Name                    ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
+    ┡━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+    │ 0 │ model                   │ _UNet               │  4.3 M │ train │     0 │
+    │ 1 │ loss                    │ CrossEntropyLoss    │      0 │ train │     0 │
+    │ 2 │ format_batch_fn         │ Identity            │      0 │ train │     0 │
+    │ 3 │ ood_criterion           │ MaxSoftmaxCriterion │      0 │ train │     0 │
+    │ 4 │ val_seg_metrics         │ MetricCollection    │      0 │ train │     0 │
+    │ 5 │ val_sbsmpl_seg_metrics  │ MetricCollection    │      0 │ train │     0 │
+    │ 6 │ test_seg_metrics        │ MetricCollection    │      0 │ train │     0 │
+    │ 7 │ test_sbsmpl_seg_metrics │ MetricCollection    │      0 │ train │     0 │
+    └───┴─────────────────────────┴─────────────────────┴────────┴───────┴───────┘
+    Trainable params: 4.3 M                                                         
+    Non-trainable params: 0                                                         
+    Total params: 4.3 M                                                             
+    Total estimated model params size (MB): 17                                      
+    Modules in train mode: 125                                                      
+    Modules in eval mode: 0                                                         
+    Total FLOPs: 0                                                                  
+
 
 
 
@@ -386,25 +410,25 @@ Let's define the training parameters.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       Segmentation        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    Brier     │          0.64057          │
-    │     NLL      │          1.57567          │
-    │     mAcc     │          27.652%          │
-    │     mIoU     │          17.892%          │
-    │    pixAcc    │          61.230%          │
+    │    Brier     │          0.69340          │
+    │     NLL      │          1.78053          │
+    │     mAcc     │          24.925%          │
+    │     mIoU     │          15.006%          │
+    │    pixAcc    │          58.508%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          24.048%          │
-    │     aECE     │          23.994%          │
+    │     ECE      │          27.603%          │
+    │     aECE     │          27.064%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          16.354%          │
-    │     AURC     │          26.263%          │
+    │    AUGRC     │          17.493%          │
+    │     AURC     │          36.230%          │
     │  Cov@5Risk   │           nan%            │
-    │  Risk@80Cov  │          35.398%          │
+    │  Risk@80Cov  │          35.944%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -443,25 +467,25 @@ Let's now load a fully trained model to continue this tutorial
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       Segmentation        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    Brier     │          0.20444          │
-    │     NLL      │          0.39808          │
-    │     mAcc     │          68.773%          │
+    │    Brier     │          0.20465          │
+    │     NLL      │          0.39805          │
+    │     mAcc     │          68.772%          │
     │     mIoU     │          50.739%          │
     │    pixAcc    │          85.701%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          1.697%           │
-    │     aECE     │          1.747%           │
+    │     ECE      │          1.715%           │
+    │     aECE     │          1.765%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          2.698%           │
-    │     AURC     │          3.324%           │
-    │  Cov@5Risk   │          72.055%          │
-    │  Risk@80Cov  │          7.022%           │
+    │    AUGRC     │          2.701%           │
+    │     AURC     │          3.325%           │
+    │  Cov@5Risk   │          72.695%          │
+    │  Risk@80Cov  │          7.054%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -599,25 +623,25 @@ allow us to have a better confidence score by using the dropout during test time
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       Segmentation        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    Brier     │          0.20275          │
-    │     NLL      │          0.39858          │
-    │     mAcc     │          68.408%          │
-    │     mIoU     │          50.820%          │
-    │    pixAcc    │          85.840%          │
+    │    Brier     │          0.20467          │
+    │     NLL      │          0.40089          │
+    │     mAcc     │          68.455%          │
+    │     mIoU     │          50.728%          │
+    │    pixAcc    │          85.770%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          2.908%           │
-    │     aECE     │          2.908%           │
+    │     ECE      │          2.843%           │
+    │     aECE     │          2.843%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          2.636%           │
-    │     AURC     │          3.237%           │
-    │  Cov@5Risk   │          73.435%          │
-    │  Risk@80Cov  │          6.769%           │
+    │    AUGRC     │          2.683%           │
+    │     AURC     │          3.294%           │
+    │  Cov@5Risk   │          72.245%          │
+    │  Risk@80Cov  │          6.928%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -703,7 +727,7 @@ of the different estimators.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 56.718 seconds)
+   **Total running time of the script:** (0 minutes 54.249 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Bayesian_Methods_tutorial_muad_mc_drop.py:

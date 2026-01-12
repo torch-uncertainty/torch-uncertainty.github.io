@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>BatchEnsemble &#8212; TorchUncertainty 0.7.0.post1 documentation</title>
+    <title>BatchEnsemble &#8212; TorchUncertainty 0.8.0 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=707ba2b3"></script>
+    <script src="../_static/documentation_options.js?v=486e5634"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -391,21 +391,6 @@
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.routines.PixelRegressionRoutine.html">PixelRegressionRoutine</a></li>
 </ul>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.classification.ResNetBaseline.html">ResNetBaseline</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.classification.VGGBaseline.html">VGGBaseline</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.classification.WideResNetBaseline.html">WideResNetBaseline</a></li>
-</ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.regression.MLPBaseline.html">MLPBaseline</a></li>
-</ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.segmentation.DeepLabBaseline.html">DeepLabBaseline</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.segmentation.SegFormerBaseline.html">SegFormerBaseline</a></li>
-</ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.depth.BTSBaseline.html">BTSBaseline</a></li>
-</ul>
-<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.PackedLinear.html">PackedLinear</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.PackedConv2d.html">PackedConv2d</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.PackedMultiheadAttention.html">PackedMultiheadAttention</a></li>
@@ -670,7 +655,7 @@
 <h1>BatchEnsemble<a class="headerlink" href="#batchensemble" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.models.BatchEnsemble">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.models.</span></span><span class="sig-name descname"><span class="pre">BatchEnsemble</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeat_training_inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_layers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/models/wrappers/batch_ensemble.html#BatchEnsemble"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.models.BatchEnsemble" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.models.</span></span><span class="sig-name descname"><span class="pre">BatchEnsemble</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeat_training_inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_layers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/models/wrappers/batch_ensemble.html#BatchEnsemble"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.models.BatchEnsemble" title="Link to this definition">#</a></dt>
 <dd><p>Wrap a BatchEnsemble model to ensure correct batch replication.</p>
 <p>In a BatchEnsemble architecture, each estimator operates on a <strong>sub-batch</strong>
 of the input. This means that the input batch must be <strong>repeated</strong>
@@ -680,7 +665,7 @@ ensuring that each estimator receives the correct data format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<em>nn.Module</em>) – The BatchEnsemble model.</p></li>
+<li><p><strong>core_model</strong> (<em>nn.Module</em>) – The BatchEnsemble model.</p></li>
 <li><p><strong>num_estimators</strong> (<em>int</em>) – Number of ensemble members.</p></li>
 <li><p><strong>repeat_training_inputs</strong> (<em>optional</em><em>, </em><em>bool</em>) – Whether to repeat the input batch during training.
 If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the input batch is repeated during both training and evaluation. If <code class="docutils literal notranslate"><span class="pre">False</span></code>,
@@ -692,20 +677,20 @@ BatchEnsemble counterparts. Default is <code class="docutils literal notranslate
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If neither <code class="docutils literal notranslate"><span class="pre">BatchLinear</span></code> nor <code class="docutils literal notranslate"><span class="pre">BatchConv2d</span></code> layers are found in the model at the
+<li><p><strong>ValueError</strong> – If neither <code class="docutils literal notranslate"><span class="pre">BatchLinear</span></code> nor <code class="docutils literal notranslate"><span class="pre">BatchConv2d</span></code> layers are found in the core_model at the
     end of initialization.</p></li>
 <li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">num_estimators</span></code> is less than or equal to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
 <li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">convert_layers=True</span></code> and neither <code class="docutils literal notranslate"><span class="pre">nn.Linear</span></code> nor <code class="docutils literal notranslate"><span class="pre">nn.Conv2d</span></code> layers are
-    found in the model.</p></li>
+    found in the core_model.</p></li>
 </ul>
 </dd>
 </dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">convert_layers==True</span></code>, the wrapper will attempt to convert all <code class="docutils literal notranslate"><span class="pre">nn.Linear</span></code> and <code class="docutils literal notranslate"><span class="pre">nn.Conv2d</span></code>
-layers in the model to their BatchEnsemble counterparts. If the model contains other types of
+layers in the core_model to their BatchEnsemble counterparts. If the core_model contains other types of
 layers, the conversion won’t happen for these layers. If don’t have any <code class="docutils literal notranslate"><span class="pre">nn.Linear</span></code> or <code class="docutils literal notranslate"><span class="pre">nn.Conv2d</span></code>
-layers in the model, the wrapper will raise an error during conversion.</p>
+layers in the core_model, the wrapper will raise an error during conversion.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -714,11 +699,11 @@ for training, be sure to set <code class="docutils literal notranslate"><span cl
 initializing the routine.</p>
 </div>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">BatchEnsemble</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">convert_layers</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">core_model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">BatchEnsemble</span><span class="p">(</span><span class="n">core_model</span><span class="p">,</span> <span class="n">num_estimators</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">convert_layers</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span>
 <span class="go">BatchEnsemble(</span>
-<span class="go">(model): Sequential(</span>
+<span class="go">(core_model): Sequential(</span>
 <span class="go">    (0): BatchLinear(in_features=10, out_features=5, num_estimators=4)</span>
 <span class="go">    (1): ReLU()</span>
 <span class="go">    (2): BatchLinear(in_features=5, out_features=2, num_estimators=4)</span>
@@ -825,7 +810,7 @@ initializing the routine.</p>
 
   <p class="copyright">
     
-      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      © Copyright 2026, Adrien Lafage and Olivier Laurent.
       <br/>
     
   </p>

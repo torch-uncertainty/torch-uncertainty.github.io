@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>torch_uncertainty.models.wrappers.ema &#8212; TorchUncertainty 0.7.0.post1 documentation</title>
+    <title>torch_uncertainty.models.wrappers.ema &#8212; TorchUncertainty 0.8.0 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=707ba2b3"></script>
+    <script src="../../../../_static/documentation_options.js?v=486e5634"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -444,7 +444,7 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">EMA</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+        <span class="n">core_model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
         <span class="n">momentum</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Exponential Moving Average (EMA).</span>
@@ -452,19 +452,23 @@
 <span class="sd">        The :attr:`model` given as argument is used to compute the gradient during the training.</span>
 <span class="sd">        The EMA model is regularly updated with the inner-model and used at evaluation time.</span>
 
-<span class="sd">        The :attr:`model` given as argument is used to compute the gradient during the training.</span>
-<span class="sd">        The EMA model is regularly updated with the inner-model and used at evaluation time.</span>
-
 <span class="sd">        Args:</span>
-<span class="sd">            model (nn.Module): The model to train and ensemble.</span>
-<span class="sd">            momentum (float): The momentum of the moving average.</span>
+<span class="sd">            core_model (nn.Module): The model to train and ensemble.</span>
+<span class="sd">            momentum (float): The momentum of the moving average. The larger the momentum,</span>
+<span class="sd">                the more stable the model.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            The momentum value is often large, such as 0.9 or 0.95.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">_ema_checks</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">core_model</span> <span class="o">=</span> <span class="n">model</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ema_model</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">core_model</span> <span class="o">=</span> <span class="n">core_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ema_model</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">core_model</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">momentum</span> <span class="o">=</span> <span class="n">momentum</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">remainder</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">momentum</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remainder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">momentum</span>
 
 <div class="viewcode-block" id="EMA.update_wrapper">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.models.EMA.html#torch_uncertainty.models.EMA.update_wrapper">[docs]</a>
@@ -537,7 +541,7 @@
 
   <p class="copyright">
     
-      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      © Copyright 2026, Adrien Lafage and Olivier Laurent.
       <br/>
     
   </p>

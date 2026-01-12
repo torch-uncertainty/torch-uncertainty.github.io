@@ -30,10 +30,11 @@ For this tutorial, we will only load the corruption transforms available in
 torch_uncertainty.transforms.corruption. We also need to load utilities from
 torchvision and matplotlib.
 
-.. GENERATED FROM PYTHON SOURCE LINES 17-83
+.. GENERATED FROM PYTHON SOURCE LINES 17-96
 
 .. code-block:: Python
 
+    from pathlib import Path
     from urllib import request
 
     import matplotlib.pyplot as plt
@@ -50,8 +51,20 @@ torchvision and matplotlib.
 
 
     def download_img(url, i):
-        request.urlretrieve(url, f"tmp_{i}.png")  # noqa: S310
-        return Image.open(f"tmp_{i}.png").convert("RGB")
+        # Create a request with proper headers to avoid 403 Forbidden error
+        if not url.startswith(("http:", "https:")):
+            raise ValueError("URL must start with 'http:' or 'https:'")
+
+        req = request.Request(  # noqa: S310
+            url,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            },
+        )
+        filename = Path(f"tmp_{i}.png")
+        with request.urlopen(req) as response, filename.open("wb") as f:  # noqa: S310
+            f.write(response.read())
+        return Image.open(filename).convert("RGB")
 
 
     images_ds = [download_img(url, i) for i, url in enumerate(urls)]
@@ -107,12 +120,12 @@ torchvision and matplotlib.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-86
+.. GENERATED FROM PYTHON SOURCE LINES 97-99
 
 1. Noise Corruptions
 ~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-100
+.. GENERATED FROM PYTHON SOURCE LINES 99-113
 
 .. code-block:: Python
 
@@ -142,12 +155,12 @@ torchvision and matplotlib.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-103
+.. GENERATED FROM PYTHON SOURCE LINES 114-116
 
 2. Blur Corruptions
 ~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-119
+.. GENERATED FROM PYTHON SOURCE LINES 116-132
 
 .. code-block:: Python
 
@@ -179,12 +192,12 @@ torchvision and matplotlib.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-122
+.. GENERATED FROM PYTHON SOURCE LINES 133-135
 
 3. Weather Corruptions
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-136
+.. GENERATED FROM PYTHON SOURCE LINES 135-149
 
 .. code-block:: Python
 
@@ -214,12 +227,12 @@ torchvision and matplotlib.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-139
+.. GENERATED FROM PYTHON SOURCE LINES 150-152
 
 4. Other Corruptions
 ~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 139-158
+.. GENERATED FROM PYTHON SOURCE LINES 152-171
 
 .. code-block:: Python
 
@@ -254,12 +267,12 @@ torchvision and matplotlib.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-161
+.. GENERATED FROM PYTHON SOURCE LINES 172-174
 
 5. Unused Corruptions
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-178
+.. GENERATED FROM PYTHON SOURCE LINES 174-191
 
 .. code-block:: Python
 
@@ -292,7 +305,7 @@ torchvision and matplotlib.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-183
+.. GENERATED FROM PYTHON SOURCE LINES 192-196
 
 Reference
 ---------
@@ -302,7 +315,7 @@ Reference
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.710 seconds)
+   **Total running time of the script:** (0 minutes 4.533 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Data_Augmentation_tutorial_corruption.py:

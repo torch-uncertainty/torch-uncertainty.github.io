@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>deep_ensembles &#8212; TorchUncertainty 0.7.0.post1 documentation</title>
+    <title>deep_ensembles &#8212; TorchUncertainty 0.8.0 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=707ba2b3"></script>
+    <script src="../_static/documentation_options.js?v=486e5634"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -391,21 +391,6 @@
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.routines.PixelRegressionRoutine.html">PixelRegressionRoutine</a></li>
 </ul>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.classification.ResNetBaseline.html">ResNetBaseline</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.classification.VGGBaseline.html">VGGBaseline</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.classification.WideResNetBaseline.html">WideResNetBaseline</a></li>
-</ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.regression.MLPBaseline.html">MLPBaseline</a></li>
-</ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.segmentation.DeepLabBaseline.html">DeepLabBaseline</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.segmentation.SegFormerBaseline.html">SegFormerBaseline</a></li>
-</ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.baselines.depth.BTSBaseline.html">BTSBaseline</a></li>
-</ul>
-<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.PackedLinear.html">PackedLinear</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.PackedConv2d.html">PackedConv2d</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.PackedMultiheadAttention.html">PackedMultiheadAttention</a></li>
@@ -670,17 +655,17 @@
 <h1>deep_ensembles<a class="headerlink" href="#deep-ensembles" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="torch_uncertainty.models.deep_ensembles">
-<span class="sig-prename descclassname"><span class="pre">torch_uncertainty.models.</span></span><span class="sig-name descname"><span class="pre">deep_ensembles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'classification'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probabilistic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_model_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_on_cpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ckpt_paths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tu_ckpt_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/models/wrappers/deep_ensembles.html#deep_ensembles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.models.deep_ensembles" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">torch_uncertainty.models.</span></span><span class="sig-name descname"><span class="pre">deep_ensembles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core_models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'classification'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probabilistic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_model_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_on_cpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ckpt_paths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tu_ckpt_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/models/wrappers/deep_ensembles.html#deep_ensembles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.models.deep_ensembles" title="Link to this definition">#</a></dt>
 <dd><p>Build a Deep Ensembles out of the original models.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>models</strong> (<em>list</em><em>[</em><em>nn.Module</em><em>] </em><em>| </em><em>nn.Module</em>) – The model to be ensembled.</p></li>
+<li><p><strong>core_models</strong> (<em>list</em><em>[</em><em>nn.Module</em><em>] </em><em>| </em><em>nn.Module</em>) – The model to be ensembled.</p></li>
 <li><p><strong>num_estimators</strong> (<em>int</em><em> | </em><em>None</em>) – The number of estimators in the ensemble.</p></li>
 <li><p><strong>task</strong> (Literal[<code class="docutils literal notranslate"><span class="pre">&quot;classification&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;regression&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;segmentation&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;pixel_regression&quot;</span></code>]) – The model task. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;classification&quot;</span></code>.</p></li>
 <li><p><strong>probabilistic</strong> (<em>bool</em>) – Whether the regression model is probabilistic.</p></li>
 <li><p><strong>reset_model_parameters</strong> (<em>bool</em>) – Whether to reset the model parameters
-when :attr:models is a module or a list of length 1. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+when :attr:core_models is a module or a list of length 1. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 <li><p><strong>store_on_cpu</strong> (<em>bool</em>) – Whether to store the models on CPU. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.
 This is useful for large models that do not fit in GPU memory. Only one
 model will be stored on GPU at a time during forward. The rest will be stored on CPU.</p></li>
@@ -809,7 +794,7 @@ only supported for inference.</p>
 
   <p class="copyright">
     
-      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      © Copyright 2026, Adrien Lafage and Olivier Laurent.
       <br/>
     
   </p>

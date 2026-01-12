@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Contributing — TorchUncertainty 0.7.0.post1 documentation</title>
+<title>Contributing — TorchUncertainty 0.8.0 documentation</title>
 <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
@@ -35,7 +35,7 @@
 <!-- Pre-loaded scripts that we'll load fully later -->
 <link as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" rel="preload"/>
 <link as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" rel="preload"/>
-<script src="_static/documentation_options.js?v=707ba2b3"></script>
+<script src="_static/documentation_options.js?v=486e5634"></script>
 <script src="_static/doctools.js?v=9a2dae69"></script>
 <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
 <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -277,21 +277,18 @@ roughly contained in the following fields:</p>
 to follow the following steps to reproduce a clean development environment
 ensuring continuous integration does not break.</p>
 <ol class="arabic simple">
-<li><p>Check that you have PyTorch already installed on your system</p></li>
+<li><p>Install <code class="docutils literal notranslate"><span class="pre">uv</span></code> following the steps <a class="reference external" href="https://docs.astral.sh/uv/getting-started/installation/">here</a></p></li>
 <li><p>Clone the repository</p></li>
-<li><p>Install torch-uncertainty in editable mode with the dev packages:
-<code class="code highlight cmd bash docutils literal highlight-bash">python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>dev<span class="o">]</span></code></p></li>
-<li><p>Install pre-commit hooks with <code class="code highlight cmd bash docutils literal highlight-bash">pre-commit<span class="w"> </span>install</code></p></li>
+<li><p>Install torch-uncertainty with the dev packages
+<code class="code highlight cmd bash docutils literal highlight-bash">uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>gpu</code> for GPU-based systems
+<code class="code highlight cmd bash docutils literal highlight-bash">uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>cpu</code> if no GPUs are available</p></li>
+<li><p>Install pre-commit hooks with <code class="code highlight cmd bash docutils literal highlight-bash">uv<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>install</code></p></li>
 </ol>
+<p>Note: failure to include the extra flag will result in the GPU version of PyTorch without CUDA and might cause issues.</p>
 </section>
 <section id="build-the-documentation-locally">
 <h3>Build the documentation locally<a class="headerlink" href="#build-the-documentation-locally" title="Link to this heading">#</a></h3>
-<p>To build the documentation, reinstall TorchUncertainty with the packages of the docs
-group:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span><span class="p">[</span><span class="n">dev</span><span class="p">,</span><span class="n">docs</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>Then navigate to <code class="docutils literal notranslate"><span class="pre">./docs</span></code> and build the documentation with:</p>
+<p>To build the documentation on Linux, navigate to <code class="docutils literal notranslate"><span class="pre">./docs</span></code> and build the documentation with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">html</span>
 </pre></div>
 </div>
@@ -306,7 +303,7 @@ that your code is properly formatted and linted before committing.</p>
 <p>Please ensure that the tests are passing on your machine before pushing on a
 PR. This will avoid multiplying the number featureless commits. To do this,
 run, at the root of the folder:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pytest</span> <span class="n">tests</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uv</span> <span class="n">run</span> <span class="n">pytest</span> <span class="n">tests</span>
 </pre></div>
 </div>
 <p>Try to include an emoji at the start of each commit message following the suggestions
@@ -411,7 +408,7 @@ Face are likely to remain Apache 2.0.</p>
 <div class="footer-item">
 <p class="copyright">
     
-      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      © Copyright 2026, Adrien Lafage and Olivier Laurent.
       <br/>
 </p>
 </div>

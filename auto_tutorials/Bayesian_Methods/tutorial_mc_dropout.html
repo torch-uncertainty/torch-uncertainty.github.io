@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Training a LeNet with Monte-Carlo Dropout &#8212; TorchUncertainty 0.7.0.post1 documentation</title>
+    <title>Training a LeNet with Monte-Carlo Dropout &#8212; TorchUncertainty 0.8.0 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=707ba2b3"></script>
+    <script src="../../_static/documentation_options.js?v=486e5634"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -583,27 +583,47 @@ metrics that you will find in the table below.</p>
 <span class="n">results</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃   ┃ Name                ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
+┡━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ 0 │ ood_criterion       │ MaxSoftmaxCriterion │      0 │ train │     0 │
+│ 1 │ model               │ _MCDropout          │ 44.4 K │ train │     0 │
+│ 2 │ loss                │ CrossEntropyLoss    │      0 │ train │     0 │
+│ 3 │ format_batch_fn     │ Identity            │      0 │ train │     0 │
+│ 4 │ val_cls_metrics     │ MetricCollection    │      0 │ train │     0 │
+│ 5 │ test_cls_metrics    │ MetricCollection    │      0 │ train │     0 │
+│ 6 │ test_id_entropy     │ Entropy             │      0 │ train │     0 │
+│ 7 │ test_id_ens_metrics │ MetricCollection    │      0 │ train │     0 │
+│ 8 │ mixup               │ Identity            │      0 │ train │     0 │
+└───┴─────────────────────┴─────────────────────┴────────┴───────┴───────┘
+Trainable params: 44.4 K
+Non-trainable params: 0
+Total params: 44.4 K
+Total estimated model params size (MB): 0
+Modules in train mode: 42
+Modules in eval mode: 0
+Total FLOPs: 0
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          79.720%          │
-│    Brier     │          0.53990          │
-│   Entropy    │          1.89540          │
-│     NLL      │          1.20738          │
+│     Acc      │          73.470%          │
+│    Brier     │          0.52171          │
+│   Entropy    │          1.78543          │
+│     NLL      │          1.14980          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          44.684%          │
-│     aECE     │          44.684%          │
+│     ECE      │          34.382%          │
+│     aECE     │          34.380%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          4.755%           │
-│     AURC     │          6.141%           │
-│  Cov@5Risk   │          53.650%          │
-│  Risk@80Cov  │          12.313%          │
+│    AUGRC     │          7.714%           │
+│     AURC     │          10.741%          │
+│  Cov@5Risk   │           nan%            │
+│  Risk@80Cov  │          19.512%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -653,17 +673,17 @@ metrics that you will find in the table below.</p>
     <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_mc_dropout_001.png" srcset="../../_images/sphx_glr_tutorial_mc_dropout_001.png" alt="tutorial mc dropout" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MC-Dropout predictions for the image 1:  7 7 7 7 7 7 8 7 7 7 9 7 7 7 7 1
-MC-Dropout predictions for the image 2:  2 2 2 8 6 5 2 2 6 2 2 0 2 3 2 2
-MC-Dropout predictions for the image 3:  1 1 1 1 1 1 1 1 1 1 8 1 1 7 1 1
-MC-Dropout predictions for the image 4:  0 6 0 0 0 2 0 0 0 0 0 6 0 0 0 6
-MC-Dropout predictions for the image 5:  4 4 4 2 4 4 4 4 4 4 4 4 4 4 4 2
-MC-Dropout predictions for the image 6:  1 1 1 1 1 1 6 1 1 1 1 1 1 1 1 1
+<img src="../../_images/sphx_glr_tutorial_mc_dropout_001.png" srcset="../../_images/sphx_glr_tutorial_mc_dropout_001.png" alt="tutorial mc dropout" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MC-Dropout predictions for the image 1:  7 7 7 7 7 7 7 7 7 7 7 0 7 7 7 7
+MC-Dropout predictions for the image 2:  2 0 2 2 0 6 2 1 2 2 2 3 2 2 2 0
+MC-Dropout predictions for the image 3:  4 1 1 1 1 1 1 6 1 1 1 1 1 1 3 1
+MC-Dropout predictions for the image 4:  6 0 3 0 0 0 0 5 0 0 0 0 1 0 0 6
+MC-Dropout predictions for the image 5:  4 4 4 4 7 4 5 3 4 4 1 4 4 6 4 4
+MC-Dropout predictions for the image 6:  3 1 1 1 9 1 1 1 1 6 1 1 1 1 1 1
 </pre></div>
 </div>
 <p>Most of the time, we see that there is some disagreement between the samples of the dropout
 approximation of the posterior distribution.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.562 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.420 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-bayesian-methods-tutorial-mc-dropout-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/d3a3ba08353d48467d22e26f836ab9bf/tutorial_mc_dropout.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_dropout.ipynb</span></code></a></p>
@@ -773,7 +793,7 @@ approximation of the posterior distribution.</p>
 
   <p class="copyright">
     
-      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      © Copyright 2026, Adrien Lafage and Olivier Laurent.
       <br/>
     
   </p>

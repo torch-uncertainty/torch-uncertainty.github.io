@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Training a LeNet with Monte Carlo Batch Normalization &#8212; TorchUncertainty 0.7.0.post1 documentation</title>
+    <title>Training a LeNet with Monte Carlo Batch Normalization &#8212; TorchUncertainty 0.8.0 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=707ba2b3"></script>
+    <script src="../../_static/documentation_options.js?v=486e5634"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -568,27 +568,46 @@ and the optimization recipe.</p>
 <span class="n">perf</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃   ┃ Name             ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
+┡━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ 0 │ ood_criterion    │ MaxSoftmaxCriterion │      0 │ train │     0 │
+│ 1 │ model            │ _LeNet              │ 44.5 K │ train │     0 │
+│ 2 │ loss             │ CrossEntropyLoss    │      0 │ train │     0 │
+│ 3 │ format_batch_fn  │ Identity            │      0 │ train │     0 │
+│ 4 │ val_cls_metrics  │ MetricCollection    │      0 │ train │     0 │
+│ 5 │ test_cls_metrics │ MetricCollection    │      0 │ train │     0 │
+│ 6 │ test_id_entropy  │ Entropy             │      0 │ train │     0 │
+│ 7 │ mixup            │ Identity            │      0 │ train │     0 │
+└───┴──────────────────┴─────────────────────┴────────┴───────┴───────┘
+Trainable params: 44.5 K
+Non-trainable params: 0
+Total params: 44.5 K
+Total estimated model params size (MB): 0
+Modules in train mode: 37
+Modules in eval mode: 0
+Total FLOPs: 0
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          97.650%          │
-│    Brier     │          0.03645          │
-│   Entropy    │          0.08997          │
-│     NLL      │          0.07537          │
+│     Acc      │          97.640%          │
+│    Brier     │          0.03627          │
+│   Entropy    │          0.08007          │
+│     NLL      │          0.07707          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          0.474%           │
-│     aECE     │          0.404%           │
+│     ECE      │          0.294%           │
+│     aECE     │          0.071%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          0.121%           │
-│     AURC     │          0.131%           │
+│    AUGRC     │          0.101%           │
+│     AURC     │          0.106%           │
 │  Cov@5Risk   │         100.000%          │
-│  Risk@80Cov  │          0.150%           │
+│  Risk@80Cov  │          0.088%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -659,17 +678,17 @@ in this order (num_estimator x batch, classes).</p>
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_tutorial_mc_batch_norm_001.png" srcset="../../_images/sphx_glr_tutorial_mc_batch_norm_001.png" alt="tutorial mc batch norm" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ground truth:  7 2 1 0
-Predicted digits for the image 94:  1 8 8 1 1 8 1 8
-Predicted digits for the image 95:  4 8 8 8 4 8 4 8
-Predicted digits for the image 118:  4 9 9 9 9 9 9 9
-Predicted digits for the image 125:  4 9 9 9 9 9 9 9
+Predicted digits for the image 43:  2 4 4 4 4 4 2 2
+Predicted digits for the image 104:  5 9 9 9 9 9 5 5
+Predicted digits for the image 111:  7 7 1 7 7 1 7 7
+Predicted digits for the image 125:  9 4 4 4 4 4 9 9
 </pre></div>
 </div>
 <p>The predictions are mostly erroneous, which is expected since we selected
 the most uncertain images. We also see that there stochasticity in the
 predictions, as the predictions for the same image differ depending on the
 stochastic estimator used.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 16.447 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 17.873 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-bayesian-methods-tutorial-mc-batch-norm-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/d13ff3c657c4f5e710ba744815d554a5/tutorial_mc_batch_norm.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_batch_norm.ipynb</span></code></a></p>
@@ -780,7 +799,7 @@ stochastic estimator used.</p>
 
   <p class="copyright">
     
-      © Copyright 2025, Adrien Lafage and Olivier Laurent.
+      © Copyright 2026, Adrien Lafage and Olivier Laurent.
       <br/>
     
   </p>
