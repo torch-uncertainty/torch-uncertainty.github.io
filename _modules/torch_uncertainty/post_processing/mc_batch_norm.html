@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>torch_uncertainty.post_processing.mc_batch_norm &#8212; TorchUncertainty 0.8.0 documentation</title>
+    <title>torch_uncertainty.post_processing.mc_batch_norm &#8212; TorchUncertainty 0.9.0 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=486e5634"></script>
+    <script src="../../../_static/documentation_options.js?v=39bb1c6d"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -460,19 +460,28 @@
         <span class="n">mc_batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Monte Carlo Batch Normalization wrapper.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Monte Carlo Batch Normalization wrapper for 2d inputs.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            model (nn.Module): model to be converted.</span>
 <span class="sd">            num_estimators (int): number of estimators.</span>
 <span class="sd">            convert (bool): whether to convert the model. Defaults to ``True``.</span>
 <span class="sd">            mc_batch_size (int, optional): Monte Carlo batch size. The smaller the more variability</span>
-<span class="sd">            in the predictions. Defaults to 32.</span>
+<span class="sd">                in the predictions. Defaults to ``32``.</span>
 <span class="sd">            device (Literal[&quot;cpu&quot;, &quot;cuda&quot;] | torch.device | None, optional): device.</span>
 <span class="sd">                Defaults to ``None``.</span>
 
+<span class="sd">        Warning:</span>
+<span class="sd">            The update of the batch statistics slightly differs from the method as worded in the</span>
+<span class="sd">            original paper but sticks to its implementation. Instead of updating the training-based</span>
+<span class="sd">            statistics with 1 new batch of data, we perform a direct replacement.</span>
+<span class="sd">            See `this issue/discussion &lt;https://github.com/torch-uncertainty/torch-uncertainty/issues/218&gt;`_.</span>
+
 <span class="sd">        Note:</span>
 <span class="sd">            This wrapper will be stochastic in eval mode only.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            Raise an issue if you would like a wrapper for 1d and 3d inputs.</span>
 
 <span class="sd">        References:</span>
 <span class="sd">            [1] `Teye M, Azizpour H, Smith K. Bayesian uncertainty estimation for batch normalized deep networks. In ICML 2018</span>
@@ -508,13 +517,14 @@
 <span class="sd">        Args:</span>
 <span class="sd">            dataloader (DataLoader): DataLoader with the post-processing dataset.</span>
 
+<span class="sd">        Warning:</span>
+<span class="sd">            The ``batch_size`` of the DataLoader (i.e. :attr:`mc_batch_size`) should be carefully</span>
+<span class="sd">            chosen as it will have an impact on diversity of the statistics of the MC BatchNorm</span>
+<span class="sd">            layers and therefore of the predictions.</span>
+
 <span class="sd">        Note:</span>
 <span class="sd">            This method is used to populate the MC BatchNorm layers.</span>
 <span class="sd">            Use the post-processing dataset.</span>
-
-<span class="sd">        Warning:</span>
-<span class="sd">            The ``batch_size`` of the DataLoader should be carefully chosen as it</span>
-<span class="sd">            will have an impact on the statistics of the MC BatchNorm layers.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: If there are less batches than the number of estimators.</span>
@@ -602,9 +612,7 @@
                     <span class="n">num_features</span><span class="o">=</span><span class="n">module</span><span class="o">.</span><span class="n">num_features</span><span class="p">,</span>
                     <span class="n">num_estimators</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">,</span>
                     <span class="n">eps</span><span class="o">=</span><span class="n">module</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span>
-                    <span class="n">momentum</span><span class="o">=</span><span class="n">module</span><span class="o">.</span><span class="n">momentum</span><span class="p">,</span>
                     <span class="n">affine</span><span class="o">=</span><span class="n">module</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-                    <span class="n">track_running_stats</span><span class="o">=</span><span class="n">module</span><span class="o">.</span><span class="n">track_running_stats</span><span class="p">,</span>
                     <span class="n">device</span><span class="o">=</span><span class="n">module</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
                     <span class="n">dtype</span><span class="o">=</span><span class="n">module</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
                 <span class="p">)</span>

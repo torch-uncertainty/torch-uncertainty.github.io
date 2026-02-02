@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>MCBatchNorm &#8212; TorchUncertainty 0.8.0 documentation</title>
+    <title>MCBatchNorm &#8212; TorchUncertainty 0.9.0 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=486e5634"></script>
+    <script src="../_static/documentation_options.js?v=39bb1c6d"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -425,6 +425,28 @@
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.layers.distributions.NormalInverseGammaConvNd.html">NormalInverseGammaConvNd</a></li>
 </ul>
 <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.batched_resnet.html">batched_resnet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.lpbnn_resnet.html">lpbnn_resnet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.masked_resnet.html">masked_resnet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.mimo_resnet.html">mimo_resnet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.packed_resnet.html">packed_resnet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.resnet.html">resnet</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.batched_wideresnet28x10.html">batched_wideresnet28x10</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.masked_wideresnet28x10.html">masked_wideresnet28x10</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.mimo_wideresnet28x10.html">mimo_wideresnet28x10</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.packed_wideresnet28x10.html">packed_wideresnet28x10</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.wideresnet28x10.html">wideresnet28x10</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.batched_inception_time.html">batched_inception_time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.bayesian_inception_time.html">bayesian_inception_time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.inception_time.html">inception_time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.mimo_inception_time.html">mimo_inception_time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.packed_inception_time.html">packed_inception_time</a></li>
+</ul>
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.batch_ensemble.html">batch_ensemble</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.deep_ensembles.html">deep_ensembles</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.mc_dropout.html">mc_dropout</a></li>
@@ -656,23 +678,34 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.post_processing.MCBatchNorm">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.post_processing.</span></span><span class="sig-name descname"><span class="pre">MCBatchNorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mc_batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/post_processing/mc_batch_norm.html#MCBatchNorm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.post_processing.MCBatchNorm" title="Link to this definition">#</a></dt>
-<dd><p>Monte Carlo Batch Normalization wrapper.</p>
+<dd><p>Monte Carlo Batch Normalization wrapper for 2d inputs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<em>nn.Module</em>) – model to be converted.</p></li>
 <li><p><strong>num_estimators</strong> (<em>int</em>) – number of estimators.</p></li>
 <li><p><strong>convert</strong> (<em>bool</em>) – whether to convert the model. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
-<li><p><strong>mc_batch_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Monte Carlo batch size. The smaller the more variability</p></li>
-<li><p><strong>32.</strong> (<em>in the predictions. Defaults to</em>)</p></li>
+<li><p><strong>mc_batch_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Monte Carlo batch size. The smaller the more variability
+in the predictions. Defaults to <code class="docutils literal notranslate"><span class="pre">32</span></code>.</p></li>
 <li><p><strong>device</strong> (<em>Literal</em><em>[</em><em>&quot;cpu&quot;</em><em>, </em><em>&quot;cuda&quot;</em><em>] </em><em>| </em><em>torch.device</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – device.
 Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The update of the batch statistics slightly differs from the method as worded in the
+original paper but sticks to its implementation. Instead of updating the training-based
+statistics with 1 new batch of data, we perform a direct replacement.
+See <a class="reference external" href="https://github.com/torch-uncertainty/torch-uncertainty/issues/218">this issue/discussion</a>.</p>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This wrapper will be stochastic in eval mode only.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Raise an issue if you would like a wrapper for 1d and 3d inputs.</p>
 </div>
 <p class="rubric">References</p>
 <p>[1] <a class="reference external" href="https://arxiv.org/abs/1802.06455">Teye M, Azizpour H, Smith K. Bayesian uncertainty estimation for batch normalized deep networks. In ICML 2018</a>.</p>
@@ -685,15 +718,16 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">None</s
 <dd class="field-odd"><p><strong>dataloader</strong> (<em>DataLoader</em>) – DataLoader with the post-processing dataset.</p>
 </dd>
 </dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> of the DataLoader (i.e. <code class="xref py py-attr docutils literal notranslate"><span class="pre">mc_batch_size</span></code>) should be carefully
+chosen as it will have an impact on diversity of the statistics of the MC BatchNorm
+layers and therefore of the predictions.</p>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This method is used to populate the MC BatchNorm layers.
 Use the post-processing dataset.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> of the DataLoader should be carefully chosen as it
-will have an impact on the statistics of the MC BatchNorm layers.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>

@@ -133,6 +133,52 @@ Models
 
 .. currentmodule:: torch_uncertainty.models
 
+Backbones
+^^^^^^^^^
+
+ResNet
+""""""
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+    :template: function.rst
+
+    batched_resnet
+    lpbnn_resnet
+    masked_resnet
+    mimo_resnet
+    packed_resnet
+    resnet
+
+WideResNet
+""""""""""
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+    :template: function.rst
+
+    batched_wideresnet28x10
+    masked_wideresnet28x10
+    mimo_wideresnet28x10
+    packed_wideresnet28x10
+    wideresnet28x10
+
+InceptionTime
+"""""""""""""
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+    :template: function.rst
+
+    batched_inception_time
+    bayesian_inception_time
+    inception_time
+    mimo_inception_time
+    packed_inception_time
+
+
 Wrappers
 ^^^^^^^^
 
