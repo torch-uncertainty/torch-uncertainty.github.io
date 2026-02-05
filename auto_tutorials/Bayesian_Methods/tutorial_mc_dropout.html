@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Training a LeNet with Monte-Carlo Dropout &#8212; TorchUncertainty 0.9.0 documentation</title>
+    <title>Training a LeNet with Monte-Carlo Dropout &#8212; TorchUncertainty 0.10.0 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=39bb1c6d"></script>
+    <script src="../../_static/documentation_options.js?v=82662543"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -236,7 +236,7 @@
           
           
           
-          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+          <a href="https://github.com/torch-uncertainty/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -364,7 +364,7 @@
           
           
           
-          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+          <a href="https://github.com/torch-uncertainty/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -417,6 +417,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Data_Augmentation/index.html">Data Augmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../Data_Augmentation/tutorial_corruption.html">Corrupting Images with TorchUncertainty to Benchmark Robustness</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Data_Augmentation/tutorial_mixup_ensembles_mixupmp.html">Mixup and MixupMP Training &amp; Ensembles with TorchUncertainty</a></li>
 </ul>
 </details></li>
 </ul>
@@ -606,24 +607,24 @@ Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          76.500%          │
-│    Brier     │          0.48356          │
-│   Entropy    │          1.72867          │
-│     NLL      │          1.07809          │
+│     Acc      │          72.130%          │
+│    Brier     │          0.51313          │
+│   Entropy    │          1.76567          │
+│     NLL      │          1.15269          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          35.060%          │
-│     aECE     │          35.055%          │
+│     ECE      │          30.526%          │
+│     aECE     │          30.526%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          5.790%           │
-│     AURC     │          7.405%           │
-│  Cov@5Risk   │          51.630%          │
-│  Risk@80Cov  │          15.913%          │
+│    AUGRC     │          8.582%           │
+│     AURC     │          12.094%          │
+│  Cov@5Risk   │           nan%            │
+│  Risk@80Cov  │          21.587%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -673,17 +674,17 @@ Total FLOPs: 0
     <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_mc_dropout_001.png" srcset="../../_images/sphx_glr_tutorial_mc_dropout_001.png" alt="tutorial mc dropout" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MC-Dropout predictions for the image 1:  7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7
-MC-Dropout predictions for the image 2:  2 6 0 4 2 0 4 5 2 0 2 6 0 0 2 0
+<img src="../../_images/sphx_glr_tutorial_mc_dropout_001.png" srcset="../../_images/sphx_glr_tutorial_mc_dropout_001.png" alt="tutorial mc dropout" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MC-Dropout predictions for the image 1:  7 7 7 7 7 7 7 7 7 7 7 7 7 9 7 7
+MC-Dropout predictions for the image 2:  2 2 2 3 2 2 0 0 3 2 0 6 2 2 0 0
 MC-Dropout predictions for the image 3:  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-MC-Dropout predictions for the image 4:  0 0 0 0 0 0 0 0 0 0 0 8 0 0 0 0
-MC-Dropout predictions for the image 5:  1 4 6 0 6 4 1 4 2 4 6 2 4 0 0 6
-MC-Dropout predictions for the image 6:  1 1 8 1 1 1 1 1 1 1 1 1 1 1 1 1
+MC-Dropout predictions for the image 4:  0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 0
+MC-Dropout predictions for the image 5:  4 6 4 6 4 6 1 0 6 6 6 6 6 4 0 0
+MC-Dropout predictions for the image 6:  1 1 1 1 1 1 1 8 1 1 1 1 1 1 1 1
 </pre></div>
 </div>
 <p>Most of the time, we see that there is some disagreement between the samples of the dropout
 approximation of the posterior distribution.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.513 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.521 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-bayesian-methods-tutorial-mc-dropout-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/d3a3ba08353d48467d22e26f836ab9bf/tutorial_mc_dropout.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_dropout.ipynb</span></code></a></p>

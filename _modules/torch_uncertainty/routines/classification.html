@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>torch_uncertainty.routines.classification &#8212; TorchUncertainty 0.9.0 documentation</title>
+    <title>torch_uncertainty.routines.classification &#8212; TorchUncertainty 0.10.0 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=39bb1c6d"></script>
+    <script src="../../../_static/documentation_options.js?v=82662543"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -233,7 +233,7 @@
           
           
           
-          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+          <a href="https://github.com/torch-uncertainty/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -359,7 +359,7 @@
           
           
           
-          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+          <a href="https://github.com/torch-uncertainty/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -443,7 +443,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">lightning.pytorch</span><span class="w"> </span><span class="kn">import</span> <span class="n">LightningModule</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">lightning.pytorch.loggers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">lightning.pytorch.utilities.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">STEP_OUTPUT</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">timm.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mixup</span> <span class="k">as</span> <span class="n">timm_Mixup</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optimizer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.flop_counter</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlopCounterMode</span>
@@ -453,7 +452,6 @@
     <span class="n">BinaryAveragePrecision</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.layers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Identity</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.losses</span><span class="w"> </span><span class="kn">import</span> <span class="n">DECLoss</span><span class="p">,</span> <span class="n">ELBOLoss</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AUGRC</span><span class="p">,</span>
@@ -482,24 +480,8 @@
     <span class="n">get_ood_criterion</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.post_processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Conformal</span><span class="p">,</span> <span class="n">LaplaceApprox</span><span class="p">,</span> <span class="n">PostProcessing</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.transforms</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Mixup</span><span class="p">,</span>
-    <span class="n">MixupIO</span><span class="p">,</span>
-    <span class="n">RegMixup</span><span class="p">,</span>
-    <span class="n">RepeatTarget</span><span class="p">,</span>
-    <span class="n">WarpingMixup</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.transforms</span><span class="w"> </span><span class="kn">import</span> <span class="n">MIXUP_PARAMS</span><span class="p">,</span> <span class="n">RepeatTarget</span><span class="p">,</span> <span class="n">build_mixup</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">csv_writer</span><span class="p">,</span> <span class="n">plot_hist</span>
-
-<span class="n">MIXUP_PARAMS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;mixtype&quot;</span><span class="p">:</span> <span class="s2">&quot;erm&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;mixmode&quot;</span><span class="p">:</span> <span class="s2">&quot;elem&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dist_sim&quot;</span><span class="p">:</span> <span class="s2">&quot;emb&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;kernel_tau_max&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-    <span class="s2">&quot;kernel_tau_std&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
-    <span class="s2">&quot;mixup_alpha&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="s2">&quot;cutmix_alpha&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-<span class="p">}</span>
 
 
 <div class="viewcode-block" id="ClassificationRoutine">
@@ -513,6 +495,7 @@
         <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
         <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">loss</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
         <span class="n">is_ensemble</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">num_tta</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">format_batch_fn</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -746,49 +729,9 @@
         <span class="k">if</span> <span class="n">mixup_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">mixup_params</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">mixup_params</span> <span class="o">=</span> <span class="n">MIXUP_PARAMS</span> <span class="o">|</span> <span class="n">mixup_params</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mixup_params</span> <span class="o">=</span> <span class="n">mixup_params</span>
-
-        <span class="k">if</span> <span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixup_alpha&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;cutmix_alpha&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Cutmix alpha and Mixup alpha must be positive.&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">mixup_params</span><span class="p">[</span><span class="s1">&#39;mixup_alpha&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">mixup_params</span><span class="p">[</span><span class="s1">&#39;cutmix_alpha&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixtype&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;timm&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">timm_Mixup</span><span class="p">(</span>
-                <span class="n">mixup_alpha</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixup_alpha&quot;</span><span class="p">],</span>
-                <span class="n">cutmix_alpha</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;cutmix_alpha&quot;</span><span class="p">],</span>
-                <span class="n">mode</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixmode&quot;</span><span class="p">],</span>
-                <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixtype&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;mixup&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">Mixup</span><span class="p">(</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixup_alpha&quot;</span><span class="p">],</span>
-                <span class="n">mode</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixmode&quot;</span><span class="p">],</span>
-                <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixtype&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;mixup_io&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">MixupIO</span><span class="p">(</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixup_alpha&quot;</span><span class="p">],</span>
-                <span class="n">mode</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixmode&quot;</span><span class="p">],</span>
-                <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixtype&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;regmixup&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">RegMixup</span><span class="p">(</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixup_alpha&quot;</span><span class="p">],</span>
-                <span class="n">mode</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixmode&quot;</span><span class="p">],</span>
-                <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixtype&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;kernel_warping&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">WarpingMixup</span><span class="p">(</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixup_alpha&quot;</span><span class="p">],</span>
-                <span class="n">mode</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixmode&quot;</span><span class="p">],</span>
-                <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
-                <span class="n">apply_kernel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">tau_max</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;kernel_tau_max&quot;</span><span class="p">],</span>
-                <span class="n">tau_std</span><span class="o">=</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;kernel_tau_std&quot;</span><span class="p">],</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="n">Identity</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_kernel_warping_mixup</span> <span class="o">=</span> <span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixtype&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;kernel_warping&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kw_on_embeddings</span> <span class="o">=</span> <span class="n">mixup_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;kw_on_embeddings&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">build_mixup</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span> <span class="o">**</span><span class="n">mixup_params</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_apply_mixup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the mixup augmentation on a :attr:`batch` of images.</span>
@@ -800,12 +743,12 @@
 <span class="sd">            tuple[Tensor, Tensor]: the images and the corresponding targets transformed with mixup.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;mixtype&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;kernel_warping&quot;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixup_params</span><span class="p">[</span><span class="s2">&quot;dist_sim&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;emb&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_kernel_warping_mixup</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kw_on_embeddings</span><span class="p">:</span>
                     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
                         <span class="n">feats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">feats_forward</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
                     <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixup</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">,</span> <span class="n">feats</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>  <span class="c1"># self.mixup_params[&quot;dist_sim&quot;] == &quot;inp&quot;:</span>
+                <span class="k">else</span><span class="p">:</span>
                     <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixup</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixup</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">)</span>

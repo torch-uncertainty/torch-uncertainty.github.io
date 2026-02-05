@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Monte Carlo Dropout for Semantic Segmentation on MUAD &#8212; TorchUncertainty 0.9.0 documentation</title>
+    <title>Monte Carlo Dropout for Semantic Segmentation on MUAD &#8212; TorchUncertainty 0.10.0 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=39bb1c6d"></script>
+    <script src="../../_static/documentation_options.js?v=82662543"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -236,7 +236,7 @@
           
           
           
-          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+          <a href="https://github.com/torch-uncertainty/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -364,7 +364,7 @@
           
           
           
-          <a href="https://github.com/ENSTA-U2IS-AI/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+          <a href="https://github.com/torch-uncertainty/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
             <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
@@ -417,6 +417,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Data_Augmentation/index.html">Data Augmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../Data_Augmentation/tutorial_corruption.html">Corrupting Images with TorchUncertainty to Benchmark Robustness</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Data_Augmentation/tutorial_mixup_ensembles_mixupmp.html">Mixup and MixupMP Training &amp; Ensembles with TorchUncertainty</a></li>
 </ul>
 </details></li>
 </ul>
@@ -739,25 +740,25 @@ Total FLOPs: 0
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.67134          │
-│     NLL      │          1.69061          │
-│     mAcc     │          25.807%          │
-│     mIoU     │          16.861%          │
-│    pixAcc    │          61.703%          │
+│    Brier     │          0.70562          │
+│     NLL      │          1.79927          │
+│     mAcc     │          25.450%          │
+│     mIoU     │          16.462%          │
+│    pixAcc    │          54.377%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          31.716%          │
-│     aECE     │          31.591%          │
+│     ECE      │          24.277%          │
+│     aECE     │          24.277%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          14.559%          │
-│     AURC     │          24.879%          │
+│    AUGRC     │          19.185%          │
+│     AURC     │          30.693%          │
 │  Cov@5Risk   │           nan%            │
-│  Risk@80Cov  │          32.943%          │
+│  Risk@80Cov  │          42.912%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -782,8 +783,8 @@ Total FLOPs: 0
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.20550          │
-│     NLL      │          0.40045          │
+│    Brier     │          0.20613          │
+│     NLL      │          0.40071          │
 │     mAcc     │          68.772%          │
 │     mIoU     │          50.739%          │
 │    pixAcc    │          85.701%          │
@@ -791,16 +792,16 @@ Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          1.587%           │
-│     aECE     │          1.613%           │
+│     ECE      │          1.508%           │
+│     aECE     │          1.648%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          2.705%           │
-│     AURC     │          3.324%           │
-│  Cov@5Risk   │          72.564%          │
-│  Risk@80Cov  │          7.034%           │
+│    AUGRC     │          2.742%           │
+│     AURC     │          3.382%           │
+│  Cov@5Risk   │          71.826%          │
+│  Risk@80Cov  │          7.108%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -893,25 +894,25 @@ allow us to have a better confidence score by using the dropout during test time
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.20485          │
-│     NLL      │          0.40124          │
-│     mAcc     │          68.377%          │
-│     mIoU     │          50.793%          │
-│    pixAcc    │          85.779%          │
+│    Brier     │          0.20602          │
+│     NLL      │          0.40280          │
+│     mAcc     │          68.310%          │
+│     mIoU     │          50.613%          │
+│    pixAcc    │          85.631%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          2.783%           │
-│     aECE     │          2.783%           │
+│     ECE      │          2.583%           │
+│     aECE     │          2.583%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          2.696%           │
-│     AURC     │          3.340%           │
-│  Cov@5Risk   │          72.190%          │
-│  Risk@80Cov  │          6.954%           │
+│    AUGRC     │          2.712%           │
+│     AURC     │          3.338%           │
+│  Cov@5Risk   │          72.414%          │
+│  Risk@80Cov  │          7.035%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -975,7 +976,7 @@ of the different estimators.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" srcset="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" alt="tutorial muad mc drop" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 54.860 seconds)</p>
+<img src="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" srcset="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" alt="tutorial muad mc drop" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 54.724 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-bayesian-methods-tutorial-muad-mc-drop-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/3cc96ba0ee86ad145779685dc1a694fe/tutorial_muad_mc_drop.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_muad_mc_drop.ipynb</span></code></a></p>

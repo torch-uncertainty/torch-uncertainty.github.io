@@ -1,0 +1,1084 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Mixup and MixupMP Training &amp; Ensembles with TorchUncertainty &#8212; TorchUncertainty 0.10.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-codeautolink.css?v=b2176991" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=82662543"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_tutorials/Data_Augmentation/tutorial_mixup_ensembles_mixupmp';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="CLI Guide" href="../../cli_guide.html" />
+    <link rel="prev" title="Corrupting Images with TorchUncertainty to Benchmark Robustness" href="tutorial_corruption.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="TorchUncertainty Logo"/>
+    <img src="../../_static/logo_dark.png" class="logo__image only-dark pst-js-only" alt="TorchUncertainty Logo"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../references.html">
+    References
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/torch-uncertainty/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../references.html">
+    References
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/torch-uncertainty/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Classification/index.html">Classification</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_classification.html">Training a LeNet for Image Classification with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_distribution_shift.html">Evaluating Model Performance Under Distribution Shift with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_evidential_classification.html">Deep Evidential Classification on a Toy Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_ood_detection.html">Out-of-distribution detection with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_pe_cifar10.html">From a Standard Classifier to a Packed-Ensemble</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Regression/index.html">Regression with Uncertainty</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Regression/tutorial_der_cubic.html">Deep Evidential Regression on a Toy Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Regression/tutorial_probabilistic_regression.html">Deep Probabilistic Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Regression/tutorial_regression.html">Training an MLP for Tabular Regression with TorchUncertainty</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Post_Hoc_Methods/index.html">Post-hoc Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scaler.html">Improve Top-label Calibration with Temperature Scaling</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Bayesian_Methods/index.html">Bayesian Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_bayesian.html">Training a Bayesian Neural Network in 20 seconds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_mc_batch_norm.html">Training a LeNet with Monte Carlo Batch Normalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_mc_dropout.html">Training a LeNet with Monte-Carlo Dropout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_muad_mc_drop.html">Monte Carlo Dropout for Semantic Segmentation on MUAD</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Ensemble_Methods/index.html">Ensemble Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Ensemble_Methods/tutorial_from_de_to_pe.html">Improved Ensemble parameter-efficiency with Packed-Ensembles</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Segmentation/index.html">Segmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Segmentation/tutorial_muad_deep_en.html">Deep ensembles Segmentation Tutorial using Muad Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Segmentation/tutorial_muad_packed.html">Packed ensembles Segmentation Tutorial using Muad Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Segmentation/tutorial_muad_seg.html">Segmentation Tutorial using Muad Dataset</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Data Augmentation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tutorial_corruption.html">Corrupting Images with TorchUncertainty to Benchmark Robustness</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Mixup and MixupMP Training &amp; Ensembles with TorchUncertainty</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+        <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Data Augmentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Mixup and MixupMP Training &amp; Ensembles with TorchUncertainty</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-tutorials-data-augmentation-tutorial-mixup-ensembles-mixupmp-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="mixup-and-mixupmp-training-ensembles-with-torchuncertainty">
+<span id="sphx-glr-auto-tutorials-data-augmentation-tutorial-mixup-ensembles-mixupmp-py"></span><h1>Mixup and MixupMP Training &amp; Ensembles with TorchUncertainty<a class="headerlink" href="#mixup-and-mixupmp-training-ensembles-with-torchuncertainty" title="Link to this heading">#</a></h1>
+<p><em>This tutorial illustrates how to train models using Mixup and MixupMP</em>
+<em>in the same style as the Packed-Ensembles tutorial you provided.</em></p>
+<p>In this notebook we will show:
+1. Standard Mixup training
+2. Assembling Mixup-trained models into a Deep Ensemble
+3. MixupMP training
+4. Assembling MixupMP models the same way</p>
+<p>Throughout this notebook we use <a class="reference external" href="https://lightning.ai/docs/pytorch/stable/">PyTorch Lightning</a>
+and <a class="reference external" href="https://torch-uncertainty.github.io/">TorchUncertainty</a> for training.</p>
+<p>Note: This script does <em>not</em> actually run training — it shows the configuration and conceptual usage only.</p>
+<section id="training-with-mixup">
+<h2>1. Training with Mixup<a class="headerlink" href="#training-with-mixup" title="Link to this heading">#</a></h2>
+<p>To train a Mixup model using TorchUncertainty with Lightning,
+you need to configure the routine’s <cite>mixup_params</cite>:</p>
+<ul class="simple">
+<li><p><cite>mixtype: “mixup”</cite> tells the routine to use standard Mixup augmentation.</p></li>
+<li><p><cite>mixup_alpha</cite> controls the strength of mixing (Beta(α,α)).</p></li>
+</ul>
+<p>Mixup internally creates convex combinations of images and labels
+and computes the soft-label cross entropy under the hood.</p>
+<p>This config snippet focuses on <em>only</em> the mixup setup.
+Refer to your standard training setup for other keys.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example Lightning CLI config for Mixup training:</span>
+<span class="n">mixup_config</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2"># lightning.pytorch==2.1.3</span>
+<span class="s2">seed_everything: false</span>
+<span class="s2">eval_after_fit: true</span>
+
+<span class="s2">trainer:</span>
+<span class="s2">  accelerator: gpu</span>
+<span class="s2">  devices: 1</span>
+<span class="s2">  precision: 16-mixed</span>
+<span class="s2">  max_epochs: 200</span>
+<span class="s2">  logger:</span>
+<span class="s2">    class_path: lightning.pytorch.loggers.TensorBoardLogger</span>
+<span class="s2">    init_args:</span>
+<span class="s2">      save_dir: logs/wideresnet28x10</span>
+<span class="s2">      name: mixup</span>
+<span class="s2">      default_hp_metric: false</span>
+<span class="s2">  callbacks:</span>
+<span class="s2">    - class_path: torch_uncertainty.callbacks.TUClsCheckpoint</span>
+<span class="s2">    - class_path: lightning.pytorch.callbacks.LearningRateMonitor</span>
+<span class="s2">      init_args:</span>
+<span class="s2">        logging_interval: step</span>
+<span class="s2">    - class_path: lightning.pytorch.callbacks.EarlyStopping</span>
+<span class="s2">      init_args:</span>
+<span class="s2">        monitor: val/cls/Acc</span>
+<span class="s2">        patience: 1000</span>
+<span class="s2">        check_finite: true</span>
+
+<span class="s2">routine:</span>
+<span class="s2">  model:</span>
+<span class="s2">    class_path: torch_uncertainty.models.classification.wideresnet28x10</span>
+<span class="s2">    init_args:</span>
+<span class="s2">      in_channels: 3</span>
+<span class="s2">      num_classes: 10</span>
+<span class="s2">      dropout_rate: 0.0</span>
+<span class="s2">      style: cifar</span>
+<span class="s2">  num_classes: 10</span>
+<span class="s2">  loss: CrossEntropyLoss</span>
+
+<span class="s2">  # Mixup-specific parameters</span>
+<span class="s2">  mixup_params:</span>
+<span class="s2">    mixtype: &quot;mixup&quot;</span>
+<span class="s2">    mixup_alpha: 2</span>
+
+<span class="s2">data:</span>
+<span class="s2">  root: ./data</span>
+<span class="s2">  batch_size: 128</span>
+<span class="s2">  num_workers: 4</span>
+
+<span class="s2">optimizer:</span>
+<span class="s2">  class_path: torch.optim.SGD</span>
+<span class="s2">  init_args:</span>
+<span class="s2">    lr: 0.1</span>
+<span class="s2">    momentum: 0.9</span>
+<span class="s2">    weight_decay: 5e-4</span>
+<span class="s2">    nesterov: true</span>
+
+<span class="s2">lr_scheduler:</span>
+<span class="s2">  class_path: torch.optim.lr_scheduler.MultiStepLR</span>
+<span class="s2">  init_args:</span>
+<span class="s2">    milestones:</span>
+<span class="s2">      - 60</span>
+<span class="s2">      - 120</span>
+<span class="s2">      - 160</span>
+<span class="s2">    gamma: 0.2</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mixup_config</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span># lightning.pytorch==2.1.3
+seed_everything: false
+eval_after_fit: true
+
+trainer:
+  accelerator: gpu
+  devices: 1
+  precision: 16-mixed
+  max_epochs: 200
+  logger:
+    class_path: lightning.pytorch.loggers.TensorBoardLogger
+    init_args:
+      save_dir: logs/wideresnet28x10
+      name: mixup
+      default_hp_metric: false
+  callbacks:
+    - class_path: torch_uncertainty.callbacks.TUClsCheckpoint
+    - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+      init_args:
+        logging_interval: step
+    - class_path: lightning.pytorch.callbacks.EarlyStopping
+      init_args:
+        monitor: val/cls/Acc
+        patience: 1000
+        check_finite: true
+
+routine:
+  model:
+    class_path: torch_uncertainty.models.classification.wideresnet28x10
+    init_args:
+      in_channels: 3
+      num_classes: 10
+      dropout_rate: 0.0
+      style: cifar
+  num_classes: 10
+  loss: CrossEntropyLoss
+
+  # Mixup-specific parameters
+  mixup_params:
+    mixtype: &quot;mixup&quot;
+    mixup_alpha: 2
+
+data:
+  root: ./data
+  batch_size: 128
+  num_workers: 4
+
+optimizer:
+  class_path: torch.optim.SGD
+  init_args:
+    lr: 0.1
+    momentum: 0.9
+    weight_decay: 5e-4
+    nesterov: true
+
+lr_scheduler:
+  class_path: torch.optim.lr_scheduler.MultiStepLR
+  init_args:
+    milestones:
+      - 60
+      - 120
+      - 160
+    gamma: 0.2
+</pre></div>
+</div>
+</section>
+<section id="how-to-ensemble-mixup-models">
+<h2>2. How to Ensemble Mixup Models<a class="headerlink" href="#how-to-ensemble-mixup-models" title="Link to this heading">#</a></h2>
+<p>Once you have trained multiple Mixup models (e.g., using the previous config
+under different versions / runs), you can assemble them with <cite>deep_ensembles</cite>.
+This is identical to ensembling vanilla models, except the ckpt paths point
+to your Mixup-trained checkpoints.</p>
+<p>TorchUncertainty’s <cite>deep_ensembles</cite> helper will load each checkpoint
+and produce an ensemble model that averages predictions across all members.:contentReference[oaicite:0]{index=0}</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">ensemble_mixup_config</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2"># lightning.pytorch==2.1.3</span>
+<span class="s2">seed_everything: false</span>
+<span class="s2">eval_after_fit: true</span>
+
+<span class="s2">trainer:</span>
+<span class="s2">  accelerator: gpu</span>
+<span class="s2">  devices: 1</span>
+<span class="s2">  precision: 16-mixed</span>
+<span class="s2">  max_epochs: 200</span>
+<span class="s2">  logger:</span>
+<span class="s2">    class_path: lightning.pytorch.loggers.TensorBoardLogger</span>
+<span class="s2">    init_args:</span>
+<span class="s2">      save_dir: logs/wideresnet28x10</span>
+<span class="s2">      name: mixup_ensemble</span>
+<span class="s2">      default_hp_metric: false</span>
+<span class="s2">  callbacks:</span>
+<span class="s2">    - class_path: torch_uncertainty.callbacks.TUClsCheckpoint</span>
+<span class="s2">    - class_path: lightning.pytorch.callbacks.LearningRateMonitor</span>
+<span class="s2">      init_args:</span>
+<span class="s2">        logging_interval: step</span>
+<span class="s2">    - class_path: lightning.pytorch.callbacks.EarlyStopping</span>
+<span class="s2">      init_args:</span>
+<span class="s2">        monitor: val/cls/Acc</span>
+<span class="s2">        patience: 1000</span>
+<span class="s2">        check_finite: true</span>
+
+<span class="s2">routine:</span>
+<span class="s2">  model:</span>
+<span class="s2">    class_path: torch_uncertainty.models.deep_ensembles</span>
+<span class="s2">    init_args:</span>
+<span class="s2">      core_models:</span>
+<span class="s2">        class_path: torch_uncertainty.models.classification.wideresnet28x10</span>
+<span class="s2">        init_args:</span>
+<span class="s2">          in_channels: 3</span>
+<span class="s2">          num_classes: 10</span>
+<span class="s2">          style: cifar</span>
+<span class="s2">          dropout_rate: 0.0</span>
+<span class="s2">      num_estimators: 4</span>
+<span class="s2">      task: classification</span>
+<span class="s2">      # Replace with your trained mixup Checkpoint paths</span>
+<span class="s2">      ckpt_paths:</span>
+<span class="s2">        - path/to/mixup/version_0.ckpt</span>
+<span class="s2">        - path/to/mixup/version_1.ckpt</span>
+<span class="s2">        - path/to/mixup/version_2.ckpt</span>
+<span class="s2">        - path/to/mixup/version_3.ckpt</span>
+
+<span class="s2">  num_classes: 10</span>
+<span class="s2">  is_ensemble: true</span>
+<span class="s2">  format_batch_fn:</span>
+<span class="s2">    class_path: torch_uncertainty.transforms.RepeatTarget</span>
+<span class="s2">    init_args:</span>
+<span class="s2">      num_repeats: 4</span>
+
+<span class="s2">data:</span>
+<span class="s2">  root: ./data</span>
+<span class="s2">  batch_size: 128</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ensemble_mixup_config</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span># lightning.pytorch==2.1.3
+seed_everything: false
+eval_after_fit: true
+
+trainer:
+  accelerator: gpu
+  devices: 1
+  precision: 16-mixed
+  max_epochs: 200
+  logger:
+    class_path: lightning.pytorch.loggers.TensorBoardLogger
+    init_args:
+      save_dir: logs/wideresnet28x10
+      name: mixup_ensemble
+      default_hp_metric: false
+  callbacks:
+    - class_path: torch_uncertainty.callbacks.TUClsCheckpoint
+    - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+      init_args:
+        logging_interval: step
+    - class_path: lightning.pytorch.callbacks.EarlyStopping
+      init_args:
+        monitor: val/cls/Acc
+        patience: 1000
+        check_finite: true
+
+routine:
+  model:
+    class_path: torch_uncertainty.models.deep_ensembles
+    init_args:
+      core_models:
+        class_path: torch_uncertainty.models.classification.wideresnet28x10
+        init_args:
+          in_channels: 3
+          num_classes: 10
+          style: cifar
+          dropout_rate: 0.0
+      num_estimators: 4
+      task: classification
+      # Replace with your trained mixup Checkpoint paths
+      ckpt_paths:
+        - path/to/mixup/version_0.ckpt
+        - path/to/mixup/version_1.ckpt
+        - path/to/mixup/version_2.ckpt
+        - path/to/mixup/version_3.ckpt
+
+  num_classes: 10
+  is_ensemble: true
+  format_batch_fn:
+    class_path: torch_uncertainty.transforms.RepeatTarget
+    init_args:
+      num_repeats: 4
+
+data:
+  root: ./data
+  batch_size: 128
+</pre></div>
+</div>
+</section>
+<section id="training-with-mixupmp">
+<h2>3. Training with MixupMP<a class="headerlink" href="#training-with-mixupmp" title="Link to this heading">#</a></h2>
+<p>MixupMP is a variant of mixup that produces posterior samples from a predictive
+distribution that is more realistic than deep ensembles alone, according to the
+<cite>MixupMP</cite> paper (Martingale posterior based construction).</p>
+<dl class="simple">
+<dt>The two key differences vs standard Mixup:</dt><dd><ul class="simple">
+<li><p>You use a specialized loss: <cite>MixupMPLoss</cite></p></li>
+<li><p>You set <cite>mixtype: “mixupmp”</cite> in mixup_params</p></li>
+</ul>
+</dd>
+</dl>
+<p>This causes the routine to sample augmented predictive variations as part of
+the MixupMP methodology for uncertainty.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mixupmp_config</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2"># lightning.pytorch==2.1.3</span>
+<span class="s2">seed_everything: false</span>
+<span class="s2">eval_after_fit: true</span>
+
+<span class="s2">trainer:</span>
+<span class="s2">  accelerator: gpu</span>
+<span class="s2">  devices: 1</span>
+<span class="s2">  precision: 16-mixed</span>
+<span class="s2">  max_epochs: 200</span>
+<span class="s2">  logger:</span>
+<span class="s2">    class_path: lightning.pytorch.loggers.TensorBoardLogger</span>
+<span class="s2">    init_args:</span>
+<span class="s2">      save_dir: logs/wideresnet28x10</span>
+<span class="s2">      name: mixupmp</span>
+<span class="s2">      default_hp_metric: false</span>
+<span class="s2">  callbacks:</span>
+<span class="s2">    - class_path: torch_uncertainty.callbacks.TUClsCheckpoint</span>
+<span class="s2">    - class_path: lightning.pytorch.callbacks.LearningRateMonitor</span>
+<span class="s2">      init_args:</span>
+<span class="s2">        logging_interval: step</span>
+<span class="s2">    - class_path: lightning.pytorch.callbacks.EarlyStopping</span>
+<span class="s2">      init_args:</span>
+<span class="s2">        monitor: val/cls/Acc</span>
+<span class="s2">        patience: 1000</span>
+<span class="s2">        check_finite: true</span>
+
+<span class="s2">routine:</span>
+<span class="s2">  model:</span>
+<span class="s2">    class_path: torch_uncertainty.models.classification.wideresnet28x10</span>
+<span class="s2">    init_args:</span>
+<span class="s2">      in_channels: 3</span>
+<span class="s2">      num_classes: 10</span>
+<span class="s2">      style: cifar</span>
+<span class="s2">      dropout_rate: 0.0</span>
+
+<span class="s2">  num_classes: 10</span>
+
+<span class="s2">  # Use MixupMP-specific loss with default parameters</span>
+<span class="s2">  loss: torch_uncertainty.losses.MixupMPLoss</span>
+
+<span class="s2">  mixup_params:</span>
+<span class="s2">    mixtype: &quot;mixupmp&quot;</span>
+<span class="s2">    mixup_alpha: 2</span>
+
+<span class="s2">data:</span>
+<span class="s2">  root: ./data</span>
+<span class="s2">  batch_size: 128</span>
+<span class="s2">  num_workers: 4</span>
+
+<span class="s2">optimizer:</span>
+<span class="s2">  class_path: torch.optim.SGD</span>
+<span class="s2">  init_args:</span>
+<span class="s2">    lr: 0.1</span>
+<span class="s2">    momentum: 0.9</span>
+<span class="s2">    weight_decay: 5e-4</span>
+<span class="s2">    nesterov: true</span>
+
+<span class="s2">lr_scheduler:</span>
+<span class="s2">  class_path: torch.optim.lr_scheduler.MultiStepLR</span>
+<span class="s2">  init_args:</span>
+<span class="s2">    milestones:</span>
+<span class="s2">      - 60</span>
+<span class="s2">      - 120</span>
+<span class="s2">      - 160</span>
+<span class="s2">    gamma: 0.2</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mixupmp_config</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span># lightning.pytorch==2.1.3
+seed_everything: false
+eval_after_fit: true
+
+trainer:
+  accelerator: gpu
+  devices: 1
+  precision: 16-mixed
+  max_epochs: 200
+  logger:
+    class_path: lightning.pytorch.loggers.TensorBoardLogger
+    init_args:
+      save_dir: logs/wideresnet28x10
+      name: mixupmp
+      default_hp_metric: false
+  callbacks:
+    - class_path: torch_uncertainty.callbacks.TUClsCheckpoint
+    - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+      init_args:
+        logging_interval: step
+    - class_path: lightning.pytorch.callbacks.EarlyStopping
+      init_args:
+        monitor: val/cls/Acc
+        patience: 1000
+        check_finite: true
+
+routine:
+  model:
+    class_path: torch_uncertainty.models.classification.wideresnet28x10
+    init_args:
+      in_channels: 3
+      num_classes: 10
+      style: cifar
+      dropout_rate: 0.0
+
+  num_classes: 10
+
+  # Use MixupMP-specific loss with default parameters
+  loss: torch_uncertainty.losses.MixupMPLoss
+
+  mixup_params:
+    mixtype: &quot;mixupmp&quot;
+    mixup_alpha: 2
+
+data:
+  root: ./data
+  batch_size: 128
+  num_workers: 4
+
+optimizer:
+  class_path: torch.optim.SGD
+  init_args:
+    lr: 0.1
+    momentum: 0.9
+    weight_decay: 5e-4
+    nesterov: true
+
+lr_scheduler:
+  class_path: torch.optim.lr_scheduler.MultiStepLR
+  init_args:
+    milestones:
+      - 60
+      - 120
+      - 160
+    gamma: 0.2
+</pre></div>
+</div>
+</section>
+<section id="how-to-ensemble-mixupmp-models">
+<h2>4. How to Ensemble MixupMP Models<a class="headerlink" href="#how-to-ensemble-mixupmp-models" title="Link to this heading">#</a></h2>
+<p>Ensembling MixupMP models is conceptually the same as ensembling
+any other model: train N different runs (with different seeds / settings),
+then point their ckpt_paths to the Deep Ensembles config.</p>
+<p>The only difference is that each individual model is a MixupMP-trained
+checkpoint instead of standard training or mixup training.</p>
+<p>Use the exact same deep_ensembles format as shown above (Section 2),
+but give it the paths to your MixupMP checkpoints.</p>
+</section>
+<section id="references">
+<h2>5. References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<p>For more information on Mixup Ensembles, we refer to the following resources:</p>
+<ul class="simple">
+<li><p>Combining ensembles and data augmentation can harm your calibration
+<a class="reference external" href="https://arxiv.org/pdf/2010.09875">ICLR 2021</a>
+(Yeming Wen, Ghassen Jerfel, Rafael Muller, Michael W. Dusenberry,
+Jasper Snoek, Balaji Lakshminarayanan, and Dustin Tran)</p></li>
+<li><p>Uncertainty quantification and deep ensembles
+<a class="reference external" href="https://arxiv.org/pdf/2007.08792">NeurIPS 2021</a>
+(Rahul Rahaman &amp; Alexandre H. Thiery)</p></li>
+</ul>
+<p>For more information on MixupMP, we refer to the following resource:</p>
+<ul class="simple">
+<li><p>Posterior Uncertainty Quantification in Neural Networks using Data Augmentation
+<a class="reference external" href="https://arxiv.org/abs/2403.12729">AISTATS 2024</a>
+(Luhuan Wu &amp; Sinead Williamson)</p></li>
+</ul>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.002 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-data-augmentation-tutorial-mixup-ensembles-mixupmp-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/0702c9f45ba6cc218e9a600e8afd7772/tutorial_mixup_ensembles_mixupmp.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mixup_ensembles_mixupmp.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/e31090d58dc3204c663e7a1a3bd5f5cc/tutorial_mixup_ensembles_mixupmp.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_mixup_ensembles_mixupmp.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/9c2114b8654b31d9b231e57b019f1bdf/tutorial_mixup_ensembles_mixupmp.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">tutorial_mixup_ensembles_mixupmp.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="tutorial_corruption.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Corrupting Images with TorchUncertainty to Benchmark Robustness</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../cli_guide.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">CLI Guide</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training-with-mixup">1. Training with Mixup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-ensemble-mixup-models">2. How to Ensemble Mixup Models</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training-with-mixupmp">3. Training with MixupMP</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-ensemble-mixupmp-models">4. How to Ensemble MixupMP Models</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">5. References</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/auto_tutorials/Data_Augmentation/tutorial_mixup_ensembles_mixupmp.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2026, Adrien Lafage and Olivier Laurent.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>
