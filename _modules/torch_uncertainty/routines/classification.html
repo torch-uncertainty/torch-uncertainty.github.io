@@ -1040,35 +1040,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">Logger</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_plots</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
-                <span class="s2">&quot;Reliabity diagram&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span><span class="p">[</span><span class="s2">&quot;cal/ECE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
-                <span class="s2">&quot;Risk-Coverage curve&quot;</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span><span class="p">[</span><span class="s2">&quot;sc/AURC&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
-                <span class="s2">&quot;Generalized Risk-Coverage curve&quot;</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span><span class="p">[</span><span class="s2">&quot;sc/AUGRC&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="p">)</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">,</span> <span class="n">Conformal</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
-                    <span class="s2">&quot;Reliabity diagram after calibration&quot;</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">post_cls_metrics</span><span class="p">[</span><span class="s2">&quot;cal/ECE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="p">)</span>
-
-            <span class="c1"># plot histograms of logits and likelihoods</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
-                <span class="n">id_scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_score_storage</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                <span class="n">ood_scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ood_score_storage</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-                <span class="n">score_fig</span> <span class="o">=</span> <span class="n">plot_hist</span><span class="p">(</span>
-                    <span class="p">[</span><span class="n">id_scores</span><span class="p">,</span> <span class="n">ood_scores</span><span class="p">],</span>
-                    <span class="mi">20</span><span class="p">,</span>
-                    <span class="s2">&quot;Histogram of the OOD scores&quot;</span><span class="p">,</span>
-                <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span><span class="s2">&quot;OOD Score Histogram&quot;</span><span class="p">,</span> <span class="n">score_fig</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plot_results</span><span class="p">()</span>
 
         <span class="c1"># reset metrics</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
@@ -1094,7 +1066,39 @@
                 <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log_dir</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">csv_filename</span><span class="p">,</span>
                 <span class="n">result_dict</span><span class="p">,</span>
             <span class="p">)</span></div>
-</div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_plot_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot uncertainty quantification metrics.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
+            <span class="s2">&quot;Reliabity diagram&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span><span class="p">[</span><span class="s2">&quot;cal/ECE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
+            <span class="s2">&quot;Risk-Coverage curve&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span><span class="p">[</span><span class="s2">&quot;sc/AURC&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
+            <span class="s2">&quot;Generalized Risk-Coverage curve&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span><span class="p">[</span><span class="s2">&quot;sc/AUGRC&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">,</span> <span class="n">Conformal</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
+                <span class="s2">&quot;Reliabity diagram after calibration&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">post_cls_metrics</span><span class="p">[</span><span class="s2">&quot;cal/ECE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">)</span>
+
+        <span class="c1"># plot histograms of logits and likelihoods</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
+            <span class="n">id_scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_score_storage</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">ood_scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ood_score_storage</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">score_fig</span> <span class="o">=</span> <span class="n">plot_hist</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">id_scores</span><span class="p">,</span> <span class="n">ood_scores</span><span class="p">],</span>
+                <span class="mi">20</span><span class="p">,</span>
+                <span class="s2">&quot;Histogram of the OOD scores&quot;</span><span class="p">,</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span><span class="s2">&quot;OOD Score Histogram&quot;</span><span class="p">,</span> <span class="n">score_fig</span><span class="p">)</span></div>
 
 
 

@@ -733,7 +733,7 @@
         <span class="n">valid_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">targets</span> <span class="o">!=</span> <span class="mi">255</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">targets</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">)</span>
         <span class="n">probs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">probs</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">],</span> <span class="n">targets</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_seg_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">val_sbsmpl_seg_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">subsample</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">))</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_sbsmpl_seg_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_subsample</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="SegmentationRoutine.test_step">
@@ -795,7 +795,7 @@
         <span class="k">if</span> <span class="n">dataloader_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">id_probs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">id_targets</span> <span class="o">=</span> <span class="n">probs</span><span class="p">[</span><span class="n">id_mask</span><span class="p">],</span> <span class="n">probs_per_est</span><span class="p">[</span><span class="n">id_mask</span><span class="p">],</span> <span class="n">targets</span><span class="p">[</span><span class="n">id_mask</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_seg_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">id_probs</span><span class="p">,</span> <span class="n">id_targets</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">test_sbsmpl_seg_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">subsample</span><span class="p">(</span><span class="n">id_probs</span><span class="p">,</span> <span class="n">id_targets</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_sbsmpl_seg_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_subsample</span><span class="p">(</span><span class="n">id_probs</span><span class="p">,</span> <span class="n">id_targets</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="ow">and</span> <span class="n">dataloader_idx</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="o">.</span><span class="n">input_type</span> <span class="o">==</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">PROB</span><span class="p">:</span>
@@ -847,22 +847,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="n">result_dict</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">Logger</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_plots</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
-                <span class="s2">&quot;Calibration/Reliabity diagram&quot;</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">test_sbsmpl_seg_metrics</span><span class="p">[</span><span class="s2">&quot;cal/ECE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
-                <span class="s2">&quot;Selective Classification/Risk-Coverage curve&quot;</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">test_sbsmpl_seg_metrics</span><span class="p">[</span><span class="s2">&quot;sc/AURC&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
-                <span class="s2">&quot;Selective Classification/Generalized Risk-Coverage curve&quot;</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">test_sbsmpl_seg_metrics</span><span class="p">[</span><span class="s2">&quot;sc/AUGRC&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">datamodule</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log_segmentation_plots</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No datamodule found, skipping segmentation plots.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plot_results</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">test_seg_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_sbsmpl_seg_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
@@ -876,9 +861,26 @@
             <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="SegmentationRoutine.log_segmentation_plots">
-<a class="viewcode-back" href="../../../generated/torch_uncertainty.routines.SegmentationRoutine.html#torch_uncertainty.routines.SegmentationRoutine.log_segmentation_plots">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">log_segmentation_plots</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_plot_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot uncertainty quantification metrics and segmentation figures.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
+            <span class="s2">&quot;Calibration/Reliabity diagram&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_sbsmpl_seg_metrics</span><span class="p">[</span><span class="s2">&quot;cal/ECE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
+            <span class="s2">&quot;Selective Classification/Risk-Coverage curve&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_sbsmpl_seg_metrics</span><span class="p">[</span><span class="s2">&quot;sc/AURC&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
+            <span class="s2">&quot;Selective Classification/Generalized Risk-Coverage curve&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_sbsmpl_seg_metrics</span><span class="p">[</span><span class="s2">&quot;sc/AUGRC&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">datamodule</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_segmentation_plots</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No datamodule found, skipping segmentation plots.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_segmentation_plots</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Build and log examples of segmentation plots from the test set.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">tgt</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_buffer</span><span class="p">):</span>
             <span class="n">pred</span> <span class="o">=</span> <span class="n">pred</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">pred</span><span class="o">.</span><span class="n">device</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
@@ -899,12 +901,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Segmentation results/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">show_segmentation_predictions</span><span class="p">(</span><span class="n">pred_mask</span><span class="p">,</span> <span class="n">gt_mask</span><span class="p">),</span>
-            <span class="p">)</span></div>
+            <span class="p">)</span>
 
-
-<div class="viewcode-block" id="SegmentationRoutine.subsample">
-<a class="viewcode-back" href="../../../generated/torch_uncertainty.routines.SegmentationRoutine.html#torch_uncertainty.routines.SegmentationRoutine.subsample">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">subsample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pred</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_subsample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pred</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Select a random sample of the data to compute the loss onto.</span>
 
 <span class="sd">        Args:</span>
@@ -918,7 +917,6 @@
         <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">total_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">metric_subsampling_rate</span><span class="p">))</span>
         <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">total_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">pred</span><span class="o">.</span><span class="n">device</span><span class="p">)[:</span><span class="n">num_samples</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">pred</span><span class="p">[</span><span class="n">indices</span><span class="p">],</span> <span class="n">target</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span></div>
-</div>
 
 
 
