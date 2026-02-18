@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>torch_uncertainty.datasets.segmentation.cityscapes &#8212; TorchUncertainty 0.10.0 documentation</title>
+    <title>torch_uncertainty.datasets.segmentation.cityscapes &#8212; TorchUncertainty 0.10.1 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=82662543"></script>
+    <script src="../../../../_static/documentation_options.js?v=261ea15a"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -482,6 +482,34 @@
         <span class="n">target_transform</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">transforms</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cityscapes dataset wrapper with train ID color mapping.</span>
+
+<span class="sd">        This class extends the `TVCityscapes` dataset to provide a fixed</span>
+<span class="sd">        color palette for visualization and encode/decode utilities for</span>
+<span class="sd">        semantic segmentation targets using Cityscapes train IDs. It also</span>
+<span class="sd">        sets up mapping from train IDs to RGB colors for easier interpretation</span>
+<span class="sd">        of predicted masks.</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">            color_palette (list[tuple[int, int, int]]):</span>
+<span class="sd">                List of RGB tuples for each class label in the Cityscapes dataset.</span>
+<span class="sd">            train_id_to_color (torch.Tensor):</span>
+<span class="sd">                Tensor mapping train IDs to RGB colors for output decoding.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            root (str): Root directory of the Cityscapes dataset.</span>
+<span class="sd">            split (str, optional): Dataset split to use, such as &quot;train&quot;, &quot;val&quot;, or &quot;test&quot;.</span>
+<span class="sd">            mode (str, optional): Annotation mode, e.g., &quot;fine&quot; or &quot;coarse&quot;.</span>
+<span class="sd">            target_type (list[str] | str, optional):</span>
+<span class="sd">                One or more target types to load (&quot;instance&quot;, &quot;semantic&quot;, etc.).</span>
+<span class="sd">            transform (Callable[..., Any] | None, optional):</span>
+<span class="sd">                Transformation applied to the input image.</span>
+<span class="sd">            target_transform (Callable[..., Any] | None, optional):</span>
+<span class="sd">                Transformation applied to the target.</span>
+<span class="sd">            transforms (Callable[..., Any] | None, optional):</span>
+<span class="sd">                Combined transformation for image and target.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">root</span><span class="p">,</span>
             <span class="n">split</span><span class="p">,</span>

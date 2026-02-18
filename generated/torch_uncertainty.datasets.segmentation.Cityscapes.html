@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Cityscapes &#8212; TorchUncertainty 0.10.0 documentation</title>
+    <title>Cityscapes &#8212; TorchUncertainty 0.10.1 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=82662543"></script>
+    <script src="../_static/documentation_options.js?v=261ea15a"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -458,6 +458,7 @@
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.StochasticModel.html">StochasticModel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.SWA.html">SWA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.SWAG.html">SWAG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.models.Zero.html">Zero</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.metrics.classification.BrierScore.html">BrierScore</a></li>
@@ -684,7 +685,32 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.datasets.segmentation.Cityscapes">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.datasets.segmentation.</span></span><span class="sig-name descname"><span class="pre">Cityscapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fine'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/datasets/segmentation/cityscapes.html#Cityscapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.datasets.segmentation.Cityscapes" title="Link to this definition">#</a></dt>
-<dd><dl class="py method">
+<dd><p>Cityscapes dataset wrapper with train ID color mapping.</p>
+<p>This class extends the <cite>TVCityscapes</cite> dataset to provide a fixed
+color palette for visualization and encode/decode utilities for
+semantic segmentation targets using Cityscapes train IDs. It also
+sets up mapping from train IDs to RGB colors for easier interpretation
+of predicted masks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>color_palette</strong> (<em>list</em><em>[</em><em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em>) – List of RGB tuples for each class label in the Cityscapes dataset.</p></li>
+<li><p><strong>train_id_to_color</strong> (<em>torch.Tensor</em>) – Tensor mapping train IDs to RGB colors for output decoding.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>root</strong> (<em>str</em>) – Root directory of the Cityscapes dataset.</p></li>
+<li><p><strong>split</strong> (<em>str</em><em>, </em><em>optional</em>) – Dataset split to use, such as “train”, “val”, or “test”.</p></li>
+<li><p><strong>mode</strong> (<em>str</em><em>, </em><em>optional</em>) – Annotation mode, e.g., “fine” or “coarse”.</p></li>
+<li><p><strong>target_type</strong> (<em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>str</em><em>, </em><em>optional</em>) – One or more target types to load (“instance”, “semantic”, etc.).</p></li>
+<li><p><strong>transform</strong> (<em>Callable</em><em>[</em><em>...</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – Transformation applied to the input image.</p></li>
+<li><p><strong>target_transform</strong> (<em>Callable</em><em>[</em><em>...</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – Transformation applied to the target.</p></li>
+<li><p><strong>transforms</strong> (<em>Callable</em><em>[</em><em>...</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – Combined transformation for image and target.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.datasets.segmentation.Cityscapes.decode_target">
 <span class="sig-name descname"><span class="pre">decode_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/datasets/segmentation/cityscapes.html#Cityscapes.decode_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.datasets.segmentation.Cityscapes.decode_target" title="Link to this definition">#</a></dt>
 <dd><p>Decode target tensor to RGB tensor.</p>

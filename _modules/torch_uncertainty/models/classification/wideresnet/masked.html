@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>torch_uncertainty.models.classification.wideresnet.masked &#8212; TorchUncertainty 0.10.0 documentation</title>
+    <title>torch_uncertainty.models.classification.wideresnet.masked &#8212; TorchUncertainty 0.10.1 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=82662543"></script>
+    <script src="../../../../../_static/documentation_options.js?v=261ea15a"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -442,6 +442,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="kn">import</span> <span class="n">relu</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.layers</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaskedConv2d</span><span class="p">,</span> <span class="n">MaskedLinear</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models.classification.resnet.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResNetStyle</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;masked_wideresnet28x10&quot;</span><span class="p">,</span>
@@ -547,7 +548,7 @@
             <span class="mi">64</span> <span class="o">*</span> <span class="n">widen_factor</span><span class="p">,</span>
         <span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;imagenet&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="n">ResNetStyle</span><span class="o">.</span><span class="n">IMAGENET</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span>
                 <span class="n">in_channels</span><span class="p">,</span>
                 <span class="n">num_stages</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
@@ -557,7 +558,7 @@
                 <span class="n">bias</span><span class="o">=</span><span class="n">conv_bias</span><span class="p">,</span>
                 <span class="n">groups</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;cifar&quot;</span><span class="p">:</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># style == &quot;cifar&quot;:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span>
                 <span class="n">in_channels</span><span class="p">,</span>
                 <span class="n">num_stages</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
@@ -567,12 +568,10 @@
                 <span class="n">bias</span><span class="o">=</span><span class="n">conv_bias</span><span class="p">,</span>
                 <span class="n">groups</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown WideResNet style: </span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s2">. &quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">bn1</span> <span class="o">=</span> <span class="n">normalization_layer</span><span class="p">(</span><span class="n">num_stages</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-        <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;imagenet&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="n">ResNetStyle</span><span class="o">.</span><span class="n">IMAGENET</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optional_pool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optional_pool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
@@ -683,7 +682,7 @@
     <span class="n">conv_bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">dropout_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
     <span class="n">groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">style</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;imagenet&quot;</span><span class="p">,</span> <span class="s2">&quot;cifar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;imagenet&quot;</span><span class="p">,</span>
+    <span class="n">style</span><span class="p">:</span> <span class="n">ResNetStyle</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;imagenet&quot;</span><span class="p">,</span> <span class="s2">&quot;cifar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ResNetStyle</span><span class="o">.</span><span class="n">IMAGENET</span><span class="p">,</span>
     <span class="n">activation_fn</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">relu</span><span class="p">,</span>
     <span class="n">normalization_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">,</span>
     <span class="n">repeat_strategy</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;legacy&quot;</span><span class="p">,</span> <span class="s2">&quot;paper&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;paper&quot;</span><span class="p">,</span>
@@ -700,8 +699,8 @@
 <span class="sd">        dropout_rate (float, optional): Dropout rate. Defaults to ``0.3``.</span>
 <span class="sd">        groups (int): Number of groups within each estimator. Defaults to</span>
 <span class="sd">            ``1``.</span>
-<span class="sd">        style (bool, optional): Whether to use the ImageNet</span>
-<span class="sd">            structure. Defaults to ``True``.</span>
+<span class="sd">        style (ResNetStyle | Literal[&quot;imagenet&quot;, &quot;cifar&quot;]): Whether to use the ImageNet or CIFAR</span>
+<span class="sd">            structure. Defaults to ``ResNetStyle.IMAGENET``.</span>
 <span class="sd">        activation_fn (Callable, optional): Activation function. Defaults to</span>
 <span class="sd">            ``torch.nn.functional.relu``.</span>
 <span class="sd">        normalization_layer (nn.Module, optional): Normalization layer.</span>

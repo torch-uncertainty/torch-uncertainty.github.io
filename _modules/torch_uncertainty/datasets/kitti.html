@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>torch_uncertainty.datasets.kitti &#8212; TorchUncertainty 0.10.0 documentation</title>
+    <title>torch_uncertainty.datasets.kitti &#8212; TorchUncertainty 0.10.1 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=82662543"></script>
+    <script src="../../../_static/documentation_options.js?v=261ea15a"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -477,11 +477,55 @@
         <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">remove_unused</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;KITTI Depth Estimation dataset.</span>
+
+<span class="sd">        PyTorch ``VisionDataset`` wrapper for depth estimation</span>
+<span class="sd">        benchmark derived from the KITTI raw dataset. This dataset provides RGB</span>
+<span class="sd">        images from the left color camera (``leftImg8bit``) paired with projected</span>
+<span class="sd">        LiDAR depth maps (``leftDepth``).</span>
+
+<span class="sd">        The dataset is automatically structured as:</span>
+
+<span class="sd">            root/</span>
+<span class="sd">                KITTIDepth/</span>
+<span class="sd">                    train/</span>
+<span class="sd">                        leftImg8bit/*.png</span>
+<span class="sd">                        leftDepth/*.png</span>
+<span class="sd">                    val/</span>
+<span class="sd">                        leftImg8bit/*.png</span>
+<span class="sd">                        leftDepth/*.png</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            root (str or Path): Root directory where the dataset will be stored.</span>
+<span class="sd">            split (Literal[&quot;train&quot;, &quot;val&quot;]): Dataset split to use.</span>
+<span class="sd">            min_depth (float, default=0.0): Minimum valid depth value (in meters). Depth values</span>
+<span class="sd">                smaller than or equal to this threshold are set to NaN.</span>
+<span class="sd">            max_depth (float, default=80.0): Maximum valid depth value (in meters). Depth values</span>
+<span class="sd">                greater than this threshold are set to NaN.</span>
+<span class="sd">            transforms (Callable, optional): A function/transform that takes an ``(image, target)``</span>
+<span class="sd">                pair and returns the transformed pair.</span>
+<span class="sd">            download (bool, default=False): If True, downloads and restructures the depth</span>
+<span class="sd">                annotations and raw KITTI data if not already present.</span>
+<span class="sd">            remove_unused (bool, default=False): If True, removes the extracted raw files after</span>
+<span class="sd">                restructuring to save disk space.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple[tv_tensors.Image, tv_tensors.Mask]:</span>
+<span class="sd">                - image: RGB image as ``tv_tensors.Image``.</span>
+<span class="sd">                - target: Depth map as ``tv_tensors.Mask`` in meters (float),</span>
+<span class="sd">                with invalid values set to NaN.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            - Depth maps are stored as 16-bit PNG files and converted to meters</span>
+<span class="sd">            by dividing by 256.0.</span>
+<span class="sd">            - Usage of this dataset is subject to the original KITTI license</span>
+<span class="sd">            (CC BY-NC-SA 3.0).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
             <span class="s2">&quot;KITTIDepth is copyrighted by the Karlsruhe Institute of Technology &quot;</span>
             <span class="s2">&quot;(KIT) and the Toyota Technological Institute at Chicago (TTIC). &quot;</span>
             <span class="s2">&quot;By using KITTIDepth, you agree to the terms and conditions of the &quot;</span>
-            <span class="s2">&quot;Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License. &quot;</span>
+            <span class="s2">&quot;CC BY-NC-SA 3.0 License. &quot;</span>
             <span class="s2">&quot;This means that you must attribute the work in the manner specified &quot;</span>
             <span class="s2">&quot;by the authors, you may not use this work for commercial purposes &quot;</span>
             <span class="s2">&quot;and if you alter, transform, or build upon this work, you may &quot;</span>
