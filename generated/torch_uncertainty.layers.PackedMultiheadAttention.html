@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>PackedMultiheadAttention &#8212; TorchUncertainty 0.10.1.post0 documentation</title>
+    <title>PackedMultiheadAttention &#8212; TorchUncertainty 0.10.2 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=c1b6a621"></script>
+    <script src="../_static/documentation_options.js?v=11e62b30"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -698,7 +698,7 @@
 <li><p><strong>gamma</strong> (<em>int</em><em>, </em><em>optional</em>) – Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
 <li><p><strong>dropout</strong> (<em>float</em><em>, </em><em>optional</em>) – Dropout probability on <code class="docutils literal notranslate"><span class="pre">attn_output_weights</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">0.0</span></code>
 (no dropout).</p></li>
-<li><p><strong>bias</strong> (<em>bool</em><em>, </em><em>optional</em>) – Ì specified, adds bias to input / output projection layers.
+<li><p><strong>bias</strong> (<em>bool</em><em>, </em><em>optional</em>) – If specified, adds bias to input / output projection layers.
 Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 <li><p><strong>add_bias_kv</strong> (<em>bool</em><em>, </em><em>optional</em>) – If specified, adds bias to the key and value sequences at
 <code class="docutils literal notranslate"><span class="pre">dim=0</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
@@ -740,7 +740,7 @@ to <code class="docutils literal notranslate"><span class="pre">None</span></cod
 <span class="math notranslate nohighlight">\((L, B, E_q)\)</span> when <code class="docutils literal notranslate"><span class="pre">batch_first=False</span></code> or <span class="math notranslate nohighlight">\((B, L, E_q)\)</span> when
 <code class="docutils literal notranslate"><span class="pre">batch_first=True</span></code>, where <span class="math notranslate nohighlight">\(L\)</span> is the target sequence length, <span class="math notranslate nohighlight">\(B\)</span> is
 the batch size, and <span class="math notranslate nohighlight">\(E_q\)</span> is the query embedding dimension <code class="docutils literal notranslate"><span class="pre">embed_dim</span></code>.</p></li>
-<li><p><strong>key</strong> (<em>Tensor</em>) – Key embeddingd of shape <span class="math notranslate nohighlight">\((S, E_k)\)</span> for unbatched input,
+<li><p><strong>key</strong> (<em>Tensor</em>) – Key embeddings of shape <span class="math notranslate nohighlight">\((S, E_k)\)</span> for unbatched input,
 <span class="math notranslate nohighlight">\((S, B, E_k)\)</span> when <code class="docutils literal notranslate"><span class="pre">batch_first=False</span></code> or <span class="math notranslate nohighlight">\((B, S, E_k)\)</span> when
 <code class="docutils literal notranslate"><span class="pre">batch_first=True</span></code>, where <span class="math notranslate nohighlight">\(S\)</span> is the source sequence length, <span class="math notranslate nohighlight">\(B\)</span> is
 the batch size and <span class="math notranslate nohighlight">\(E_k\)</span> is the key embedding dimension <code class="docutils literal notranslate"><span class="pre">kdim</span></code>.</p></li>
@@ -773,7 +773,8 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">None</s
 <code class="docutils literal notranslate"><span class="pre">attn_weights</span></code> should be averaged across heads. Otherwise, <code class="docutils literal notranslate"><span class="pre">attn_weights</span></code> are
 provided separately per head. Note that this flag only has an effect when
 <code class="docutils literal notranslate"><span class="pre">need_weights=True</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
-<li><p><strong>is_causal</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>is_causal</strong> (<em>bool</em><em>, </em><em>optional</em>) – If specified, applies a causal mask as <code class="docutils literal notranslate"><span class="pre">attn_mask</span></code>.
+Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -788,7 +789,7 @@ have no effect.</p>
 <li><p><em>attn_output</em> (Tensor): The output tensor of shape <span class="math notranslate nohighlight">\((L, E_q)\)</span>, <span class="math notranslate nohighlight">\((L, B, E_q)\)</span>
 or <span class="math notranslate nohighlight">\((B, L, E_q)\)</span> where <span class="math notranslate nohighlight">\(L\)</span> is the target sequence length, <span class="math notranslate nohighlight">\(B\)</span> is
 the batch size, and <span class="math notranslate nohighlight">\(E_q\)</span> is the embedding dimension <code class="docutils literal notranslate"><span class="pre">embed_dim</span></code>.</p></li>
-<li><p><em>attn_output_weights</em> (None): Always <code class="docutils literal notranslate"><span class="pre">None</span></code> has we do not support
+<li><p><em>attn_output_weights</em> (None): Always <code class="docutils literal notranslate"><span class="pre">None</span></code> as we do not support
 <code class="docutils literal notranslate"><span class="pre">need_weights=True</span></code> yet.</p></li>
 </ul>
 </p>

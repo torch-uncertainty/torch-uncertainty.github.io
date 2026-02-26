@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>torch_uncertainty.layers.packed &#8212; TorchUncertainty 0.10.1.post0 documentation</title>
+    <title>torch_uncertainty.layers.packed &#8212; TorchUncertainty 0.10.2 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=c1b6a621"></script>
+    <script src="../../../_static/documentation_options.js?v=11e62b30"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -451,7 +451,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check the consistency of the parameters of the Packed-Ensembles layers.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        alpha (int): The width multiplier of the layer.</span>
+<span class="sd">        alpha (float): The width multiplier of the layer.</span>
 <span class="sd">        gamma (int): The number of groups in the ensemble.</span>
 <span class="sd">        num_estimators (int): The number of estimators in the ensemble.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -502,7 +502,7 @@
 <span class="sd">            alpha (float): The width multiplier of the linear layer.</span>
 <span class="sd">            num_estimators (int): The number of estimators grouped in the layer.</span>
 <span class="sd">            gamma (int, optional): Defaults to ``1``.</span>
-<span class="sd">            bias (bool, optional): It ``True``, adds a learnable bias to the</span>
+<span class="sd">            bias (bool, optional): If ``True``, adds a learnable bias to the</span>
 <span class="sd">                output. Defaults to ``True``.</span>
 <span class="sd">            first (bool, optional): Whether this is the first layer of the</span>
 <span class="sd">                network. Defaults to ``False``.</span>
@@ -541,7 +541,7 @@
 <span class="sd">            :math:`\frac{\text{in_features}}{\text{num_estimators}}` features,</span>
 <span class="sd">            so when using :attr:`gamma` you should make sure that</span>
 <span class="sd">            :attr:`in_features` and :attr:`out_features` are both divisible by</span>
-<span class="sd">            :attr:`n_estimators` :math:`\times`:attr:`gamma`. However, the</span>
+<span class="sd">            :attr:`num_estimators` :math:`\times`:attr:`gamma`. However, the</span>
 <span class="sd">            number of input and output features will be changed to comply with</span>
 <span class="sd">            this constraint.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -549,7 +549,7 @@
 
         <span class="k">if</span> <span class="n">implementation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;sparse&quot;</span><span class="p">,</span> <span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;einsum&quot;</span><span class="p">,</span> <span class="s2">&quot;conv1d&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Unknown implementation: </span><span class="si">{</span><span class="n">implementation</span><span class="si">}</span><span class="s2"> for PackedLinear&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Unknown implementation: </span><span class="si">{</span><span class="n">implementation</span><span class="si">}</span><span class="s2"> for PackedLinear. &quot;</span>
                 <span class="s2">&quot;Available implementations are: &#39;sparse&#39;, &#39;full&#39;, &#39;einsum&#39;, &#39;conv1d&#39;&quot;</span>
             <span class="p">)</span>
 
@@ -569,12 +569,17 @@
         <span class="c1"># Define the number of groups of the underlying convolution</span>
         <span class="n">actual_groups</span> <span class="o">=</span> <span class="n">num_estimators</span> <span class="o">*</span> <span class="n">gamma</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">first</span> <span class="k">else</span> <span class="mi">1</span>
 
-        <span class="c1"># fix if not divisible by groups</span>
         <span class="k">if</span> <span class="n">extended_in_features</span> <span class="o">%</span> <span class="n">actual_groups</span><span class="p">:</span>
-            <span class="n">extended_in_features</span> <span class="o">+=</span> <span class="n">num_estimators</span> <span class="o">-</span> <span class="n">extended_in_features</span> <span class="o">%</span> <span class="p">(</span><span class="n">actual_groups</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">extended_out_features</span> <span class="o">%</span> <span class="n">num_estimators</span> <span class="o">*</span> <span class="n">gamma</span><span class="p">:</span>
-            <span class="n">extended_out_features</span> <span class="o">+=</span> <span class="n">num_estimators</span> <span class="o">-</span> <span class="n">extended_out_features</span> <span class="o">%</span> <span class="p">(</span>
-                <span class="n">num_estimators</span> <span class="o">*</span> <span class="n">gamma</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;PackedLinear: `in_features` (</span><span class="si">{</span><span class="n">in_features</span><span class="si">}</span><span class="s2">) is not divisible by &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`actual_groups` (</span><span class="si">{</span><span class="n">actual_groups</span><span class="si">}</span><span class="s2">). Please make `in_features` divisible &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;by `num_estimators * gamma` (</span><span class="si">{</span><span class="n">num_estimators</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gamma</span><span class="si">}</span><span class="s2">).&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">extended_out_features</span> <span class="o">%</span> <span class="p">(</span><span class="n">num_estimators</span> <span class="o">*</span> <span class="n">gamma</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;PackedLinear: `out_features` (</span><span class="si">{</span><span class="n">out_features</span><span class="si">}</span><span class="s2">) is not divisible by &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`num_estimators * gamma` (</span><span class="si">{</span><span class="n">num_estimators</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gamma</span><span class="si">}</span><span class="s2">). Please make &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`out_features` divisible by `num_estimators * gamma` (</span><span class="si">{</span><span class="n">num_estimators</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gamma</span><span class="si">}</span><span class="s2">).&quot;</span>
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span>
@@ -718,11 +723,19 @@
             <span class="n">gamma</span> <span class="o">-=</span> <span class="mi">1</span>
             <span class="n">actual_groups</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">groups</span> <span class="o">*</span> <span class="n">num_estimators</span>
 
-        <span class="c1"># fix if not divisible by groups</span>
         <span class="k">if</span> <span class="n">extended_in_channels</span> <span class="o">%</span> <span class="n">actual_groups</span><span class="p">:</span>
-            <span class="n">extended_in_channels</span> <span class="o">+=</span> <span class="n">num_estimators</span> <span class="o">-</span> <span class="n">extended_in_channels</span> <span class="o">%</span> <span class="n">actual_groups</span>
-        <span class="k">if</span> <span class="n">extended_out_channels</span> <span class="o">%</span> <span class="n">actual_groups</span><span class="p">:</span>
-            <span class="n">extended_out_channels</span> <span class="o">+=</span> <span class="n">num_estimators</span> <span class="o">-</span> <span class="n">extended_out_channels</span> <span class="o">%</span> <span class="n">actual_groups</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;PackedConv1d: `in_channels` (</span><span class="si">{</span><span class="n">in_channels</span><span class="si">}</span><span class="s2">) is not divisible by &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`actual_groups` (</span><span class="si">{</span><span class="n">actual_groups</span><span class="si">}</span><span class="s2">). Please make `in_channels` divisible &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;by `gamma * groups * num_estimators` (</span><span class="si">{</span><span class="n">gamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">groups</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">).&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">extended_out_channels</span> <span class="o">%</span> <span class="p">(</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">groups</span> <span class="o">*</span> <span class="n">num_estimators</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;PackedConv1d: `out_channels` (</span><span class="si">{</span><span class="n">out_channels</span><span class="si">}</span><span class="s2">) is not divisible by &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`gamma * groups * num_estimators` (</span><span class="si">{</span><span class="n">gamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">groups</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">). &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Please make `out_channels` divisible by `gamma * groups * num_estimators` &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">gamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">groups</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">).&quot;</span>
+            <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span>
             <span class="n">in_channels</span><span class="o">=</span><span class="n">extended_in_channels</span><span class="p">,</span>
@@ -850,11 +863,19 @@
             <span class="n">gamma</span> <span class="o">-=</span> <span class="mi">1</span>
             <span class="n">actual_groups</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">groups</span> <span class="o">*</span> <span class="n">num_estimators</span>
 
-        <span class="c1"># fix if not divisible by groups</span>
         <span class="k">if</span> <span class="n">extended_in_channels</span> <span class="o">%</span> <span class="n">actual_groups</span><span class="p">:</span>
-            <span class="n">extended_in_channels</span> <span class="o">+=</span> <span class="n">num_estimators</span> <span class="o">-</span> <span class="n">extended_in_channels</span> <span class="o">%</span> <span class="n">actual_groups</span>
-        <span class="k">if</span> <span class="n">extended_out_channels</span> <span class="o">%</span> <span class="n">actual_groups</span><span class="p">:</span>
-            <span class="n">extended_out_channels</span> <span class="o">+=</span> <span class="n">num_estimators</span> <span class="o">-</span> <span class="n">extended_out_channels</span> <span class="o">%</span> <span class="n">actual_groups</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;PackedConv2d: `in_channels` (</span><span class="si">{</span><span class="n">in_channels</span><span class="si">}</span><span class="s2">) is not divisible by &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`actual_groups` (</span><span class="si">{</span><span class="n">actual_groups</span><span class="si">}</span><span class="s2">). Please make `in_channels` divisible &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;by `gamma * groups * num_estimators` (</span><span class="si">{</span><span class="n">gamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">groups</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">).&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">extended_out_channels</span> <span class="o">%</span> <span class="p">(</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">groups</span> <span class="o">*</span> <span class="n">num_estimators</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;PackedConv2d: `out_channels` (</span><span class="si">{</span><span class="n">out_channels</span><span class="si">}</span><span class="s2">) is not divisible by &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`gamma * groups * num_estimators` (</span><span class="si">{</span><span class="n">gamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">groups</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">). &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Please make `out_channels` divisible by `gamma * groups * num_estimators` &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">gamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">groups</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">).&quot;</span>
+            <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span>
             <span class="n">in_channels</span><span class="o">=</span><span class="n">extended_in_channels</span><span class="p">,</span>
@@ -981,11 +1002,19 @@
             <span class="n">gamma</span> <span class="o">-=</span> <span class="mi">1</span>
             <span class="n">actual_groups</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">groups</span> <span class="o">*</span> <span class="n">num_estimators</span>
 
-        <span class="c1"># fix if not divisible by groups</span>
         <span class="k">if</span> <span class="n">extended_in_channels</span> <span class="o">%</span> <span class="n">actual_groups</span><span class="p">:</span>
-            <span class="n">extended_in_channels</span> <span class="o">+=</span> <span class="n">num_estimators</span> <span class="o">-</span> <span class="n">extended_in_channels</span> <span class="o">%</span> <span class="n">actual_groups</span>
-        <span class="k">if</span> <span class="n">extended_out_channels</span> <span class="o">%</span> <span class="n">actual_groups</span><span class="p">:</span>
-            <span class="n">extended_out_channels</span> <span class="o">+=</span> <span class="n">num_estimators</span> <span class="o">-</span> <span class="n">extended_out_channels</span> <span class="o">%</span> <span class="n">actual_groups</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;PackedConv3d: `in_channels` (</span><span class="si">{</span><span class="n">in_channels</span><span class="si">}</span><span class="s2">) is not divisible by &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`actual_groups` (</span><span class="si">{</span><span class="n">actual_groups</span><span class="si">}</span><span class="s2">). Please make `in_channels` divisible &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;by `gamma * groups * num_estimators` (</span><span class="si">{</span><span class="n">gamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">groups</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">).&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">extended_out_channels</span> <span class="o">%</span> <span class="p">(</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">groups</span> <span class="o">*</span> <span class="n">num_estimators</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;PackedConv3d: `out_channels` (</span><span class="si">{</span><span class="n">out_channels</span><span class="si">}</span><span class="s2">) is not divisible by &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`gamma * groups * num_estimators` (</span><span class="si">{</span><span class="n">gamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">groups</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">). &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Please make `out_channels` divisible by `gamma * groups * num_estimators` &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">gamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">groups</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">).&quot;</span>
+            <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv3d</span><span class="p">(</span>
             <span class="n">in_channels</span><span class="o">=</span><span class="n">extended_in_channels</span><span class="p">,</span>
@@ -1083,14 +1112,18 @@
             <span class="n">gamma</span> <span class="o">-=</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">actual_groups</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">groups</span> <span class="o">*</span> <span class="n">num_estimators</span>
 
-        <span class="c1"># Fix dimensions to be divisible by groups</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">extended_in_channels</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">actual_groups</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">extended_in_channels</span> <span class="o">+=</span> <span class="p">(</span>
-                <span class="n">num_estimators</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">extended_in_channels</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">actual_groups</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;PackedConvTranspose2d: `in_channels` (</span><span class="si">{</span><span class="n">in_channels</span><span class="si">}</span><span class="s2">) is not divisible by &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`actual_groups` (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">actual_groups</span><span class="si">}</span><span class="s2">). Please make `in_channels` divisible &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;by `gamma * groups * num_estimators` (</span><span class="si">{</span><span class="n">gamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">groups</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">).&quot;</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">extended_out_channels</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">actual_groups</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">extended_out_channels</span> <span class="o">+=</span> <span class="p">(</span>
-                <span class="n">num_estimators</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">extended_out_channels</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">actual_groups</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">extended_out_channels</span> <span class="o">%</span> <span class="p">(</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">groups</span> <span class="o">*</span> <span class="n">num_estimators</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;PackedConvTranspose2d: `out_channels` (</span><span class="si">{</span><span class="n">out_channels</span><span class="si">}</span><span class="s2">) is not divisible by &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`gamma * groups * num_estimators` (</span><span class="si">{</span><span class="n">gamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">groups</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">). &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Please make `out_channels` divisible by `gamma * groups * num_estimators` &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">gamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">groups</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_estimators</span><span class="si">}</span><span class="s2">).&quot;</span>
             <span class="p">)</span>
 
         <span class="c1"># Initialize the transposed convolutional layer</span>
@@ -1108,7 +1141,12 @@
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_transpose</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_transpose</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">out</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">last</span>
+            <span class="k">else</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="s2">&quot;b (m c) ... -&gt; (m b) c ...&quot;</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">weight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
@@ -1131,10 +1169,12 @@
         <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span>
         <span class="n">affine</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Packed-Ensembles-style LayerNorm layer.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Packed-Ensembles-style LayerNorm layer.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            embed_dim (int): the number of features in the input tensor.</span>
@@ -1142,6 +1182,8 @@
 <span class="sd">            alpha (float): the width multiplier of the layer.</span>
 <span class="sd">            eps (float, optional): a value added to the denominator for numerical stability. Defaults to 1e-5.</span>
 <span class="sd">            affine (bool, optional): a boolean value that when set to ``True``, this module has learnable per_channel affine parameters initialized to ones (for weights) and zeros (for biases). Defaults to ``True``.</span>
+<span class="sd">            first (bool, optional): Whether this layer processes the raw inputs of the model. Defaults to ``False``.</span>
+<span class="sd">            last (bool, optional): Whether this layer processes the final outputs of the model. Defaults to ``False``.</span>
 <span class="sd">            device (torch.device, optional): The device to use for the layer&#39;s parameters. Defaults to ``None``.</span>
 <span class="sd">            dtype (torch.dtype, optional): The dtype to use for the layer&#39;s parameters. Defaults to ``None``.</span>
 
@@ -1152,20 +1194,23 @@
 <span class="sd">        Warnings:</span>
 <span class="sd">            This layer is only suitable to replace ``nn.LayerNorm`` when only the last dimension is normalized.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">expansion_factor</span> <span class="o">=</span> <span class="n">num_estimators</span> <span class="k">if</span> <span class="n">last</span> <span class="k">else</span> <span class="n">alpha</span>
+        <span class="n">num_groups</span> <span class="o">=</span> <span class="n">num_estimators</span> <span class="k">if</span> <span class="n">first</span> <span class="k">else</span> <span class="mi">1</span>
+
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">num_groups</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
-            <span class="n">num_channels</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">embed_dim</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">),</span>
+            <span class="n">num_groups</span><span class="o">=</span><span class="n">num_groups</span><span class="p">,</span>
+            <span class="n">num_channels</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">embed_dim</span> <span class="o">*</span> <span class="n">expansion_factor</span><span class="p">),</span>
             <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span>
             <span class="n">affine</span><span class="o">=</span><span class="n">affine</span><span class="p">,</span>
             <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
             <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="n">shapes</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;d</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">size</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])}</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>  <span class="c1"># noqa: A002</span>
+        <span class="n">shapes</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;d</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">size</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])}</span>
         <span class="n">shape_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shapes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
-        <span class="n">x</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="s2">&quot;b ... h -&gt; (b ...) h&quot;</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="s2">&quot;b ... h -&gt; (b ...) h&quot;</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">group_norm</span><span class="p">(</span>
             <span class="n">x</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">num_groups</span><span class="p">,</span>
@@ -1213,7 +1258,7 @@
 <span class="sd">            gamma (int, optional): Defaults to ``1``.</span>
 <span class="sd">            dropout (float, optional): Dropout probability on ``attn_output_weights``. Defaults to ``0.0``</span>
 <span class="sd">                (no dropout).</span>
-<span class="sd">            bias (bool, optional): Ì specified, adds bias to input / output projection layers.</span>
+<span class="sd">            bias (bool, optional): If specified, adds bias to input / output projection layers.</span>
 <span class="sd">                Defaults to ``True``.</span>
 <span class="sd">            add_bias_kv (bool, optional): If specified, adds bias to the key and value sequences at</span>
 <span class="sd">                ``dim=0``. Defaults to ``False``.</span>
@@ -1385,7 +1430,7 @@
 <span class="sd">                :math:`(L, B, E_q)` when ``batch_first=False`` or :math:`(B, L, E_q)` when</span>
 <span class="sd">                ``batch_first=True``, where :math:`L` is the target sequence length, :math:`B` is</span>
 <span class="sd">                the batch size, and :math:`E_q` is the query embedding dimension ``embed_dim``.</span>
-<span class="sd">            key (Tensor): Key embeddingd of shape :math:`(S, E_k)` for unbatched input,</span>
+<span class="sd">            key (Tensor): Key embeddings of shape :math:`(S, E_k)` for unbatched input,</span>
 <span class="sd">                :math:`(S, B, E_k)` when ``batch_first=False`` or :math:`(B, S, E_k)` when</span>
 <span class="sd">                ``batch_first=True``, where :math:`S` is the source sequence length, :math:`B` is</span>
 <span class="sd">                the batch size and :math:`E_k` is the key embedding dimension ``kdim``.</span>
@@ -1418,7 +1463,8 @@
 <span class="sd">                ``attn_weights`` should be averaged across heads. Otherwise, ``attn_weights`` are</span>
 <span class="sd">                provided separately per head. Note that this flag only has an effect when</span>
 <span class="sd">                ``need_weights=True``. Defaults to ``True``.</span>
-<span class="sd">            is_causal (bool, optional): _description_. Defaults to ``False``.</span>
+<span class="sd">            is_causal (bool, optional): If specified, applies a causal mask as ``attn_mask``.</span>
+<span class="sd">                Defaults to ``False``.</span>
 
 <span class="sd">        Warning:</span>
 <span class="sd">            ``need_weights=True`` and therefore ``average_attn_weights`` are not supported yet thus</span>
@@ -1429,7 +1475,7 @@
 <span class="sd">                - *attn_output* (Tensor): The output tensor of shape :math:`(L, E_q)`, :math:`(L, B, E_q)`</span>
 <span class="sd">                  or :math:`(B, L, E_q)` where :math:`L` is the target sequence length, :math:`B` is</span>
 <span class="sd">                  the batch size, and :math:`E_q` is the embedding dimension ``embed_dim``.</span>
-<span class="sd">                - *attn_output_weights* (None): Always ``None`` has we do not support</span>
+<span class="sd">                - *attn_output_weights* (None): Always ``None`` as we do not support</span>
 <span class="sd">                  ``need_weights=True`` yet.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">is_batched</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span>
@@ -1631,33 +1677,24 @@
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span> <span class="o">=</span> <span class="n">norm_first</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span> <span class="ow">and</span> <span class="n">first</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
-                <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
-                <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
-                <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
-            <span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span> <span class="ow">and</span> <span class="n">last</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
-                <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
-                <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
-                <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
-                <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
-                <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
-                <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
+            <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
+            <span class="n">first</span><span class="o">=</span><span class="n">first</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
+            <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
+            <span class="n">last</span><span class="o">=</span><span class="n">last</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
@@ -1764,7 +1801,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">nhead</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">gamma</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">dim_feedforward</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2048</span><span class="p">,</span>
@@ -1869,16 +1906,15 @@
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span> <span class="o">=</span> <span class="n">norm_first</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span> <span class="ow">and</span> <span class="n">first</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
-                <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
-                <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
-                <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
-            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
+            <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
+            <span class="n">first</span><span class="o">=</span><span class="n">first</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
             <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
@@ -1888,22 +1924,14 @@
             <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span> <span class="ow">and</span> <span class="n">last</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">norm3</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
-                <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
-                <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
-                <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">norm3</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
-                <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
-                <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
-                <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm3</span> <span class="o">=</span> <span class="n">PackedLayerNorm</span><span class="p">(</span>
+            <span class="n">embed_dim</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+            <span class="n">num_estimators</span><span class="o">=</span><span class="n">num_estimators</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">eps</span><span class="o">=</span><span class="n">layer_norm_eps</span><span class="p">,</span>
+            <span class="n">last</span><span class="o">=</span><span class="n">last</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">factory_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
@@ -1955,7 +1983,7 @@
 <span class="sd">                including forward and backward compatibility.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: The output of the encoder layer. Shape: :math:`(B, L, E)` or :math:`(L, B, E)`.</span>
+<span class="sd">            Tensor: The output of the decoder layer. Shape: :math:`(B, L, E)` or :math:`(L, B, E)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">tgt</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_first</span><span class="p">:</span>
