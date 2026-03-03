@@ -101,7 +101,7 @@ Density layers
 .. currentmodule:: torch_uncertainty.layers.distributions
 
 Linear Layers
-"""""""""""""
+^^^^^^^^^^^^^
 
 .. autosummary::
     :toctree: generated/
@@ -115,7 +115,7 @@ Linear Layers
     NormalInverseGammaLinear
 
 Convolution Layers
-""""""""""""""""""
+^^^^^^^^^^^^^^^^^^
 
 .. autosummary::
     :toctree: generated/
@@ -135,7 +135,8 @@ Model Backbones
 
 
 ResNet
-""""""
+^^^^^^
+
 .. autosummary::
     :toctree: generated/
     :nosignatures:
@@ -149,7 +150,7 @@ ResNet
     resnet
 
 WideResNet
-""""""""""
+^^^^^^^^^^
 
 .. autosummary::
     :toctree: generated/
@@ -163,7 +164,7 @@ WideResNet
     wideresnet28x10
 
 InceptionTime
-"""""""""""""
+^^^^^^^^^^^^^
 
 .. autosummary::
     :toctree: generated/
@@ -417,7 +418,7 @@ Scaling Methods
 
 
 Conformal Methods
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 .. autosummary::
     :toctree: generated/
