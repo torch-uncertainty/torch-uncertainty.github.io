@@ -184,7 +184,7 @@ Model Wrappers
 Wrappers encapsulate your models to enable better uncertainty estimation.
 
 Functions
-"""""""""
+^^^^^^^^^
 
 Some wrappers can be directly created through functions such as the following: 
 
@@ -198,7 +198,7 @@ Some wrappers can be directly created through functions such as the following:
     mc_dropout
 
 Classes
-"""""""
+^^^^^^^
 
 Some wrappers need to be instantiated as classes such as the following:
 
@@ -605,3 +605,20 @@ Others & Cross-Categories
     KITTIDepth
     MUAD
     NYUv2
+
+Callbacks
+---------
+
+Custom Lightning callbacks for advanced checkpointing and model saving functionalities.
+
+.. currentmodule:: torch_uncertainty.callbacks
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+    :template: class.rst
+
+    CompoundCheckpoint
+    TUClsCheckpoint
+    TURegCheckpoint
+    TUSegCheckpoint
