@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>ConformalClsRAPS &#8212; TorchUncertainty 0.10.3 documentation</title>
+    <title>ConformalClsRAPS &#8212; TorchUncertainty 0.10.4 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=b59eaf29"></script>
+    <script src="../_static/documentation_options.js?v=7e173fe4"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -537,9 +537,10 @@
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.MCBatchNorm.html">MCBatchNorm</a></li>
 </ul>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.MatrixScaler.html">MatrixScaler</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.TemperatureScaler.html">TemperatureScaler</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.VectorScaler.html">VectorScaler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.MatrixScaler.html">MatrixScaler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.DirichletScaler.html">DirichletScaler</a></li>
 </ul>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.Conformal.html">Conformal</a></li>
@@ -698,14 +699,14 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>alpha</strong> (<em>float</em>) – The confidence level meaning we allow <span class="math notranslate nohighlight">\(1-\alpha\)</span> error.</p></li>
-<li><p><strong>model</strong> (<em>nn.Module</em>) – Trained classification model. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>model</strong> (<em>nn.Module</em><em> | </em><em>None</em>) – Trained classification model. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 <li><p><strong>randomized</strong> (<em>bool</em>) – Whether to use randomized smoothing in RAPS. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 <li><p><strong>penalty</strong> (<em>float</em>) – Regularization weight. Defaults to <code class="docutils literal notranslate"><span class="pre">0.1</span></code>.</p></li>
 <li><p><strong>regularization_rank</strong> (<em>int</em>) – Rank threshold for regularization. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
 <li><p><strong>ts_init_val</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial value for the temperature.
 Defaults to <code class="docutils literal notranslate"><span class="pre">1.0</span></code>.</p></li>
-<li><p><strong>ts_lr</strong> (<em>float</em><em>, </em><em>optional</em>) – Learning rate for the optimizer. Defaults to <code class="docutils literal notranslate"><span class="pre">0.1</span></code>.</p></li>
-<li><p><strong>ts_max_iter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for the
+<li><p><strong>ts_lr</strong> (<em>float</em><em>, </em><em>optional</em>) – Learning rate for the temperature scaling optimizer. Defaults to <code class="docutils literal notranslate"><span class="pre">0.1</span></code>.</p></li>
+<li><p><strong>ts_max_iter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for the temperature scaling
 optimizer. Defaults to <code class="docutils literal notranslate"><span class="pre">100</span></code>.</p></li>
 <li><p><strong>enable_ts</strong> (<em>bool</em>) – Whether to scale the logits. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>device</strong> (<em>Literal</em><em>[</em><em>&quot;cpu&quot;</em><em>, </em><em>&quot;cuda&quot;</em><em>] </em><em>| </em><em>torch.device</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – device.
@@ -713,6 +714,10 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">None</s
 </ul>
 </dd>
 </dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This implementation only works in the multiclass setting. Raise an issue if binary is needed.</p>
+</div>
 <dl class="simple">
 <dt>Reference:</dt><dd><ul class="simple">
 <li><p>TODO:</p></li>

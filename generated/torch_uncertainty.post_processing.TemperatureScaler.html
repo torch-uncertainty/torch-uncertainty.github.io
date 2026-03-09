@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>TemperatureScaler &#8212; TorchUncertainty 0.10.3 documentation</title>
+    <title>TemperatureScaler &#8212; TorchUncertainty 0.10.4 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=b59eaf29"></script>
+    <script src="../_static/documentation_options.js?v=7e173fe4"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="VectorScaler" href="torch_uncertainty.post_processing.VectorScaler.html" />
-    <link rel="prev" title="MatrixScaler" href="torch_uncertainty.post_processing.MatrixScaler.html" />
+    <link rel="prev" title="MCBatchNorm" href="torch_uncertainty.post_processing.MCBatchNorm.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -535,9 +535,10 @@
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.MCBatchNorm.html">MCBatchNorm</a></li>
 </ul>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.MatrixScaler.html">MatrixScaler</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">TemperatureScaler</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.VectorScaler.html">VectorScaler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.MatrixScaler.html">MatrixScaler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.DirichletScaler.html">DirichletScaler</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="torch_uncertainty.post_processing.Conformal.html">Conformal</a></li>
@@ -690,13 +691,13 @@
 <h1>TemperatureScaler<a class="headerlink" href="#temperaturescaler" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.post_processing.TemperatureScaler">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.post_processing.</span></span><span class="sig-name descname"><span class="pre">TemperatureScaler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/post_processing/calibration/temperature_scaler.html#TemperatureScaler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.post_processing.TemperatureScaler" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.post_processing.</span></span><span class="sig-name descname"><span class="pre">TemperatureScaler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/post_processing/calibration/temperature_scaler.html#TemperatureScaler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.post_processing.TemperatureScaler" title="Link to this definition">#</a></dt>
 <dd><p>Temperature scaling post-processing for calibrated probabilities.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> (<em>nn.Module</em>) – Model to calibrate.</p></li>
-<li><p><strong>init_val</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial value for the temperature. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>init_temperature</strong> (<em>float</em><em> | </em><em>Tensor</em><em>, </em><em>optional</em>) – Initial value for the temperature. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
 <li><p><strong>lr</strong> (<em>float</em><em>, </em><em>optional</em>) – Learning rate for the optimizer. Defaults to <code class="docutils literal notranslate"><span class="pre">0.1</span></code>.</p></li>
 <li><p><strong>max_iter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations for the optimizer. Defaults to <code class="docutils literal notranslate"><span class="pre">100</span></code>.</p></li>
 <li><p><strong>eps</strong> (<em>float</em>) – Small value for stability. Defaults to <code class="docutils literal notranslate"><span class="pre">1e-8</span></code>.</p></li>
@@ -706,24 +707,15 @@
 </dl>
 <p class="rubric">References</p>
 <p>[1] <a class="reference external" href="https://arxiv.org/abs/1706.04599">On calibration of modern neural networks. In ICML 2017</a>.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.post_processing.TemperatureScaler.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_logits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.post_processing.TemperatureScaler.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit the temperature parameters to the calibration data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dataloader</strong> (<em>DataLoader</em>) – Dataloader with the calibration data. If there is no model,
-the dataloader should include the confidence score directly and not the logits.</p></li>
-<li><p><strong>save_logits</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save the logits and
-labels in memory. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>progress</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to show a progress bar.
-Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If the model is binary, we will by default apply the sigmoid before transposing the prediction to the
+corresponding 2-class logits.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Scaler will log an error if the temperature after fitting is negative.</p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.post_processing.TemperatureScaler.set_temperature">
 <span class="sig-name descname"><span class="pre">set_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/post_processing/calibration/temperature_scaler.html#TemperatureScaler.set_temperature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.post_processing.TemperatureScaler.set_temperature" title="Link to this definition">#</a></dt>
@@ -750,12 +742,12 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">True</s
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="torch_uncertainty.post_processing.MatrixScaler.html"
+       href="torch_uncertainty.post_processing.MCBatchNorm.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">MatrixScaler</p>
+        <p class="prev-next-title">MCBatchNorm</p>
       </div>
     </a>
     <a class="right-next"
@@ -787,7 +779,6 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">True</s
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.post_processing.TemperatureScaler"><code class="docutils literal notranslate"><span class="pre">TemperatureScaler</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.post_processing.TemperatureScaler.fit"><code class="docutils literal notranslate"><span class="pre">TemperatureScaler.fit()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.post_processing.TemperatureScaler.set_temperature"><code class="docutils literal notranslate"><span class="pre">TemperatureScaler.set_temperature()</span></code></a></li>
 </ul>
 </li>
