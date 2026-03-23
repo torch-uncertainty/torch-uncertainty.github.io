@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>torch_uncertainty.post_processing.calibration.temperature_scaler &#8212; TorchUncertainty 0.10.4 documentation</title>
+    <title>torch_uncertainty.post_processing.calibration.temperature_scaler &#8212; TorchUncertainty 0.11.0 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=7e173fe4"></script>
+    <script src="../../../../_static/documentation_options.js?v=f3b36f1a"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -491,18 +491,18 @@
         <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataloader</span><span class="o">=</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">save_logits</span><span class="o">=</span><span class="n">save_logits</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_temp</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_temp</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
                 <span class="s2">&quot;TemperatureScaler converged to a negative temperature </span><span class="si">%.3f</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_temp</span>
             <span class="p">)</span>
 
 <div class="viewcode-block" id="TemperatureScaler.set_temperature">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.post_processing.TemperatureScaler.html#torch_uncertainty.post_processing.TemperatureScaler.set_temperature">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">set_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the temperature to a fixed value.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            val (float): Temperature value.</span>
+<span class="sd">            val (float | Tensor): Temperature value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">val</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Temperature value must be strictly positive. Got </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>

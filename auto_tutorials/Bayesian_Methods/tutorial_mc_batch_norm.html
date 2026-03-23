@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Training a LeNet with Monte Carlo Batch Normalization &#8212; TorchUncertainty 0.10.4 documentation</title>
+    <title>Training a LeNet with Monte Carlo Batch Normalization &#8212; TorchUncertainty 0.11.0 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=7e173fe4"></script>
+    <script src="../../_static/documentation_options.js?v=f3b36f1a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -395,7 +395,8 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Post_Hoc_Methods/index.html">Post-hoc Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scaler.html">Improve Top-label Calibration with Temperature Scaling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scalers.html">Histogram Binning, Isotonic Regression, and BBQ tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_temperature.html">Improve Top-label Calibration with Temperature Scaling</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Bayesian Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -585,30 +586,32 @@ Trainable params: 44.5 K
 Non-trainable params: 0
 Total params: 44.5 K
 Total estimated model params size (MB): 0
-Modules in train mode: 37
+Modules in train mode: 41
 Modules in eval mode: 0
 Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          97.600%          │
-│    Brier     │          0.03673          │
-│   Entropy    │          0.08088          │
-│     NLL      │          0.07780          │
+│     Acc      │          97.950%          │
+│    Brier     │          0.03176          │
+│   Entropy    │          0.06440          │
+│     NLL      │          0.06460          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          0.266%           │
-│     aECE     │          0.195%           │
+│     ECE      │          0.287%           │
+│     MCE      │          22.883%          │
+│    SmECE     │          1.368%           │
+│     aECE     │          0.080%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          0.128%           │
-│     AURC     │          0.140%           │
+│    AUGRC     │          0.087%           │
+│     AURC     │          0.093%           │
 │  Cov@5Risk   │         100.000%          │
-│  Risk@80Cov  │          0.150%           │
+│  Risk@80Cov  │          0.050%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -679,17 +682,17 @@ in this order (num_estimator x batch, classes).</p>
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_tutorial_mc_batch_norm_001.png" srcset="../../_images/sphx_glr_tutorial_mc_batch_norm_001.png" alt="tutorial mc batch norm" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ground truth:  7 2 1 0
-Predicted digits for the image 7:  4 4 9 4 9 4 4 4
-Predicted digits for the image 18:  3 3 3 8 3 3 3 3
-Predicted digits for the image 41:  7 7 3 7 3 7 7 7
-Predicted digits for the image 125:  4 4 9 4 4 4 4 4
+Predicted digits for the image 43:  4 2 2 4 2 2 4 4
+Predicted digits for the image 73:  9 9 9 9 9 8 9 9
+Predicted digits for the image 78:  9 4 9 9 9 8 4 9
+Predicted digits for the image 92:  4 4 4 4 9 4 4 4
 </pre></div>
 </div>
 <p>The predictions are mostly erroneous, which is expected since we selected
 the most uncertain images. We also see that there stochasticity in the
 predictions, as the predictions for the same image differ depending on the
 stochastic estimator used.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 20.035 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 18.849 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-bayesian-methods-tutorial-mc-batch-norm-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/d13ff3c657c4f5e710ba744815d554a5/tutorial_mc_batch_norm.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_batch_norm.ipynb</span></code></a></p>

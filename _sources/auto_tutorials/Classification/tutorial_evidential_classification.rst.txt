@@ -176,31 +176,33 @@ with the default learning rate of 0.002 and a weight decay of 0.005.
     Non-trainable params: 0                                                         
     Total params: 44.4 K                                                            
     Total estimated model params size (MB): 0                                       
-    Modules in train mode: 37                                                       
+    Modules in train mode: 41                                                       
     Modules in eval mode: 0                                                         
     Total FLOPs: 0                                                                  
     /home/chocolatine/actions-runner/_work/torch-uncertainty/torch-uncertainty/.venv/lib/python3.13/site-packages/lightning/pytorch/utilities/_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃      Classification       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     Acc      │          73.070%          │
-    │    Brier     │          0.51097          │
-    │   Entropy    │          0.04747          │
-    │     NLL      │          5.07057          │
+    │     Acc      │          71.680%          │
+    │    Brier     │          0.52978          │
+    │   Entropy    │          0.08423          │
+    │     NLL      │          5.27894          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          24.986%          │
-    │     aECE     │          24.973%          │
+    │     ECE      │          25.220%          │
+    │     MCE      │          68.517%          │
+    │    SmECE     │          34.897%          │
+    │     aECE     │          25.180%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          5.488%           │
-    │     AURC     │          7.438%           │
-    │  Cov@5Risk   │          65.620%          │
-    │  Risk@80Cov  │          14.525%          │
+    │    AUGRC     │          7.348%           │
+    │     AURC     │          11.962%          │
+    │  Cov@5Risk   │           nan%            │
+    │  Risk@80Cov  │          18.275%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -209,7 +211,7 @@ with the default learning rate of 0.002 and a weight decay of 0.005.
     │    params    │          44.43 K          │
     └──────────────┴───────────────────────────┘
 
-    [{'test/cal/ECE': 0.24986493587493896, 'test/cal/aECE': 0.24973492324352264, 'test/cls/Acc': 0.7307000160217285, 'test/cls/Brier': 0.5109740495681763, 'test/cls/NLL': 5.070565223693848, 'test/sc/AUGRC': 0.054878734052181244, 'test/sc/AURC': 0.07437634468078613, 'test/sc/Cov@5Risk': 0.6562000513076782, 'test/sc/Risk@80Cov': 0.14524999260902405, 'test/cls/Entropy': 0.04746526479721069, 'test/cplx/flops': 288399360.0, 'test/cplx/params': 44426.0}]
+    [{'test/cal/ECE': 0.25219693779945374, 'test/cal/MCE': 0.685169517993927, 'test/cal/SmECE': 0.3489735424518585, 'test/cal/aECE': 0.25180140137672424, 'test/cls/Acc': 0.7167999744415283, 'test/cls/Brier': 0.5297824740409851, 'test/cls/NLL': 5.278936862945557, 'test/sc/AUGRC': 0.07348175346851349, 'test/sc/AURC': 0.11961761116981506, 'test/sc/Cov@5Risk': nan, 'test/sc/Risk@80Cov': 0.18275000154972076, 'test/cls/Entropy': 0.0842273011803627, 'test/cplx/flops': 288399360.0, 'test/cplx/params': 44426.0}]
 
 
 
@@ -284,20 +286,20 @@ Now that the model is trained, let's test it on MNIST.
  .. code-block:: none
 
     Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 7 with strength 65.029 and entropy 0.706.
+    Predicted digits for the image 0: 7 with strength 106.753 and entropy 0.474.
+    Predicted digits for the image 1: 2 with strength 72.923 and entropy 0.645.
+    Predicted digits for the image 2: 1 with strength 87.808 and entropy 0.556.
+    Predicted digits for the image 3: 0 with strength 10.000 and entropy 2.303.
+    Ground truth:  7 2 1 0
+    Predicted digits for the image 0: 7 with strength 40.224 and entropy 1.023.
     Predicted digits for the image 1: 0 with strength 10.000 and entropy 2.303.
-    Predicted digits for the image 2: 0 with strength 10.000 and entropy 2.303.
-    Predicted digits for the image 3: 0 with strength 30.786 and entropy 1.247.
+    Predicted digits for the image 2: 3 with strength 13.031 and entropy 2.136.
+    Predicted digits for the image 3: 7 with strength 33.009 and entropy 1.185.
     Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 7 with strength 10.324 and entropy 2.298.
-    Predicted digits for the image 1: 4 with strength 15.243 and entropy 1.974.
-    Predicted digits for the image 2: 0 with strength 10.000 and entropy 2.303.
-    Predicted digits for the image 3: 0 with strength 16.862 and entropy 1.864.
-    Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 7 with strength 14.134 and entropy 2.054.
-    Predicted digits for the image 1: 4 with strength 46.172 and entropy 0.922.
-    Predicted digits for the image 2: 7 with strength 17.495 and entropy 1.823.
-    Predicted digits for the image 3: 0 with strength 12.934 and entropy 2.143.
+    Predicted digits for the image 0: 7 with strength 42.198 and entropy 0.987.
+    Predicted digits for the image 1: 2 with strength 50.050 and entropy 1.353.
+    Predicted digits for the image 2: 7 with strength 56.617 and entropy 1.082.
+    Predicted digits for the image 3: 0 with strength 10.000 and entropy 2.303.
 
 
 
@@ -312,7 +314,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 6.817 seconds)
+   **Total running time of the script:** (0 minutes 6.269 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Classification_tutorial_evidential_classification.py:

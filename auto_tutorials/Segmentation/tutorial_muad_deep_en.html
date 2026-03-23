@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Deep ensembles Segmentation Tutorial using Muad Dataset &#8212; TorchUncertainty 0.10.4 documentation</title>
+    <title>Deep ensembles Segmentation Tutorial using Muad Dataset &#8212; TorchUncertainty 0.11.0 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=7e173fe4"></script>
+    <script src="../../_static/documentation_options.js?v=f3b36f1a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -395,7 +395,8 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Post_Hoc_Methods/index.html">Post-hoc Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scaler.html">Improve Top-label Calibration with Temperature Scaling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scalers.html">Histogram Binning, Isotonic Regression, and BBQ tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_temperature.html">Improve Top-label Calibration with Temperature Scaling</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Bayesian_Methods/index.html">Bayesian Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -739,7 +740,7 @@ Trainable params: 17.3 M
 Non-trainable params: 0
 Total params: 17.3 M
 Total estimated model params size (MB): 69
-Modules in train mode: 415
+Modules in train mode: 419
 Modules in eval mode: 0
 Total FLOPs: 0
 </pre></div>
@@ -753,25 +754,27 @@ Total FLOPs: 0
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.64527          │
-│     NLL      │          1.46771          │
-│     mAcc     │          24.112%          │
-│     mIoU     │          13.641%          │
-│    pixAcc    │          55.155%          │
+│    Brier     │          0.65271          │
+│     NLL      │          1.49803          │
+│     mAcc     │          22.603%          │
+│     mIoU     │          13.941%          │
+│    pixAcc    │          54.030%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          17.063%          │
-│     aECE     │          17.140%          │
+│     ECE      │          18.556%          │
+│     MCE      │          26.282%          │
+│    SmECE     │          18.284%          │
+│     aECE     │          18.300%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          18.172%          │
-│     AURC     │          31.635%          │
+│    AUGRC     │          18.343%          │
+│     AURC     │          30.004%          │
 │  Cov@5Risk   │           nan%            │
-│  Risk@80Cov  │          40.141%          │
+│  Risk@80Cov  │          41.122%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -838,7 +841,7 @@ Total FLOPs: 0
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_muad_deep_en_003.png" srcset="../../_images/sphx_glr_tutorial_muad_deep_en_003.png" alt="tutorial muad deep en" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 50.065 seconds)</p>
+<img src="../../_images/sphx_glr_tutorial_muad_deep_en_003.png" srcset="../../_images/sphx_glr_tutorial_muad_deep_en_003.png" alt="tutorial muad deep en" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 50.131 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-segmentation-tutorial-muad-deep-en-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c600403fd848d50cfcc5f80a21319f6b/tutorial_muad_deep_en.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_muad_deep_en.ipynb</span></code></a></p>

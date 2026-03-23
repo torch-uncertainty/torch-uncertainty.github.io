@@ -296,6 +296,16 @@ For Dirichlet calibration, consider citing:
 * Authors: *Meelis Kull, Miquel Perello-Nieto, Markus Kängsepp, Telmo Silva Filho, Hao Song, and Peter Flach*
 * Paper: `NeurIPS 2019 <https://arxiv.org/abs/1910.12656>`__.
 
+Isotonic Regression
+^^^^^^^^^^^^^^^^^^^
+
+For isotonic regression calibration, consider citing:
+
+**Transforming Classifier Scores into Accurate Multiclass Probability Estimates**
+
+* Authors: *Bianca Zadrozny and Charles Elkan*
+* Paper: `KDD 2002 <https://dl.acm.org/doi/10.1145/775047.775151>`__
+
 Monte-Carlo Batch Normalization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -406,6 +416,26 @@ For the adaptive calibration error, consider citing:
 
 * Authors: *Jeremy Nixon, Mike Dusenberry, Ghassen Jerfel, Timothy Nguyen, Jeremiah Liu, Linchuan Zhang, and Dustin Tran*
 * Paper: `CVPRW 2019 <https://arxiv.org/pdf/1904.01685.pdf>`__.
+
+Smooth Expected Calibration Error
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For the Smooth Expected Calibration Error, consider citing:
+
+**Smooth ECE: Principled Reliability Diagrams via Kernel Smoothing**
+
+* Authors: *Jarosław Błasiok and Preetum Nakkiran*
+* Paper: `ICLR 2024 <https://arxiv.org/pdf/2309.12236.pdf>`__.
+
+Classwise Calibration Error
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For the Classwise Calibration Error, consider citing:
+
+**Beyond Temperature Scaling: Obtaining Well-Calibrated Multiclass Probabilities with Dirichlet Calibration**
+
+* Authors: *Meelis Kull, Miquel Perello-Nieto, Markus Kängsepp, Telmo Silva Filho, Hao Song, and Peter Flach*
+* Paper: `NeurIPS 2019 <https://arxiv.org/abs/1910.12656>`__.
 
 Area Under the Risk-Coverage curve
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

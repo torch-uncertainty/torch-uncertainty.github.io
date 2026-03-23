@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Training a Bayesian Neural Network in 20 seconds &#8212; TorchUncertainty 0.10.4 documentation</title>
+    <title>Training a Bayesian Neural Network in 20 seconds &#8212; TorchUncertainty 0.11.0 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=7e173fe4"></script>
+    <script src="../../_static/documentation_options.js?v=f3b36f1a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -395,7 +395,8 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Post_Hoc_Methods/index.html">Post-hoc Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scaler.html">Improve Top-label Calibration with Temperature Scaling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scalers.html">Histogram Binning, Isotonic Regression, and BBQ tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_temperature.html">Improve Top-label Calibration with Temperature Scaling</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Bayesian Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -598,27 +599,28 @@ logs will be saved in the root/logs folder.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/9.91M [00:00&lt;?, ?B/s]
-  1%|          | 65.5k/9.91M [00:00&lt;00:23, 423kB/s]
-  4%|▎         | 360k/9.91M [00:00&lt;00:07, 1.29MB/s]
-  8%|▊         | 819k/9.91M [00:00&lt;00:04, 2.05MB/s]
- 17%|█▋        | 1.67M/9.91M [00:00&lt;00:02, 3.40MB/s]
- 31%|███       | 3.05M/9.91M [00:00&lt;00:01, 5.35MB/s]
- 60%|██████    | 5.96M/9.91M [00:00&lt;00:00, 11.3MB/s]
- 90%|████████▉ | 8.88M/9.91M [00:01&lt;00:00, 14.7MB/s]
-100%|██████████| 9.91M/9.91M [00:01&lt;00:00, 9.70MB/s]
+  1%|          | 65.5k/9.91M [00:00&lt;00:23, 412kB/s]
+  3%|▎         | 295k/9.91M [00:00&lt;00:09, 1.01MB/s]
+  7%|▋         | 721k/9.91M [00:00&lt;00:04, 1.99MB/s]
+ 12%|█▏        | 1.21M/9.91M [00:00&lt;00:03, 2.75MB/s]
+ 25%|██▍       | 2.46M/9.91M [00:00&lt;00:01, 5.31MB/s]
+ 35%|███▌      | 3.51M/9.91M [00:00&lt;00:00, 6.42MB/s]
+ 62%|██████▏   | 6.19M/9.91M [00:00&lt;00:00, 11.5MB/s]
+ 96%|█████████▌| 9.50M/9.91M [00:01&lt;00:00, 16.5MB/s]
+100%|██████████| 9.91M/9.91M [00:01&lt;00:00, 9.51MB/s]
 
   0%|          | 0.00/28.9k [00:00&lt;?, ?B/s]
-100%|██████████| 28.9k/28.9k [00:00&lt;00:00, 373kB/s]
+100%|██████████| 28.9k/28.9k [00:00&lt;00:00, 364kB/s]
 
   0%|          | 0.00/1.65M [00:00&lt;?, ?B/s]
-  4%|▍         | 65.5k/1.65M [00:00&lt;00:03, 415kB/s]
- 16%|█▌        | 262k/1.65M [00:00&lt;00:01, 908kB/s]
- 42%|████▏     | 688k/1.65M [00:00&lt;00:00, 1.73MB/s]
- 89%|████████▉ | 1.47M/1.65M [00:00&lt;00:00, 3.03MB/s]
-100%|██████████| 1.65M/1.65M [00:00&lt;00:00, 2.62MB/s]
+  4%|▍         | 65.5k/1.65M [00:00&lt;00:03, 410kB/s]
+ 18%|█▊        | 295k/1.65M [00:00&lt;00:01, 1.01MB/s]
+ 40%|███▉      | 655k/1.65M [00:00&lt;00:00, 1.58MB/s]
+ 87%|████████▋ | 1.44M/1.65M [00:00&lt;00:00, 2.89MB/s]
+100%|██████████| 1.65M/1.65M [00:00&lt;00:00, 2.57MB/s]
 
   0%|          | 0.00/4.54k [00:00&lt;?, ?B/s]
-100%|██████████| 4.54k/4.54k [00:00&lt;00:00, 11.5MB/s]
+100%|██████████| 4.54k/4.54k [00:00&lt;00:00, 11.0MB/s]
 ┏━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
 ┃   ┃ Name                ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
 ┡━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
@@ -636,30 +638,32 @@ Trainable params: 88.9 K
 Non-trainable params: 0
 Total params: 88.9 K
 Total estimated model params size (MB): 0
-Modules in train mode: 64
+Modules in train mode: 68
 Modules in eval mode: 0
 Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          94.860%          │
-│    Brier     │          0.07974          │
-│   Entropy    │          0.23193          │
-│     NLL      │          0.17414          │
+│     Acc      │          92.330%          │
+│    Brier     │          0.11780          │
+│   Entropy    │          0.30218          │
+│     NLL      │          0.24338          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          1.843%           │
-│     aECE     │          1.841%           │
+│     ECE      │          2.229%           │
+│     MCE      │          18.390%          │
+│    SmECE     │          2.483%           │
+│     aECE     │          2.260%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          0.542%           │
-│     AURC     │          0.681%           │
-│  Cov@5Risk   │          99.800%          │
-│  Risk@80Cov  │          0.825%           │
+│    AUGRC     │          1.009%           │
+│     AURC     │          1.213%           │
+│  Cov@5Risk   │          93.910%          │
+│  Risk@80Cov  │          2.025%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -668,7 +672,7 @@ Total FLOPs: 0
 │    params    │          88.85 K          │
 └──────────────┴───────────────────────────┘
 
-[{&#39;test/cal/ECE&#39;: 0.018428362905979156, &#39;test/cal/aECE&#39;: 0.018414782360196114, &#39;test/cls/Acc&#39;: 0.9485999941825867, &#39;test/cls/Brier&#39;: 0.07974440604448318, &#39;test/cls/NLL&#39;: 0.17413608729839325, &#39;test/sc/AUGRC&#39;: 0.005421862937510014, &#39;test/sc/AURC&#39;: 0.006808589678257704, &#39;test/sc/Cov@5Risk&#39;: 0.9980000257492065, &#39;test/sc/Risk@80Cov&#39;: 0.008249999955296516, &#39;test/cls/Entropy&#39;: 0.23193064332008362, &#39;test/cplx/flops&#39;: 4614389760.0, &#39;test/cplx/params&#39;: 88852.0, &#39;test/ens_Disagreement&#39;: 0.027707498520612717, &#39;test/ens_Entropy&#39;: 0.21723401546478271, &#39;test/ens_MI&#39;: 0.014696630649268627}]
+[{&#39;test/cal/ECE&#39;: 0.022288713604211807, &#39;test/cal/MCE&#39;: 0.1839008778333664, &#39;test/cal/SmECE&#39;: 0.02483176440000534, &#39;test/cal/aECE&#39;: 0.022597840055823326, &#39;test/cls/Acc&#39;: 0.92330002784729, &#39;test/cls/Brier&#39;: 0.11780130863189697, &#39;test/cls/NLL&#39;: 0.2433810979127884, &#39;test/sc/AUGRC&#39;: 0.010085005313158035, &#39;test/sc/AURC&#39;: 0.01212533749639988, &#39;test/sc/Cov@5Risk&#39;: 0.9391000270843506, &#39;test/sc/Risk@80Cov&#39;: 0.020250000059604645, &#39;test/cls/Entropy&#39;: 0.3021838366985321, &#39;test/cplx/flops&#39;: 4614389760.0, &#39;test/cplx/params&#39;: 88852.0, &#39;test/ens_Disagreement&#39;: 0.04094000160694122, &#39;test/ens_Entropy&#39;: 0.28538185358047485, &#39;test/ens_MI&#39;: 0.016802022233605385}]
 </pre></div>
 </div>
 </section>
@@ -722,7 +726,7 @@ in this order (num_estimator x batch, classes).</p>
 <img src="../../_images/sphx_glr_tutorial_bayesian_001.png" srcset="../../_images/sphx_glr_tutorial_bayesian_001.png" alt="tutorial bayesian" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ground truth:  7 2 1 0
 Output logit shape (Num predictions x Batch) x Classes:  torch.Size([64, 10])
 Predicted digits:  7 2 1 0
-Std. dev. of the scores over the posterior samples 0.007 0.001 0.003 0.016
+Std. dev. of the scores over the posterior samples 0.068 0.002 0.004 0.002
 </pre></div>
 </div>
 <p>Here, we show the variance of the top prediction. This is a non-standard but intuitive way to show the diversity of the predictions
@@ -737,7 +741,7 @@ of the ensemble. Ideally, the variance should be high when the prediction is inc
 <li><p><strong>The Adam optimizer:</strong> Kingma, D. P., &amp; Ba, J. (2014). “Adam: A method for stochastic optimization.” <a class="reference external" href="https://arxiv.org/pdf/1412.6980.pdf">ICLR 2015</a>.</p></li>
 <li><p><strong>The Blitz</strong> <a class="reference external" href="https://github.com/piEsposito/blitz-bayesian-deep-learning">library</a> (for the hyperparameters).</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 16.612 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 16.182 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-bayesian-methods-tutorial-bayesian-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/cae7b1d5e1f76f661d2ba21fd89024a3/tutorial_bayesian.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_bayesian.ipynb</span></code></a></p>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Improve Top-label Calibration with Temperature Scaling &#8212; TorchUncertainty 0.10.4 documentation</title>
+    <title>Improve Top-label Calibration with Temperature Scaling &#8212; TorchUncertainty 0.11.0 documentation</title>
   
   
   
@@ -45,17 +45,17 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=7e173fe4"></script>
+    <script src="../../_static/documentation_options.js?v=f3b36f1a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_tutorials/Post_Hoc_Methods/tutorial_scaler';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_tutorials/Post_Hoc_Methods/tutorial_temperature';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Bayesian Methods" href="../Bayesian_Methods/index.html" />
-    <link rel="prev" title="Conformal Prediction on CIFAR-10 with TorchUncertainty" href="tutorial_conformal.html" />
+    <link rel="prev" title="Histogram Binning, Isotonic Regression, and BBQ tutorial" href="tutorial_scalers.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -395,6 +395,7 @@
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Post-hoc Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_scalers.html">Histogram Binning, Isotonic Regression, and BBQ tutorial</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Improve Top-label Calibration with Temperature Scaling</a></li>
 </ul>
 </details></li>
@@ -492,18 +493,23 @@
                   
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p><a class="reference internal" href="#sphx-glr-download-auto-tutorials-post-hoc-methods-tutorial-scaler-py"><span class="std std-ref">Go to the end</span></a>
+<p><a class="reference internal" href="#sphx-glr-download-auto-tutorials-post-hoc-methods-tutorial-temperature-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="improve-top-label-calibration-with-temperature-scaling">
-<span id="sphx-glr-auto-tutorials-post-hoc-methods-tutorial-scaler-py"></span><h1>Improve Top-label Calibration with Temperature Scaling<a class="headerlink" href="#improve-top-label-calibration-with-temperature-scaling" title="Link to this heading">#</a></h1>
+<span id="sphx-glr-auto-tutorials-post-hoc-methods-tutorial-temperature-py"></span><h1>Improve Top-label Calibration with Temperature Scaling<a class="headerlink" href="#improve-top-label-calibration-with-temperature-scaling" title="Link to this heading">#</a></h1>
 <p>In this tutorial, we use <em>TorchUncertainty</em> to improve the calibration
 of the top-label predictions and the reliability of the underlying neural network.</p>
 <p>This tutorial provides extensive details on how to use the TemperatureScaler
-class and its derivative, VectorScaler and MatrixScaler. However, please note that this is usually done
+class and its derivatives, VectorScaler, MatrixScaler, and Dirichlet calibration, as well
+as IsotonicRegressionScaler. However, please note that this is usually done
 automatically in the datamodule when setting the <cite>postprocess_set</cite> to val or test.</p>
 <p>Through this tutorial, we also see how to use the datamodules outside any Lightning trainers,
 and how to use TorchUncertainty’s models.</p>
+<section id="note">
+<h2>Note:<a class="headerlink" href="#note" title="Link to this heading">#</a></h2>
+<p>The Expected Calibration Error (ECE) is not sufficient to properly assess the calibration properties of a model.</p>
+</section>
 <section id="loading-the-utilities">
 <h2>1. Loading the Utilities<a class="headerlink" href="#loading-the-utilities" title="Link to this heading">#</a></h2>
 <p>In this tutorial, we will need:</p>
@@ -552,56 +558,6 @@ of out-of-distribution data. Otherwise, it is a list of 1 element.</p>
 <span class="n">dm</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/169M [00:00&lt;?, ?B/s]
-  0%|          | 65.5k/169M [00:00&lt;07:00, 402kB/s]
-  0%|          | 229k/169M [00:00&lt;03:40, 764kB/s]
-  0%|          | 623k/169M [00:00&lt;01:49, 1.54MB/s]
-  1%|          | 1.38M/169M [00:00&lt;00:54, 3.08MB/s]
-  1%|          | 2.10M/169M [00:00&lt;00:41, 4.02MB/s]
-  3%|▎         | 4.33M/169M [00:00&lt;00:19, 8.54MB/s]
-  4%|▎         | 6.09M/169M [00:00&lt;00:15, 10.5MB/s]
-  6%|▌         | 10.4M/169M [00:01&lt;00:08, 19.2MB/s]
-  9%|▉         | 14.8M/169M [00:01&lt;00:05, 26.3MB/s]
- 11%|█         | 18.7M/169M [00:01&lt;00:05, 26.7MB/s]
- 14%|█▍        | 23.5M/169M [00:01&lt;00:04, 31.7MB/s]
- 17%|█▋        | 28.2M/169M [00:01&lt;00:04, 31.8MB/s]
- 19%|█▉        | 32.6M/169M [00:01&lt;00:03, 35.1MB/s]
- 22%|██▏       | 36.9M/169M [00:01&lt;00:03, 37.2MB/s]
- 24%|██▍       | 40.9M/169M [00:01&lt;00:03, 34.0MB/s]
- 27%|██▋       | 45.4M/169M [00:01&lt;00:03, 36.9MB/s]
- 29%|██▉       | 49.7M/169M [00:02&lt;00:03, 38.7MB/s]
- 32%|███▏      | 53.7M/169M [00:02&lt;00:03, 35.3MB/s]
- 34%|███▍      | 58.1M/169M [00:02&lt;00:02, 37.1MB/s]
- 37%|███▋      | 62.5M/169M [00:02&lt;00:02, 38.8MB/s]
- 39%|███▉      | 66.5M/169M [00:02&lt;00:02, 35.1MB/s]
- 41%|████▏     | 70.1M/169M [00:02&lt;00:02, 35.0MB/s]
- 44%|████▎     | 73.7M/169M [00:02&lt;00:02, 35.2MB/s]
- 46%|████▌     | 77.3M/169M [00:02&lt;00:02, 35.1MB/s]
- 48%|████▊     | 80.9M/169M [00:03&lt;00:02, 34.4MB/s]
- 50%|█████     | 84.6M/169M [00:03&lt;00:02, 35.2MB/s]
- 52%|█████▏    | 88.2M/169M [00:03&lt;00:02, 35.1MB/s]
- 54%|█████▍    | 91.8M/169M [00:03&lt;00:02, 34.5MB/s]
- 56%|█████▋    | 95.5M/169M [00:03&lt;00:02, 35.2MB/s]
- 59%|█████▊    | 99.0M/169M [00:03&lt;00:02, 34.3MB/s]
- 61%|██████    | 103M/169M [00:03&lt;00:01, 35.8MB/s]
- 63%|██████▎   | 107M/169M [00:03&lt;00:01, 35.1MB/s]
- 65%|██████▌   | 111M/169M [00:03&lt;00:01, 34.7MB/s]
- 68%|██████▊   | 115M/169M [00:03&lt;00:01, 37.9MB/s]
- 70%|███████   | 119M/169M [00:04&lt;00:01, 35.6MB/s]
- 73%|███████▎  | 123M/169M [00:04&lt;00:01, 35.0MB/s]
- 75%|███████▌  | 127M/169M [00:04&lt;00:01, 37.2MB/s]
- 78%|███████▊  | 131M/169M [00:04&lt;00:01, 35.6MB/s]
- 80%|███████▉  | 135M/169M [00:04&lt;00:00, 36.4MB/s]
- 82%|████████▏ | 139M/169M [00:04&lt;00:00, 35.6MB/s]
- 84%|████████▍ | 143M/169M [00:04&lt;00:00, 36.6MB/s]
- 87%|████████▋ | 146M/169M [00:04&lt;00:00, 35.4MB/s]
- 89%|████████▉ | 150M/169M [00:04&lt;00:00, 34.8MB/s]
- 91%|█████████▏| 155M/169M [00:05&lt;00:00, 35.1MB/s]
- 94%|█████████▍| 159M/169M [00:05&lt;00:00, 36.0MB/s]
- 97%|█████████▋| 164M/169M [00:05&lt;00:00, 36.7MB/s]
-100%|██████████| 169M/169M [00:05&lt;00:00, 31.2MB/s]
-</pre></div>
-</div>
 </section>
 <section id="iterating-on-the-dataloader-and-computing-the-ece">
 <h2>4. Iterating on the Dataloader and Computing the ECE<a class="headerlink" href="#iterating-on-the-dataloader-and-computing-the-ece" title="Link to this heading">#</a></h2>
@@ -631,7 +587,7 @@ of the test set.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ECE before scaling - </span><span class="si">{</span><span class="n">ece</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span><span class="si">:</span><span class="s2">.3%</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE before scaling - 11.525%.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE before scaling - 10.773%.
 </pre></div>
 </div>
 <p>We also compute and plot the top-label calibration figure. We see that the
@@ -641,7 +597,7 @@ model is not well calibrated.</p>
 <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_scaler_001.png" srcset="../../_images/sphx_glr_tutorial_scaler_001.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/></section>
+<img src="../../_images/sphx_glr_tutorial_temperature_001.png" srcset="../../_images/sphx_glr_tutorial_temperature_001.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/></section>
 <section id="fitting-the-scaler-to-improve-the-calibration">
 <h2>5. Fitting the Scaler to Improve the Calibration<a class="headerlink" href="#fitting-the-scaler-to-improve-the-calibration" title="Link to this heading">#</a></h2>
 <p>The TemperatureScaler has one parameter that can be used to temper the softmax.
@@ -654,38 +610,38 @@ a subset of the test set and containing 1000 data. Look at the code run by Tempe
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/32 [00:00&lt;?, ?it/s]
-  3%|▎         | 1/32 [00:00&lt;00:10,  3.06it/s]
-  6%|▋         | 2/32 [00:00&lt;00:09,  3.05it/s]
-  9%|▉         | 3/32 [00:00&lt;00:09,  3.05it/s]
- 12%|█▎        | 4/32 [00:01&lt;00:09,  3.05it/s]
- 16%|█▌        | 5/32 [00:01&lt;00:08,  3.04it/s]
- 19%|█▉        | 6/32 [00:01&lt;00:08,  3.04it/s]
- 22%|██▏       | 7/32 [00:02&lt;00:08,  3.04it/s]
- 25%|██▌       | 8/32 [00:02&lt;00:07,  3.04it/s]
- 28%|██▊       | 9/32 [00:02&lt;00:07,  3.04it/s]
- 31%|███▏      | 10/32 [00:03&lt;00:07,  3.04it/s]
- 34%|███▍      | 11/32 [00:03&lt;00:06,  3.04it/s]
- 38%|███▊      | 12/32 [00:03&lt;00:06,  3.04it/s]
- 41%|████      | 13/32 [00:04&lt;00:06,  3.04it/s]
- 44%|████▍     | 14/32 [00:04&lt;00:05,  3.04it/s]
- 47%|████▋     | 15/32 [00:04&lt;00:05,  3.04it/s]
- 50%|█████     | 16/32 [00:05&lt;00:05,  3.05it/s]
- 53%|█████▎    | 17/32 [00:05&lt;00:04,  3.05it/s]
- 56%|█████▋    | 18/32 [00:05&lt;00:04,  3.05it/s]
- 59%|█████▉    | 19/32 [00:06&lt;00:04,  3.05it/s]
- 62%|██████▎   | 20/32 [00:06&lt;00:03,  3.05it/s]
- 66%|██████▌   | 21/32 [00:06&lt;00:03,  3.05it/s]
- 69%|██████▉   | 22/32 [00:07&lt;00:03,  3.05it/s]
- 72%|███████▏  | 23/32 [00:07&lt;00:02,  3.05it/s]
- 75%|███████▌  | 24/32 [00:07&lt;00:02,  3.05it/s]
- 78%|███████▊  | 25/32 [00:08&lt;00:02,  3.05it/s]
- 81%|████████▏ | 26/32 [00:08&lt;00:01,  3.05it/s]
- 84%|████████▍ | 27/32 [00:08&lt;00:01,  3.06it/s]
- 88%|████████▊ | 28/32 [00:09&lt;00:01,  3.06it/s]
- 91%|█████████ | 29/32 [00:09&lt;00:00,  3.05it/s]
- 94%|█████████▍| 30/32 [00:09&lt;00:00,  3.05it/s]
- 97%|█████████▋| 31/32 [00:10&lt;00:00,  3.05it/s]
-100%|██████████| 32/32 [00:10&lt;00:00,  3.12it/s]
+  3%|▎         | 1/32 [00:00&lt;00:11,  2.73it/s]
+  6%|▋         | 2/32 [00:00&lt;00:11,  2.64it/s]
+  9%|▉         | 3/32 [00:01&lt;00:11,  2.60it/s]
+ 12%|█▎        | 4/32 [00:01&lt;00:10,  2.60it/s]
+ 16%|█▌        | 5/32 [00:01&lt;00:10,  2.60it/s]
+ 19%|█▉        | 6/32 [00:02&lt;00:09,  2.60it/s]
+ 22%|██▏       | 7/32 [00:02&lt;00:09,  2.60it/s]
+ 25%|██▌       | 8/32 [00:03&lt;00:09,  2.60it/s]
+ 28%|██▊       | 9/32 [00:03&lt;00:08,  2.60it/s]
+ 31%|███▏      | 10/32 [00:03&lt;00:08,  2.60it/s]
+ 34%|███▍      | 11/32 [00:04&lt;00:08,  2.60it/s]
+ 38%|███▊      | 12/32 [00:04&lt;00:07,  2.60it/s]
+ 41%|████      | 13/32 [00:04&lt;00:07,  2.61it/s]
+ 44%|████▍     | 14/32 [00:05&lt;00:06,  2.61it/s]
+ 47%|████▋     | 15/32 [00:05&lt;00:06,  2.61it/s]
+ 50%|█████     | 16/32 [00:06&lt;00:06,  2.60it/s]
+ 53%|█████▎    | 17/32 [00:06&lt;00:05,  2.61it/s]
+ 56%|█████▋    | 18/32 [00:06&lt;00:05,  2.61it/s]
+ 59%|█████▉    | 19/32 [00:07&lt;00:04,  2.61it/s]
+ 62%|██████▎   | 20/32 [00:07&lt;00:04,  2.61it/s]
+ 66%|██████▌   | 21/32 [00:08&lt;00:04,  2.61it/s]
+ 69%|██████▉   | 22/32 [00:08&lt;00:03,  2.61it/s]
+ 72%|███████▏  | 23/32 [00:08&lt;00:03,  2.61it/s]
+ 75%|███████▌  | 24/32 [00:09&lt;00:03,  2.60it/s]
+ 78%|███████▊  | 25/32 [00:09&lt;00:02,  2.60it/s]
+ 81%|████████▏ | 26/32 [00:09&lt;00:02,  2.60it/s]
+ 84%|████████▍ | 27/32 [00:10&lt;00:01,  2.60it/s]
+ 88%|████████▊ | 28/32 [00:10&lt;00:01,  2.60it/s]
+ 91%|█████████ | 29/32 [00:11&lt;00:01,  2.60it/s]
+ 94%|█████████▍| 30/32 [00:11&lt;00:00,  2.60it/s]
+ 97%|█████████▋| 31/32 [00:11&lt;00:00,  2.60it/s]
+100%|██████████| 32/32 [00:11&lt;00:00,  2.67it/s]
 </pre></div>
 </div>
 </section>
@@ -708,7 +664,7 @@ the previous and current iterations.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE after scaling - 3.769% with temperature 1.37.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE after scaling - 2.882% with temperature 1.38.
 </pre></div>
 </div>
 <p>We finally compute and plot the scaled top-label calibration figure. We see
@@ -719,7 +675,7 @@ the final model is less confident than before.</p>
 <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_scaler_002.png" srcset="../../_images/sphx_glr_tutorial_scaler_002.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/><p>The top-label calibration should be improved.</p>
+<img src="../../_images/sphx_glr_tutorial_temperature_002.png" srcset="../../_images/sphx_glr_tutorial_temperature_002.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/><p>The top-label calibration should be improved.</p>
 </section>
 <section id="what-about-vector-scaling">
 <h2>7. What about Vector Scaling?<a class="headerlink" href="#what-about-vector-scaling" title="Link to this heading">#</a></h2>
@@ -752,40 +708,40 @@ Can it continue improving the calibration of our model?</p>
 <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_scaler_003.png" srcset="../../_images/sphx_glr_tutorial_scaler_003.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/32 [00:00&lt;?, ?it/s]
-  3%|▎         | 1/32 [00:00&lt;00:10,  2.86it/s]
-  6%|▋         | 2/32 [00:00&lt;00:10,  2.84it/s]
-  9%|▉         | 3/32 [00:01&lt;00:10,  2.83it/s]
- 12%|█▎        | 4/32 [00:01&lt;00:09,  2.82it/s]
- 16%|█▌        | 5/32 [00:01&lt;00:09,  2.82it/s]
- 19%|█▉        | 6/32 [00:02&lt;00:09,  2.81it/s]
- 22%|██▏       | 7/32 [00:02&lt;00:08,  2.82it/s]
- 25%|██▌       | 8/32 [00:02&lt;00:08,  2.82it/s]
- 28%|██▊       | 9/32 [00:03&lt;00:08,  2.82it/s]
- 31%|███▏      | 10/32 [00:03&lt;00:07,  2.81it/s]
- 34%|███▍      | 11/32 [00:03&lt;00:07,  2.81it/s]
- 38%|███▊      | 12/32 [00:04&lt;00:07,  2.81it/s]
- 41%|████      | 13/32 [00:04&lt;00:06,  2.81it/s]
- 44%|████▍     | 14/32 [00:04&lt;00:06,  2.81it/s]
- 47%|████▋     | 15/32 [00:05&lt;00:06,  2.81it/s]
- 50%|█████     | 16/32 [00:05&lt;00:05,  2.81it/s]
- 53%|█████▎    | 17/32 [00:06&lt;00:05,  2.81it/s]
- 56%|█████▋    | 18/32 [00:06&lt;00:04,  2.81it/s]
- 59%|█████▉    | 19/32 [00:06&lt;00:04,  2.82it/s]
- 62%|██████▎   | 20/32 [00:07&lt;00:04,  2.82it/s]
- 66%|██████▌   | 21/32 [00:07&lt;00:03,  2.81it/s]
- 69%|██████▉   | 22/32 [00:07&lt;00:03,  2.81it/s]
- 72%|███████▏  | 23/32 [00:08&lt;00:03,  2.82it/s]
- 75%|███████▌  | 24/32 [00:08&lt;00:02,  2.82it/s]
- 78%|███████▊  | 25/32 [00:08&lt;00:02,  2.82it/s]
- 81%|████████▏ | 26/32 [00:09&lt;00:02,  2.82it/s]
- 84%|████████▍ | 27/32 [00:09&lt;00:01,  2.82it/s]
- 88%|████████▊ | 28/32 [00:09&lt;00:01,  2.82it/s]
- 91%|█████████ | 29/32 [00:10&lt;00:01,  2.82it/s]
- 94%|█████████▍| 30/32 [00:10&lt;00:00,  2.82it/s]
- 97%|█████████▋| 31/32 [00:11&lt;00:00,  2.82it/s]
-100%|██████████| 32/32 [00:11&lt;00:00,  2.89it/s]
-ECE after vector scaling - 4.288% with average temperature 1.35.
+<img src="../../_images/sphx_glr_tutorial_temperature_003.png" srcset="../../_images/sphx_glr_tutorial_temperature_003.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/32 [00:00&lt;?, ?it/s]
+  3%|▎         | 1/32 [00:00&lt;00:11,  2.65it/s]
+  6%|▋         | 2/32 [00:00&lt;00:11,  2.59it/s]
+  9%|▉         | 3/32 [00:01&lt;00:11,  2.60it/s]
+ 12%|█▎        | 4/32 [00:01&lt;00:10,  2.59it/s]
+ 16%|█▌        | 5/32 [00:01&lt;00:10,  2.59it/s]
+ 19%|█▉        | 6/32 [00:02&lt;00:10,  2.59it/s]
+ 22%|██▏       | 7/32 [00:02&lt;00:09,  2.59it/s]
+ 25%|██▌       | 8/32 [00:03&lt;00:09,  2.59it/s]
+ 28%|██▊       | 9/32 [00:03&lt;00:08,  2.59it/s]
+ 31%|███▏      | 10/32 [00:03&lt;00:08,  2.59it/s]
+ 34%|███▍      | 11/32 [00:04&lt;00:08,  2.59it/s]
+ 38%|███▊      | 12/32 [00:04&lt;00:07,  2.59it/s]
+ 41%|████      | 13/32 [00:05&lt;00:07,  2.58it/s]
+ 44%|████▍     | 14/32 [00:05&lt;00:06,  2.58it/s]
+ 47%|████▋     | 15/32 [00:05&lt;00:06,  2.58it/s]
+ 50%|█████     | 16/32 [00:06&lt;00:06,  2.58it/s]
+ 53%|█████▎    | 17/32 [00:06&lt;00:05,  2.58it/s]
+ 56%|█████▋    | 18/32 [00:06&lt;00:05,  2.58it/s]
+ 59%|█████▉    | 19/32 [00:07&lt;00:05,  2.58it/s]
+ 62%|██████▎   | 20/32 [00:07&lt;00:04,  2.58it/s]
+ 66%|██████▌   | 21/32 [00:08&lt;00:04,  2.59it/s]
+ 69%|██████▉   | 22/32 [00:08&lt;00:03,  2.59it/s]
+ 72%|███████▏  | 23/32 [00:08&lt;00:03,  2.58it/s]
+ 75%|███████▌  | 24/32 [00:09&lt;00:03,  2.58it/s]
+ 78%|███████▊  | 25/32 [00:09&lt;00:02,  2.58it/s]
+ 81%|████████▏ | 26/32 [00:10&lt;00:02,  2.59it/s]
+ 84%|████████▍ | 27/32 [00:10&lt;00:01,  2.58it/s]
+ 88%|████████▊ | 28/32 [00:10&lt;00:01,  2.59it/s]
+ 91%|█████████ | 29/32 [00:11&lt;00:01,  2.58it/s]
+ 94%|█████████▍| 30/32 [00:11&lt;00:00,  2.59it/s]
+ 97%|█████████▋| 31/32 [00:11&lt;00:00,  2.58it/s]
+100%|██████████| 32/32 [00:12&lt;00:00,  2.65it/s]
+ECE after vector scaling - 3.002% with average temperature 1.36.
 </pre></div>
 </div>
 <p>It is most likely not the case: we don’t have much data to fit more parameters, and might
@@ -822,10 +778,10 @@ Can it continue improving the calibration of our model?</p>
 <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_scaler_004.png" srcset="../../_images/sphx_glr_tutorial_scaler_004.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/32 [00:00&lt;?, ?it/s]
-  3%|▎         | 1/32 [00:00&lt;00:11,  2.70it/s]
-  6%|▋         | 2/32 [00:00&lt;00:11,  2.63it/s]
-  9%|▉         | 3/32 [00:01&lt;00:11,  2.61it/s]
+<img src="../../_images/sphx_glr_tutorial_temperature_004.png" srcset="../../_images/sphx_glr_tutorial_temperature_004.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/32 [00:00&lt;?, ?it/s]
+  3%|▎         | 1/32 [00:00&lt;00:11,  2.68it/s]
+  6%|▋         | 2/32 [00:00&lt;00:11,  2.61it/s]
+  9%|▉         | 3/32 [00:01&lt;00:11,  2.59it/s]
  12%|█▎        | 4/32 [00:01&lt;00:10,  2.60it/s]
  16%|█▌        | 5/32 [00:01&lt;00:10,  2.60it/s]
  19%|█▉        | 6/32 [00:02&lt;00:10,  2.60it/s]
@@ -833,29 +789,29 @@ Can it continue improving the calibration of our model?</p>
  25%|██▌       | 8/32 [00:03&lt;00:09,  2.59it/s]
  28%|██▊       | 9/32 [00:03&lt;00:08,  2.59it/s]
  31%|███▏      | 10/32 [00:03&lt;00:08,  2.59it/s]
- 34%|███▍      | 11/32 [00:04&lt;00:08,  2.59it/s]
- 38%|███▊      | 12/32 [00:04&lt;00:07,  2.59it/s]
+ 34%|███▍      | 11/32 [00:04&lt;00:08,  2.58it/s]
+ 38%|███▊      | 12/32 [00:04&lt;00:07,  2.58it/s]
  41%|████      | 13/32 [00:05&lt;00:07,  2.59it/s]
  44%|████▍     | 14/32 [00:05&lt;00:06,  2.59it/s]
- 47%|████▋     | 15/32 [00:05&lt;00:06,  2.59it/s]
- 50%|█████     | 16/32 [00:06&lt;00:06,  2.59it/s]
- 53%|█████▎    | 17/32 [00:06&lt;00:05,  2.59it/s]
- 56%|█████▋    | 18/32 [00:06&lt;00:05,  2.59it/s]
- 59%|█████▉    | 19/32 [00:07&lt;00:05,  2.59it/s]
- 62%|██████▎   | 20/32 [00:07&lt;00:04,  2.59it/s]
- 66%|██████▌   | 21/32 [00:08&lt;00:04,  2.60it/s]
- 69%|██████▉   | 22/32 [00:08&lt;00:03,  2.60it/s]
- 72%|███████▏  | 23/32 [00:08&lt;00:03,  2.60it/s]
- 75%|███████▌  | 24/32 [00:09&lt;00:03,  2.59it/s]
- 78%|███████▊  | 25/32 [00:09&lt;00:02,  2.60it/s]
- 81%|████████▏ | 26/32 [00:10&lt;00:02,  2.60it/s]
- 84%|████████▍ | 27/32 [00:10&lt;00:01,  2.60it/s]
- 88%|████████▊ | 28/32 [00:10&lt;00:01,  2.60it/s]
- 91%|█████████ | 29/32 [00:11&lt;00:01,  2.60it/s]
- 94%|█████████▍| 30/32 [00:11&lt;00:00,  2.60it/s]
- 97%|█████████▋| 31/32 [00:11&lt;00:00,  2.60it/s]
-100%|██████████| 32/32 [00:12&lt;00:00,  2.66it/s]
-ECE after matrix scaling - 43.743% with average diagonal temperature 0.026.
+ 47%|████▋     | 15/32 [00:05&lt;00:06,  2.58it/s]
+ 50%|█████     | 16/32 [00:06&lt;00:06,  2.58it/s]
+ 53%|█████▎    | 17/32 [00:06&lt;00:05,  2.57it/s]
+ 56%|█████▋    | 18/32 [00:06&lt;00:05,  2.57it/s]
+ 59%|█████▉    | 19/32 [00:07&lt;00:05,  2.58it/s]
+ 62%|██████▎   | 20/32 [00:07&lt;00:04,  2.57it/s]
+ 66%|██████▌   | 21/32 [00:08&lt;00:04,  2.56it/s]
+ 69%|██████▉   | 22/32 [00:08&lt;00:03,  2.57it/s]
+ 72%|███████▏  | 23/32 [00:08&lt;00:03,  2.57it/s]
+ 75%|███████▌  | 24/32 [00:09&lt;00:03,  2.58it/s]
+ 78%|███████▊  | 25/32 [00:09&lt;00:02,  2.58it/s]
+ 81%|████████▏ | 26/32 [00:10&lt;00:02,  2.58it/s]
+ 84%|████████▍ | 27/32 [00:10&lt;00:01,  2.58it/s]
+ 88%|████████▊ | 28/32 [00:10&lt;00:01,  2.58it/s]
+ 91%|█████████ | 29/32 [00:11&lt;00:01,  2.58it/s]
+ 94%|█████████▍| 30/32 [00:11&lt;00:00,  2.58it/s]
+ 97%|█████████▋| 31/32 [00:12&lt;00:00,  2.58it/s]
+100%|██████████| 32/32 [00:12&lt;00:00,  2.65it/s]
+ECE after matrix scaling - 44.206% with average diagonal temperature 0.0175.
 </pre></div>
 </div>
 <p>Here it is a definitive no, we don’t have enough data to fit a MatrixScaler in this case.
@@ -888,47 +844,47 @@ off-diagonal matrix coefficients (lambda_reg) and bias vector (mu_reg).</p>
 <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_scaler_005.png" srcset="../../_images/sphx_glr_tutorial_scaler_005.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/32 [00:00&lt;?, ?it/s]
-  3%|▎         | 1/32 [00:00&lt;00:11,  2.67it/s]
-  6%|▋         | 2/32 [00:00&lt;00:11,  2.62it/s]
-  9%|▉         | 3/32 [00:01&lt;00:11,  2.60it/s]
- 12%|█▎        | 4/32 [00:01&lt;00:10,  2.60it/s]
- 16%|█▌        | 5/32 [00:01&lt;00:10,  2.60it/s]
- 19%|█▉        | 6/32 [00:02&lt;00:09,  2.61it/s]
- 22%|██▏       | 7/32 [00:02&lt;00:09,  2.60it/s]
- 25%|██▌       | 8/32 [00:03&lt;00:09,  2.60it/s]
- 28%|██▊       | 9/32 [00:03&lt;00:08,  2.60it/s]
- 31%|███▏      | 10/32 [00:03&lt;00:08,  2.60it/s]
- 34%|███▍      | 11/32 [00:04&lt;00:08,  2.60it/s]
- 38%|███▊      | 12/32 [00:04&lt;00:07,  2.59it/s]
- 41%|████      | 13/32 [00:04&lt;00:07,  2.60it/s]
- 44%|████▍     | 14/32 [00:05&lt;00:06,  2.59it/s]
- 47%|████▋     | 15/32 [00:05&lt;00:06,  2.59it/s]
- 50%|█████     | 16/32 [00:06&lt;00:06,  2.59it/s]
- 53%|█████▎    | 17/32 [00:06&lt;00:05,  2.60it/s]
- 56%|█████▋    | 18/32 [00:06&lt;00:05,  2.60it/s]
- 59%|█████▉    | 19/32 [00:07&lt;00:05,  2.59it/s]
- 62%|██████▎   | 20/32 [00:07&lt;00:04,  2.59it/s]
- 66%|██████▌   | 21/32 [00:08&lt;00:04,  2.60it/s]
- 69%|██████▉   | 22/32 [00:08&lt;00:03,  2.59it/s]
- 72%|███████▏  | 23/32 [00:08&lt;00:03,  2.59it/s]
- 75%|███████▌  | 24/32 [00:09&lt;00:03,  2.59it/s]
- 78%|███████▊  | 25/32 [00:09&lt;00:02,  2.59it/s]
- 81%|████████▏ | 26/32 [00:10&lt;00:02,  2.59it/s]
- 84%|████████▍ | 27/32 [00:10&lt;00:01,  2.60it/s]
- 88%|████████▊ | 28/32 [00:10&lt;00:01,  2.60it/s]
- 91%|█████████ | 29/32 [00:11&lt;00:01,  2.59it/s]
- 94%|█████████▍| 30/32 [00:11&lt;00:00,  2.60it/s]
- 97%|█████████▋| 31/32 [00:11&lt;00:00,  2.60it/s]
-100%|██████████| 32/32 [00:12&lt;00:00,  2.66it/s]
-ECE after Dirichlet calibration - 18.044%.
+<img src="../../_images/sphx_glr_tutorial_temperature_005.png" srcset="../../_images/sphx_glr_tutorial_temperature_005.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/32 [00:00&lt;?, ?it/s]
+  3%|▎         | 1/32 [00:00&lt;00:11,  2.73it/s]
+  6%|▋         | 2/32 [00:00&lt;00:11,  2.66it/s]
+  9%|▉         | 3/32 [00:01&lt;00:10,  2.64it/s]
+ 12%|█▎        | 4/32 [00:01&lt;00:10,  2.63it/s]
+ 16%|█▌        | 5/32 [00:01&lt;00:10,  2.62it/s]
+ 19%|█▉        | 6/32 [00:02&lt;00:09,  2.62it/s]
+ 22%|██▏       | 7/32 [00:02&lt;00:09,  2.62it/s]
+ 25%|██▌       | 8/32 [00:03&lt;00:09,  2.62it/s]
+ 28%|██▊       | 9/32 [00:03&lt;00:08,  2.62it/s]
+ 31%|███▏      | 10/32 [00:03&lt;00:08,  2.62it/s]
+ 34%|███▍      | 11/32 [00:04&lt;00:08,  2.62it/s]
+ 38%|███▊      | 12/32 [00:04&lt;00:07,  2.61it/s]
+ 41%|████      | 13/32 [00:04&lt;00:07,  2.61it/s]
+ 44%|████▍     | 14/32 [00:05&lt;00:06,  2.61it/s]
+ 47%|████▋     | 15/32 [00:05&lt;00:06,  2.61it/s]
+ 50%|█████     | 16/32 [00:06&lt;00:06,  2.61it/s]
+ 53%|█████▎    | 17/32 [00:06&lt;00:05,  2.61it/s]
+ 56%|█████▋    | 18/32 [00:06&lt;00:05,  2.61it/s]
+ 59%|█████▉    | 19/32 [00:07&lt;00:04,  2.61it/s]
+ 62%|██████▎   | 20/32 [00:07&lt;00:04,  2.61it/s]
+ 66%|██████▌   | 21/32 [00:08&lt;00:04,  2.61it/s]
+ 69%|██████▉   | 22/32 [00:08&lt;00:03,  2.61it/s]
+ 72%|███████▏  | 23/32 [00:08&lt;00:03,  2.61it/s]
+ 75%|███████▌  | 24/32 [00:09&lt;00:03,  2.61it/s]
+ 78%|███████▊  | 25/32 [00:09&lt;00:02,  2.61it/s]
+ 81%|████████▏ | 26/32 [00:09&lt;00:02,  2.61it/s]
+ 84%|████████▍ | 27/32 [00:10&lt;00:01,  2.61it/s]
+ 88%|████████▊ | 28/32 [00:10&lt;00:01,  2.61it/s]
+ 91%|█████████ | 29/32 [00:11&lt;00:01,  2.61it/s]
+ 94%|█████████▍| 30/32 [00:11&lt;00:00,  2.61it/s]
+ 97%|█████████▋| 31/32 [00:11&lt;00:00,  2.61it/s]
+100%|██████████| 32/32 [00:11&lt;00:00,  2.68it/s]
+ECE after Dirichlet calibration - 16.906%.
 </pre></div>
 </div>
-<p>The results are somewhat better than MatrixScaling, but we again do not have enough data to
-tune the parameters of Dirichlet scaling.</p>
+<p>The results are somewhat better than MatrixScaling, but we again likely do not have enough data to
+correclty tune the parameters of Dirichlet scaling.</p>
 </section>
-<section id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading">#</a></h2>
+<section id="remark">
+<h2>Remark<a class="headerlink" href="#remark" title="Link to this heading">#</a></h2>
 <p>Temperature scaling is very efficient when the calibration set is representative of the test set.
 In this case, we say that the calibration and test set are drawn from the same distribution.
 However, this may not hold true in real-world cases where dataset shift could happen.</p>
@@ -938,16 +894,16 @@ However, this may not hold true in real-world cases where dataset shift could ha
 <li><p><strong>Expected Calibration Error:</strong> Naeini, M. P., Cooper, G. F., &amp; Hauskrecht, M. (2015). Obtaining Well Calibrated Probabilities Using Bayesian Binning. In <a class="reference external" href="https://arxiv.org/pdf/1411.0160.pdf">AAAI 2015</a>.</p></li>
 <li><p><strong>Temperature Scaling:</strong> Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. (2017). On calibration of modern neural networks. In <a class="reference external" href="https://arxiv.org/pdf/1706.04599.pdf">ICML 2017</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (2 minutes 22.816 seconds)</p>
-<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-post-hoc-methods-tutorial-scaler-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (2 minutes 24.360 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-post-hoc-methods-tutorial-temperature-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/e49b61c049b24568b49b8b662e1434ef/tutorial_scaler.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_scaler.ipynb</span></code></a></p>
+<p><a class="reference download internal" download="" href="../../_downloads/ed988239070717beaca209a5fe47d51b/tutorial_temperature.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_temperature.ipynb</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/df3f2bce6e9525475e905756bef1935f/tutorial_scaler.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_scaler.py</span></code></a></p>
+<p><a class="reference download internal" download="" href="../../_downloads/fa073e716d75d063542ba9aec846942b/tutorial_temperature.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_temperature.py</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-zip docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/f069aa5125941cb41fbd7adac4facc0c/tutorial_scaler.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">tutorial_scaler.zip</span></code></a></p>
+<p><a class="reference download internal" download="" href="../../_downloads/3c2edbe3fcbfabc194dc5deb324fe85c/tutorial_temperature.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">tutorial_temperature.zip</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -966,12 +922,12 @@ However, this may not hold true in real-world cases where dataset shift could ha
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="tutorial_conformal.html"
+       href="tutorial_scalers.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Conformal Prediction on CIFAR-10 with TorchUncertainty</p>
+        <p class="prev-next-title">Histogram Binning, Isotonic Regression, and BBQ tutorial</p>
       </div>
     </a>
     <a class="right-next"
@@ -1002,6 +958,7 @@ However, this may not hold true in real-world cases where dataset shift could ha
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#note">Note:</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-the-utilities">1. Loading the Utilities</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-a-model-from-torchuncertainty-s-hf">2. Loading a model from TorchUncertainty’s HF</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-the-datamodule-and-dataloaders">3. Setting up the Datamodule and Dataloaders</a></li>
@@ -1011,7 +968,7 @@ However, this may not hold true in real-world cases where dataset shift could ha
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-about-vector-scaling">7. What about Vector Scaling?</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-about-matrix-scaling">8. What about Matrix Scaling?</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#can-dirichlet-calibration-help">9. Can Dirichlet Calibration help?</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes">Notes</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#remark">Remark</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
 </ul>
 </li>
@@ -1022,7 +979,7 @@ However, this may not hold true in real-world cases where dataset shift could ha
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../../_sources/auto_tutorials/Post_Hoc_Methods/tutorial_scaler.rst.txt"
+      <li><a href="../../_sources/auto_tutorials/Post_Hoc_Methods/tutorial_temperature.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

@@ -276,6 +276,8 @@ Calibration
     
     AdaptiveCalibrationError
     CalibrationError
+    SmoothCalibrationError
+    ClasswiseCalibrationError
 
 Conformal Predictions
 """""""""""""""""""""
@@ -416,6 +418,7 @@ Scaling Methods
     VectorScaler
     MatrixScaler
     DirichletScaler
+    IsotonicRegressionScaler
 
 
 Conformal Methods

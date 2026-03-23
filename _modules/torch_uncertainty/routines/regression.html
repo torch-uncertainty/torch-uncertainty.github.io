@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>torch_uncertainty.routines.regression &#8212; TorchUncertainty 0.10.4 documentation</title>
+    <title>torch_uncertainty.routines.regression &#8212; TorchUncertainty 0.11.0 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=7e173fe4"></script>
+    <script src="../../../_static/documentation_options.js?v=f3b36f1a"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -446,7 +446,6 @@
     <span class="n">Distribution</span><span class="p">,</span>
     <span class="n">Independent</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optimizer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.flop_counter</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlopCounterMode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeanAbsoluteError</span><span class="p">,</span> <span class="n">MeanSquaredError</span><span class="p">,</span> <span class="n">MetricCollection</span>
 
@@ -461,6 +460,7 @@
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">csv_writer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.utils.distributions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DistEstimate</span><span class="p">,</span>
     <span class="n">get_dist_class</span><span class="p">,</span>
     <span class="n">get_dist_estimate</span><span class="p">,</span>
 <span class="p">)</span>
@@ -478,10 +478,10 @@
         <span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">loss</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">dist_family</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">dist_estimate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
+        <span class="n">dist_estimate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">DistEstimate</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">is_ensemble</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">optim_recipe</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">Optimizer</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">optim_recipe</span><span class="p">:</span> <span class="n">OptimizerLRScheduler</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">eval_shift</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">format_batch_fn</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">log_plots</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -497,9 +497,9 @@
 <span class="sd">            loss (torch.nn.Module): Loss function to optimize the :attr:`model`.</span>
 <span class="sd">                Defaults to ``None``.</span>
 <span class="sd">            dist_family (str, optional): The distribution family to use for probabilistic regression. If ``None`` then point-wise regression. Defaults to ``None``.</span>
-<span class="sd">            dist_estimate (str, optional): The estimate to use when computing the point-wise metrics. Defaults to ``&quot;mean&quot;``.</span>
+<span class="sd">            dist_estimate (str | DistEstimate, optional): The estimate to use when computing the point-wise metrics. Defaults to ``&quot;mean&quot;``.</span>
 <span class="sd">            is_ensemble (bool, optional): Whether the model is an ensemble. Defaults to ``False``.</span>
-<span class="sd">            optim_recipe (dict or torch.optim.Optimizer, optional): The optimizer and optionally the scheduler to use. Defaults to ``None``.</span>
+<span class="sd">            optim_recipe (OptimizerLRScheduler, optional): The optimizer and optionally the scheduler to use. Defaults to ``None``.</span>
 <span class="sd">            eval_shift (bool, optional): Indicates whether to evaluate the Distribution shift performance. Defaults to ``False``.</span>
 <span class="sd">            format_batch_fn (torch.nn.Module, optional): The function to format the batch. Defaults to ``None``.</span>
 <span class="sd">            log_plots (bool, optional): Indicates whether to log figures in the logger.</span>
@@ -532,7 +532,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dist_family</span> <span class="o">=</span> <span class="n">dist_family</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dist_estimate</span> <span class="o">=</span> <span class="n">dist_estimate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist_estimate</span> <span class="o">=</span> <span class="n">DistEstimate</span><span class="p">(</span><span class="n">dist_estimate</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">probabilistic</span> <span class="o">=</span> <span class="n">dist_family</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span> <span class="o">=</span> <span class="n">output_dim</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span>
@@ -547,8 +547,7 @@
         <span class="k">if</span> <span class="n">format_batch_fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">format_batch_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">is_elbo</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">ELBOLoss</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_elbo</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">ELBOLoss</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">optim_recipe</span> <span class="o">=</span> <span class="n">optim_recipe</span>
@@ -672,6 +671,11 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: the loss corresponding to this training step.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;To train a model, you must specify the `loss` argument in the routine. Got None.&quot;</span>
+            <span class="p">)</span>
+
         <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_batch_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">one_dim_regression</span><span class="p">:</span>

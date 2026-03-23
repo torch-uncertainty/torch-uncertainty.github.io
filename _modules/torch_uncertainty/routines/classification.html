@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>torch_uncertainty.routines.classification &#8212; TorchUncertainty 0.10.4 documentation</title>
+    <title>torch_uncertainty.routines.classification &#8212; TorchUncertainty 0.11.0 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=7e173fe4"></script>
+    <script src="../../../_static/documentation_options.js?v=f3b36f1a"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -444,7 +444,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">lightning.pytorch.loggers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">lightning.pytorch.utilities.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">STEP_OUTPUT</span><span class="p">,</span> <span class="n">OptimizerLRScheduler</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optimizer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.flop_counter</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlopCounterMode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">Accuracy</span><span class="p">,</span> <span class="n">MetricCollection</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.classification</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -468,6 +467,7 @@
     <span class="n">MutualInformation</span><span class="p">,</span>
     <span class="n">RiskAt80Cov</span><span class="p">,</span>
     <span class="n">SetSize</span><span class="p">,</span>
+    <span class="n">SmoothCalibrationError</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">EPOCH_UPDATE_MODEL</span><span class="p">,</span>
@@ -499,7 +499,7 @@
         <span class="n">is_ensemble</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">num_tta</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">format_batch_fn</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">optim_recipe</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">Optimizer</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">optim_recipe</span><span class="p">:</span> <span class="n">OptimizerLRScheduler</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">mixup_params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">eval_ood</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">eval_shift</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -524,7 +524,7 @@
 <span class="sd">                Defaults to ``1``.</span>
 <span class="sd">            format_batch_fn (torch.nn.Module, optional): Function to format the batch.</span>
 <span class="sd">                Defaults to ``None``.</span>
-<span class="sd">            optim_recipe (dict or torch.optim.Optimizer, optional): The optimizer and</span>
+<span class="sd">            optim_recipe (OptimizerLRScheduler, optional): The optimizer and</span>
 <span class="sd">                optionally the scheduler to use. Defaults to ``None``.</span>
 <span class="sd">            mixup_params (dict, optional): Mixup parameters. Can include mixup type,</span>
 <span class="sd">                mixup mode, distance similarity, kernel tau max, kernel tau std,</span>
@@ -616,9 +616,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_metrics</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mixup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_mixup</span><span class="p">(</span><span class="n">mixup_params</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">is_elbo</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">ELBOLoss</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_elbo</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">ELBOLoss</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">set_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">is_dec</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">DECLoss</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">id_score_storage</span> <span class="o">=</span> <span class="kc">None</span>
@@ -637,12 +637,19 @@
                 <span class="n">num_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bins_calibration_error</span><span class="p">,</span>
                 <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
             <span class="p">),</span>
+            <span class="s2">&quot;cal/MCE&quot;</span><span class="p">:</span> <span class="n">CalibrationError</span><span class="p">(</span>
+                <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+                <span class="n">num_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bins_calibration_error</span><span class="p">,</span>
+                <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+                <span class="n">norm</span><span class="o">=</span><span class="s2">&quot;max&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
             <span class="s2">&quot;cal/aECE&quot;</span><span class="p">:</span> <span class="n">CalibrationError</span><span class="p">(</span>
                 <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
                 <span class="n">adaptive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">num_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bins_calibration_error</span><span class="p">,</span>
                 <span class="n">num_classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
             <span class="p">),</span>
+            <span class="s2">&quot;cal/SmECE&quot;</span><span class="p">:</span> <span class="n">SmoothCalibrationError</span><span class="p">(),</span>
             <span class="s2">&quot;sc/AURC&quot;</span><span class="p">:</span> <span class="n">AURC</span><span class="p">(),</span>
             <span class="s2">&quot;sc/AUGRC&quot;</span><span class="p">:</span> <span class="n">AUGRC</span><span class="p">(),</span>
             <span class="s2">&quot;sc/Cov@5Risk&quot;</span><span class="p">:</span> <span class="n">CovAt5Risk</span><span class="p">(),</span>
@@ -652,7 +659,7 @@
             <span class="p">[</span><span class="s2">&quot;cls/Acc&quot;</span><span class="p">],</span>
             <span class="p">[</span><span class="s2">&quot;cls/Brier&quot;</span><span class="p">],</span>
             <span class="p">[</span><span class="s2">&quot;cls/NLL&quot;</span><span class="p">],</span>
-            <span class="p">[</span><span class="s2">&quot;cal/ECE&quot;</span><span class="p">,</span> <span class="s2">&quot;cal/aECE&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;cal/ECE&quot;</span><span class="p">,</span> <span class="s2">&quot;cal/SmECE&quot;</span><span class="p">,</span> <span class="s2">&quot;cal/MCE&quot;</span><span class="p">,</span> <span class="s2">&quot;cal/aECE&quot;</span><span class="p">],</span>
             <span class="p">[</span><span class="s2">&quot;sc/AURC&quot;</span><span class="p">,</span> <span class="s2">&quot;sc/AUGRC&quot;</span><span class="p">,</span> <span class="s2">&quot;sc/Cov@5Risk&quot;</span><span class="p">,</span> <span class="s2">&quot;sc/Risk@80Cov&quot;</span><span class="p">],</span>
         <span class="p">]</span>
 
@@ -766,9 +773,7 @@
                 <span class="s2">&quot;To train a model, you must specify the `loss` argument in the routine. Got None.&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log_hyperparams</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="p">,</span>
-            <span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log_hyperparams</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ClassificationRoutine.on_validation_start">
@@ -843,10 +848,15 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: the loss corresponding to this training step.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;To train a model, you must specify the `loss` argument in the routine. Got None.&quot;</span>
+            <span class="p">)</span>
+
         <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_mixup</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
         <span class="n">inputs</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_batch_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_elbo</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">ELBOLoss</span><span class="p">):</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>

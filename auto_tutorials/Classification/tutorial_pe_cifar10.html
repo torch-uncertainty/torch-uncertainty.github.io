@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>From a Standard Classifier to a Packed-Ensemble &#8212; TorchUncertainty 0.10.4 documentation</title>
+    <title>From a Standard Classifier to a Packed-Ensemble &#8212; TorchUncertainty 0.11.0 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=7e173fe4"></script>
+    <script src="../../_static/documentation_options.js?v=f3b36f1a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -397,7 +397,8 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Post_Hoc_Methods/index.html">Post-hoc Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scaler.html">Improve Top-label Calibration with Temperature Scaling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scalers.html">Histogram Binning, Isotonic Regression, and BBQ tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_temperature.html">Improve Top-label Calibration with Temperature Scaling</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Bayesian_Methods/index.html">Bayesian Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -604,7 +605,7 @@ the num_worker of torch.utils.data.DataLoader() to 0.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">classes</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s2">5s</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_pe_cifar10_001.png" srcset="../../_images/sphx_glr_tutorial_pe_cifar10_001.png" alt="tutorial pe cifar10" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>bird  car   dog   frog
+<img src="../../_images/sphx_glr_tutorial_pe_cifar10_001.png" srcset="../../_images/sphx_glr_tutorial_pe_cifar10_001.png" alt="tutorial pe cifar10" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>frog  bird  bird  dog
 </pre></div>
 </div>
 </section>
@@ -720,33 +721,33 @@ parameters <span class="math notranslate nohighlight">\(M=4,\ \alpha=2\text{ and
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finished Training&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1,    20] loss: 3.383
-[1,    40] loss: 2.593
-[1,    60] loss: 2.316
-[1,    80] loss: 2.178
-[1,   100] loss: 2.067
-[1,   120] loss: 1.992
-[1,   140] loss: 1.925
-[1,   160] loss: 1.851
-[1,   180] loss: 1.809
-[2,    20] loss: 1.764
-[2,    40] loss: 1.700
-[2,    60] loss: 1.690
-[2,    80] loss: 1.678
-[2,   100] loss: 1.676
-[2,   120] loss: 1.630
-[2,   140] loss: 1.604
-[2,   160] loss: 1.588
-[2,   180] loss: 1.589
-[3,    20] loss: 1.567
-[3,    40] loss: 1.543
-[3,    60] loss: 1.543
-[3,    80] loss: 1.531
-[3,   100] loss: 1.531
-[3,   120] loss: 1.535
-[3,   140] loss: 1.526
-[3,   160] loss: 1.504
-[3,   180] loss: 1.511
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1,    20] loss: 3.341
+[1,    40] loss: 2.582
+[1,    60] loss: 2.339
+[1,    80] loss: 2.209
+[1,   100] loss: 2.069
+[1,   120] loss: 1.993
+[1,   140] loss: 1.879
+[1,   160] loss: 1.820
+[1,   180] loss: 1.805
+[2,    20] loss: 1.708
+[2,    40] loss: 1.684
+[2,    60] loss: 1.646
+[2,    80] loss: 1.654
+[2,   100] loss: 1.605
+[2,   120] loss: 1.620
+[2,   140] loss: 1.564
+[2,   160] loss: 1.559
+[2,   180] loss: 1.551
+[3,    20] loss: 1.551
+[3,    40] loss: 1.523
+[3,    60] loss: 1.509
+[3,    80] loss: 1.535
+[3,   100] loss: 1.519
+[3,   120] loss: 1.502
+[3,   140] loss: 1.510
+[3,   160] loss: 1.494
+[3,   180] loss: 1.489
 Finished Training
 </pre></div>
 </div>
@@ -796,11 +797,11 @@ model wasn’t necessary here, we only did it to illustrate how to do so):</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Predicted:  frog  car   car   car   frog  frog
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Predicted:  cat   ship  car   ship  deer  frog
 </pre></div>
 </div>
 <p>The results seem pretty good.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 10.817 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 10.660 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-classification-tutorial-pe-cifar10-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/d5efdc6f5c8cd00f1c1d9b51348028cc/tutorial_pe_cifar10.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_pe_cifar10.ipynb</span></code></a></p>

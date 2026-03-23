@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Deep Probabilistic Regression &#8212; TorchUncertainty 0.10.4 documentation</title>
+    <title>Deep Probabilistic Regression &#8212; TorchUncertainty 0.11.0 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=7e173fe4"></script>
+    <script src="../../_static/documentation_options.js?v=f3b36f1a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -395,7 +395,8 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Post_Hoc_Methods/index.html">Post-hoc Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scaler.html">Improve Top-label Calibration with Temperature Scaling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scalers.html">Histogram Binning, Isotonic Regression, and BBQ tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_temperature.html">Improve Top-label Calibration with Temperature Scaling</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Bayesian_Methods/index.html">Bayesian Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -607,10 +608,9 @@ lower is better.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/1.13M [00:00&lt;?, ?B/s]
- 14%|█▍        | 164k/1.13M [00:00&lt;00:00, 1.45MB/s]
- 35%|███▍      | 393k/1.13M [00:00&lt;00:00, 1.90MB/s]
- 81%|████████  | 918k/1.13M [00:00&lt;00:00, 3.33MB/s]
-100%|██████████| 1.13M/1.13M [00:00&lt;00:00, 3.31MB/s]
+ 20%|██        | 229k/1.13M [00:00&lt;00:00, 2.25MB/s]
+ 58%|█████▊    | 655k/1.13M [00:00&lt;00:00, 3.35MB/s]
+100%|██████████| 1.13M/1.13M [00:00&lt;00:00, 4.21MB/s]
 ┏━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
 ┃   ┃ Name              ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
 ┡━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
@@ -632,15 +632,15 @@ Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Regression         ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     MAE      │          0.30948          │
-│     MSE      │          0.16165          │
-│     NLL      │          0.43979          │
-│     RMSE     │          0.40206          │
+│     MAE      │          0.26912          │
+│     MSE      │          0.12501          │
+│     NLL      │          0.33182          │
+│     RMSE     │          0.35357          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     QCE      │          0.04804          │
+│     QCE      │          0.04399          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -709,15 +709,15 @@ is not defined for the Cauchy distribution.</p>
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Regression         ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     MAE      │          0.27936          │
-│     MSE      │          0.13339          │
-│     NLL      │          0.39848          │
-│     RMSE     │          0.36523          │
+│     MAE      │          0.27538          │
+│     MSE      │          0.13878          │
+│     NLL      │          0.36297          │
+│     RMSE     │          0.37254          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     QCE      │          0.04205          │
+│     QCE      │          0.03347          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -731,15 +731,15 @@ is not defined for the Cauchy distribution.</p>
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Regression         ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     MAE      │          0.27458          │
-│     MSE      │          0.13640          │
-│     NLL      │          0.37148          │
-│     RMSE     │          0.36933          │
+│     MAE      │          0.28677          │
+│     MSE      │          0.14513          │
+│     NLL      │          0.44995          │
+│     RMSE     │          0.38095          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     QCE      │          0.02867          │
+│     QCE      │          0.05147          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -753,15 +753,15 @@ is not defined for the Cauchy distribution.</p>
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Regression         ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     MAE      │          0.32995          │
-│     MSE      │          0.18913          │
-│     NLL      │          0.71198          │
-│     RMSE     │          0.43489          │
+│     MAE      │          0.33977          │
+│     MSE      │          0.20384          │
+│     NLL      │          0.75715          │
+│     RMSE     │          0.45148          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     QCE      │          0.08269          │
+│     QCE      │          0.09108          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -775,7 +775,7 @@ is not defined for the Cauchy distribution.</p>
 distributions, evaluating both the correctness of the mode (the point prediction) and of the predicted uncertainty
 around the mode (“represented” by the variance). Although there is a lot of variability, in this case, it seems that
 the Normal distribution often performs better.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 9.215 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 8.518 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-regression-tutorial-probabilistic-regression-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/f1a7f1b23be708d34143b90b09e5673a/tutorial_probabilistic_regression.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_probabilistic_regression.ipynb</span></code></a></p>

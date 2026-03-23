@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Monte Carlo Dropout for Semantic Segmentation on MUAD &#8212; TorchUncertainty 0.10.4 documentation</title>
+    <title>Monte Carlo Dropout for Semantic Segmentation on MUAD &#8212; TorchUncertainty 0.11.0 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=7e173fe4"></script>
+    <script src="../../_static/documentation_options.js?v=f3b36f1a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -395,7 +395,8 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Post_Hoc_Methods/index.html">Post-hoc Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scaler.html">Improve Top-label Calibration with Temperature Scaling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scalers.html">Histogram Binning, Isotonic Regression, and BBQ tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_temperature.html">Improve Top-label Calibration with Temperature Scaling</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Bayesian Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -726,7 +727,7 @@ Trainable params: 4.3 M
 Non-trainable params: 0
 Total params: 4.3 M
 Total estimated model params size (MB): 17
-Modules in train mode: 125
+Modules in train mode: 129
 Modules in eval mode: 0
 Total FLOPs: 0
 </pre></div>
@@ -740,25 +741,27 @@ Total FLOPs: 0
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.67319          │
-│     NLL      │          1.70461          │
-│     mAcc     │          23.573%          │
-│     mIoU     │          15.756%          │
-│    pixAcc    │          58.209%          │
+│    Brier     │          0.66498          │
+│     NLL      │          1.65956          │
+│     mAcc     │          24.875%          │
+│     mIoU     │          16.004%          │
+│    pixAcc    │          52.207%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          23.085%          │
-│     aECE     │          23.048%          │
+│     ECE      │          18.374%          │
+│     MCE      │          33.543%          │
+│    SmECE     │          18.373%          │
+│     aECE     │          18.373%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          17.489%          │
-│     AURC     │          30.761%          │
+│    AUGRC     │          18.273%          │
+│     AURC     │          28.595%          │
 │  Cov@5Risk   │           nan%            │
-│  Risk@80Cov  │          36.212%          │
+│  Risk@80Cov  │          41.589%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -783,8 +786,8 @@ Total FLOPs: 0
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.20521          │
-│     NLL      │          0.39987          │
+│    Brier     │          0.20703          │
+│     NLL      │          0.40285          │
 │     mAcc     │          68.772%          │
 │     mIoU     │          50.739%          │
 │    pixAcc    │          85.701%          │
@@ -792,16 +795,18 @@ Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          1.620%           │
-│     aECE     │          1.689%           │
+│     ECE      │          1.658%           │
+│     MCE      │          7.369%           │
+│    SmECE     │          1.809%           │
+│     aECE     │          1.773%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          2.706%           │
-│     AURC     │          3.332%           │
-│  Cov@5Risk   │          72.332%          │
-│  Risk@80Cov  │          7.043%           │
+│    AUGRC     │          2.748%           │
+│     AURC     │          3.388%           │
+│  Cov@5Risk   │          72.031%          │
+│  Risk@80Cov  │          7.187%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -894,25 +899,27 @@ allow us to have a better confidence score by using the dropout during test time
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.20398          │
-│     NLL      │          0.39911          │
-│     mAcc     │          68.289%          │
-│     mIoU     │          50.720%          │
-│    pixAcc    │          85.817%          │
+│    Brier     │          0.20302          │
+│     NLL      │          0.39777          │
+│     mAcc     │          68.414%          │
+│     mIoU     │          50.884%          │
+│    pixAcc    │          85.766%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          2.815%           │
-│     aECE     │          2.815%           │
+│     ECE      │          2.873%           │
+│     MCE      │          7.356%           │
+│    SmECE     │          2.871%           │
+│     aECE     │          2.873%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          2.668%           │
-│     AURC     │          3.279%           │
-│  Cov@5Risk   │          72.701%          │
-│  Risk@80Cov  │          6.862%           │
+│    AUGRC     │          2.645%           │
+│     AURC     │          3.253%           │
+│  Cov@5Risk   │          73.238%          │
+│  Risk@80Cov  │          6.888%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -976,7 +983,7 @@ of the different estimators.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" srcset="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" alt="tutorial muad mc drop" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 54.602 seconds)</p>
+<img src="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" srcset="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" alt="tutorial muad mc drop" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 54.727 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-bayesian-methods-tutorial-muad-mc-drop-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/3cc96ba0ee86ad145779685dc1a694fe/tutorial_muad_mc_drop.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_muad_mc_drop.ipynb</span></code></a></p>
