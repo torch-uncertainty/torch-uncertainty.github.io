@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Histogram Binning, Isotonic Regression, and BBQ tutorial &#8212; TorchUncertainty 0.11.0 documentation</title>
+    <title>Histogram Binning, Isotonic Regression, and BBQ tutorial &#8212; TorchUncertainty Docs</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -40,10 +40,10 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
 
     <script src="../../_static/documentation_options.js?v=f3b36f1a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
@@ -52,6 +52,8 @@
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'auto_tutorials/Post_Hoc_Methods/tutorial_scalers';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Improve Top-label Calibration with Temperature Scaling" href="tutorial_temperature.html" />
@@ -59,14 +61,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
@@ -98,7 +104,7 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -375,6 +381,7 @@
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
+
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
@@ -550,58 +557,51 @@ into a calibration subset and a held-out test subset for reliable ECE computatio
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/169M [00:00&lt;?, ?B/s]
-  0%|          | 65.5k/169M [00:00&lt;07:31, 374kB/s]
-  0%|          | 197k/169M [00:00&lt;03:37, 777kB/s]
-  0%|          | 393k/169M [00:00&lt;02:39, 1.06MB/s]
-  1%|          | 852k/169M [00:00&lt;01:17, 2.17MB/s]
-  1%|          | 1.38M/169M [00:00&lt;00:53, 3.11MB/s]
-  1%|▏         | 2.16M/169M [00:00&lt;00:40, 4.14MB/s]
-  2%|▏         | 3.51M/169M [00:00&lt;00:24, 6.75MB/s]
-  3%|▎         | 5.47M/169M [00:00&lt;00:15, 10.5MB/s]
-  5%|▍         | 7.63M/169M [00:01&lt;00:11, 13.6MB/s]
-  7%|▋         | 11.1M/169M [00:01&lt;00:08, 19.7MB/s]
-  8%|▊         | 14.0M/169M [00:01&lt;00:06, 22.6MB/s]
- 10%|█         | 17.3M/169M [00:01&lt;00:05, 25.4MB/s]
- 12%|█▏        | 20.4M/169M [00:01&lt;00:05, 27.2MB/s]
- 14%|█▍        | 23.6M/169M [00:01&lt;00:05, 28.5MB/s]
- 16%|█▌        | 26.7M/169M [00:01&lt;00:04, 29.0MB/s]
- 18%|█▊        | 30.0M/169M [00:01&lt;00:04, 30.3MB/s]
- 20%|█▉        | 33.2M/169M [00:01&lt;00:04, 30.6MB/s]
- 21%|██▏       | 36.3M/169M [00:01&lt;00:04, 30.7MB/s]
- 24%|██▎       | 39.9M/169M [00:02&lt;00:03, 32.4MB/s]
- 26%|██▌       | 43.2M/169M [00:02&lt;00:04, 31.2MB/s]
- 28%|██▊       | 46.6M/169M [00:02&lt;00:03, 31.8MB/s]
- 29%|██▉       | 49.8M/169M [00:02&lt;00:03, 31.6MB/s]
- 32%|███▏      | 53.2M/169M [00:02&lt;00:03, 31.5MB/s]
- 34%|███▎      | 56.9M/169M [00:02&lt;00:03, 32.8MB/s]
- 36%|███▌      | 60.4M/169M [00:02&lt;00:03, 32.5MB/s]
- 38%|███▊      | 64.1M/169M [00:02&lt;00:03, 33.7MB/s]
- 40%|████      | 67.8M/169M [00:02&lt;00:03, 32.4MB/s]
- 42%|████▏     | 71.4M/169M [00:03&lt;00:02, 33.2MB/s]
- 44%|████▍     | 75.1M/169M [00:03&lt;00:02, 33.2MB/s]
- 47%|████▋     | 78.8M/169M [00:03&lt;00:02, 34.2MB/s]
- 49%|████▉     | 82.5M/169M [00:03&lt;00:02, 33.0MB/s]
- 52%|█████▏    | 87.1M/169M [00:03&lt;00:02, 36.4MB/s]
- 54%|█████▎    | 90.8M/169M [00:03&lt;00:02, 34.9MB/s]
- 56%|█████▋    | 95.3M/169M [00:03&lt;00:01, 37.8MB/s]
- 59%|█████▊    | 99.1M/169M [00:03&lt;00:01, 35.3MB/s]
- 61%|██████    | 103M/169M [00:03&lt;00:01, 35.0MB/s]
- 64%|██████▍   | 108M/169M [00:04&lt;00:01, 37.8MB/s]
- 66%|██████▌   | 112M/169M [00:04&lt;00:01, 35.4MB/s]
- 69%|██████▊   | 116M/169M [00:04&lt;00:01, 35.4MB/s]
- 71%|███████▏  | 121M/169M [00:04&lt;00:01, 38.3MB/s]
- 74%|███████▍  | 125M/169M [00:04&lt;00:01, 35.8MB/s]
- 76%|███████▌  | 129M/169M [00:04&lt;00:01, 35.3MB/s]
- 79%|███████▉  | 134M/169M [00:04&lt;00:00, 38.3MB/s]
- 81%|████████▏ | 137M/169M [00:04&lt;00:00, 35.9MB/s]
- 84%|████████▍ | 142M/169M [00:04&lt;00:00, 35.2MB/s]
- 87%|████████▋ | 146M/169M [00:05&lt;00:00, 38.1MB/s]
- 89%|████████▉ | 150M/169M [00:05&lt;00:00, 35.7MB/s]
- 91%|█████████▏| 154M/169M [00:05&lt;00:00, 35.4MB/s]
- 94%|█████████▍| 159M/169M [00:05&lt;00:00, 38.4MB/s]
- 96%|█████████▋| 163M/169M [00:05&lt;00:00, 36.0MB/s]
- 99%|█████████▉| 167M/169M [00:05&lt;00:00, 35.3MB/s]
-100%|██████████| 169M/169M [00:05&lt;00:00, 29.4MB/s]
+  0%|          | 65.5k/169M [00:00&lt;06:56, 406kB/s]
+  0%|          | 197k/169M [00:00&lt;04:20, 647kB/s]
+  0%|          | 786k/169M [00:00&lt;01:14, 2.25MB/s]
+  1%|          | 1.67M/169M [00:00&lt;00:41, 4.08MB/s]
+  3%|▎         | 4.52M/169M [00:00&lt;00:14, 11.3MB/s]
+  5%|▌         | 8.81M/169M [00:00&lt;00:07, 20.7MB/s]
+  7%|▋         | 12.4M/169M [00:00&lt;00:06, 25.2MB/s]
+  9%|▉         | 15.7M/169M [00:00&lt;00:05, 26.0MB/s]
+ 12%|█▏        | 20.4M/169M [00:01&lt;00:04, 31.2MB/s]
+ 15%|█▍        | 25.2M/169M [00:01&lt;00:04, 31.8MB/s]
+ 18%|█▊        | 29.9M/169M [00:01&lt;00:03, 35.8MB/s]
+ 20%|██        | 33.9M/169M [00:01&lt;00:03, 36.9MB/s]
+ 23%|██▎       | 38.1M/169M [00:01&lt;00:03, 34.4MB/s]
+ 25%|██▍       | 42.2M/169M [00:01&lt;00:03, 36.2MB/s]
+ 28%|██▊       | 46.7M/169M [00:01&lt;00:03, 38.4MB/s]
+ 30%|██▉       | 50.7M/169M [00:01&lt;00:03, 34.9MB/s]
+ 33%|███▎      | 55.5M/169M [00:02&lt;00:02, 37.9MB/s]
+ 36%|███▌      | 60.2M/169M [00:02&lt;00:03, 35.8MB/s]
+ 38%|███▊      | 65.0M/169M [00:02&lt;00:02, 37.6MB/s]
+ 41%|████      | 69.6M/169M [00:02&lt;00:02, 36.1MB/s]
+ 44%|████▍     | 74.3M/169M [00:02&lt;00:02, 37.4MB/s]
+ 47%|████▋     | 78.7M/169M [00:02&lt;00:02, 39.2MB/s]
+ 49%|████▉     | 82.7M/169M [00:02&lt;00:02, 36.6MB/s]
+ 51%|█████▏    | 87.0M/169M [00:02&lt;00:02, 36.7MB/s]
+ 54%|█████▍    | 90.9M/169M [00:02&lt;00:02, 37.4MB/s]
+ 56%|█████▌    | 94.8M/169M [00:03&lt;00:02, 36.1MB/s]
+ 59%|█████▉    | 99.3M/169M [00:03&lt;00:01, 35.7MB/s]
+ 61%|██████    | 103M/169M [00:03&lt;00:01, 35.7MB/s]
+ 63%|██████▎   | 107M/169M [00:03&lt;00:01, 34.8MB/s]
+ 66%|██████▌   | 111M/169M [00:03&lt;00:01, 36.6MB/s]
+ 68%|██████▊   | 115M/169M [00:03&lt;00:01, 35.6MB/s]
+ 70%|███████   | 119M/169M [00:03&lt;00:01, 36.7MB/s]
+ 72%|███████▏  | 122M/169M [00:03&lt;00:01, 35.5MB/s]
+ 75%|███████▍  | 126M/169M [00:03&lt;00:01, 36.9MB/s]
+ 77%|███████▋  | 130M/169M [00:04&lt;00:01, 36.2MB/s]
+ 79%|███████▉  | 134M/169M [00:04&lt;00:00, 37.4MB/s]
+ 82%|████████▏ | 138M/169M [00:04&lt;00:00, 36.1MB/s]
+ 84%|████████▍ | 142M/169M [00:04&lt;00:00, 38.2MB/s]
+ 87%|████████▋ | 146M/169M [00:04&lt;00:00, 37.1MB/s]
+ 89%|████████▉ | 151M/169M [00:04&lt;00:00, 36.0MB/s]
+ 92%|█████████▏| 155M/169M [00:04&lt;00:00, 37.2MB/s]
+ 94%|█████████▍| 160M/169M [00:04&lt;00:00, 38.2MB/s]
+ 97%|█████████▋| 163M/169M [00:04&lt;00:00, 36.8MB/s]
+100%|█████████▉| 168M/169M [00:05&lt;00:00, 37.0MB/s]
+100%|██████████| 169M/169M [00:05&lt;00:00, 33.0MB/s]
 </pre></div>
 </div>
 </section>
@@ -624,7 +624,7 @@ We feed probabilities (softmax over logits) to the metric.</p>
 <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_scalers_001.png" srcset="../../_images/sphx_glr_tutorial_scalers_001.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE before calibration - 9.373%.
+<img src="../../_images/sphx_glr_tutorial_scalers_001.png" srcset="../../_images/sphx_glr_tutorial_scalers_001.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ECE before calibration - 9.138%.
 </pre></div>
 </div>
 </section>
@@ -650,47 +650,47 @@ We feed probabilities (softmax over logits) to the metric.</p>
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_tutorial_scalers_002.png" srcset="../../_images/sphx_glr_tutorial_scalers_002.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/40 [00:00&lt;?, ?it/s]
-  2%|▎         | 1/40 [00:00&lt;00:13,  2.93it/s]
-  5%|▌         | 2/40 [00:00&lt;00:12,  2.94it/s]
-  8%|▊         | 3/40 [00:01&lt;00:12,  2.93it/s]
- 10%|█         | 4/40 [00:01&lt;00:12,  2.93it/s]
- 12%|█▎        | 5/40 [00:01&lt;00:11,  2.93it/s]
- 15%|█▌        | 6/40 [00:02&lt;00:11,  2.93it/s]
- 18%|█▊        | 7/40 [00:02&lt;00:11,  2.92it/s]
- 20%|██        | 8/40 [00:02&lt;00:10,  2.92it/s]
- 22%|██▎       | 9/40 [00:03&lt;00:10,  2.92it/s]
- 25%|██▌       | 10/40 [00:03&lt;00:10,  2.92it/s]
- 28%|██▊       | 11/40 [00:03&lt;00:09,  2.91it/s]
- 30%|███       | 12/40 [00:04&lt;00:09,  2.92it/s]
- 32%|███▎      | 13/40 [00:04&lt;00:09,  2.92it/s]
- 35%|███▌      | 14/40 [00:04&lt;00:08,  2.92it/s]
- 38%|███▊      | 15/40 [00:05&lt;00:08,  2.93it/s]
- 40%|████      | 16/40 [00:05&lt;00:08,  2.91it/s]
- 42%|████▎     | 17/40 [00:05&lt;00:07,  2.90it/s]
- 45%|████▌     | 18/40 [00:06&lt;00:07,  2.91it/s]
- 48%|████▊     | 19/40 [00:06&lt;00:07,  2.91it/s]
- 50%|█████     | 20/40 [00:06&lt;00:06,  2.92it/s]
- 52%|█████▎    | 21/40 [00:07&lt;00:06,  2.91it/s]
- 55%|█████▌    | 22/40 [00:07&lt;00:06,  2.91it/s]
- 57%|█████▊    | 23/40 [00:07&lt;00:05,  2.92it/s]
- 60%|██████    | 24/40 [00:08&lt;00:05,  2.92it/s]
- 62%|██████▎   | 25/40 [00:08&lt;00:05,  2.92it/s]
- 65%|██████▌   | 26/40 [00:08&lt;00:04,  2.91it/s]
- 68%|██████▊   | 27/40 [00:09&lt;00:04,  2.89it/s]
- 70%|███████   | 28/40 [00:09&lt;00:04,  2.89it/s]
- 72%|███████▎  | 29/40 [00:09&lt;00:03,  2.89it/s]
- 75%|███████▌  | 30/40 [00:10&lt;00:03,  2.90it/s]
- 78%|███████▊  | 31/40 [00:10&lt;00:03,  2.90it/s]
- 80%|████████  | 32/40 [00:10&lt;00:02,  2.90it/s]
- 82%|████████▎ | 33/40 [00:11&lt;00:02,  2.90it/s]
- 85%|████████▌ | 34/40 [00:11&lt;00:02,  2.91it/s]
- 88%|████████▊ | 35/40 [00:12&lt;00:01,  2.91it/s]
- 90%|█████████ | 36/40 [00:12&lt;00:01,  2.90it/s]
- 92%|█████████▎| 37/40 [00:12&lt;00:01,  2.89it/s]
- 95%|█████████▌| 38/40 [00:13&lt;00:00,  2.89it/s]
- 98%|█████████▊| 39/40 [00:13&lt;00:00,  2.90it/s]
-100%|██████████| 40/40 [00:13&lt;00:00,  2.98it/s]
-ECE after BBQ Binning - 3.300%.
+  2%|▎         | 1/40 [00:00&lt;00:12,  3.01it/s]
+  5%|▌         | 2/40 [00:00&lt;00:12,  2.98it/s]
+  8%|▊         | 3/40 [00:01&lt;00:12,  2.98it/s]
+ 10%|█         | 4/40 [00:01&lt;00:12,  2.97it/s]
+ 12%|█▎        | 5/40 [00:01&lt;00:11,  2.97it/s]
+ 15%|█▌        | 6/40 [00:02&lt;00:11,  2.97it/s]
+ 18%|█▊        | 7/40 [00:02&lt;00:11,  2.97it/s]
+ 20%|██        | 8/40 [00:02&lt;00:10,  2.97it/s]
+ 22%|██▎       | 9/40 [00:03&lt;00:10,  2.97it/s]
+ 25%|██▌       | 10/40 [00:03&lt;00:10,  2.96it/s]
+ 28%|██▊       | 11/40 [00:03&lt;00:09,  2.97it/s]
+ 30%|███       | 12/40 [00:04&lt;00:09,  2.96it/s]
+ 32%|███▎      | 13/40 [00:04&lt;00:09,  2.95it/s]
+ 35%|███▌      | 14/40 [00:04&lt;00:08,  2.95it/s]
+ 38%|███▊      | 15/40 [00:05&lt;00:08,  2.96it/s]
+ 40%|████      | 16/40 [00:05&lt;00:08,  2.95it/s]
+ 42%|████▎     | 17/40 [00:05&lt;00:07,  2.95it/s]
+ 45%|████▌     | 18/40 [00:06&lt;00:07,  2.95it/s]
+ 48%|████▊     | 19/40 [00:06&lt;00:07,  2.95it/s]
+ 50%|█████     | 20/40 [00:06&lt;00:06,  2.95it/s]
+ 52%|█████▎    | 21/40 [00:07&lt;00:06,  2.96it/s]
+ 55%|█████▌    | 22/40 [00:07&lt;00:06,  2.95it/s]
+ 57%|█████▊    | 23/40 [00:07&lt;00:05,  2.95it/s]
+ 60%|██████    | 24/40 [00:08&lt;00:05,  2.96it/s]
+ 62%|██████▎   | 25/40 [00:08&lt;00:05,  2.96it/s]
+ 65%|██████▌   | 26/40 [00:08&lt;00:04,  2.95it/s]
+ 68%|██████▊   | 27/40 [00:09&lt;00:04,  2.96it/s]
+ 70%|███████   | 28/40 [00:09&lt;00:04,  2.94it/s]
+ 72%|███████▎  | 29/40 [00:09&lt;00:03,  2.94it/s]
+ 75%|███████▌  | 30/40 [00:10&lt;00:03,  2.94it/s]
+ 78%|███████▊  | 31/40 [00:10&lt;00:03,  2.95it/s]
+ 80%|████████  | 32/40 [00:10&lt;00:02,  2.94it/s]
+ 82%|████████▎ | 33/40 [00:11&lt;00:02,  2.94it/s]
+ 85%|████████▌ | 34/40 [00:11&lt;00:02,  2.95it/s]
+ 88%|████████▊ | 35/40 [00:11&lt;00:01,  2.95it/s]
+ 90%|█████████ | 36/40 [00:12&lt;00:01,  2.95it/s]
+ 92%|█████████▎| 37/40 [00:12&lt;00:01,  2.95it/s]
+ 95%|█████████▌| 38/40 [00:12&lt;00:00,  2.95it/s]
+ 98%|█████████▊| 39/40 [00:13&lt;00:00,  2.95it/s]
+100%|██████████| 40/40 [00:13&lt;00:00,  3.02it/s]
+ECE after BBQ Binning - 3.484%.
 </pre></div>
 </div>
 <p>If you look closely at the predictions of the BBQScaler in this case,
@@ -723,47 +723,47 @@ infer the device from calibration data by passing device=None.</p>
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_tutorial_scalers_003.png" srcset="../../_images/sphx_glr_tutorial_scalers_003.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/40 [00:00&lt;?, ?it/s]
-  2%|▎         | 1/40 [00:00&lt;00:14,  2.74it/s]
-  5%|▌         | 2/40 [00:00&lt;00:13,  2.72it/s]
-  8%|▊         | 3/40 [00:01&lt;00:13,  2.72it/s]
- 10%|█         | 4/40 [00:01&lt;00:13,  2.71it/s]
- 12%|█▎        | 5/40 [00:01&lt;00:12,  2.70it/s]
- 15%|█▌        | 6/40 [00:02&lt;00:12,  2.70it/s]
- 18%|█▊        | 7/40 [00:02&lt;00:12,  2.70it/s]
- 20%|██        | 8/40 [00:02&lt;00:11,  2.69it/s]
- 22%|██▎       | 9/40 [00:03&lt;00:11,  2.69it/s]
- 25%|██▌       | 10/40 [00:03&lt;00:11,  2.69it/s]
- 28%|██▊       | 11/40 [00:04&lt;00:10,  2.69it/s]
- 30%|███       | 12/40 [00:04&lt;00:10,  2.69it/s]
- 32%|███▎      | 13/40 [00:04&lt;00:10,  2.69it/s]
- 35%|███▌      | 14/40 [00:05&lt;00:09,  2.70it/s]
- 38%|███▊      | 15/40 [00:05&lt;00:09,  2.70it/s]
- 40%|████      | 16/40 [00:05&lt;00:08,  2.70it/s]
- 42%|████▎     | 17/40 [00:06&lt;00:08,  2.69it/s]
- 45%|████▌     | 18/40 [00:06&lt;00:08,  2.69it/s]
- 48%|████▊     | 19/40 [00:07&lt;00:07,  2.70it/s]
- 50%|█████     | 20/40 [00:07&lt;00:07,  2.70it/s]
- 52%|█████▎    | 21/40 [00:07&lt;00:07,  2.70it/s]
- 55%|█████▌    | 22/40 [00:08&lt;00:06,  2.70it/s]
- 57%|█████▊    | 23/40 [00:08&lt;00:06,  2.70it/s]
- 60%|██████    | 24/40 [00:08&lt;00:05,  2.70it/s]
- 62%|██████▎   | 25/40 [00:09&lt;00:05,  2.70it/s]
- 65%|██████▌   | 26/40 [00:09&lt;00:05,  2.70it/s]
- 68%|██████▊   | 27/40 [00:10&lt;00:04,  2.70it/s]
- 70%|███████   | 28/40 [00:10&lt;00:04,  2.71it/s]
- 72%|███████▎  | 29/40 [00:10&lt;00:04,  2.71it/s]
- 75%|███████▌  | 30/40 [00:11&lt;00:03,  2.71it/s]
- 78%|███████▊  | 31/40 [00:11&lt;00:03,  2.71it/s]
- 80%|████████  | 32/40 [00:11&lt;00:02,  2.72it/s]
- 82%|████████▎ | 33/40 [00:12&lt;00:02,  2.71it/s]
- 85%|████████▌ | 34/40 [00:12&lt;00:02,  2.71it/s]
- 88%|████████▊ | 35/40 [00:12&lt;00:01,  2.71it/s]
- 90%|█████████ | 36/40 [00:13&lt;00:01,  2.71it/s]
- 92%|█████████▎| 37/40 [00:13&lt;00:01,  2.71it/s]
- 95%|█████████▌| 38/40 [00:14&lt;00:00,  2.71it/s]
- 98%|█████████▊| 39/40 [00:14&lt;00:00,  2.71it/s]
-100%|██████████| 40/40 [00:14&lt;00:00,  2.77it/s]
-ECE after Histogram Binning - 8.820%.
+  2%|▎         | 1/40 [00:00&lt;00:13,  2.83it/s]
+  5%|▌         | 2/40 [00:00&lt;00:13,  2.82it/s]
+  8%|▊         | 3/40 [00:01&lt;00:13,  2.81it/s]
+ 10%|█         | 4/40 [00:01&lt;00:12,  2.80it/s]
+ 12%|█▎        | 5/40 [00:01&lt;00:12,  2.79it/s]
+ 15%|█▌        | 6/40 [00:02&lt;00:12,  2.79it/s]
+ 18%|█▊        | 7/40 [00:02&lt;00:11,  2.79it/s]
+ 20%|██        | 8/40 [00:02&lt;00:11,  2.79it/s]
+ 22%|██▎       | 9/40 [00:03&lt;00:11,  2.79it/s]
+ 25%|██▌       | 10/40 [00:03&lt;00:10,  2.78it/s]
+ 28%|██▊       | 11/40 [00:03&lt;00:10,  2.79it/s]
+ 30%|███       | 12/40 [00:04&lt;00:10,  2.77it/s]
+ 32%|███▎      | 13/40 [00:04&lt;00:09,  2.78it/s]
+ 35%|███▌      | 14/40 [00:05&lt;00:09,  2.78it/s]
+ 38%|███▊      | 15/40 [00:05&lt;00:08,  2.78it/s]
+ 40%|████      | 16/40 [00:05&lt;00:08,  2.79it/s]
+ 42%|████▎     | 17/40 [00:06&lt;00:08,  2.80it/s]
+ 45%|████▌     | 18/40 [00:06&lt;00:07,  2.81it/s]
+ 48%|████▊     | 19/40 [00:06&lt;00:07,  2.79it/s]
+ 50%|█████     | 20/40 [00:07&lt;00:07,  2.79it/s]
+ 52%|█████▎    | 21/40 [00:07&lt;00:06,  2.79it/s]
+ 55%|█████▌    | 22/40 [00:07&lt;00:06,  2.78it/s]
+ 57%|█████▊    | 23/40 [00:08&lt;00:06,  2.78it/s]
+ 60%|██████    | 24/40 [00:08&lt;00:05,  2.77it/s]
+ 62%|██████▎   | 25/40 [00:08&lt;00:05,  2.77it/s]
+ 65%|██████▌   | 26/40 [00:09&lt;00:05,  2.78it/s]
+ 68%|██████▊   | 27/40 [00:09&lt;00:04,  2.79it/s]
+ 70%|███████   | 28/40 [00:10&lt;00:04,  2.79it/s]
+ 72%|███████▎  | 29/40 [00:10&lt;00:03,  2.78it/s]
+ 75%|███████▌  | 30/40 [00:10&lt;00:03,  2.78it/s]
+ 78%|███████▊  | 31/40 [00:11&lt;00:03,  2.78it/s]
+ 80%|████████  | 32/40 [00:11&lt;00:02,  2.78it/s]
+ 82%|████████▎ | 33/40 [00:11&lt;00:02,  2.78it/s]
+ 85%|████████▌ | 34/40 [00:12&lt;00:02,  2.78it/s]
+ 88%|████████▊ | 35/40 [00:12&lt;00:01,  2.77it/s]
+ 90%|█████████ | 36/40 [00:12&lt;00:01,  2.77it/s]
+ 92%|█████████▎| 37/40 [00:13&lt;00:01,  2.78it/s]
+ 95%|█████████▌| 38/40 [00:13&lt;00:00,  2.79it/s]
+ 98%|█████████▊| 39/40 [00:14&lt;00:00,  2.78it/s]
+100%|██████████| 40/40 [00:14&lt;00:00,  2.85it/s]
+ECE after Histogram Binning - 9.941%.
 </pre></div>
 </div>
 </section>
@@ -857,61 +857,59 @@ fits a monotone mapping and tends to produce smoother calibration functions.</p>
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_tutorial_scalers_007.png" srcset="../../_images/sphx_glr_tutorial_scalers_007.png" alt="Reliability Diagram" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/40 [00:00&lt;?, ?it/s]
-  2%|▎         | 1/40 [00:00&lt;00:14,  2.69it/s]
-  5%|▌         | 2/40 [00:00&lt;00:14,  2.58it/s]
-  8%|▊         | 3/40 [00:01&lt;00:14,  2.55it/s]
- 10%|█         | 4/40 [00:01&lt;00:14,  2.54it/s]
- 12%|█▎        | 5/40 [00:01&lt;00:13,  2.52it/s]
- 15%|█▌        | 6/40 [00:02&lt;00:13,  2.51it/s]
- 18%|█▊        | 7/40 [00:02&lt;00:13,  2.51it/s]
- 20%|██        | 8/40 [00:03&lt;00:12,  2.50it/s]
- 22%|██▎       | 9/40 [00:03&lt;00:12,  2.50it/s]
- 25%|██▌       | 10/40 [00:03&lt;00:12,  2.50it/s]
- 28%|██▊       | 11/40 [00:04&lt;00:11,  2.49it/s]
- 30%|███       | 12/40 [00:04&lt;00:11,  2.49it/s]
- 32%|███▎      | 13/40 [00:05&lt;00:10,  2.49it/s]
- 35%|███▌      | 14/40 [00:05&lt;00:10,  2.49it/s]
- 38%|███▊      | 15/40 [00:05&lt;00:10,  2.49it/s]
- 40%|████      | 16/40 [00:06&lt;00:09,  2.49it/s]
- 42%|████▎     | 17/40 [00:06&lt;00:09,  2.49it/s]
- 45%|████▌     | 18/40 [00:07&lt;00:08,  2.50it/s]
- 48%|████▊     | 19/40 [00:07&lt;00:08,  2.48it/s]
- 50%|█████     | 20/40 [00:07&lt;00:08,  2.47it/s]
- 52%|█████▎    | 21/40 [00:08&lt;00:07,  2.47it/s]
- 55%|█████▌    | 22/40 [00:08&lt;00:07,  2.47it/s]
- 57%|█████▊    | 23/40 [00:09&lt;00:06,  2.48it/s]
- 60%|██████    | 24/40 [00:09&lt;00:06,  2.48it/s]
- 62%|██████▎   | 25/40 [00:10&lt;00:06,  2.48it/s]
- 65%|██████▌   | 26/40 [00:10&lt;00:05,  2.48it/s]
- 68%|██████▊   | 27/40 [00:10&lt;00:05,  2.48it/s]
- 70%|███████   | 28/40 [00:11&lt;00:04,  2.48it/s]
- 72%|███████▎  | 29/40 [00:11&lt;00:04,  2.48it/s]
- 75%|███████▌  | 30/40 [00:12&lt;00:04,  2.48it/s]
- 78%|███████▊  | 31/40 [00:12&lt;00:03,  2.49it/s]
- 80%|████████  | 32/40 [00:12&lt;00:03,  2.49it/s]
- 82%|████████▎ | 33/40 [00:13&lt;00:02,  2.49it/s]
- 85%|████████▌ | 34/40 [00:13&lt;00:02,  2.49it/s]
- 88%|████████▊ | 35/40 [00:14&lt;00:02,  2.48it/s]
- 90%|█████████ | 36/40 [00:14&lt;00:01,  2.47it/s]
- 92%|█████████▎| 37/40 [00:14&lt;00:01,  2.46it/s]
- 95%|█████████▌| 38/40 [00:15&lt;00:00,  2.46it/s]
- 98%|█████████▊| 39/40 [00:15&lt;00:00,  2.46it/s]
-100%|██████████| 40/40 [00:15&lt;00:00,  2.55it/s]
-ECE after Isotonic calibration - 4.773%.
+  2%|▎         | 1/40 [00:00&lt;00:13,  2.92it/s]
+  5%|▌         | 2/40 [00:00&lt;00:13,  2.81it/s]
+  8%|▊         | 3/40 [00:01&lt;00:13,  2.79it/s]
+ 10%|█         | 4/40 [00:01&lt;00:12,  2.78it/s]
+ 12%|█▎        | 5/40 [00:01&lt;00:12,  2.77it/s]
+ 15%|█▌        | 6/40 [00:02&lt;00:12,  2.75it/s]
+ 18%|█▊        | 7/40 [00:02&lt;00:12,  2.68it/s]
+ 20%|██        | 8/40 [00:02&lt;00:12,  2.63it/s]
+ 22%|██▎       | 9/40 [00:03&lt;00:11,  2.60it/s]
+ 25%|██▌       | 10/40 [00:03&lt;00:11,  2.57it/s]
+ 28%|██▊       | 11/40 [00:04&lt;00:11,  2.56it/s]
+ 30%|███       | 12/40 [00:04&lt;00:10,  2.56it/s]
+ 32%|███▎      | 13/40 [00:04&lt;00:10,  2.55it/s]
+ 35%|███▌      | 14/40 [00:05&lt;00:10,  2.55it/s]
+ 38%|███▊      | 15/40 [00:05&lt;00:09,  2.55it/s]
+ 40%|████      | 16/40 [00:06&lt;00:09,  2.54it/s]
+ 42%|████▎     | 17/40 [00:06&lt;00:09,  2.54it/s]
+ 45%|████▌     | 18/40 [00:06&lt;00:08,  2.54it/s]
+ 48%|████▊     | 19/40 [00:07&lt;00:08,  2.54it/s]
+ 50%|█████     | 20/40 [00:07&lt;00:07,  2.54it/s]
+ 52%|█████▎    | 21/40 [00:08&lt;00:07,  2.54it/s]
+ 55%|█████▌    | 22/40 [00:08&lt;00:07,  2.54it/s]
+ 57%|█████▊    | 23/40 [00:08&lt;00:06,  2.54it/s]
+ 60%|██████    | 24/40 [00:09&lt;00:06,  2.54it/s]
+ 62%|██████▎   | 25/40 [00:09&lt;00:05,  2.55it/s]
+ 65%|██████▌   | 26/40 [00:10&lt;00:05,  2.55it/s]
+ 68%|██████▊   | 27/40 [00:10&lt;00:05,  2.55it/s]
+ 70%|███████   | 28/40 [00:10&lt;00:04,  2.55it/s]
+ 72%|███████▎  | 29/40 [00:11&lt;00:04,  2.55it/s]
+ 75%|███████▌  | 30/40 [00:11&lt;00:03,  2.55it/s]
+ 78%|███████▊  | 31/40 [00:12&lt;00:03,  2.55it/s]
+ 80%|████████  | 32/40 [00:12&lt;00:03,  2.55it/s]
+ 82%|████████▎ | 33/40 [00:12&lt;00:02,  2.55it/s]
+ 85%|████████▌ | 34/40 [00:13&lt;00:02,  2.55it/s]
+ 88%|████████▊ | 35/40 [00:13&lt;00:01,  2.56it/s]
+ 90%|█████████ | 36/40 [00:13&lt;00:01,  2.56it/s]
+ 92%|█████████▎| 37/40 [00:14&lt;00:01,  2.56it/s]
+ 95%|█████████▌| 38/40 [00:14&lt;00:00,  2.56it/s]
+ 98%|█████████▊| 39/40 [00:15&lt;00:00,  2.56it/s]
+100%|██████████| 40/40 [00:15&lt;00:00,  2.64it/s]
+ECE after Isotonic calibration - 4.034%.
 </pre></div>
 </div>
 </section>
 <section id="practical-guidance">
 <h2>9. Practical guidance<a class="headerlink" href="#practical-guidance" title="Link to this heading">#</a></h2>
-<ul>
-<li><p>Takeaways:
-* BBQ averages multiple equal-frequency histograms weighted by the</p>
-<blockquote>
-<div><p>model posterior; it reduces overfitting relative to a single histogram.
-It still needs enough calibration data — in multiclass settings prefer
-simpler schemes or temperature-scaling when data is scarce.</p>
-</div></blockquote>
 <ul class="simple">
+<li><p>Takeaways:</p>
+<ul>
+<li><p>BBQ averages multiple equal-frequency histograms weighted by the
+model posterior; it reduces overfitting relative to a single histogram.
+It still needs enough calibration data — in multiclass settings prefer
+simpler schemes or temperature-scaling when data is scarce.</p></li>
 <li><p>Histogram binning is flexible and non-parametric; it replaces predicted
 probabilities with bin-wise empirical accuracies. It can correct complex
 miscalibration patterns but may produce discontinuities. It needs a lot of
@@ -921,12 +919,10 @@ with model confidence) and typically yields smoother mappings than plain
 histogram binning; it can be advantageous when monotonicity is desirable.</p></li>
 </ul>
 </li>
-<li><p>Practical tips:
-* Visualize the learned mapping: inspect bin values for histogram binning or</p>
-<blockquote>
-<div><p>the monotone piecewise mapping for isotonic to detect overfitting.</p>
-</div></blockquote>
-<ul class="simple">
+<li><p>Practical tips:</p>
+<ul>
+<li><p>Visualize the learned mapping: inspect bin values for histogram binning or
+the monotone piecewise mapping for isotonic to detect overfitting.</p></li>
 <li><p>If calibration data is scarce, prefer low-parameter approaches (temperature
 scaling) or reduce <cite>num_bins</cite>.</p></li>
 <li><p>If dataset shift is expected, measure calibration across multiple held-out
@@ -934,8 +930,6 @@ splits or OOD datasets.</p></li>
 </ul>
 </li>
 </ul>
-<p>(If you’d like, I can add a cell that visualizes per-class bin mappings for a
-few classes, or a small grid-search cell that cross-validates <cite>num_bins</cite>.)</p>
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
@@ -949,7 +943,7 @@ modern neural networks. <em>ICML 2017</em>. &lt;<a class="reference external" hr
 Calibrated Probabilities Using Bayesian Binning. <em>AAAI 2015</em>.
 &lt;<a class="reference external" href="https://arxiv.org/pdf/1411.0160.pdf">https://arxiv.org/pdf/1411.0160.pdf</a>&gt;</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 52.621 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 48.428 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-post-hoc-methods-tutorial-scalers-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/eec224b4bf0682eedf9c0c7cd01072f4/tutorial_scalers.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_scalers.ipynb</span></code></a></p>
@@ -1010,8 +1004,8 @@ Calibrated Probabilities Using Bayesian Binning. <em>AAAI 2015</em>.
     class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-the-utilities">1. Loading the Utilities</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-a-pretrained-model-from-the-hub">2. Loading a pretrained model from the hub</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-the-datamodule-and-dataloaders">3. Setting up the Datamodule and Dataloaders</a></li>
@@ -1026,13 +1020,13 @@ Calibrated Probabilities Using Bayesian Binning. <em>AAAI 2015</em>.
   </nav></div>
 
   <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/auto_tutorials/Post_Hoc_Methods/tutorial_scalers.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/auto_tutorials/Post_Hoc_Methods/tutorial_scalers.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
 
 </div></div>
               
@@ -1047,8 +1041,8 @@ Calibrated Probabilities Using Bayesian Binning. <em>AAAI 2015</em>.
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

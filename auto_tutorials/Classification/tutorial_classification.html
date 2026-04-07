@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Training a LeNet for Image Classification with TorchUncertainty &#8212; TorchUncertainty 0.11.0 documentation</title>
+    <title>Training a LeNet for Image Classification with TorchUncertainty &#8212; TorchUncertainty Docs</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -40,10 +40,10 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
 
     <script src="../../_static/documentation_options.js?v=f3b36f1a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
@@ -52,6 +52,8 @@
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'auto_tutorials/Classification/tutorial_classification';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Evaluating Model Performance Under Distribution Shift with TorchUncertainty" href="tutorial_distribution_shift.html" />
@@ -59,14 +61,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
@@ -98,7 +104,7 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -375,6 +381,7 @@
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
+
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
@@ -575,26 +582,39 @@ metrics that you will find in the table below.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/9.91M [00:00&lt;?, ?B/s]
-  1%|          | 65.5k/9.91M [00:00&lt;00:23, 415kB/s]
-  3%|▎         | 295k/9.91M [00:00&lt;00:09, 1.01MB/s]
-  7%|▋         | 721k/9.91M [00:00&lt;00:05, 1.77MB/s]
- 16%|█▌        | 1.54M/9.91M [00:00&lt;00:02, 3.09MB/s]
- 30%|███       | 2.98M/9.91M [00:00&lt;00:01, 5.20MB/s]
- 53%|█████▎    | 5.24M/9.91M [00:00&lt;00:00, 9.41MB/s]
- 70%|███████   | 6.98M/9.91M [00:01&lt;00:00, 10.4MB/s]
-100%|██████████| 9.91M/9.91M [00:01&lt;00:00, 8.82MB/s]
+  1%|          | 98.3k/9.91M [00:00&lt;00:15, 622kB/s]
+  4%|▍         | 393k/9.91M [00:00&lt;00:07, 1.34MB/s]
+  8%|▊         | 754k/9.91M [00:00&lt;00:05, 1.76MB/s]
+ 14%|█▍        | 1.41M/9.91M [00:00&lt;00:02, 2.96MB/s]
+ 20%|██        | 2.00M/9.91M [00:00&lt;00:02, 3.58MB/s]
+ 26%|██▌       | 2.56M/9.91M [00:00&lt;00:01, 3.91MB/s]
+ 30%|███       | 2.98M/9.91M [00:00&lt;00:01, 3.78MB/s]
+ 35%|███▍      | 3.44M/9.91M [00:01&lt;00:01, 3.81MB/s]
+ 39%|███▊      | 3.83M/9.91M [00:01&lt;00:01, 3.63MB/s]
+ 44%|████▍     | 4.36M/9.91M [00:01&lt;00:01, 3.51MB/s]
+ 50%|█████     | 4.98M/9.91M [00:01&lt;00:01, 3.64MB/s]
+ 57%|█████▋    | 5.60M/9.91M [00:01&lt;00:01, 3.72MB/s]
+ 63%|██████▎   | 6.23M/9.91M [00:01&lt;00:00, 3.77MB/s]
+ 69%|██████▉   | 6.85M/9.91M [00:01&lt;00:00, 4.13MB/s]
+ 73%|███████▎  | 7.27M/9.91M [00:02&lt;00:00, 3.95MB/s]
+ 79%|███████▉  | 7.83M/9.91M [00:02&lt;00:00, 3.81MB/s]
+ 86%|████████▌ | 8.49M/9.91M [00:02&lt;00:00, 3.89MB/s]
+ 92%|█████████▏| 9.14M/9.91M [00:02&lt;00:00, 3.96MB/s]
+ 99%|█████████▉| 9.80M/9.91M [00:02&lt;00:00, 4.00MB/s]
+100%|██████████| 9.91M/9.91M [00:02&lt;00:00, 3.63MB/s]
 
   0%|          | 0.00/28.9k [00:00&lt;?, ?B/s]
-100%|██████████| 28.9k/28.9k [00:00&lt;00:00, 365kB/s]
+100%|██████████| 28.9k/28.9k [00:00&lt;00:00, 364kB/s]
 
   0%|          | 0.00/1.65M [00:00&lt;?, ?B/s]
-  4%|▍         | 65.5k/1.65M [00:00&lt;00:03, 414kB/s]
- 22%|██▏       | 360k/1.65M [00:00&lt;00:01, 1.26MB/s]
- 54%|█████▎    | 885k/1.65M [00:00&lt;00:00, 2.18MB/s]
-100%|██████████| 1.65M/1.65M [00:00&lt;00:00, 2.94MB/s]
+  6%|▌         | 98.3k/1.65M [00:00&lt;00:02, 614kB/s]
+ 24%|██▍       | 393k/1.65M [00:00&lt;00:00, 1.33MB/s]
+ 38%|███▊      | 623k/1.65M [00:00&lt;00:00, 1.36MB/s]
+ 99%|█████████▉| 1.64M/1.65M [00:00&lt;00:00, 3.32MB/s]
+100%|██████████| 1.65M/1.65M [00:00&lt;00:00, 2.55MB/s]
 
   0%|          | 0.00/4.54k [00:00&lt;?, ?B/s]
-100%|██████████| 4.54k/4.54k [00:00&lt;00:00, 10.7MB/s]
+100%|██████████| 4.54k/4.54k [00:00&lt;00:00, 11.2MB/s]
 ┏━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
 ┃   ┃ Name                ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
 ┡━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
@@ -622,26 +642,26 @@ Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          85.400%          │
-│    Brier     │          0.31513          │
-│   Entropy    │          1.24821          │
-│     NLL      │          0.72747          │
+│     Acc      │          91.780%          │
+│    Brier     │          0.16926          │
+│   Entropy    │          0.81020          │
+│     NLL      │          0.41200          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          24.871%          │
-│     MCE      │          87.371%          │
-│    SmECE     │          24.672%          │
-│     aECE     │          24.871%          │
+│     ECE      │          15.232%          │
+│     MCE      │          31.732%          │
+│    SmECE     │          14.604%          │
+│     aECE     │          15.232%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          2.905%           │
-│     AURC     │          3.789%           │
-│  Cov@5Risk   │          70.240%          │
-│  Risk@80Cov  │          6.900%           │
+│    AUGRC     │          1.032%           │
+│     AURC     │          1.226%           │
+│  Cov@5Risk   │          91.880%          │
+│  Risk@80Cov  │          1.887%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -692,7 +712,7 @@ Total FLOPs: 0
 LeNet predictions for the first 6 images:  7 2 1 0 4 1
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 24.410 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 25.728 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-classification-tutorial-classification-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/1d73e10cebb64090359837d6682d2001/tutorial_classification.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_classification.ipynb</span></code></a></p>
@@ -753,8 +773,8 @@ LeNet predictions for the first 6 images:  7 2 1 0 4 1
     class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-the-utilities">1. Loading the utilities</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-the-trainer-and-the-datamodule">2. Creating the Trainer and the DataModule</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#instantiating-the-model">3. Instantiating the Model</a></li>
@@ -765,13 +785,13 @@ LeNet predictions for the first 6 images:  7 2 1 0 4 1
   </nav></div>
 
   <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/auto_tutorials/Classification/tutorial_classification.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/auto_tutorials/Classification/tutorial_classification.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
 
 </div></div>
               
@@ -786,8 +806,8 @@ LeNet predictions for the first 6 images:  7 2 1 0 4 1
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
