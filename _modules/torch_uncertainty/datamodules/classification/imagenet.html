@@ -452,7 +452,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">timm.data.auto_augment</span><span class="w"> </span><span class="kn">import</span> <span class="n">rand_augment_transform</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">timm.data.mixup</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mixup</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Subset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">Subset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchvision.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">DTD</span><span class="p">,</span> <span class="n">SVHN</span><span class="p">,</span> <span class="n">ImageNet</span><span class="p">,</span> <span class="n">INaturalist</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchvision.transforms</span><span class="w"> </span><span class="kn">import</span> <span class="n">v2</span>
 
@@ -488,6 +488,8 @@
     <span class="n">std</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">)</span>
     <span class="n">train_indices</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">val_indices</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">ImageNet</span><span class="p">]</span> <span class="o">|</span> <span class="nb">type</span><span class="p">[</span><span class="n">ImageNetR</span><span class="p">]</span> <span class="o">|</span> <span class="nb">type</span><span class="p">[</span><span class="n">ImageNetO</span><span class="p">]</span> <span class="o">|</span> <span class="nb">type</span><span class="p">[</span><span class="n">ImageNetA</span><span class="p">]</span> <span class="o">|</span> <span class="nb">type</span><span class="p">[</span><span class="n">ImageNetC</span><span class="p">]</span>
+    <span class="n">ood_dataset</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -684,7 +686,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_alt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                 <span class="n">split</span><span class="o">=</span><span class="s2">&quot;val&quot;</span><span class="p">,</span>
                 <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -698,7 +700,7 @@
                     <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_transform</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_ds</span> <span class="o">!=</span> <span class="s2">&quot;textures&quot;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">ood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_dataset</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
                     <span class="n">split</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
                     <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -719,7 +721,7 @@
                 <span class="n">shift_severity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shift_severity</span><span class="p">,</span>
             <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;fit&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;fit&quot;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_alt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The test_alt argument is not supported for training.&quot;</span><span class="p">)</span>

@@ -589,7 +589,7 @@
     <span class="n">rd_ylabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Success Rate (%)&quot;</span><span class="p">,</span>
     <span class="n">ch_xlabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Top-class Confidence (%)&quot;</span><span class="p">,</span>
     <span class="n">ch_ylabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Density (%)&quot;</span><span class="p">,</span>
-    <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+    <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">6.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">),</span>
     <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">150</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Builds Reliability Diagram</span>
@@ -808,7 +808,7 @@
                 <span class="n">validate_args</span><span class="o">=</span><span class="n">validate_args</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="n">task</span> <span class="o">=</span> <span class="n">ClassificationTaskNoMultilabel</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+        <span class="n">task_enum</span> <span class="o">=</span> <span class="n">ClassificationTaskNoMultilabel</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
             <span class="p">{</span>
                 <span class="s2">&quot;n_bins&quot;</span><span class="p">:</span> <span class="n">num_bins</span><span class="p">,</span>
@@ -817,7 +817,7 @@
                 <span class="s2">&quot;validate_args&quot;</span><span class="p">:</span> <span class="n">validate_args</span><span class="p">,</span>
             <span class="p">}</span>
         <span class="p">)</span>
-        <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="n">ClassificationTaskNoMultilabel</span><span class="o">.</span><span class="n">BINARY</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">task_enum</span> <span class="o">==</span> <span class="n">ClassificationTaskNoMultilabel</span><span class="o">.</span><span class="n">BINARY</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">TUBinaryCalibrationError</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1">#  task is ClassificationTaskNoMultilabel.MULTICLASS</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_classes</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>

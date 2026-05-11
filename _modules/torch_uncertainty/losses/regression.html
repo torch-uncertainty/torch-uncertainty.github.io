@@ -535,10 +535,15 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">dist</span><span class="p">:</span> <span class="n">NormalInverseGamma</span><span class="p">,</span>
+        <span class="n">dist</span><span class="p">:</span> <span class="n">Distribution</span><span class="p">,</span>
         <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">padding_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="n">loss_nll</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">NormalInverseGamma</span> <span class="o">|</span> <span class="n">Independent</span><span class="p">):</span>  <span class="c1"># coverage: ignore</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;DER only works for NormalInverseGamma or Independent[NormalInverseGamma] distributions. Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">loss_nll</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">padding_mask</span><span class="o">=</span><span class="n">padding_mask</span><span class="p">)</span>
         <span class="n">loss_reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reg</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_nll</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_weight</span> <span class="o">*</span> <span class="n">loss_reg</span>
 

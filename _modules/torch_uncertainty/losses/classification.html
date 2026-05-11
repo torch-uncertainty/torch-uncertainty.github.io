@@ -461,9 +461,10 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The Deep Evidential Classification loss.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            annealing_step (int): Annealing step for the weight of the</span>
-<span class="sd">                regularization term.</span>
-<span class="sd">            reg_weight (float): Fixed weight of the regularization term.</span>
+<span class="sd">            annealing_step (int | None): Annealing step for the weight of the</span>
+<span class="sd">                regularization term. Defaults to None.</span>
+<span class="sd">            reg_weight (float | None): Fixed weight of the regularization term.</span>
+<span class="sd">                Defaults to None.</span>
 <span class="sd">            loss_type (str, optional): Specifies the loss type to apply to the</span>
 <span class="sd">                Dirichlet parameters: ``&#39;mse&#39;`` | ``&#39;log&#39;`` | ``&#39;digamma&#39;``.</span>
 <span class="sd">            reduction (str, optional): Specifies the reduction to apply to the</span>
@@ -578,17 +579,32 @@
             <span class="n">loss_dirichlet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_digamma_loss</span><span class="p">(</span><span class="n">evidence</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_weight</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">annealing_coef</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_weight</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">annealing_coef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_weight</span>
+            <span class="n">annealing_coef</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">annealing_coef</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+                <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_weight</span><span class="p">),</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+                <span class="n">device</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">current_epoch</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;current_epoch must be set when annealing_step is used and reg_weight is None.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;annealing_step must be set when annealing_step is used and reg_weight is None.&quot;</span>
+                <span class="p">)</span>
             <span class="n">annealing_coef</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">min</span><span class="p">(</span>
-                <span class="nb">input</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
-                <span class="n">other</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">current_epoch</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
+                <span class="nb">input</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+                <span class="n">other</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+                    <span class="nb">float</span><span class="p">(</span><span class="n">current_epoch</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annealing_step</span><span class="p">),</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+                    <span class="n">device</span><span class="o">=</span><span class="n">evidence</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+                <span class="p">),</span>
             <span class="p">)</span>
 
-        <span class="n">loss_reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kldiv_reg</span><span class="p">(</span><span class="n">evidence</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_dirichlet</span> <span class="o">+</span> <span class="n">annealing_coef</span> <span class="o">*</span> <span class="n">loss_reg</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_dirichlet</span> <span class="o">+</span> <span class="n">annealing_coef</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kldiv_reg</span><span class="p">(</span><span class="n">evidence</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
@@ -812,12 +828,12 @@
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">label_smoothing</span> <span class="o">=</span> <span class="n">label_smoothing</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>  <span class="c1"># noqa: A002</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_smoothing</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="o">.</span><span class="n">type_as</span><span class="p">(</span><span class="n">inputs</span><span class="p">))</span>
-        <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
-        <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_smoothing</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_smoothing</span> <span class="o">/</span> <span class="mi">2</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">targets</span> <span class="o">*</span> <span class="n">F</span><span class="o">.</span><span class="n">logsigmoid</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">targets</span><span class="p">)</span> <span class="o">*</span> <span class="n">F</span><span class="o">.</span><span class="n">logsigmoid</span><span class="p">(</span><span class="o">-</span><span class="n">inputs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">type_as</span><span class="p">(</span><span class="nb">input</span><span class="p">))</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">target</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_smoothing</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_smoothing</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">target</span> <span class="o">*</span> <span class="n">F</span><span class="o">.</span><span class="n">logsigmoid</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">target</span><span class="p">)</span> <span class="o">*</span> <span class="n">F</span><span class="o">.</span><span class="n">logsigmoid</span><span class="p">(</span><span class="o">-</span><span class="nb">input</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
@@ -846,18 +862,24 @@
 <span class="sd">        Reference:</span>
 <span class="sd">            MaxSup: Fixing Label-smoothing for improved feature representation. Y. Zhou et al.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">weight</span><span class="p">,</span> <span class="n">size_average</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="n">reduction</span><span class="p">,</span> <span class="n">label_smoothing</span><span class="o">=</span><span class="n">label_smoothing</span><span class="p">)</span>
+        <span class="n">reduction</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span> <span class="k">if</span> <span class="n">reduction</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">reduction</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span>
+            <span class="n">size_average</span><span class="o">=</span><span class="n">size_average</span><span class="p">,</span>
+            <span class="n">reduction</span><span class="o">=</span><span class="n">reduction</span><span class="p">,</span>
+            <span class="n">label_smoothing</span><span class="o">=</span><span class="n">label_smoothing</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_sup</span> <span class="o">=</span> <span class="n">max_sup</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>  <span class="c1"># noqa: A002</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_sup</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
-        <span class="n">z_top1</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">reg</span> <span class="o">=</span> <span class="n">z_top1</span> <span class="o">-</span> <span class="n">inputs</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="n">z_top1</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">reg</span> <span class="o">=</span> <span class="n">z_top1</span> <span class="o">-</span> <span class="nb">input</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span>
-                <span class="n">inputs</span><span class="p">,</span>
-                <span class="n">targets</span><span class="p">,</span>
+                <span class="nb">input</span><span class="p">,</span>
+                <span class="n">target</span><span class="p">,</span>
                 <span class="n">label_smoothing</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label_smoothing</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_sup</span> <span class="o">*</span> <span class="n">reg</span>
@@ -913,7 +935,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mixup_ratio must be &gt; 0. Got </span><span class="si">{</span><span class="n">mixup_ratio</span><span class="si">}</span><span class="s2"> &lt; 0.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mixup_ratio</span> <span class="o">=</span> <span class="n">mixup_ratio</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>  <span class="c1"># noqa: A002</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The mixup transform should arrange outputs as `[mixup, normal]` or</span>
 <span class="sd">        `[normal, mixup]` depending on r; this splits them accordingly.</span>
 
@@ -921,15 +943,15 @@
 <span class="sd">        that case by manually using F.kl_div if needed.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            inputs (Tensor): model logits shape (N_total, num_classes)</span>
-<span class="sd">            targets (Tensor): target labels (one-hot or class indices) shape (N_total, ...)</span>
+<span class="sd">            input (Tensor): model logits shape (N_total, num_classes)</span>
+<span class="sd">            target (Tensor): target labels (one-hot or class indices) shape (N_total, ...)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># determine how many samples correspond to mixup vs normal</span>
-        <span class="n">mixup_count</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">mixup_ratio</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mixup_ratio</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="n">inputs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">mixup_count</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">mixup_ratio</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mixup_ratio</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="nb">input</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
 
         <span class="c1"># slices: assume mixup first, then normal</span>
-        <span class="n">mixup_preds</span><span class="p">,</span> <span class="n">mixup_targets</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[:</span><span class="n">mixup_count</span><span class="p">],</span> <span class="n">targets</span><span class="p">[:</span><span class="n">mixup_count</span><span class="p">]</span>
-        <span class="n">norm_preds</span><span class="p">,</span> <span class="n">norm_targets</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="n">mixup_count</span><span class="p">:],</span> <span class="n">targets</span><span class="p">[</span><span class="n">mixup_count</span><span class="p">:]</span>
+        <span class="n">mixup_preds</span><span class="p">,</span> <span class="n">mixup_targets</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[:</span><span class="n">mixup_count</span><span class="p">],</span> <span class="n">target</span><span class="p">[:</span><span class="n">mixup_count</span><span class="p">]</span>
+        <span class="n">norm_preds</span><span class="p">,</span> <span class="n">norm_targets</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="n">mixup_count</span><span class="p">:],</span> <span class="n">target</span><span class="p">[</span><span class="n">mixup_count</span><span class="p">:]</span>
 
         <span class="c1"># standard cross entropy for normal samples</span>
         <span class="n">loss_norm</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">norm_preds</span><span class="p">,</span> <span class="n">norm_targets</span><span class="p">)</span>

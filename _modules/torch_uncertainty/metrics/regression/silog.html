@@ -456,6 +456,7 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">SILog</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
     <span class="n">log_dists</span><span class="p">:</span> <span class="n">Tensor</span>
     <span class="n">sq_log_dists</span><span class="p">:</span> <span class="n">Tensor</span>
+    <span class="n">total</span><span class="p">:</span> <span class="n">Tensor</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes The Scale-Invariant Logarithmic Loss metric.</span>
@@ -524,15 +525,15 @@
 
 <div class="viewcode-block" id="SILog.update">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.SILog.html#torch_uncertainty.metrics.regression.SILog.update">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pred</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preds</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pyrefly: ignore[bad-override]</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update state with predictions and targets.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            pred (Tensor): A prediction tensor of shape (batch)</span>
+<span class="sd">            preds (Tensor): A prediction tensor of shape (batch)</span>
 <span class="sd">            target (Tensor): A tensor of ground truth labels of shape (batch)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log_dists</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">log</span><span class="p">()</span> <span class="o">-</span> <span class="n">target</span><span class="o">.</span><span class="n">log</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sq_log_dists</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">pred</span><span class="o">.</span><span class="n">log</span><span class="p">()</span> <span class="o">-</span> <span class="n">target</span><span class="o">.</span><span class="n">log</span><span class="p">())</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_dists</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">preds</span><span class="o">.</span><span class="n">log</span><span class="p">()</span> <span class="o">-</span> <span class="n">target</span><span class="o">.</span><span class="n">log</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sq_log_dists</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">preds</span><span class="o">.</span><span class="n">log</span><span class="p">()</span> <span class="o">-</span> <span class="n">target</span><span class="o">.</span><span class="n">log</span><span class="p">())</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">+=</span> <span class="n">target</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
 
 

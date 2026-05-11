@@ -444,7 +444,7 @@
                   
   <h1>Source code for torch_uncertainty.metrics.regression.quantile_calibration</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
@@ -493,7 +493,7 @@
 
 <div class="viewcode-block" id="QuantileCalibrationError.update">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.QuantileCalibrationError.html#torch_uncertainty.metrics.regression.QuantileCalibrationError.update">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>  <span class="c1"># pyrefly: ignore[bad-override]</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dist</span><span class="p">:</span> <span class="n">Distribution</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -535,8 +535,9 @@
             <span class="n">bound_log_prob</span> <span class="o">=</span> <span class="n">iid_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">b_min</span><span class="p">)</span>
             <span class="n">target_log_prob</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">reduce_event_dims</span><span class="p">:</span>
+                <span class="n">indep_dist</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Independent&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
                 <span class="n">bound_log_prob</span> <span class="o">=</span> <span class="n">bound_log_prob</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
-                    <span class="n">dim</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">dist</span><span class="o">.</span><span class="n">reinterpreted_batch_ndims</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                    <span class="n">dim</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">indep_dist</span><span class="o">.</span><span class="n">reinterpreted_batch_ndims</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
                 <span class="p">)</span>
 
             <span class="n">correct_mask</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">bound_log_prob</span> <span class="o">&lt;=</span> <span class="n">target_log_prob</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
@@ -566,7 +567,7 @@
 
 <div class="viewcode-block" id="QuantileCalibrationError.plot">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.QuantileCalibrationError.html#torch_uncertainty.metrics.regression.QuantileCalibrationError.plot">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PLOT_OUT_TYPE</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PLOT_OUT_TYPE</span><span class="p">:</span>  <span class="c1"># pyrefly: ignore[bad-override]</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the quantile calibration reliability diagram.</span>
 
 <span class="sd">        Raises:</span>

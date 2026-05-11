@@ -524,13 +524,16 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataloader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">la</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_loader</span><span class="o">=</span><span class="n">dataloader</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimize_prior_precision</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">la</span><span class="o">.</span><span class="n">optimize_prior_precision</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;marglik&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">la</span><span class="o">.</span><span class="n">optimize_prior_precision</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;marglik&quot;</span><span class="p">,</span> <span class="n">pred_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pred_type</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">la</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">pred_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pred_type</span><span class="p">,</span> <span class="n">link_approx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">link_approx</span><span class="p">)</span></div>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">la</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">pred_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pred_type</span><span class="p">,</span> <span class="n">link_approx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">link_approx</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>  <span class="c1"># coverage: ignore</span>
+            <span class="k">return</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 
 </pre></div>
 

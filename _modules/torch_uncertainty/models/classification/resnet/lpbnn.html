@@ -444,7 +444,6 @@
                   
   <h1>Source code for torch_uncertainty.models.classification.resnet.lpbnn</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span><span class="p">,</span> <span class="n">relu</span>
 
@@ -640,6 +639,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">bn1</span> <span class="o">=</span> <span class="n">normalization_layer</span><span class="p">(</span><span class="n">block_planes</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">optional_pool</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span>
         <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="n">ResNetStyle</span><span class="o">.</span><span class="n">IMAGENET</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optional_pool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -723,7 +723,7 @@
         <span class="n">conv_bias</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
         <span class="n">strides</span> <span class="o">=</span> <span class="p">[</span><span class="n">stride</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_blocks</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">layers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">stride</span> <span class="ow">in</span> <span class="n">strides</span><span class="p">:</span>
             <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">block</span><span class="p">(</span>
@@ -767,7 +767,7 @@
     <span class="n">conv_bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">width_multiplier</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">style</span><span class="p">:</span> <span class="n">ResNetStyle</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;imagenet&quot;</span><span class="p">,</span> <span class="s2">&quot;cifar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ResNetStyle</span><span class="o">.</span><span class="n">IMAGENET</span><span class="p">,</span>
+    <span class="n">style</span><span class="p">:</span> <span class="n">ResNetStyle</span> <span class="o">=</span> <span class="n">ResNetStyle</span><span class="o">.</span><span class="n">IMAGENET</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_LPBNNResNet</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;LPBNN version of ResNet.</span>
 

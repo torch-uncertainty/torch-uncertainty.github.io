@@ -443,7 +443,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for torch_uncertainty.models.classification.resnet.packed</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
@@ -490,7 +490,7 @@
         <span class="n">in_planes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">planes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">gamma</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">conv_bias</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -512,7 +512,7 @@
             <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">bias</span><span class="o">=</span><span class="n">conv_bias</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bn1</span> <span class="o">=</span> <span class="n">normalization_layer</span><span class="p">(</span><span class="n">planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bn1</span> <span class="o">=</span> <span class="n">normalization_layer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout2d</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">dropout_rate</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">PackedConv2d</span><span class="p">(</span>
             <span class="n">planes</span><span class="p">,</span>
@@ -526,7 +526,7 @@
             <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">bias</span><span class="o">=</span><span class="n">conv_bias</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bn2</span> <span class="o">=</span> <span class="n">normalization_layer</span><span class="p">(</span><span class="n">planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bn2</span> <span class="o">=</span> <span class="n">normalization_layer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">shortcut</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">stride</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">in_planes</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion</span> <span class="o">*</span> <span class="n">planes</span><span class="p">:</span>
@@ -542,7 +542,7 @@
                     <span class="n">stride</span><span class="o">=</span><span class="n">stride</span><span class="p">,</span>
                     <span class="n">bias</span><span class="o">=</span><span class="n">conv_bias</span><span class="p">,</span>
                 <span class="p">),</span>
-                <span class="n">normalization_layer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expansion</span> <span class="o">*</span> <span class="n">planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">),</span>
+                <span class="n">normalization_layer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expansion</span> <span class="o">*</span> <span class="n">planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)),</span>
             <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
@@ -560,7 +560,7 @@
         <span class="n">in_planes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">planes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">gamma</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">conv_bias</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -581,7 +581,7 @@
             <span class="n">groups</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span>
             <span class="n">bias</span><span class="o">=</span><span class="n">conv_bias</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bn1</span> <span class="o">=</span> <span class="n">normalization_layer</span><span class="p">(</span><span class="n">planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bn1</span> <span class="o">=</span> <span class="n">normalization_layer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">PackedConv2d</span><span class="p">(</span>
             <span class="n">planes</span><span class="p">,</span>
             <span class="n">planes</span><span class="p">,</span>
@@ -594,7 +594,7 @@
             <span class="n">groups</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span>
             <span class="n">bias</span><span class="o">=</span><span class="n">conv_bias</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bn2</span> <span class="o">=</span> <span class="n">normalization_layer</span><span class="p">(</span><span class="n">planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bn2</span> <span class="o">=</span> <span class="n">normalization_layer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout2d</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">dropout_rate</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conv3</span> <span class="o">=</span> <span class="n">PackedConv2d</span><span class="p">(</span>
             <span class="n">planes</span><span class="p">,</span>
@@ -606,7 +606,7 @@
             <span class="n">groups</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span>
             <span class="n">bias</span><span class="o">=</span><span class="n">conv_bias</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bn3</span> <span class="o">=</span> <span class="n">normalization_layer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expansion</span> <span class="o">*</span> <span class="n">planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bn3</span> <span class="o">=</span> <span class="n">normalization_layer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expansion</span> <span class="o">*</span> <span class="n">planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">shortcut</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">stride</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">in_planes</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expansion</span> <span class="o">*</span> <span class="n">planes</span><span class="p">:</span>
@@ -622,7 +622,7 @@
                     <span class="n">stride</span><span class="o">=</span><span class="n">stride</span><span class="p">,</span>
                     <span class="n">bias</span><span class="o">=</span><span class="n">conv_bias</span><span class="p">,</span>
                 <span class="p">),</span>
-                <span class="n">normalization_layer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expansion</span> <span class="o">*</span> <span class="n">planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">),</span>
+                <span class="n">normalization_layer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expansion</span> <span class="o">*</span> <span class="n">planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)),</span>
             <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
@@ -643,7 +643,7 @@
         <span class="n">conv_bias</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">dropout_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
         <span class="n">gamma</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">style</span><span class="p">:</span> <span class="n">ResNetStyle</span> <span class="o">=</span> <span class="n">ResNetStyle</span><span class="o">.</span><span class="n">IMAGENET</span><span class="p">,</span>
@@ -691,8 +691,9 @@
                 <span class="n">first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">bn1</span> <span class="o">=</span> <span class="n">normalization_layer</span><span class="p">(</span><span class="n">block_planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bn1</span> <span class="o">=</span> <span class="n">normalization_layer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">block_planes</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">))</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">optional_pool</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span>
         <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="n">ResNetStyle</span><span class="o">.</span><span class="n">IMAGENET</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optional_pool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -775,7 +776,7 @@
         <span class="n">planes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">num_blocks</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">conv_bias</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">dropout_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -784,7 +785,7 @@
         <span class="n">normalization_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
         <span class="n">strides</span> <span class="o">=</span> <span class="p">[</span><span class="n">stride</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_blocks</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">layers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">stride</span> <span class="ow">in</span> <span class="n">strides</span><span class="p">:</span>
             <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">block</span><span class="p">(</span>
@@ -831,13 +832,13 @@
     <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">arch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">alpha</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">gamma</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">conv_bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">width_multiplier</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">dropout_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="n">style</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;imagenet&quot;</span><span class="p">,</span> <span class="s2">&quot;cifar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;imagenet&quot;</span><span class="p">,</span>
+    <span class="n">style</span><span class="p">:</span> <span class="n">ResNetStyle</span> <span class="o">=</span> <span class="n">ResNetStyle</span><span class="o">.</span><span class="n">IMAGENET</span><span class="p">,</span>
     <span class="n">normalization_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">,</span>
     <span class="n">pretrained</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">linear_implementation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;conv1d&quot;</span><span class="p">,</span>
