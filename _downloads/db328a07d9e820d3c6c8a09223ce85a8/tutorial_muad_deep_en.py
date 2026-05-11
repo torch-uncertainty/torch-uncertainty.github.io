@@ -160,9 +160,9 @@ def enet_weighing(dataloader, num_classes, c=1.02):
         dataloader (``data.Dataloader``): A data loader to iterate over the
             dataset.
         num_classes (``int``): The number of classes.
-        c (``int``, optional): AN additional hyper-parameter which restricts
+        c (``int``): An additional hyper-parameter which restricts
             the interval of values for the weights. Default: 1.02.
-        ignore_indexes (``list``, optional): A list of indexes to ignore
+        ignore_indexes (``list``): A list of indexes to ignore
             when computing the weights. Default to `None`.
 
     """

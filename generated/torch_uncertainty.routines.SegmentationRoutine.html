@@ -713,31 +713,31 @@
 <li><p><strong>num_classes</strong> (<em>int</em>) – Number of classes in the segmentation task.</p></li>
 <li><p><strong>loss</strong> (<em>torch.nn.Module</em>) – Loss function to optimize the <code class="xref py py-attr docutils literal notranslate"><span class="pre">model</span></code>.
 Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-<li><p><strong>optim_recipe</strong> (<em>Callable</em><em>[</em><em>[</em><em>nn.Module</em><em>]</em><em>, </em><em>OptimizerLRScheduler</em><em>] </em><em>| </em><em>OptimizerLRScheduler</em><em>, </em><em>optional</em>) – The optimizer and
+<li><p><strong>optim_recipe</strong> (<em>Callable</em><em>[</em><em>[</em><em>nn.Module</em><em>]</em><em>, </em><em>OptimizerLRScheduler</em><em>] </em><em>| </em><em>OptimizerLRScheduler</em>) – The optimizer and
 optionally the scheduler to use, or a callable that returns them. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-<li><p><strong>eval_shift</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to evaluate the Distribution
+<li><p><strong>eval_shift</strong> (<em>bool</em>) – Indicates whether to evaluate the Distribution
 shift performance. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>format_batch_fn</strong> (<em>torch.nn.Module</em><em>, </em><em>optional</em>) – The function to format the
+<li><p><strong>format_batch_fn</strong> (<em>torch.nn.Module</em>) – The function to format the
 batch. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-<li><p><strong>metric_subsampling_rate</strong> (<em>float</em><em>, </em><em>optional</em>) – The rate of subsampling for the
+<li><p><strong>metric_subsampling_rate</strong> (<em>float</em>) – The rate of subsampling for the
 memory consuming metrics. Defaults to <code class="docutils literal notranslate"><span class="pre">1e-2</span></code>.</p></li>
-<li><p><strong>eval_ood</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to evaluate the OOD
+<li><p><strong>eval_ood</strong> (<em>bool</em>) – Indicates whether to evaluate the OOD
 performance. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>ood_criterion</strong> (<a class="reference internal" href="torch_uncertainty.ood_criteria.TUOODCriterion.html#torch_uncertainty.ood_criteria.TUOODCriterion" title="torch_uncertainty.ood_criteria.TUOODCriterion"><em>TUOODCriterion</em></a><em>, </em><em>optional</em>) – Criterion for the binary OOD detection task.
+<li><p><strong>ood_criterion</strong> (<a class="reference internal" href="torch_uncertainty.ood_criteria.TUOODCriterion.html#torch_uncertainty.ood_criteria.TUOODCriterion" title="torch_uncertainty.ood_criteria.TUOODCriterion"><em>TUOODCriterion</em></a>) – Criterion for the binary OOD detection task.
 Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;msp&quot;</span></code> which amounts to the maximum softmax probability score (MSP).</p></li>
-<li><p><strong>post_processing</strong> (<em>PostProcessing</em><em>, </em><em>optional</em>) – The post-processing
+<li><p><strong>post_processing</strong> (<em>PostProcessing</em>) – The post-processing
 technique to use. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>. Warning: There is no
 post-processing technique implemented yet for segmentation tasks.</p></li>
-<li><p><strong>log_plots</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates whether to log figures in the logger.
+<li><p><strong>log_plots</strong> (<em>bool</em>) – Indicates whether to log figures in the logger.
 Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>num_samples_to_plot</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of segmentation prediction and
+<li><p><strong>num_samples_to_plot</strong> (<em>int</em>) – Number of segmentation prediction and
 target to plot in the logger. Note that this is only used if
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">log_plots</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p></li>
-<li><p><strong>num_bins_calibration_error</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of bins to compute calibration
+<li><p><strong>num_bins_calibration_error</strong> (<em>int</em>) – Number of bins to compute calibration
 error metrics. Defaults to <code class="docutils literal notranslate"><span class="pre">15</span></code>.</p></li>
-<li><p><strong>save_in_csv</strong> (<em>bool</em><em>, </em><em>optional</em>) – Save the results in csv. Defaults to
+<li><p><strong>save_in_csv</strong> (<em>bool</em>) – Save the results in csv. Defaults to
 <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>csv_filename</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the csv file to save the results in.
+<li><p><strong>csv_filename</strong> (<em>str</em>) – The name of the csv file to save the results in.
 Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;results.csv&quot;</span></code>.</p></li>
 </ul>
 </dd>
@@ -791,7 +791,7 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;r
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>batch</strong> (<em>tuple</em><em>[</em><em>Tensor</em><em>, </em><em>Tensor</em><em>]</em>) – the test images and their corresponding targets</p></li>
 <li><p><strong>batch_idx</strong> (<em>int</em>) – the index of the batch in the test dataloader.</p></li>
-<li><p><strong>dataloader_idx</strong> (<em>int</em><em>, </em><em>optional</em>) – the index of the dataloader. Defaults to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p><strong>dataloader_idx</strong> (<em>int</em>) – the index of the dataloader. Defaults to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
