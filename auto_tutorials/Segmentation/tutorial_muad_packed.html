@@ -634,7 +634,7 @@ depth estimation, and object detection.</p>
 </section>
 <section id="compute-class-weights-to-mitigate-class-inbalance">
 <h2>4. Compute class weights to mitigate class inbalance<a class="headerlink" href="#compute-class-weights-to-mitigate-class-inbalance" title="Link to this heading">#</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">enet_weighing</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">1.02</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">enet_weighting</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">1.02</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes class weights as described in the ENet paper.</span>
 
 <span class="sd">        w_class = 1 / (ln(c + p_class)),</span>
@@ -648,14 +648,12 @@ depth estimation, and object detection.</p>
 <span class="sd">        https://arxiv.org/abs/1606.02147</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        dataloader (``data.Dataloader``): A data loader to iterate over the</span>
-<span class="sd">            dataset.</span>
-<span class="sd">        num_classes (``int``): The number of classes.</span>
-<span class="sd">        c (``int``): An additional hyper-parameter which restricts</span>
-<span class="sd">            the interval of values for the weights. Default: 1.02.</span>
-<span class="sd">        ignore_indexes (``list``): A list of indexes to ignore</span>
-<span class="sd">            when computing the weights. Default to `None`.</span>
-
+<span class="sd">        dataloader: A data loader to iterate over the dataset.</span>
+<span class="sd">        num_classes: The number of classes.</span>
+<span class="sd">        c: An additional hyper-parameter which restricts</span>
+<span class="sd">            the interval of values for the weights. Defaults to `1.02`.</span>
+<span class="sd">        ignore_indexes: A list of indexes to ignore</span>
+<span class="sd">            when computing the weights. Defaults to `None`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">class_count</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
@@ -677,7 +675,7 @@ depth estimation, and object detection.</p>
     <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="n">propensity_score</span><span class="p">))</span>
 
 
-<span class="n">class_weights</span> <span class="o">=</span> <span class="n">enet_weighing</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">(),</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">)</span>
+<span class="n">class_weights</span> <span class="o">=</span> <span class="n">enet_weighting</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">(),</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">class_weights</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -759,27 +757,27 @@ Total FLOPs: 0
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.67994          │
-│     NLL      │          1.65489          │
-│     mAcc     │          21.345%          │
-│     mIoU     │          11.840%          │
-│    pixAcc    │          53.198%          │
+│    Brier     │          0.65978          │
+│     NLL      │          1.55692          │
+│     mAcc     │          22.893%          │
+│     mIoU     │          12.725%          │
+│    pixAcc    │          52.344%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          21.462%          │
-│     MCE      │          29.028%          │
-│    SmECE     │          20.521%          │
-│     aECE     │          21.468%          │
+│     ECE      │          17.465%          │
+│     MCE      │          28.591%          │
+│    SmECE     │          17.409%          │
+│     aECE     │          17.409%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          19.352%          │
-│     AURC     │          30.914%          │
+│    AUGRC     │          19.345%          │
+│     AURC     │          30.992%          │
 │  Cov@5Risk   │           nan%            │
-│  Risk@80Cov  │          42.583%          │
+│  Risk@80Cov  │          43.569%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -846,7 +844,7 @@ Total FLOPs: 0
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_muad_packed_003.png" srcset="../../_images/sphx_glr_tutorial_muad_packed_003.png" alt="tutorial muad packed" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 32.206 seconds)</p>
+<img src="../../_images/sphx_glr_tutorial_muad_packed_003.png" srcset="../../_images/sphx_glr_tutorial_muad_packed_003.png" alt="tutorial muad packed" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 32.885 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-segmentation-tutorial-muad-packed-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/5d2c10bc7ea2717aa2112fa343dfa847/tutorial_muad_packed.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_muad_packed.ipynb</span></code></a></p>

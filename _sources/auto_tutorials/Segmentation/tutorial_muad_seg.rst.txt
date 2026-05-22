@@ -225,13 +225,13 @@ We create the model easily using the blueprint from torch_uncertainty.models.
 4. Compute class weights to mitigate class inbalance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-186
+.. GENERATED FROM PYTHON SOURCE LINES 137-185
 
 .. code-block:: Python
 
 
 
-    def enet_weighing(dataloader, num_classes, c=1.02):
+    def enet_weighting(dataloader, num_classes, c=1.02):
         """Computes class weights as described in the ENet paper.
 
             w_class = 1 / (ln(c + p_class)),
@@ -245,13 +245,12 @@ We create the model easily using the blueprint from torch_uncertainty.models.
             https://arxiv.org/abs/1606.02147
 
         Args:
-            dataloader (``data.Dataloader``): A data loader to iterate over the
-                dataset.
-            num_classes (``int``): The number of classes.
-            c (``int``): An additional hyper-parameter which restricts
-                the interval of values for the weights. Default: 1.02.
-            ignore_indexes (``list``): A list of indexes to ignore
-                when computing the weights. Default to `None`.
+            dataloader: A data loader to iterate over the dataset.
+            num_classes: The number of classes.
+            c: An additional hyper-parameter which restricts
+                the interval of values for the weights. Defaults to `1.02`.
+            ignore_indexes: A list of indexes to ignore
+                when computing the weights. Defaults to `None`.
 
         """
         class_count = 0
@@ -274,7 +273,7 @@ We create the model easily using the blueprint from torch_uncertainty.models.
         return 1 / (torch.log(c + propensity_score))
 
 
-    class_weights = enet_weighing(datamodule.val_dataloader(), datamodule.num_classes)
+    class_weights = enet_weighting(datamodule.val_dataloader(), datamodule.num_classes)
     print(class_weights)
 
 
@@ -292,11 +291,11 @@ We create the model easily using the blueprint from torch_uncertainty.models.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-188
+.. GENERATED FROM PYTHON SOURCE LINES 186-187
 
 Let's define the training parameters.
 
-.. GENERATED FROM PYTHON SOURCE LINES 188-195
+.. GENERATED FROM PYTHON SOURCE LINES 187-194
 
 .. code-block:: Python
 
@@ -314,12 +313,12 @@ Let's define the training parameters.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 196-198
+.. GENERATED FROM PYTHON SOURCE LINES 195-197
 
 5. The Loss, the Routine, and the Trainer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-220
+.. GENERATED FROM PYTHON SOURCE LINES 197-219
 
 .. code-block:: Python
 
@@ -352,12 +351,12 @@ Let's define the training parameters.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 221-223
+.. GENERATED FROM PYTHON SOURCE LINES 220-222
 
 6. Training the model
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 223-224
+.. GENERATED FROM PYTHON SOURCE LINES 222-223
 
 .. code-block:: Python
 
@@ -393,12 +392,12 @@ Let's define the training parameters.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 225-227
+.. GENERATED FROM PYTHON SOURCE LINES 224-226
 
 7. Testing the model
 ~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 227-228
+.. GENERATED FROM PYTHON SOURCE LINES 226-227
 
 .. code-block:: Python
 
@@ -414,27 +413,27 @@ Let's define the training parameters.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       Segmentation        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    Brier     │          0.66844          │
-    │     NLL      │          1.74308          │
-    │     mAcc     │          24.037%          │
-    │     mIoU     │          15.475%          │
-    │    pixAcc    │          57.734%          │
+    │    Brier     │          0.64382          │
+    │     NLL      │          1.59677          │
+    │     mAcc     │          26.258%          │
+    │     mIoU     │          16.512%          │
+    │    pixAcc    │          56.299%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          22.089%          │
-    │     MCE      │          32.673%          │
-    │    SmECE     │          21.315%          │
-    │     aECE     │          21.680%          │
+    │     ECE      │          15.026%          │
+    │     MCE      │          20.513%          │
+    │    SmECE     │          13.584%          │
+    │     aECE     │          14.225%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          17.038%          │
-    │     AURC     │          27.057%          │
+    │    AUGRC     │          17.872%          │
+    │     AURC     │          31.362%          │
     │  Cov@5Risk   │           nan%            │
-    │  Risk@80Cov  │          38.348%          │
+    │  Risk@80Cov  │          38.503%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -446,13 +445,13 @@ Let's define the training parameters.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 229-232
+.. GENERATED FROM PYTHON SOURCE LINES 228-231
 
 8. Loading a pre-trained model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Let's now load a fully trained model to continue this tutorial
 
-.. GENERATED FROM PYTHON SOURCE LINES 232-239
+.. GENERATED FROM PYTHON SOURCE LINES 231-238
 
 .. code-block:: Python
 
@@ -474,8 +473,8 @@ Let's now load a fully trained model to continue this tutorial
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       Segmentation        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    Brier     │          0.20579          │
-    │     NLL      │          0.39976          │
+    │    Brier     │          0.20535          │
+    │     NLL      │          0.40105          │
     │     mAcc     │          68.769%          │
     │     mIoU     │          50.739%          │
     │    pixAcc    │          85.704%          │
@@ -483,18 +482,18 @@ Let's now load a fully trained model to continue this tutorial
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          1.686%           │
-    │     MCE      │          6.790%           │
-    │    SmECE     │          1.852%           │
-    │     aECE     │          1.810%           │
+    │     ECE      │          1.591%           │
+    │     MCE      │          7.247%           │
+    │    SmECE     │          1.716%           │
+    │     aECE     │          1.701%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          2.727%           │
-    │     AURC     │          3.351%           │
-    │  Cov@5Risk   │          72.193%          │
-    │  Risk@80Cov  │          7.144%           │
+    │    AUGRC     │          2.711%           │
+    │     AURC     │          3.341%           │
+    │  Cov@5Risk   │          72.508%          │
+    │  Risk@80Cov  │          7.066%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -506,13 +505,13 @@ Let's now load a fully trained model to continue this tutorial
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 240-243
+.. GENERATED FROM PYTHON SOURCE LINES 239-242
 
 9. Uncertainty evaluations with MCP
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Here we will just use as confidence score the Maximum class probability (MCP)
 
-.. GENERATED FROM PYTHON SOURCE LINES 243-292
+.. GENERATED FROM PYTHON SOURCE LINES 242-291
 
 .. code-block:: Python
 
@@ -580,7 +579,7 @@ Here we will just use as confidence score the Maximum class probability (MCP)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 36.741 seconds)
+   **Total running time of the script:** (0 minutes 36.565 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Segmentation_tutorial_muad_seg.py:

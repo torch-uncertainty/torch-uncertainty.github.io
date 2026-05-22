@@ -462,10 +462,10 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;MC Dropout wrapper for a model containing nn.Dropout modules.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            core_model (nn.Module): model to wrap</span>
-<span class="sd">            num_estimators (int): number of estimators to use during the evaluation</span>
-<span class="sd">            last_layer (bool): whether to apply dropout to the last layer only.</span>
-<span class="sd">            on_batch (bool): Perform the MC-Dropout on the batch-size. Otherwise in a for loop. Useful when constrained in memory.</span>
+<span class="sd">            core_model: Model to wrap.</span>
+<span class="sd">            num_estimators: Number of estimators to use during evaluation.</span>
+<span class="sd">            last_layer: Whether to apply dropout to the last layer only.</span>
+<span class="sd">            on_batch: Perform MC-Dropout on the batch dimension instead of in a Python loop.</span>
 
 <span class="sd">        Warning:</span>
 <span class="sd">            This module will work only if you apply dropout through modules</span>
@@ -499,8 +499,7 @@
 <span class="sd">        selected dropout modules.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            mode (bool): whether to set the module to training</span>
-<span class="sd">                mode. Defaults to True.</span>
+<span class="sd">            mode: Whether to set the module to training mode. Defaults to ``True``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Training mode is expected to be boolean&quot;</span><span class="p">)</span>
@@ -523,10 +522,10 @@
 <span class="sd">        :attr:`last_layer`.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            x (Tensor): input tensor of shape (B, ...)</span>
+<span class="sd">            x: Input tensor of shape (B, ...).</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: output tensor of shape (:attr:`num_estimators` * B, ...)</span>
+<span class="sd">            Tensor | dict[str, Tensor]: Output tensor of shape (:attr:`num_estimators` * B, ...).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">core_model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -566,10 +565,10 @@
 <span class="sd">        :attr:`last_layer`.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            x (Tensor): input tensor of shape (B, ...)</span>
+<span class="sd">            x: Input tensor of shape (B, ...).</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: output tensor of shape (:attr:`num_estimators` * B, ...)</span>
+<span class="sd">            Tensor | dict[str, Tensor]: Output tensor of shape (:attr:`num_estimators` * B, ...).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">core_model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -604,12 +603,13 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;MC Dropout wrapper for a model.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        core_model (nn.Module): model to wrap</span>
-<span class="sd">        num_estimators (int): number of estimators to use last_layer (bool): whether to apply dropout to the last layer only. Defaults to ``False``.</span>
-<span class="sd">        on_batch (bool): Increase the batch_size to perform MC-Dropout. Otherwise in a for loop to reduce memory footprint. Defaults to ``True``.</span>
-<span class="sd">        last_layer (bool): whether to apply dropout to the last layer only. Defaults to ``False``.</span>
-<span class="sd">        task (Literal[``&quot;classification&quot;``, ``&quot;regression&quot;``, ``&quot;segmentation&quot;``, ``&quot;pixel_regression&quot;``]): The model task. Defaults to ``&quot;classification&quot;``.</span>
-<span class="sd">        probabilistic (bool): Whether the regression model is probabilistic.</span>
+<span class="sd">        core_model: Model to wrap.</span>
+<span class="sd">        num_estimators: Number of estimators to use during evaluation.</span>
+<span class="sd">        last_layer: Whether to apply dropout to the last layer only. Defaults to ``False``.</span>
+<span class="sd">        on_batch: Increase the batch size to perform MC-Dropout instead of using a Python loop.</span>
+<span class="sd">            Increases memory footprint. Defaults to ``True``.</span>
+<span class="sd">        task: The model task. Defaults to ``&quot;classification&quot;``.</span>
+<span class="sd">        probabilistic: Whether the regression model is probabilistic. Defaults to ``None``</span>
 
 <span class="sd">    Warning:</span>
 <span class="sd">        Beware that :attr:`on_batch==True` can raise weird errors if not enough memory is available.</span>
@@ -641,6 +641,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_dropout_checks</span><span class="p">(</span><span class="n">filtered_modules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">_DropoutNd</span><span class="p">],</span> <span class="n">num_estimators</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the dropout configuration used for MC Dropout.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">filtered_modules</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;No dropout module found in the model. &quot;</span>

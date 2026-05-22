@@ -41,7 +41,7 @@ seed_everything: false
 eval_after_fit: true
 
 trainer:
-  accelerator: gpu
+  accelerator: auto
   devices: 1
   precision: 16-mixed
   max_epochs: 200
@@ -119,7 +119,7 @@ seed_everything: false
 eval_after_fit: true
 
 trainer:
-  accelerator: gpu
+  accelerator: auto
   devices: 1
   precision: 16-mixed
   max_epochs: 200
@@ -193,7 +193,7 @@ seed_everything: false
 eval_after_fit: true
 
 trainer:
-  accelerator: gpu
+  accelerator: auto
   devices: 1
   precision: 16-mixed
   max_epochs: 200

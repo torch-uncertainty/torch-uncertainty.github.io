@@ -470,8 +470,7 @@
 <span class="sd">        or the mean confidence across estimators.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            reduction (str): Determines how to reduce over the</span>
-<span class="sd">                :math:`B`/batch dimension:</span>
+<span class="sd">            reduction: Determines how to reduce over the :math:`B`/batch dimension:</span>
 
 <span class="sd">                - ``&#39;mean&#39;`` [default]: Averages score across samples</span>
 <span class="sd">                - ``&#39;sum&#39;``: Sum score across samples</span>
@@ -548,7 +547,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the current entropy with a new tensor of probabilities.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            probs (torch.Tensor): Probabilities from the model.</span>
+<span class="sd">            probs: Probabilities from the model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">batch_size</span> <span class="o">=</span> <span class="n">probs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">entropy</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">entr</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
@@ -566,9 +565,7 @@
 <div class="viewcode-block" id="Entropy.compute">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.Entropy.html#torch_uncertainty.metrics.classification.Entropy.compute">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes Entropy based on inputs passed in to ``update``</span>
-<span class="sd">        previously.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute entropy based on inputs passed to ``update``.&quot;&quot;&quot;</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>

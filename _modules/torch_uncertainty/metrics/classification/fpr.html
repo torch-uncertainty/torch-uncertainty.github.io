@@ -463,15 +463,20 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recall_level</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pos_label</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the False Positive Rate at x% Recall.</span>
 
-<span class="sd">        The False Positive Rate at x% Recall (FPR@x) is a metric used in tasks like anomaly detection, out-of-distribution (OOD) detection, and binary classification. It measures the proportion of false positives (normal samples misclassified as anomalies) when the model achieves a specified recall level for the positive class (e.g., anomalies or OOD samples).</span>
+<span class="sd">        The False Positive Rate at x% Recall (FPR@x) is used in anomaly</span>
+<span class="sd">        detection, out-of-distribution (OOD) detection, and binary</span>
+<span class="sd">        classification. It measures the proportion of false positives</span>
+<span class="sd">        (normal samples misclassified as anomalies) when the model reaches</span>
+<span class="sd">        a specified recall level for the positive class.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            recall_level (float): The recall level at which to compute the FPR.</span>
-<span class="sd">            pos_label (int): The positive label.</span>
-<span class="sd">            kwargs: Additional arguments to pass to the metric class.</span>
+<span class="sd">            recall_level: The recall level at which to compute the FPR.</span>
+<span class="sd">            pos_label: The positive label.</span>
+<span class="sd">            kwargs: Additional keyword arguments for the metric class.</span>
 
 <span class="sd">        Reference:</span>
-<span class="sd">            Improved from https://github.com/hendrycks/anomaly-seg and translated to torch.</span>
+<span class="sd">            Improved from `anomaly-seg &lt;https://github.com/hendrycks/anomaly-seg&gt;`_</span>
+<span class="sd">            and translated to torch.</span>
 
 <span class="sd">        Example:</span>
 <span class="sd">            .. code-block:: python</span>
@@ -491,7 +496,7 @@
 <span class="sd">                # Compute FPR at 95% recall</span>
 <span class="sd">                result = metric.compute()</span>
 <span class="sd">                print(f&quot;FPR at 95% Recall: {result.item()}&quot;)</span>
-<span class="sd">                # output : FPR at 95% Recall: 0.75</span>
+<span class="sd">                # output: FPR at 95% Recall: 0.75</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -514,8 +519,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the metric state.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            confidences (Tensor): The confidence scores.</span>
-<span class="sd">            target (Tensor): The target labels, 0 if ID, 1 if OOD.</span>
+<span class="sd">            confidences: The confidence scores.</span>
+<span class="sd">            target: The target labels, 0 if ID, 1 if OOD.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">confidences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">confidences</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span></div>
@@ -590,11 +595,11 @@
 <span class="sd">        This is a specific case of the more general FPRx metric, where the recall level is fixed at 95%.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            pos_label (int): The positive label (e.g., 1 for OOD samples).</span>
-<span class="sd">            kwargs: Additional arguments to pass to the FPRx metric class.</span>
+<span class="sd">            pos_label: The positive label (e.g., 1 for OOD samples).</span>
+<span class="sd">            kwargs: Additional keyword arguments for :class:`FPRx`.</span>
 
 <span class="sd">        .. seealso::</span>
-<span class="sd">            - :class:`FPRx` - The base metric that allows customization of the recall level.</span>
+<span class="sd">            - :class:`FPRx`: Base metric that allows customization of the recall level.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">recall_level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">pos_label</span><span class="o">=</span><span class="n">pos_label</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 

@@ -488,19 +488,18 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_ExpandOutputLinear</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for expanding the output of any nn.Module using an `out_features` argument.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
-<span class="sd">        event_dim (int): The number of event dimensions.</span>
-<span class="sd">        num_params (int): The number of parameters to output. For instance, the normal distribution</span>
-<span class="sd">            has 2 parameters (loc and scale).</span>
-<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">base_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span> <span class="n">event_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_params</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">layer_args</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Abstract class for expanding the output of any nn.Module using an `out_features` argument.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            base_layer: The base layer class.</span>
+<span class="sd">            event_dim: The number of event dimensions.</span>
+<span class="sd">            num_params: The number of parameters to output. For instance, the normal distribution</span>
+<span class="sd">                has 2 parameters (loc and scale).</span>
+<span class="sd">            **layer_args: Additional arguments for the base layer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s2">&quot;out_features&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">base_layer</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_layer</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> does not have an `out_features` argument.&quot;</span><span class="p">)</span>
 
@@ -513,23 +512,22 @@
 
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
-        <span class="k">pass</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Expand the base layer output into distribution parameters.&quot;&quot;&quot;</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_ExpandOutputConvNd</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for expanding the output of any nn.Module using an `out_channels` argument.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
-<span class="sd">        event_dim (int): The number of event dimensions.</span>
-<span class="sd">        num_params (int): The number of parameters to output. For instance, the normal distribution</span>
-<span class="sd">            has 2 parameters (loc and scale).</span>
-<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">base_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span> <span class="n">event_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_params</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">layer_args</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Abstract class for expanding the output of any nn.Module using an `out_channels` argument.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            base_layer: The base layer class.</span>
+<span class="sd">            event_dim: The number of event dimensions.</span>
+<span class="sd">            num_params: The number of parameters to output. For instance, the normal distribution</span>
+<span class="sd">                has 2 parameters (loc and scale).</span>
+<span class="sd">            **layer_args: Additional arguments for the base layer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s2">&quot;out_channels&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">base_layer</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_layer</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> does not have an `out_channels` argument.&quot;</span><span class="p">)</span>
 
@@ -542,19 +540,10 @@
 
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
-        <span class="k">pass</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Expand the base layer output into distribution parameters.&quot;&quot;&quot;</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_LocScaleLinear</span><span class="p">(</span><span class="n">_ExpandOutputLinear</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base Linear layer for any distribution with loc and scale parameters.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
-<span class="sd">        event_dim (int): The number of event dimensions.</span>
-<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
-<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">base_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
@@ -562,6 +551,14 @@
         <span class="n">min_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
         <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Base Linear layer for any distribution with loc and scale parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            base_layer: The base layer class.</span>
+<span class="sd">            event_dim: The number of event dimensions.</span>
+<span class="sd">            min_scale: The minimal value of the scale parameter.</span>
+<span class="sd">            **layer_args: Additional arguments for the base layer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">base_layer</span><span class="o">=</span><span class="n">base_layer</span><span class="p">,</span>
             <span class="n">event_dim</span><span class="o">=</span><span class="n">event_dim</span><span class="p">,</span>
@@ -580,15 +577,6 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_LocScaleConvNd</span><span class="p">(</span><span class="n">_ExpandOutputConvNd</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base Convolutional layer for any distribution with loc and scale parameters.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
-<span class="sd">        event_dim (int): The number of event dimensions.</span>
-<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
-<span class="sd">        **layer_args: Additional arguments for the base layer.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">base_layer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
@@ -596,6 +584,14 @@
         <span class="n">min_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
         <span class="o">**</span><span class="n">layer_args</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Base Convolutional layer for any distribution with loc and scale parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            base_layer: The base layer class.</span>
+<span class="sd">            event_dim: The number of event dimensions.</span>
+<span class="sd">            min_scale: The minimal value of the scale parameter.</span>
+<span class="sd">            **layer_args: Additional arguments for the base layer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">base_layer</span><span class="o">=</span><span class="n">base_layer</span><span class="p">,</span>
             <span class="n">event_dim</span><span class="o">=</span><span class="n">event_dim</span><span class="p">,</span>
@@ -619,9 +615,9 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normal Distribution Linear Density Layer.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
-<span class="sd">        event_dim (int): The number of event dimensions.</span>
-<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        base_layer: The base layer class.</span>
+<span class="sd">        event_dim: The number of event dimensions.</span>
+<span class="sd">        min_scale: The minimal value of the scale parameter.</span>
 <span class="sd">        **layer_args: Additional arguments for the base layer.</span>
 
 <span class="sd">    Shape:</span>
@@ -644,16 +640,16 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normal Distribution Convolutional Density Layer.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        in_channels (int): The number of input channels.</span>
-<span class="sd">        out_channels (int): The number of event channels.</span>
-<span class="sd">        kernel_size (int | tuple[int]): The size of the convolutional kernel.</span>
-<span class="sd">        stride (int | tuple[int]): The stride of the convolution.</span>
-<span class="sd">        padding (int | tuple[int]): The padding of the convolution.</span>
-<span class="sd">        dilation (int | tuple[int]): The dilation of the convolution.</span>
-<span class="sd">        groups (int): The number of groups in the convolution.</span>
-<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
-<span class="sd">        device (torch.device): The device where the layer is stored.</span>
-<span class="sd">        dtype (torch.dtype): The datatype of the layer.</span>
+<span class="sd">        in_channels: The number of input channels.</span>
+<span class="sd">        out_channels: The number of event channels.</span>
+<span class="sd">        kernel_size: The size of the convolutional kernel.</span>
+<span class="sd">        stride: The stride of the convolution.</span>
+<span class="sd">        padding: The padding of the convolution.</span>
+<span class="sd">        dilation: The dilation of the convolution.</span>
+<span class="sd">        groups: The number of groups in the convolution.</span>
+<span class="sd">        min_scale: The minimal value of the scale parameter.</span>
+<span class="sd">        device: The device where the layer is stored.</span>
+<span class="sd">        dtype: The datatype of the layer.</span>
 
 <span class="sd">    Shape:</span>
 <span class="sd">        - Input: :math:`(N, C_{in}, \ast)` where :math:`\ast` means any number of dimensions and</span>
@@ -674,9 +670,9 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Laplace Distribution Linear Density Layer.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
-<span class="sd">        event_dim (int): The number of event dimensions.</span>
-<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        base_layer: The base layer class.</span>
+<span class="sd">        event_dim: The number of event dimensions.</span>
+<span class="sd">        min_scale: The minimal value of the scale parameter.</span>
 <span class="sd">        **layer_args: Additional arguments for the base layer.</span>
 
 <span class="sd">    Shape:</span>
@@ -699,16 +695,16 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Laplace Distribution Convolutional Density Layer.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        in_channels (int): The number of input channels.</span>
-<span class="sd">        out_channels (int): The number of event channels.</span>
-<span class="sd">        kernel_size (int | tuple[int]): The size of the convolutional kernel.</span>
-<span class="sd">        stride (int | tuple[int]): The stride of the convolution.</span>
-<span class="sd">        padding (int | tuple[int]): The padding of the convolution.</span>
-<span class="sd">        dilation (int | tuple[int]): The dilation of the convolution.</span>
-<span class="sd">        groups (int): The number of groups in the convolution.</span>
-<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
-<span class="sd">        device (torch.device): The device where the layer is stored.</span>
-<span class="sd">        dtype (torch.dtype): The datatype of the layer.</span>
+<span class="sd">        in_channels: The number of input channels.</span>
+<span class="sd">        out_channels: The number of event channels.</span>
+<span class="sd">        kernel_size: The size of the convolutional kernel.</span>
+<span class="sd">        stride: The stride of the convolution.</span>
+<span class="sd">        padding: The padding of the convolution.</span>
+<span class="sd">        dilation: The dilation of the convolution.</span>
+<span class="sd">        groups: The number of groups in the convolution.</span>
+<span class="sd">        min_scale: The minimal value of the scale parameter.</span>
+<span class="sd">        device: The device where the layer is stored.</span>
+<span class="sd">        dtype: The datatype of the layer.</span>
 
 <span class="sd">    Shape:</span>
 <span class="sd">        - Input: :math:`(N, C_{in}, \ast)` where :math:`\ast` means any number of dimensions and</span>
@@ -729,9 +725,9 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cauchy Distribution Linear Density Layer.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
-<span class="sd">        event_dim (int): The number of event dimensions.</span>
-<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        base_layer: The base layer class.</span>
+<span class="sd">        event_dim: The number of event dimensions.</span>
+<span class="sd">        min_scale: The minimal value of the scale parameter.</span>
 <span class="sd">        **layer_args: Additional arguments for the base layer.</span>
 
 <span class="sd">    Shape:</span>
@@ -754,16 +750,16 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cauchy Distribution Convolutional Density Layer.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        in_channels (int): The number of input channels.</span>
-<span class="sd">        out_channels (int): The number of event channels.</span>
-<span class="sd">        kernel_size (int | tuple[int]): The size of the convolutional kernel.</span>
-<span class="sd">        stride (int | tuple[int]): The stride of the convolution.</span>
-<span class="sd">        padding (int | tuple[int]): The padding of the convolution.</span>
-<span class="sd">        dilation (int | tuple[int]): The dilation of the convolution.</span>
-<span class="sd">        groups (int): The number of groups in the convolution.</span>
-<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
-<span class="sd">        device (torch.device): The device where the layer is stored.</span>
-<span class="sd">        dtype (torch.dtype): The datatype of the layer.</span>
+<span class="sd">        in_channels: The number of input channels.</span>
+<span class="sd">        out_channels: The number of event channels.</span>
+<span class="sd">        kernel_size: The size of the convolutional kernel.</span>
+<span class="sd">        stride: The stride of the convolution.</span>
+<span class="sd">        padding: The padding of the convolution.</span>
+<span class="sd">        dilation: The dilation of the convolution.</span>
+<span class="sd">        groups: The number of groups in the convolution.</span>
+<span class="sd">        min_scale: The minimal value of the scale parameter.</span>
+<span class="sd">        device: The device where the layer is stored.</span>
+<span class="sd">        dtype: The datatype of the layer.</span>
 
 <span class="sd">    Shape:</span>
 <span class="sd">        - Input: :math:`(N, C_{in}, \ast)` where :math:`\ast` means any number of dimensions and</span>
@@ -782,9 +778,9 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gamma distribution Linear Density Layer.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
-<span class="sd">        event_dim (int): The number of event dimensions.</span>
-<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        base_layer: The base layer class.</span>
+<span class="sd">        event_dim: The number of event dimensions.</span>
+<span class="sd">        min_scale: The minimal value of the scale parameter.</span>
 <span class="sd">        **layer_args: Additional arguments for the base layer.</span>
 
 <span class="sd">    Note:</span>
@@ -823,9 +819,9 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gamma distribution Convolutional Density Layer.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        base_layer (type[nn.Module]): The base layer class.</span>
-<span class="sd">        event_dim (int): The number of event dimensions.</span>
-<span class="sd">        min_scale (float): The minimal value of the scale parameter.</span>
+<span class="sd">        base_layer: The base layer class.</span>
+<span class="sd">        event_dim: The number of event dimensions.</span>
+<span class="sd">        min_scale: The minimal value of the scale parameter.</span>
 <span class="sd">        **layer_args: Additional arguments for the base layer.</span>
 
 <span class="sd">    Note:</span>
@@ -871,11 +867,11 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Student&#39;s T-Distribution Linear Density Layer.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            base_layer (type[nn.Module]): The base layer class.</span>
-<span class="sd">            event_dim (int): The number of event dimensions.</span>
-<span class="sd">            min_scale (float): The minimal value of the scale parameter.</span>
-<span class="sd">            min_df (float): The minimal value of the degrees of freedom parameter.</span>
-<span class="sd">            fixed_df (float): If not None, the degrees of freedom parameter is fixed to this value.</span>
+<span class="sd">            base_layer: The base layer class.</span>
+<span class="sd">            event_dim: The number of event dimensions.</span>
+<span class="sd">            min_scale: The minimal value of the scale parameter.</span>
+<span class="sd">            min_df: The minimal value of the degrees of freedom parameter.</span>
+<span class="sd">            fixed_df: If not None, the degrees of freedom parameter is fixed to this value.</span>
 <span class="sd">                Otherwise, it is learned.</span>
 <span class="sd">            **layer_args: Additional arguments for the base layer.</span>
 
@@ -933,11 +929,11 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Student&#39;s T-Distribution Convolutional Density Layer.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            base_layer (type[nn.Module]): The base layer class.</span>
-<span class="sd">            event_dim (int): The number of event dimensions.</span>
-<span class="sd">            min_scale (float): The minimal value of the scale parameter.</span>
-<span class="sd">            min_df (float): The minimal value of the degrees of freedom parameter.</span>
-<span class="sd">            fixed_df (float): If not None, the degrees of freedom parameter is fixed to this value.</span>
+<span class="sd">            base_layer: The base layer class.</span>
+<span class="sd">            event_dim: The number of event dimensions.</span>
+<span class="sd">            min_scale: The minimal value of the scale parameter.</span>
+<span class="sd">            min_df: The minimal value of the degrees of freedom parameter.</span>
+<span class="sd">            fixed_df: If not None, the degrees of freedom parameter is fixed to this value.</span>
 <span class="sd">                Otherwise, it is learned.</span>
 <span class="sd">            **layer_args: Additional arguments for the base layer.</span>
 
@@ -994,11 +990,11 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normal-Inverse-Gamma Distribution Linear Density Layer.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            base_layer (type[nn.Module]): The base layer class.</span>
-<span class="sd">            event_dim (int): The number of event dimensions.</span>
-<span class="sd">            min_lmbda (float): The minimal value of the :math:`\lambda` parameter.</span>
-<span class="sd">            min_alpha (float): The minimal value of the :math:`\alpha` parameter.</span>
-<span class="sd">            min_beta (float): The minimal value of the :math:`\beta` parameter.</span>
+<span class="sd">            base_layer: The base layer class.</span>
+<span class="sd">            event_dim: The number of event dimensions.</span>
+<span class="sd">            min_lmbda: The minimal value of the :math:`\lambda` parameter.</span>
+<span class="sd">            min_alpha: The minimal value of the :math:`\alpha` parameter.</span>
+<span class="sd">            min_beta: The minimal value of the :math:`\beta` parameter.</span>
 <span class="sd">            **layer_args: Additional arguments for the base layer.</span>
 
 <span class="sd">        Shape:</span>
@@ -1065,11 +1061,11 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normal-Inverse-Gamma Distribution Convolutional Density Layer.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            base_layer (type[nn.Module]): The base layer class.</span>
-<span class="sd">            event_dim (int): The number of event dimensions.</span>
-<span class="sd">            min_lmbda (float): The minimal value of the :math:`\lambda` parameter.</span>
-<span class="sd">            min_alpha (float): The minimal value of the :math:`\alpha` parameter.</span>
-<span class="sd">            min_beta (float): The minimal value of the :math:`\beta` parameter.</span>
+<span class="sd">            base_layer: The base layer class.</span>
+<span class="sd">            event_dim: The number of event dimensions.</span>
+<span class="sd">            min_lmbda: The minimal value of the :math:`\lambda` parameter.</span>
+<span class="sd">            min_alpha: The minimal value of the :math:`\alpha` parameter.</span>
+<span class="sd">            min_beta: The minimal value of the :math:`\beta` parameter.</span>
 <span class="sd">            **layer_args: Additional arguments for the base layer.</span>
 
 <span class="sd">        Shape:</span>

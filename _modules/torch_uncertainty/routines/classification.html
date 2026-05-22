@@ -519,48 +519,40 @@
         <span class="n">post_processing</span><span class="p">:</span> <span class="n">PostProcessing</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_bins_calibration_error</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
         <span class="n">log_plots</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">save_in_csv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">save_to_csv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">csv_filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;results.csv&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Routine for training &amp; testing on **classification** tasks.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            model (torch.nn.Module): Model to train.</span>
-<span class="sd">            num_classes (int): Number of classes.</span>
-<span class="sd">            loss (torch.nn.Module): Loss function to optimize the :attr:`model`.</span>
+<span class="sd">            model: Model to train.</span>
+<span class="sd">            num_classes: Number of classes.</span>
+<span class="sd">            loss: Loss function to optimize the :attr:`model`. Defaults to ``None``.</span>
+<span class="sd">            is_ensemble: Indicates whether the model is an ensemble at test time or not.</span>
+<span class="sd">                Defaults to ``False``.</span>
+<span class="sd">            num_tta: Number of test-time augmentations (TTA). If ``1``: no TTA. Defaults to ``1``.</span>
+<span class="sd">            format_batch_fn: Function to format the batch. Defaults to ``None``.</span>
+<span class="sd">            optim_recipe: The optimizer and optionally the scheduler to use, or a callable that returns them.</span>
 <span class="sd">                Defaults to ``None``.</span>
-<span class="sd">            is_ensemble (bool): Indicates whether the model is an</span>
-<span class="sd">                ensemble at test time or not. Defaults to ``False``.</span>
-<span class="sd">            num_tta (int): Number of test-time augmentations (TTA). If ``1``: no TTA.</span>
-<span class="sd">                Defaults to ``1``.</span>
-<span class="sd">            format_batch_fn (torch.nn.Module): Function to format the batch.</span>
+<span class="sd">            mixup_params: Mixup parameters dictionary. Can include mixup type, mixup mode, distance similarity,</span>
+<span class="sd">                kernel tau max, kernel tau std, mixup alpha, and cutmix alpha. If None, no mixup augmentations.</span>
 <span class="sd">                Defaults to ``None``.</span>
-<span class="sd">            optim_recipe (Callable[[nn.Module], OptimizerLRScheduler] | OptimizerLRScheduler): The optimizer and</span>
-<span class="sd">                optionally the scheduler to use, or a callable that returns them. Defaults to ``None``.</span>
-<span class="sd">            mixup_params (dict): Mixup parameters. Can include mixup type,</span>
-<span class="sd">                mixup mode, distance similarity, kernel tau max, kernel tau std,</span>
-<span class="sd">                mixup alpha, and cutmix alpha. If None, no mixup augmentations.</span>
+<span class="sd">            eval_ood: Indicates whether to evaluate the OOD detection performance.</span>
+<span class="sd">                Defaults to ``False``.</span>
+<span class="sd">            eval_shift: Indicates whether to evaluate the Distribution shift performance.</span>
+<span class="sd">                Defaults to ``False``.</span>
+<span class="sd">            eval_grouping_loss: Indicates whether to evaluate the grouping loss or not.</span>
+<span class="sd">                Defaults to ``False``.</span>
+<span class="sd">            ood_criterion: Criterion for the binary OOD detection task. Defaults to ``msp``, the Maximum Softmax</span>
+<span class="sd">                Probability score.</span>
+<span class="sd">            post_processing: Post-processing method to train on the calibration set. No post-processing if None.</span>
 <span class="sd">                Defaults to ``None``.</span>
-<span class="sd">            eval_ood (bool): Indicates whether to evaluate the OOD</span>
-<span class="sd">                detection performance. Defaults to ``False``.</span>
-<span class="sd">            eval_shift (bool): Indicates whether to evaluate the Distribution</span>
-<span class="sd">                shift performance. Defaults to ``False``.</span>
-<span class="sd">            eval_grouping_loss (bool): Indicates whether to evaluate the</span>
-<span class="sd">                grouping loss or not. Defaults to ``False``.</span>
-<span class="sd">            ood_criterion (TUOODCriterion | str): Criterion for the binary OOD detection</span>
-<span class="sd">                task. Defaults to ``msp``, the Maximum Softmax Probability score.</span>
-<span class="sd">            post_processing (PostProcessing): Post-processing method</span>
-<span class="sd">                to train on the calibration set. No post-processing if None.</span>
-<span class="sd">                Defaults to ``None``.</span>
-<span class="sd">            num_bins_calibration_error (int): Number of bins to compute calibration</span>
-<span class="sd">                error metrics. Defaults to ``15``.</span>
-<span class="sd">            log_plots (bool): Indicates whether to log plots from</span>
-<span class="sd">                metrics. Defaults to ``False``.</span>
-<span class="sd">            save_in_csv (bool): Save the results in csv. Defaults to</span>
-<span class="sd">                ``False``.</span>
-<span class="sd">            csv_filename (str): Name of the csv file. Defaults to</span>
-<span class="sd">                ``&quot;results.csv&quot;``. Note that this is only used if</span>
-<span class="sd">                :attr:`save_in_csv` is ``True``.</span>
+<span class="sd">            num_bins_calibration_error: Number of bins to compute calibration error metrics.</span>
+<span class="sd">                Defaults to ``15``.</span>
+<span class="sd">            log_plots: Indicates whether to log plots from metrics. Defaults to ``False``.</span>
+<span class="sd">            save_to_csv: Save the results in csv. Defaults to ``False``.</span>
+<span class="sd">            csv_filename: Name of the csv file. Defaults to ``&quot;results.csv&quot;``.</span>
+<span class="sd">                Note that this is only used if ``save_to_csv`` is ``True``.</span>
 
 <span class="sd">        Warning:</span>
 <span class="sd">            You must define :attr:`optim_recipe` if you do not use the Lightning CLI.</span>
@@ -608,7 +600,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">num_tta</span> <span class="o">=</span> <span class="n">num_tta</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span> <span class="o">=</span> <span class="n">get_ood_criterion</span><span class="p">(</span><span class="n">ood_criterion</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_plots</span> <span class="o">=</span> <span class="n">log_plots</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">save_in_csv</span> <span class="o">=</span> <span class="n">save_in_csv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_to_csv</span> <span class="o">=</span> <span class="n">save_to_csv</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">csv_filename</span> <span class="o">=</span> <span class="n">csv_filename</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">binary_cls</span> <span class="o">=</span> <span class="n">num_classes</span> <span class="o">==</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">needs_epoch_update</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">EPOCH_UPDATE_MODEL</span><span class="p">)</span>
@@ -713,6 +705,7 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_shift</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_shift_metrics</span> <span class="o">=</span> <span class="n">cls_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;shift/&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_shift_entropy</span> <span class="o">=</span> <span class="n">Entropy</span><span class="p">()</span>
 
         <span class="c1"># metrics for ensembles only</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
@@ -741,8 +734,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup the optional mixup augmentation based on the :attr:`mixup_params` dict.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            mixup_params (dict | None): the detailed parameters of the mixup augmentation. None if</span>
-<span class="sd">                unused.</span>
+<span class="sd">            mixup_params: the detailed parameters of the mixup augmentation. ``None`` if unused.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">mixup_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">mixup_params</span> <span class="o">=</span> <span class="p">{}</span>
@@ -755,7 +747,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the mixup augmentation on a :attr:`batch` of images.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            batch (tuple[Tensor, Tensor]): the images and the corresponding targets.</span>
+<span class="sd">            batch: the images and the corresponding targets.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple[Tensor, Tensor]: the images and the corresponding targets transformed with mixup.</span>
@@ -829,9 +821,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass of the inner model.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            inputs (Tensor): input tensor.</span>
-<span class="sd">            save_feats (bool): whether to store the features or</span>
-<span class="sd">                not. Defaults to ``False``.</span>
+<span class="sd">            inputs: input tensor.</span>
+<span class="sd">            save_feats: whether to store the features or not. Defaults to ``False``.</span>
 
 <span class="sd">        Note:</span>
 <span class="sd">            The features are stored in the :attr:`self.features` attribute.</span>
@@ -854,7 +845,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform a single training step based on the input tensors.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            batch (tuple[Tensor, Tensor]): the training data and their corresponding targets.</span>
+<span class="sd">            batch: the training data and their corresponding targets.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: the loss corresponding to this training step.</span>
@@ -894,7 +885,7 @@
 <span class="sd">        Compute the prediction of the model and the value of the metrics on the validation batch.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            batch (tuple[Tensor, Tensor]): the validation data and their corresponding targets</span>
+<span class="sd">            batch: the validation data and their corresponding targets</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">batch</span>
         <span class="c1"># remove duplicates when doing TTA</span>
@@ -928,9 +919,9 @@
 <span class="sd">        handle OOD and distribution-shifted images.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            batch (tuple[Tensor, Tensor]): the test data and their corresponding targets.</span>
-<span class="sd">            batch_idx (int): the number of the current batch (unused).</span>
-<span class="sd">            dataloader_idx (int): 0 if in-distribution, 1 if out-of-distribution and 2 if</span>
+<span class="sd">            batch: the test data and their corresponding targets.</span>
+<span class="sd">            batch_idx: the number of the current batch (unused).</span>
+<span class="sd">            dataloader_idx: 0 if in-distribution, 1 if out-of-distribution and 2 if</span>
 <span class="sd">                distribution-shifted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">batch</span>
@@ -979,7 +970,6 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">test_id_ens_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs_per_est</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_entropy</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ood_scores</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">targets</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_score_storage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -989,6 +979,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">post_cls_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pp_probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="ow">and</span> <span class="n">dataloader_idx</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_entropy</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ood_scores</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">targets</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
@@ -998,7 +989,9 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">ood_score_storage</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ood_scores</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_shift</span> <span class="ow">and</span> <span class="n">dataloader_idx</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="k">else</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_shift_entropy</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_shift_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">test_shift_ens_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs_per_est</span><span class="p">)</span></div>
 
@@ -1053,6 +1046,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_shift</span><span class="p">:</span>
             <span class="n">result_dict</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_shift_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span> <span class="o">|</span> <span class="p">{</span>
                 <span class="s2">&quot;shift/severity&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">datamodule</span><span class="o">.</span><span class="n">shift_severity</span><span class="p">,</span>
+                <span class="s2">&quot;shift/Entropy&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_shift_entropy</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span>
             <span class="p">}</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
@@ -1082,7 +1076,7 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ensemble</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">test_shift_ens_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_in_csv</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_to_csv</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">csv_writer</span><span class="p">(</span>
                 <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log_dir</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">csv_filename</span><span class="p">,</span>
                 <span class="n">result_dict</span><span class="p">,</span>
@@ -1137,15 +1131,15 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check the domains of the arguments of the classification routine.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        model (nn.Module): the model used to make classification predictions.</span>
-<span class="sd">        num_classes (int): the number of classes in the dataset.</span>
-<span class="sd">        is_ensemble (bool): whether the model is an ensemble or a single model.</span>
-<span class="sd">        ood_criterion (TUOODCriterion): OOD criterion for the binary OOD detection task.</span>
-<span class="sd">        eval_grouping_loss (bool): whether to evaluate the grouping loss.</span>
-<span class="sd">        num_bins_calibration_error (int): the number of bins for the evaluation of the calibration.</span>
-<span class="sd">        mixup_params (dict | None): the dictionary to setup the mixup augmentation.</span>
-<span class="sd">        post_processing (PostProcessing | None): the post-processing module.</span>
-<span class="sd">        format_batch_fn (nn.Module | None): the function for formatting the batch for ensembles.</span>
+<span class="sd">        model: the model used to make classification predictions.</span>
+<span class="sd">        num_classes: the number of classes in the dataset.</span>
+<span class="sd">        is_ensemble: whether the model is an ensemble or a single model.</span>
+<span class="sd">        ood_criterion: OOD criterion for the binary OOD detection task.</span>
+<span class="sd">        eval_grouping_loss: whether to evaluate the grouping loss.</span>
+<span class="sd">        num_bins_calibration_error: the number of bins for the evaluation of the calibration.</span>
+<span class="sd">        mixup_params: the dictionary to setup the mixup augmentation.</span>
+<span class="sd">        post_processing: the post-processing module.</span>
+<span class="sd">        format_batch_fn: the function for formatting the batch for ensembles.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ood_criterion</span> <span class="o">=</span> <span class="n">get_ood_criterion</span><span class="p">(</span><span class="n">ood_criterion</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">is_ensemble</span> <span class="ow">and</span> <span class="n">ood_criterion</span><span class="o">.</span><span class="n">ensemble_only</span><span class="p">:</span>

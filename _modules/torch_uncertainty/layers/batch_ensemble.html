@@ -475,23 +475,19 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;BatchEnsemble-style Linear layer.</span>
 
-<span class="sd">        Apply a linear transformation using BatchEnsemble method to the incoming</span>
-<span class="sd">        data.</span>
+<span class="sd">        Apply a linear transformation using the BatchEnsemble method to the</span>
+<span class="sd">        incoming data.</span>
 
 <span class="sd">        .. math::</span>
 <span class="sd">            y=(x\circ \widehat{r_{group}})W^{T}\circ \widehat{s_{group}} + \widehat{b}</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            in_features (int): Number of input features.</span>
-<span class="sd">            out_features (int): Number of output features.</span>
-<span class="sd">            num_estimators (int): Number of estimators in the ensemble, referred as</span>
-<span class="sd">                :math:`M`.</span>
-<span class="sd">            bias (bool): If ``True``, adds a learnable bias to the</span>
-<span class="sd">                output. Defaults to ``True``.</span>
-<span class="sd">            device (Any): Device to use for the parameters and</span>
-<span class="sd">                buffers of this module. Defaults to ``None``.</span>
-<span class="sd">            dtype (Any): Data type to use for the parameters and</span>
-<span class="sd">                buffers of this module. Defaults to ``None``.</span>
+<span class="sd">            in_features: Number of input features.</span>
+<span class="sd">            out_features: Number of output features.</span>
+<span class="sd">            num_estimators: Number of estimators in the ensemble (``M``).</span>
+<span class="sd">            bias: If ``True``, adds a learnable bias to the output. Defaults to ``True``.</span>
+<span class="sd">            device: Device to use for parameters and buffers. Defaults to ``None``.</span>
+<span class="sd">            dtype: Data type to use for parameters and buffers. Defaults to ``None``.</span>
 
 <span class="sd">        Reference:</span>
 <span class="sd">            Introduced by the paper `BatchEnsemble: An Alternative Approach to</span>
@@ -507,14 +503,12 @@
 <span class="sd">                :math:`(H_{out}, H_{in})` shared between the estimators. The values</span>
 <span class="sd">                are initialized from :math:`\mathcal{U}(-\sqrt{k}, \sqrt{k})`,</span>
 <span class="sd">                where :math:`k = \frac{1}{H_{in}}`.</span>
-<span class="sd">            r_group: The learnable matrice of shape :math:`(M, H_{in})` where each row</span>
-<span class="sd">                consist of the vector :math:`r_{i}` corresponding to the</span>
-<span class="sd">                :math:`i^{th}` ensemble member. The values are initialized from</span>
-<span class="sd">                :math:`\mathcal{N}(1.0, 0.5)`.</span>
-<span class="sd">            s_group: The learnable matrice of shape :math:`(M, H_{out})` where each row</span>
-<span class="sd">                consist of the vector :math:`s_{i}` corresponding to the</span>
-<span class="sd">                :math:`i^{th}` ensemble member. The values are initialized from</span>
-<span class="sd">                :math:`\mathcal{N}(1.0, 0.5)`.</span>
+<span class="sd">            r_group: Learnable matrix of shape :math:`(M, H_{in})` where each row</span>
+<span class="sd">                is the vector :math:`r_{i}` corresponding to the :math:`i^{th}`</span>
+<span class="sd">                ensemble member. Initialized from :math:`\mathcal{N}(1.0, 0.5)`.</span>
+<span class="sd">            s_group: Learnable matrix of shape :math:`(M, H_{out})` where each row</span>
+<span class="sd">                is the vector :math:`s_{i}` corresponding to the :math:`i^{th}`</span>
+<span class="sd">                ensemble member. Initialized from :math:`\mathcal{N}(1.0, 0.5)`.</span>
 <span class="sd">            bias: The learnable bias (:math:`b`) of shape :math:`(M, H_{out})`</span>
 <span class="sd">                where each row corresponds to the bias of the :math:`i^{th}`</span>
 <span class="sd">                ensemble member. If :attr:`bias` is ``True``, the values are</span>
@@ -573,8 +567,8 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a BatchEnsemble-style Linear layer from an existing Linear layer.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            linear (nn.Linear): The Linear layer to convert.</span>
-<span class="sd">            num_estimators (int): Number of ensemble members.</span>
+<span class="sd">            linear: The Linear layer to convert.</span>
+<span class="sd">            num_estimators: Number of ensemble members.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            BatchLinear: The converted BatchEnsemble-style Linear layer.</span>
@@ -670,7 +664,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;BatchEnsemble-style Conv1d layer.</span>
 
-<span class="sd">        Applies a 1d convolution over an input signal composed of several input</span>
+<span class="sd">        Apply a 1d convolution over an input signal composed of several input</span>
 <span class="sd">        planes using BatchEnsemble method to the incoming data.</span>
 
 <span class="sd">        In the simplest case, the output value of the layer with input size</span>
@@ -695,24 +689,19 @@
 <span class="sd">            &lt;https://www.tensorflow.org&gt;`_.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            in_channels (int): Number of channels in the input images.</span>
-<span class="sd">            out_channels (int): Number of channels produced by the convolution.</span>
-<span class="sd">            kernel_size (int): Size of the convolving kernel.</span>
-<span class="sd">            num_estimators (int): Number of estimators in the ensemble referred as</span>
-<span class="sd">                :math:`M` here.</span>
-<span class="sd">            stride (int): Stride of the convolution. Defaults to</span>
-<span class="sd">                ``1``.</span>
-<span class="sd">            padding (int or str): Padding added to all four sides</span>
-<span class="sd">                of the input. Defaults to ``0``.</span>
-<span class="sd">            dilation (int): Spacing between kernel elements.</span>
-<span class="sd">                Defaults to ``1``.</span>
-<span class="sd">            groups (int): Number of blocked connections from input</span>
+<span class="sd">            in_channels: Number of channels in the input images.</span>
+<span class="sd">            out_channels: Number of channels produced by the convolution.</span>
+<span class="sd">            kernel_size: Size of the convolving kernel.</span>
+<span class="sd">            num_estimators: Number of estimators in the ensemble referred as :math:`M` here.</span>
+<span class="sd">            stride: Stride of the convolution. Defaults to ``1``.</span>
+<span class="sd">            padding: Padding added to all four sides of the input. Defaults to ``0``.</span>
+<span class="sd">            dilation: Spacing between kernel elements. Defaults to ``1``.</span>
+<span class="sd">            groups: Number of blocked connections from input</span>
 <span class="sd">                channels to output channels. Defaults to ``1``.</span>
-<span class="sd">            bias (bool): If ``True``, adds a learnable bias to the</span>
-<span class="sd">                output. Defaults to ``True``.</span>
-<span class="sd">            device (Any): Device to use for the parameters and</span>
+<span class="sd">            bias: If ``True``, adds a learnable bias to the output. Defaults to ``True``.</span>
+<span class="sd">            device: Device to use for the parameters and</span>
 <span class="sd">                buffers of this module. Defaults to ``None``.</span>
-<span class="sd">            dtype (Any): Data type to use for the parameters and</span>
+<span class="sd">            dtype: Data type to use for the parameters and</span>
 <span class="sd">                buffers of this module. Defaults to ``None``.</span>
 
 <span class="sd">        Attributes:</span>
@@ -799,8 +788,8 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a BatchEnsemble-style Conv1d layer from an existing Conv1d layer.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            conv1d (nn.Conv1d): The Conv1d layer to convert.</span>
-<span class="sd">            num_estimators (int): Number of ensemble members.</span>
+<span class="sd">            conv1d: The Conv1d layer to convert.</span>
+<span class="sd">            num_estimators: Number of ensemble members.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            BatchConv1d: The converted BatchEnsemble-style Conv1d layer.</span>
@@ -904,7 +893,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;BatchEnsemble-style Conv2d layer.</span>
 
-<span class="sd">        Applies a 2d convolution over an input signal composed of several input</span>
+<span class="sd">        Apply a 2d convolution over an input signal composed of several input</span>
 <span class="sd">        planes using BatchEnsemble method to the incoming data.</span>
 
 <span class="sd">        In the simplest case, the output value of the layer with input size</span>
@@ -929,24 +918,24 @@
 <span class="sd">            &lt;https://www.tensorflow.org&gt;`_.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            in_channels (int): Number of channels in the input images.</span>
-<span class="sd">            out_channels (int): Number of channels produced by the convolution.</span>
-<span class="sd">            kernel_size (int or tuple): Size of the convolving kernel.</span>
-<span class="sd">            num_estimators (int): Number of estimators in the ensemble referred as</span>
+<span class="sd">            in_channels: Number of channels in the input images.</span>
+<span class="sd">            out_channels: Number of channels produced by the convolution.</span>
+<span class="sd">            kernel_size: Size of the convolving kernel.</span>
+<span class="sd">            num_estimators: Number of estimators in the ensemble referred as</span>
 <span class="sd">                :math:`M` here.</span>
-<span class="sd">            stride (int or tuple): Stride of the convolution. Defaults to</span>
+<span class="sd">            stride: Stride of the convolution. Defaults to</span>
 <span class="sd">                ``1``.</span>
 <span class="sd">            padding (int, tuple or str): Padding added to all four sides</span>
 <span class="sd">                of the input. Defaults to ``0``.</span>
-<span class="sd">            dilation (int or tuple): Spacing between kernel elements.</span>
+<span class="sd">            dilation: Spacing between kernel elements.</span>
 <span class="sd">                Defaults to ``1``.</span>
-<span class="sd">            groups (int): Number of blocked connections from input</span>
+<span class="sd">            groups: Number of blocked connections from input</span>
 <span class="sd">                channels to output channels. Defaults to ``1``.</span>
-<span class="sd">            bias (bool): If ``True``, adds a learnable bias to the</span>
+<span class="sd">            bias: If ``True``, adds a learnable bias to the</span>
 <span class="sd">                output. Defaults to ``True``.</span>
-<span class="sd">            device (Any): Device to use for the parameters and</span>
+<span class="sd">            device: Device to use for the parameters and</span>
 <span class="sd">                buffers of this module. Defaults to ``None``.</span>
-<span class="sd">            dtype (Any): Data type to use for the parameters and</span>
+<span class="sd">            dtype: Data type to use for the parameters and</span>
 <span class="sd">                buffers of this module. Defaults to ``None``.</span>
 
 <span class="sd">        Attributes:</span>
@@ -1040,8 +1029,8 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a BatchEnsemble-style Conv2d layer from an existing Conv2d layer.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            conv2d (nn.Conv2d): The Conv2d layer to convert.</span>
-<span class="sd">            num_estimators (int): Number of ensemble members.</span>
+<span class="sd">            conv2d: The Conv2d layer to convert.</span>
+<span class="sd">            num_estimators: Number of ensemble members.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            BatchConv2d: The converted BatchEnsemble-style Conv2d layer.</span>
@@ -1125,26 +1114,25 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;BatchEnsemble-style ConvTranspose2d layer.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            in_channels (int): Number of channels in the input images.</span>
-<span class="sd">            out_channels (int): Number of channels produced by the convolution.</span>
-<span class="sd">            kernel_size (_size_2_t): Size of the convolving kernel.</span>
-<span class="sd">            num_estimators (int): Number of estimators in the ensemble referred as</span>
+<span class="sd">            in_channels: Number of channels in the input images.</span>
+<span class="sd">            out_channels: Number of channels produced by the convolution.</span>
+<span class="sd">            kernel_size: Size of the convolving kernel.</span>
+<span class="sd">            num_estimators: Number of estimators in the ensemble referred as</span>
 <span class="sd">                :math:`M` here.</span>
-<span class="sd">            stride (_size_2_t): Stride of the convolution. Defaults to ``1``.</span>
-<span class="sd">            padding (_size_2_t): ``dilation * (kernel_size - 1) - padding`` zero-padding</span>
+<span class="sd">            stride: Stride of the convolution. Defaults to ``1``.</span>
+<span class="sd">            padding: ``dilation * (kernel_size - 1) - padding`` zero-padding</span>
 <span class="sd">                will be added to both sides of each dimension in the input. Defaults to ``0``.</span>
-<span class="sd">            output_padding (_size_2_t): Additional size added to one side</span>
+<span class="sd">            output_padding: Additional size added to one side</span>
 <span class="sd">                of each dimension in the output shape. Defaults to ``0``.</span>
-<span class="sd">            groups (int): Number of blocked connections from input channels to output</span>
-<span class="sd">                channels. Defaults to ``1``.</span>
-<span class="sd">            bias (bool): If ``True``, adds a learnable bias to the output. Defaults to</span>
-<span class="sd">                ``True``.</span>
-<span class="sd">            dilation (_size_2_t): Spacing between kernel elements. Defaults to ``1``.</span>
-<span class="sd">            padding_mode (str): Padding mode for the convolution. Defaults to ``&quot;zeros&quot;``.</span>
-<span class="sd">            device (Any): Device to use for the parameters and</span>
-<span class="sd">                buffers of this module. Defaults to ``None``.</span>
-<span class="sd">            dtype (Any): Data type to use for the parameters and</span>
-<span class="sd">                buffers of this module. Defaults to ``None``.</span>
+<span class="sd">            groups: Number of blocked connections from input channels to output channels.</span>
+<span class="sd">                Defaults to ``1``.</span>
+<span class="sd">            bias: If ``True``, adds a learnable bias to the output. Defaults to ``True``.</span>
+<span class="sd">            dilation: Spacing between kernel elements. Defaults to ``1``.</span>
+<span class="sd">            padding_mode: Padding mode for the convolution. Defaults to ``&quot;zeros&quot;``.</span>
+<span class="sd">            device: Device to use for the parameters and buffers of this module.</span>
+<span class="sd">                Defaults to ``None``.</span>
+<span class="sd">            dtype: Data type to use for the parameters and buffers of this module.</span>
+<span class="sd">                Defaults to ``None``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">factory_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -1187,8 +1175,8 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a BatchEnsemble-style ConvTranspose2d layer from an existing ConvTranspose2d layer.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            conv_transpose2d (nn.ConvTranspose2d): The ConvTranspose2d layer to convert.</span>
-<span class="sd">            num_estimators (int): Number of ensemble members.</span>
+<span class="sd">            conv_transpose2d: The ConvTranspose2d layer to convert.</span>
+<span class="sd">            num_estimators: Number of ensemble members.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            BatchConvTranspose2d: The converted BatchEnsemble-style ConvTranspose2d layer.</span>

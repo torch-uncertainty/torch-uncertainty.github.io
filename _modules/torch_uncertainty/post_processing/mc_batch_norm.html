@@ -472,13 +472,12 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Monte Carlo Batch Normalization wrapper for 2d inputs.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            model (nn.Module): model to be converted.</span>
-<span class="sd">            num_estimators (int): number of estimators.</span>
-<span class="sd">            convert (bool): whether to convert the model. Defaults to ``True``.</span>
-<span class="sd">            mc_batch_size (int): Monte Carlo batch size. The smaller the more variability</span>
-<span class="sd">                in the predictions. Defaults to ``32``.</span>
-<span class="sd">            device (Literal[&quot;cpu&quot;, &quot;cuda&quot;] | torch.device | None): device.</span>
-<span class="sd">                Defaults to ``None``.</span>
+<span class="sd">            model: model to be converted.</span>
+<span class="sd">            num_estimators: number of estimators.</span>
+<span class="sd">            convert: whether to convert the model. Defaults to ``True``.</span>
+<span class="sd">            mc_batch_size: Monte-Carlo batch size. The smaller the more variability in the</span>
+<span class="sd">                predictions. Defaults to ``32``.</span>
+<span class="sd">            device: device. Defaults to ``None``.</span>
 
 <span class="sd">        Warning:</span>
 <span class="sd">            The update of the batch statistics slightly differs from the method as worded in the</span>
@@ -524,7 +523,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fit the model on the dataset.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            dataloader (DataLoader): DataLoader with the post-processing dataset.</span>
+<span class="sd">            dataloader: DataLoader with the post-processing dataset.</span>
 
 <span class="sd">        Warning:</span>
 <span class="sd">            The ``batch_size`` of the DataLoader (i.e. :attr:`mc_batch_size`) should be carefully</span>
@@ -604,7 +603,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the accumulate flag for all MCBatchNorm2d layers.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            accumulate (bool): accumulate flag.</span>
+<span class="sd">            accumulate: accumulate flag.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mc_batch_norm_layers</span><span class="p">:</span>
             <span class="n">layer</span><span class="o">.</span><span class="n">accumulate</span> <span class="o">=</span> <span class="n">accumulate</span></div>
@@ -616,7 +615,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Replace all BatchNorm2d layers with MCBatchNorm2d layers.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            model (nn.Module): model to be converted.</span>
+<span class="sd">            model: model to be converted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_children</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">children</span><span class="p">()))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -653,8 +652,8 @@
 <span class="sd">    It is impossible to change the ``batch_size`` of an already-instantiated dataloader.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        dataloader (DataLoader): the dataloader to be reinitialized with</span>
-<span class="sd">        batch_size (int): the given batch_size.</span>
+<span class="sd">        dataloader: the dataloader to be reinitialized with</span>
+<span class="sd">        batch_size: the given batch_size.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
         <span class="n">dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span>

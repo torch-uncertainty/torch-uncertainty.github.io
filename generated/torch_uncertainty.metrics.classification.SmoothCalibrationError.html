@@ -52,6 +52,8 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.metrics.classification.SmoothCalibrationError';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -714,30 +716,23 @@ bandwidth selection strategy. Computed on the top label.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>kernel_type</strong> (<em>str</em>) – <p>The kernel to use. Choose between:
-- <code class="docutils literal notranslate"><span class="pre">'logit'</span></code>: Applies a Gaussian kernel in log-odds space. This</p>
-<blockquote>
-<div><p>effectively uses an adaptive bandwidth that is narrower near 1.0,
-making it ideal for modern overconfident models. (Default)</p>
-</div></blockquote>
-<ul>
-<li><dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">'reflected'</span></code>: Applies a Gaussian kernel in probability space</dt><dd><p>with reflections at 0 and 1 to prevent boundary bias.</p>
-</dd>
-</dl>
-</li>
-</ul>
-<p>Note that relplot’s original implementation has <code class="docutils literal notranslate"><span class="pre">'reflected'</span></code> as default.</p>
+<li><p><strong>kernel_type</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'logit'</span></code>, <code class="docutils literal notranslate"><span class="pre">'reflected'</span></code>]</span>) – The kernel to use. Choose between:</p></li>
+<li><p><strong>'logit'</strong> (<em>-</em>) – Applies a Gaussian kernel in log-odds space. This
+effectively uses an adaptive bandwidth that is narrower near 1.0,
+making it ideal for modern overconfident models. (Default)</p></li>
+<li><p><strong>'reflected'</strong> (<em>-</em>) – <p>Applies a Gaussian kernel in probability space
+with reflections at 0 and 1 to prevent boundary bias.</p>
+<p>Note that relplot’s original implementation uses <code class="docutils literal notranslate"><span class="pre">'reflected'</span></code> by default.</p>
 </p></li>
-<li><p><strong>bandwidth</strong> (<em>Literal</em><em>[</em><em>auto</em><em>] </em><em>| </em><em>float</em>) – The kernel bandwidth $h$. If set to
+<li><p><strong>bandwidth</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'auto'</span></code>]]</span>) – The kernel bandwidth <span class="math notranslate nohighlight">\(h\)</span>. If set to
 <code class="docutils literal notranslate"><span class="pre">'auto'</span></code>, it uses a fixed-point binary search to find a bandwidth
 consistent with the error level. Defaults to <code class="docutils literal notranslate"><span class="pre">'auto'</span></code>.</p></li>
-<li><p><strong>eps</strong> (<em>float</em>) – The tolerance for the binary search when
+<li><p><strong>eps</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – The tolerance for the binary search when
 bandwidth is <code class="docutils literal notranslate"><span class="pre">'auto'</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">0.001</span></code>.</p></li>
-<li><p><strong>mesh_pts</strong> (<em>int</em>) – The base number of points for the grid
+<li><p><strong>mesh_pts</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – The base number of points for the grid
 discretization. The actual number may be higher depending on the
 bandwidth. Defaults to <code class="docutils literal notranslate"><span class="pre">200</span></code>.</p></li>
-<li><p><strong>refine_steps</strong> (<em>int</em>) – Number of binary search iterations for
+<li><p><strong>refine_steps</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Number of binary search iterations for
 the <code class="docutils literal notranslate"><span class="pre">'auto'</span></code> bandwidth. Defaults to <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
 <li><p><strong>**kwargs</strong> – Additional arguments for the <code class="xref py py-class docutils literal notranslate"><span class="pre">torchmetrics.Metric</span></code> base.</p></li>
 </ul>
@@ -747,7 +742,8 @@ the <code class="docutils literal notranslate"><span class="pre">'auto'</span></
 <p class="admonition-title">Note</p>
 <p>In the multiclass case, this metric evaluates the calibration of the
 maximum probability (top-label calibration). In the binary case, it
-evaluates the calibration of the predicted class (i.e., using $max(p, 1-p)$).</p>
+evaluates the calibration of the predicted class (i.e., using
+<span class="math notranslate nohighlight">\(\max(p, 1-p)\)</span>).</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -780,13 +776,16 @@ evaluates the calibration of the predicted class (i.e., using $max(p, 1-p)$).</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>preds</strong> (<em>Tensor</em>) – Predictions from the model.
+<li><p><strong>preds</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span>) – Predictions from the model.
 - Multiclass: Shape <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">C)</span></code> (logits or probabilities).
 - Binary: Shape <code class="docutils literal notranslate"><span class="pre">(N,)</span></code> or <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">1)</span></code> (logits or probabilities).</p></li>
-<li><p><strong>target</strong> (<em>Tensor</em>) – Ground truth labels.
+<li><p><strong>target</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span>) – Ground truth labels.
 - Multiclass: Shape <code class="docutils literal notranslate"><span class="pre">(N,)</span></code> containing class indices.
 - Binary: Shape <code class="docutils literal notranslate"><span class="pre">(N,)</span></code> containing 0 or 1.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
 </dl>
 </dd></dl>

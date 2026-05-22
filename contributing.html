@@ -285,12 +285,17 @@ ensuring continuous integration does not break.</p>
 <ol class="arabic simple">
 <li><p>Install <code class="docutils literal notranslate"><span class="pre">uv</span></code> following the steps <a class="reference external" href="https://docs.astral.sh/uv/getting-started/installation/">here</a></p></li>
 <li><p>Clone the repository</p></li>
-<li><p>Install torch-uncertainty with the dev packages
-<code class="code highlight cmd bash docutils literal highlight-bash">uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>gpu</code> for GPU-based systems
+<li><p>Install torch-uncertainty with the dev packages:
+<code class="code highlight cmd bash docutils literal highlight-bash">uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>gpu</code> for GPU-based systems or
 <code class="code highlight cmd bash docutils literal highlight-bash">uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>cpu</code> if no GPUs are available</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Failure to include the extra flag will result in the GPU version of PyTorch without CUDA and might cause issues.</p>
+</div>
+<ol class="arabic simple" start="4">
 <li><p>Install pre-commit hooks with <code class="code highlight cmd bash docutils literal highlight-bash">uv<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>install</code></p></li>
 </ol>
-<p>Note: failure to include the extra flag will result in the GPU version of PyTorch without CUDA and might cause issues.</p>
 </section>
 <section id="build-the-documentation-locally">
 <h3>Build the documentation locally<a class="headerlink" href="#build-the-documentation-locally" title="Link to this heading">#</a></h3>
@@ -298,25 +303,181 @@ ensuring continuous integration does not break.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">html</span>
 </pre></div>
 </div>
-<p>Optionally, specify <code class="docutils literal notranslate"><span class="pre">html-noplot</span></code> instead of <code class="docutils literal notranslate"><span class="pre">html</span></code> to avoid running the tutorials.</p>
+<p>Optionally, specify <code class="docutils literal notranslate"><span class="pre">html-noplot</span></code> instead of <code class="docutils literal notranslate"><span class="pre">html</span></code> to avoid running the tutorials.
+This option is necessary if you only have a CPU on your machine.</p>
 </section>
 <section id="guidelines">
 <h3>Guidelines<a class="headerlink" href="#guidelines" title="Link to this heading">#</a></h3>
-<p><strong>Commits</strong></p>
+<p><strong>Code quality</strong></p>
 <p>We use ruff for code formatting, linting, and imports (as a drop-in
 replacement for black, isort, and flake8). The pre-commit hooks will ensure
 that your code is properly formatted and linted before committing.</p>
+<p>To ensure that your code complies with the standards, run the following and check for warnings:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uv</span> <span class="n">run</span> <span class="n">ruff</span> <span class="n">check</span> <span class="o">--</span><span class="n">fix</span>
+</pre></div>
+</div>
+<p>And then:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uv</span> <span class="n">run</span> <span class="n">ruff</span> <span class="nb">format</span>
+</pre></div>
+</div>
 <p>Please ensure that the tests are passing on your machine before pushing on a
-PR. This will avoid multiplying the number featureless commits. To do this,
+PR. This will avoid multiplying the number of featureless commits. To do this,
 run, at the root of the folder:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uv</span> <span class="n">run</span> <span class="n">pytest</span> <span class="n">tests</span>
 </pre></div>
 </div>
-<p>Try to include an emoji at the start of each commit message following the suggestions
-from <a class="reference external" href="https://gist.github.com/parmentf/035de27d6ed1dce0b36a">this page</a>.</p>
+<p><strong>Commit message convention</strong></p>
+<p>We follow a structured commit message format inspired by
+<a class="reference external" href="https://gitmoji.dev/">gitmoji</a> and the
+<a class="reference external" href="https://www.conventionalcommits.org/">Conventional Commits</a> specification:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>:emoji:(scope): description
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>Emoji</strong>: pick the most appropriate emoji from <a class="reference external" href="https://gitmoji.dev/">gitmoji</a>
+to categorize the change at a glance.</p></li>
+<li><p><strong>Scope</strong>: a short identifier in parentheses describing the area of the codebase
+affected (e.g. <code class="docutils literal notranslate"><span class="pre">packed</span></code>, <code class="docutils literal notranslate"><span class="pre">metrics</span></code>, <code class="docutils literal notranslate"><span class="pre">docs</span></code>, <code class="docutils literal notranslate"><span class="pre">CI</span></code>, <code class="docutils literal notranslate"><span class="pre">all</span></code>).</p></li>
+<li><p><strong>Description</strong>: a concise summary of the change after the <code class="docutils literal notranslate"><span class="pre">:</span></code> separator.</p></li>
+<li><p><strong>Breaking changes</strong>: use <code class="docutils literal notranslate"><span class="pre">!</span></code> before <code class="docutils literal notranslate"><span class="pre">:</span></code> to signal a breaking change.</p></li>
+</ul>
+<p>Here are some examples from the project:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 60.0%"/>
+<col style="width: 40.0%"/>
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Commit message</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">:bug:(cli):</span> <span class="pre">fix</span> <span class="pre">self.model</span> <span class="pre">not</span> <span class="pre">being</span> <span class="pre">a</span> <span class="pre">property</span></code></p></td>
+<td><p>Bug fix in the CLI module</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">:sparkles:(losses):</span> <span class="pre">add</span> <span class="pre">the</span> <span class="pre">DER</span> <span class="pre">loss</span></code></p></td>
+<td><p>New feature in losses</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">:recycle:(segformer):</span> <span class="pre">remove</span> <span class="pre">init</span> <span class="pre">redundancies</span></code></p></td>
+<td><p>Refactoring of segformer</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">:rotating_light:(all):</span> <span class="pre">ruff</span> <span class="pre">format</span></code></p></td>
+<td><p>Fixing linter warnings across the codebase</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">:memo:(tabular):</span> <span class="pre">add</span> <span class="pre">some</span> <span class="pre">documentation</span></code></p></td>
+<td><p>Documentation for the tabular module</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">:white_check_mark:(coverage):</span> <span class="pre">fix</span> <span class="pre">coverage</span> <span class="pre">misses</span></code></p></td>
+<td><p>Test improvements</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">:wrench:(uv):</span> <span class="pre">update</span> <span class="pre">uv</span> <span class="pre">&amp;</span> <span class="pre">workflows</span></code></p></td>
+<td><p>Configuration/tooling changes</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">:boom:(routines)!:</span> <span class="pre">rename</span> <span class="pre">eval</span> <span class="pre">to</span> <span class="pre">test</span></code></p></td>
+<td><p>Breaking change in routines</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Some of the most commonly used gitmoji in this project:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 10.0%"/>
+<col style="width: 25.0%"/>
+<col style="width: 65.0%"/>
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Emoji</p></th>
+<th class="head"><p>Code</p></th>
+<th class="head"><p>Use</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>✨</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">:sparkles:</span></code></p></td>
+<td><p>New feature</p></td>
+</tr>
+<tr class="row-odd"><td><p>🐛</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">:bug:</span></code></p></td>
+<td><p>Bug fix</p></td>
+</tr>
+<tr class="row-even"><td><p>♻️</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">:recycle:</span></code></p></td>
+<td><p>Refactor code</p></td>
+</tr>
+<tr class="row-odd"><td><p>📝</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">:memo:</span></code></p></td>
+<td><p>Documentation</p></td>
+</tr>
+<tr class="row-even"><td><p>🚨</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">:rotating_light:</span></code></p></td>
+<td><p>Fix linter warnings</p></td>
+</tr>
+<tr class="row-odd"><td><p>✅</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">:white_check_mark:</span></code></p></td>
+<td><p>Add/fix tests</p></td>
+</tr>
+<tr class="row-even"><td><p>🔧</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">:wrench:</span></code></p></td>
+<td><p>Configuration files</p></td>
+</tr>
+<tr class="row-odd"><td><p>🔥</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">:fire:</span></code></p></td>
+<td><p>Remove code or files</p></td>
+</tr>
+<tr class="row-even"><td><p>⬆️</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">:arrow_up:</span></code></p></td>
+<td><p>Upgrade dependencies</p></td>
+</tr>
+<tr class="row-odd"><td><p>💚</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">:green_heart:</span></code></p></td>
+<td><p>Fix CI build</p></td>
+</tr>
+<tr class="row-even"><td><p>👷</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">:construction_worker:</span></code></p></td>
+<td><p>CI system changes</p></td>
+</tr>
+<tr class="row-odd"><td><p>🎨</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">:art:</span></code></p></td>
+<td><p>Improve code structure/format</p></td>
+</tr>
+<tr class="row-even"><td><p>💥</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">:boom:</span></code></p></td>
+<td><p>Breaking changes</p></td>
+</tr>
+<tr class="row-odd"><td><p>👌</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">:ok_hand:</span></code></p></td>
+<td><p>Code review changes</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>For the full list of available emojis, visit <a class="reference external" href="https://gitmoji.dev/">gitmoji.dev</a>.</p>
+<p>You don’t need to follow this convention.</p>
 <p><strong>Pull requests</strong></p>
 <p>To make your changes, create a branch on a personal fork and create a PR when your contribution
 is mostly finished or if you need help.</p>
+<p><em>PR naming convention</em></p>
+<p>Pull requests should follow the same naming convention as commits:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>:emoji:(scope): description
+</pre></div>
+</div>
+<p>For instance: <code class="docutils literal notranslate"><span class="pre">:sparkles:(datamodules):</span> <span class="pre">add</span> <span class="pre">support</span> <span class="pre">for</span> <span class="pre">CIFAR-100-C</span></code>.</p>
+<p><em>PR labels</em></p>
+<p>Please flag your PRs with the appropriate labels to help maintainers triage and
+track changes. Common labels include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">enhancement</span></code> — new feature or improvement</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bug</span></code> — bug fix</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">documentation</span></code> — documentation changes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">refactor</span></code> — code restructuring without behavior change</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tests</span></code> — test additions or fixes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code> — dependency updates</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">breaking-change</span></code> — introduces a breaking change</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">need-help</span></code> — you need assistance from a maintainer</p></li>
+</ul>
+<p><em>PR checklist</em></p>
 <p>Check that your PR complies with the following conditions:</p>
 <ul class="simple">
 <li><p>The name of your branch is not <code class="docutils literal notranslate"><span class="pre">main</span></code> nor <code class="docutils literal notranslate"><span class="pre">dev</span></code> (see issue #58)</p></li>

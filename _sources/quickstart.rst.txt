@@ -48,7 +48,7 @@ and its parameters.
       eval_grouping_loss: bool = False,
       ood_criterion: TUOODCriterion | str = "msp",
       log_plots: bool = False,
-      save_in_csv: bool = False,
+      save_to_csv: bool = False,
     ) -> None:
       ...
 

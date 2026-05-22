@@ -474,17 +474,17 @@
         <span class="n">ignore_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">validate_args</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Quantile Calibration Error for regression tasks.</span>
 
 <span class="sd">        This metric computes the calibration error of quantile predictions</span>
 <span class="sd">        against the ground truth values.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            num_bins (int): Number of bins to use for calibration. Defaults to `15`.</span>
-<span class="sd">            norm (str): Norm to use for calibration error computation. Defaults to `&quot;l1&quot;`.</span>
-<span class="sd">            ignore_index (int): Index to ignore during calibration. Defaults to `None`.</span>
-<span class="sd">            validate_args (bool): Whether to validate the input arguments. Defaults to `True`.</span>
+<span class="sd">            num_bins: Number of bins to use for calibration. Defaults to ``15``.</span>
+<span class="sd">            norm: Norm to use for calibration error computation. Defaults to ``&quot;l1&quot;``.</span>
+<span class="sd">            ignore_index: Index to ignore during calibration. Defaults to ``None``.</span>
+<span class="sd">            validate_args: Whether to validate the input arguments. Defaults to ``True``.</span>
 <span class="sd">            kwargs: Additional keyword arguments, see `Advanced metric settings</span>
 <span class="sd">              &lt;https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs&gt;`_.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -502,9 +502,9 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the metric with new predictions and targets.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            dist (Distribution): The predicted distribution.</span>
-<span class="sd">            target (Tensor): The ground truth values.</span>
-<span class="sd">            padding_mask (Tensor | None): A mask to ignore certain values. Defaults to `None`.</span>
+<span class="sd">            dist: The predicted distribution.</span>
+<span class="sd">            target: The ground truth values.</span>
+<span class="sd">            padding_mask: A mask to ignore certain values. Defaults to ``None``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">reduce_event_dims</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">Independent</span><span class="p">):</span>
@@ -558,7 +558,7 @@
 <span class="sd">            Tensor: The quantile calibration error.</span>
 
 <span class="sd">        Warning:</span>
-<span class="sd">            If the distribution does not support the `icdf()` method, this will return `nan` values.</span>
+<span class="sd">            If the distribution does not support ``icdf()``, this returns ``nan`` values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">not_implemented_error</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">))</span>
@@ -571,7 +571,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the quantile calibration reliability diagram.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            NotImplementedError: If the distribution does not support the `icdf()` method.</span>
+<span class="sd">            NotImplementedError: If the distribution does not support ``icdf()``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">not_implemented_error</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>

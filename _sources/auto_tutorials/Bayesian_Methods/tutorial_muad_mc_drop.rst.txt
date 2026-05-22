@@ -233,7 +233,7 @@ We create the model easily using the blueprint from torch_uncertainty.models.
 
 
 
-    def enet_weighing(dataloader, num_classes, c=1.02):
+    def enet_weighting(dataloader, num_classes, c=1.02):
         """Computes class weights as described in the ENet paper.
 
             w_class = 1 / (ln(c + p_class)),
@@ -276,7 +276,7 @@ We create the model easily using the blueprint from torch_uncertainty.models.
         return 1 / (torch.log(c + propensity_score))
 
 
-    class_weights = enet_weighing(datamodule.val_dataloader(), datamodule.num_classes)
+    class_weights = enet_weighting(datamodule.val_dataloader(), datamodule.num_classes)
     print(class_weights)
 
 
@@ -410,27 +410,27 @@ Let's define the training parameters.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       Segmentation        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    Brier     │          0.69858          │
-    │     NLL      │          1.73855          │
-    │     mAcc     │          27.815%          │
-    │     mIoU     │          16.698%          │
-    │    pixAcc    │          51.642%          │
+    │    Brier     │          0.60971          │
+    │     NLL      │          1.46584          │
+    │     mAcc     │          30.654%          │
+    │     mIoU     │          18.509%          │
+    │    pixAcc    │          58.855%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          24.465%          │
-    │     MCE      │          37.661%          │
-    │    SmECE     │          24.464%          │
-    │     aECE     │          24.465%          │
+    │     ECE      │          18.191%          │
+    │     MCE      │          29.035%          │
+    │    SmECE     │          17.900%          │
+    │     aECE     │          18.191%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          20.256%          │
-    │     AURC     │          32.580%          │
+    │    AUGRC     │          16.396%          │
+    │     AURC     │          26.631%          │
     │  Cov@5Risk   │           nan%            │
-    │  Risk@80Cov  │          44.054%          │
+    │  Risk@80Cov  │          36.047%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -469,8 +469,8 @@ Let's now load a fully trained model to continue this tutorial
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       Segmentation        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    Brier     │          0.20496          │
-    │     NLL      │          0.39997          │
+    │    Brier     │          0.20541          │
+    │     NLL      │          0.40002          │
     │     mAcc     │          68.772%          │
     │     mIoU     │          50.739%          │
     │    pixAcc    │          85.701%          │
@@ -478,18 +478,18 @@ Let's now load a fully trained model to continue this tutorial
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          1.746%           │
-    │     MCE      │          19.541%          │
-    │    SmECE     │          1.897%           │
-    │     aECE     │          1.866%           │
+    │     ECE      │          1.648%           │
+    │     MCE      │          7.596%           │
+    │    SmECE     │          1.748%           │
+    │     aECE     │          1.734%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          2.706%           │
+    │    AUGRC     │          2.716%           │
     │     AURC     │          3.346%           │
-    │  Cov@5Risk   │          72.445%          │
-    │  Risk@80Cov  │          7.097%           │
+    │  Cov@5Risk   │          72.101%          │
+    │  Risk@80Cov  │          7.096%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -627,27 +627,27 @@ allow us to have a better confidence score by using the dropout during test time
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       Segmentation        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    Brier     │          0.20370          │
-    │     NLL      │          0.39867          │
-    │     mAcc     │          68.400%          │
-    │     mIoU     │          50.692%          │
-    │    pixAcc    │          85.756%          │
+    │    Brier     │          0.20439          │
+    │     NLL      │          0.40128          │
+    │     mAcc     │          68.461%          │
+    │     mIoU     │          50.817%          │
+    │    pixAcc    │          85.774%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          2.836%           │
-    │     MCE      │          13.005%          │
-    │    SmECE     │          2.830%           │
-    │     aECE     │          2.831%           │
+    │     ECE      │          2.820%           │
+    │     MCE      │          13.198%          │
+    │    SmECE     │          2.819%           │
+    │     aECE     │          2.820%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          2.656%           │
-    │     AURC     │          3.258%           │
-    │  Cov@5Risk   │          73.125%          │
-    │  Risk@80Cov  │          6.881%           │
+    │    AUGRC     │          2.662%           │
+    │     AURC     │          3.276%           │
+    │  Cov@5Risk   │          73.035%          │
+    │  Risk@80Cov  │          6.877%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -733,7 +733,7 @@ of the different estimators.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 54.804 seconds)
+   **Total running time of the script:** (0 minutes 54.889 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Bayesian_Methods_tutorial_muad_mc_drop.py:

@@ -143,7 +143,7 @@ ensemble = deep_ensembles(
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-def enet_weighing(dataloader, num_classes, c=1.02):
+def enet_weighting(dataloader, num_classes, c=1.02):
     """Computes class weights as described in the ENet paper.
 
         w_class = 1 / (ln(c + p_class)),
@@ -157,14 +157,12 @@ def enet_weighing(dataloader, num_classes, c=1.02):
         https://arxiv.org/abs/1606.02147
 
     Args:
-        dataloader (``data.Dataloader``): A data loader to iterate over the
-            dataset.
-        num_classes (``int``): The number of classes.
-        c (``int``): An additional hyper-parameter which restricts
-            the interval of values for the weights. Default: 1.02.
-        ignore_indexes (``list``): A list of indexes to ignore
+        dataloader: A data loader to iterate over the dataset.
+        num_classes: The number of classes.
+        c: An additional hyper-parameter which restricts
+            the interval of values for the weights. Defaults to `1.02`.
+        ignore_indexes: A list of indexes to ignore
             when computing the weights. Default to `None`.
-
     """
     class_count = 0
     total = 0
@@ -186,7 +184,7 @@ def enet_weighing(dataloader, num_classes, c=1.02):
     return 1 / (torch.log(c + propensity_score))
 
 
-class_weights = enet_weighing(datamodule.val_dataloader(), datamodule.num_classes)
+class_weights = enet_weighting(datamodule.val_dataloader(), datamodule.num_classes)
 print(class_weights)
 
 # %%

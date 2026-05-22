@@ -632,7 +632,7 @@ depth estimation, and object detection.</p>
 </section>
 <section id="compute-class-weights-to-mitigate-class-inbalance">
 <h2>4. Compute class weights to mitigate class inbalance<a class="headerlink" href="#compute-class-weights-to-mitigate-class-inbalance" title="Link to this heading">#</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">enet_weighing</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">1.02</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">enet_weighting</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">1.02</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes class weights as described in the ENet paper.</span>
 
 <span class="sd">        w_class = 1 / (ln(c + p_class)),</span>
@@ -646,13 +646,12 @@ depth estimation, and object detection.</p>
 <span class="sd">        https://arxiv.org/abs/1606.02147</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        dataloader (``data.Dataloader``): A data loader to iterate over the</span>
-<span class="sd">            dataset.</span>
-<span class="sd">        num_classes (``int``): The number of classes.</span>
-<span class="sd">        c (``int``): An additional hyper-parameter which restricts</span>
-<span class="sd">            the interval of values for the weights. Default: 1.02.</span>
-<span class="sd">        ignore_indexes (``list``): A list of indexes to ignore</span>
-<span class="sd">            when computing the weights. Default to `None`.</span>
+<span class="sd">        dataloader: A data loader to iterate over the dataset.</span>
+<span class="sd">        num_classes: The number of classes.</span>
+<span class="sd">        c: An additional hyper-parameter which restricts</span>
+<span class="sd">            the interval of values for the weights. Defaults to `1.02`.</span>
+<span class="sd">        ignore_indexes: A list of indexes to ignore</span>
+<span class="sd">            when computing the weights. Defaults to `None`.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">class_count</span> <span class="o">=</span> <span class="mi">0</span>
@@ -675,7 +674,7 @@ depth estimation, and object detection.</p>
     <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="n">propensity_score</span><span class="p">))</span>
 
 
-<span class="n">class_weights</span> <span class="o">=</span> <span class="n">enet_weighing</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">(),</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">)</span>
+<span class="n">class_weights</span> <span class="o">=</span> <span class="n">enet_weighting</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">(),</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">class_weights</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -754,27 +753,27 @@ Total FLOPs: 0
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.66844          │
-│     NLL      │          1.74308          │
-│     mAcc     │          24.037%          │
-│     mIoU     │          15.475%          │
-│    pixAcc    │          57.734%          │
+│    Brier     │          0.64382          │
+│     NLL      │          1.59677          │
+│     mAcc     │          26.258%          │
+│     mIoU     │          16.512%          │
+│    pixAcc    │          56.299%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          22.089%          │
-│     MCE      │          32.673%          │
-│    SmECE     │          21.315%          │
-│     aECE     │          21.680%          │
+│     ECE      │          15.026%          │
+│     MCE      │          20.513%          │
+│    SmECE     │          13.584%          │
+│     aECE     │          14.225%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          17.038%          │
-│     AURC     │          27.057%          │
+│    AUGRC     │          17.872%          │
+│     AURC     │          31.362%          │
 │  Cov@5Risk   │           nan%            │
-│  Risk@80Cov  │          38.348%          │
+│  Risk@80Cov  │          38.503%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -799,8 +798,8 @@ Total FLOPs: 0
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.20579          │
-│     NLL      │          0.39976          │
+│    Brier     │          0.20535          │
+│     NLL      │          0.40105          │
 │     mAcc     │          68.769%          │
 │     mIoU     │          50.739%          │
 │    pixAcc    │          85.704%          │
@@ -808,18 +807,18 @@ Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          1.686%           │
-│     MCE      │          6.790%           │
-│    SmECE     │          1.852%           │
-│     aECE     │          1.810%           │
+│     ECE      │          1.591%           │
+│     MCE      │          7.247%           │
+│    SmECE     │          1.716%           │
+│     aECE     │          1.701%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          2.727%           │
-│     AURC     │          3.351%           │
-│  Cov@5Risk   │          72.193%          │
-│  Risk@80Cov  │          7.144%           │
+│    AUGRC     │          2.711%           │
+│     AURC     │          3.341%           │
+│  Cov@5Risk   │          72.508%          │
+│  Risk@80Cov  │          7.066%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -884,7 +883,7 @@ Total FLOPs: 0
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_muad_seg_003.png" srcset="../../_images/sphx_glr_tutorial_muad_seg_003.png" alt="tutorial muad seg" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 36.741 seconds)</p>
+<img src="../../_images/sphx_glr_tutorial_muad_seg_003.png" srcset="../../_images/sphx_glr_tutorial_muad_seg_003.png" alt="tutorial muad seg" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 36.565 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-segmentation-tutorial-muad-seg-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ab91300a901b0b50ec4f140c171dae8d/tutorial_muad_seg.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_muad_seg.ipynb</span></code></a></p>

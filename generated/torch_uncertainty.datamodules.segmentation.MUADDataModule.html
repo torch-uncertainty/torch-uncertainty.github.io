@@ -711,16 +711,16 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>root</strong> (<em>str</em><em> or </em><em>Path</em>) – Root directory of the datasets.</p></li>
-<li><p><strong>batch_size</strong> (<em>int</em>) – Number of samples per batch during training.</p></li>
-<li><p><strong>version</strong> (<em>str</em>) – Version of the dataset to use. Can be either
+<li><p><strong>root</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span>) – Root directory of the datasets.</p></li>
+<li><p><strong>batch_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Number of samples per batch during training.</p></li>
+<li><p><strong>version</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'full'</span></code>, <code class="docutils literal notranslate"><span class="pre">'small'</span></code>]</span>) – Version of the dataset to use. Can be either
 <code class="docutils literal notranslate"><span class="pre">full</span></code> or <code class="docutils literal notranslate"><span class="pre">small</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">full</span></code>.</p></li>
-<li><p><strong>eval_batch_size</strong> (<em>int</em><em> | </em><em>None</em>) – Number of samples per batch during evaluation (val
+<li><p><strong>eval_batch_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Number of samples per batch during evaluation (val
 and test). Set to <code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_size</span></code> if <code class="docutils literal notranslate"><span class="pre">None</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-<li><p><strong>eval_ood</strong> (<em>bool</em>) – Whether to evaluate on the OOD dataset. Defaults to
+<li><p><strong>eval_ood</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Whether to evaluate on the OOD dataset. Defaults to
 <code class="docutils literal notranslate"><span class="pre">False</span></code>. If set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, the OOD dataset will be used for
 evaluation in addition of the test dataset.</p></li>
-<li><p><strong>crop_size</strong> (<em>sequence</em><em> or </em><em>int</em>) – Desired input image and
+<li><p><strong>crop_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]</span>) – Desired input image and
 segmentation mask sizes during training. If <code class="xref py py-attr docutils literal notranslate"><span class="pre">crop_size</span></code> is an
 int instead of sequence like <span class="math notranslate nohighlight">\((H, W)\)</span>, a square crop
 <span class="math notranslate nohighlight">\((\text{size},\text{size})\)</span> is made. If provided a sequence
@@ -728,25 +728,21 @@ of length <span class="math notranslate nohighlight">\(1\)</span>, it will be in
 <span class="math notranslate nohighlight">\((\text{size[0]},\text{size[1]})\)</span>. Has to be provided if
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">train_transform</span></code> is not provided. Otherwise has no effect.
 Defaults to <code class="docutils literal notranslate"><span class="pre">1024</span></code>.</p></li>
-<li><p><strong>eval_size</strong> (<em>sequence</em><em> or </em><em>int</em>) – Desired input image and
+<li><p><strong>eval_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]</span>) – Desired input image and
 segmentation mask sizes during inference. If size is an int,
 smaller edge of the images will be matched to this number, i.e.,
 <span class="math notranslate nohighlight">\(\text{height}&gt;\text{width}\)</span>, then image will be rescaled to
 <span class="math notranslate nohighlight">\((\text{size}\times\text{height}/\text{width},\text{size})\)</span>.
 Has to be provided if <code class="xref py py-attr docutils literal notranslate"><span class="pre">test_transform</span></code> is not provided.
 Otherwise has no effect. Defaults to <code class="docutils literal notranslate"><span class="pre">(1024,2048)</span></code>.</p></li>
-<li><p><strong>train_transform</strong> (<em>nn.Module</em><em> | </em><em>None</em>) – Custom training transform. Defaults
-to <code class="docutils literal notranslate"><span class="pre">None</span></code>. If not provided, a default transform is used.</p></li>
-<li><p><strong>test_transform</strong> (<em>nn.Module</em><em> | </em><em>None</em>) – Custom test transform. Defaults to
-<code class="docutils literal notranslate"><span class="pre">None</span></code>. If not provided, a default transform is used.</p></li>
-<li><p><strong>val_split</strong> (<em>float</em><em> or </em><em>None</em>) – Share of training samples to use
-for validation. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-<li><p><strong>num_workers</strong> (<em>int</em>) – Number of dataloaders to use. Defaults to
-<code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
-<li><p><strong>pin_memory</strong> (<em>bool</em>) – Whether to pin memory. Defaults to
-<code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
-<li><p><strong>persistent_workers</strong> (<em>bool</em>) – Whether to use persistent workers.
-Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>train_transform</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Custom training transform. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>. If not provided, a
+default transform is used.</p></li>
+<li><p><strong>test_transform</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Custom test transform. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>. If not provided, a default
+transform is used.</p></li>
+<li><p><strong>val_split</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Share of training samples to use for validation. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>num_workers</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Number of dataloaders to use. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>pin_memory</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Whether to pin memory. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>persistent_workers</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Whether to use persistent workers. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -802,6 +798,11 @@ and <code class="docutils literal notranslate"><span class="pre">test_transform<
 <dt class="sig sig-object py" id="torch_uncertainty.datamodules.segmentation.MUADDataModule.test_dataloader">
 <span class="sig-name descname"><span class="pre">test_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/datamodules/segmentation/muad.html#MUADDataModule.test_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.datamodules.segmentation.MUADDataModule.test_dataloader" title="Link to this definition">#</a></dt>
 <dd><p>Returns the test dataloader.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataLoader</span></code></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

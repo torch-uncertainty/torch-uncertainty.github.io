@@ -470,8 +470,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set size to compute the efficiency of conformal prediction methods.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            reduction (str): Determines how to reduce over the</span>
-<span class="sd">                :math:`B`/batch dimension:</span>
+<span class="sd">            reduction: Determines how to reduce over the :math:`B`/batch dimension:</span>
 
 <span class="sd">                - ``&#39;mean&#39;`` [default]: Averages score across samples</span>
 <span class="sd">                - ``&#39;sum&#39;``: Sum score across samples</span>
@@ -503,9 +502,9 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the metric state with predictions and targets.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            preds (torch.Tensor): predicted sets tensor of shape (B, C), where B is the batch size</span>
-<span class="sd">                and C is the number of classes.</span>
-<span class="sd">            targets (torch.Tensor): For API consistency</span>
+<span class="sd">            preds: Predicted sets tensor of shape ``(B, C)``, where ``B`` is the</span>
+<span class="sd">                batch size and ``C`` is the number of classes.</span>
+<span class="sd">            targets: Unused. Kept for API consistency. Defaults to ``None``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">batch_size</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">pred_sizes</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
@@ -521,10 +520,10 @@
 <div class="viewcode-block" id="SetSize.compute">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.classification.SetSize.html#torch_uncertainty.metrics.classification.SetSize.compute">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the mean set size.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the set size.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: The coverage rate.</span>
+<span class="sd">            Tensor: The set size according to the selected reduction.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>

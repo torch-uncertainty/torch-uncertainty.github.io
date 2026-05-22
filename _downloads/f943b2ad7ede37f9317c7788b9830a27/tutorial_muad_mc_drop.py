@@ -138,7 +138,7 @@ model = small_unet(
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-def enet_weighing(dataloader, num_classes, c=1.02):
+def enet_weighting(dataloader, num_classes, c=1.02):
     """Computes class weights as described in the ENet paper.
 
         w_class = 1 / (ln(c + p_class)),
@@ -181,7 +181,7 @@ def enet_weighing(dataloader, num_classes, c=1.02):
     return 1 / (torch.log(c + propensity_score))
 
 
-class_weights = enet_weighing(datamodule.val_dataloader(), datamodule.num_classes)
+class_weights = enet_weighting(datamodule.val_dataloader(), datamodule.num_classes)
 print(class_weights)
 
 # %%

@@ -592,8 +592,9 @@
     <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">6.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">),</span>
     <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">150</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Builds Reliability Diagram</span>
-<span class="sd">    `Source &lt;https://github.com/hollance/reliability-diagrams&gt;`_.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a reliability diagram.</span>
+
+<span class="sd">    Source: `reliability-diagrams &lt;https://github.com/hollance/reliability-diagrams&gt;`_.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="n">figsize</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">figsize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1.4</span><span class="p">)</span>
 
@@ -637,6 +638,7 @@
     <span class="n">ch_xlabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Top-class Confidence (%)&quot;</span><span class="p">,</span>
     <span class="n">ch_ylabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Density (%)&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot a reliability chart from stored confidence and accuracy states.&quot;&quot;&quot;</span>
     <span class="n">confidences</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confidences</span><span class="p">)</span>
     <span class="n">accuracies</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracies</span><span class="p">)</span>
 
@@ -742,19 +744,19 @@
 <span class="sd">            - :math:`c_i` is the mean predicted confidence in bin :math:`i`.</span>
 <span class="sd">            - :math:`b_i` is the fraction of total samples falling into bin :math:`i`.</span>
 
-<span class="sd">        Bins are constructed either uniformly in the range :math:`[0, 1]` or adaptively</span>
-<span class="sd">        (if `adaptive=True`).</span>
+<span class="sd">        Bins are constructed either uniformly in the range :math:`[0, 1]` or</span>
+<span class="sd">        adaptively (if ``adaptive=True``).</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            task (str): Specifies the task type, either ``&quot;binary&quot;`` or ``&quot;multiclass&quot;``.</span>
-<span class="sd">            adaptive (bool): Whether to use adaptive binning. Defaults to ``False``.</span>
-<span class="sd">            num_bins (int): Number of bins to divide the probability space. Defaults to ``10``.</span>
-<span class="sd">            norm (str): Specifies the type of norm to use: ``&quot;l1&quot;``, ``&quot;l2&quot;``, or ``&quot;max&quot;``.</span>
+<span class="sd">            task: Specifies the task type, either ``&quot;binary&quot;`` or ``&quot;multiclass&quot;``.</span>
+<span class="sd">            adaptive: Whether to use adaptive binning. Defaults to ``False``.</span>
+<span class="sd">            num_bins : Number of bins to divide the probability space. Defaults to ``10``.</span>
+<span class="sd">            norm: Specifies the type of norm to use: ``&quot;l1&quot;``, ``&quot;l2&quot;``, or ``&quot;max&quot;``.</span>
 <span class="sd">                Defaults to ``&quot;l1&quot;``.</span>
-<span class="sd">            num_classes (int): Number of classes for ``&quot;multiclass&quot;`` tasks. Required when task</span>
-<span class="sd">                is ``&quot;multiclass&quot;``.</span>
-<span class="sd">            ignore_index (int): Index to ignore during calculations. Defaults to ``None``.</span>
-<span class="sd">            validate_args (bool): Whether to validate input arguments. Defaults to ``True``.</span>
+<span class="sd">            num_classes: Number of classes for ``&quot;multiclass&quot;`` tasks.</span>
+<span class="sd">                Required when task is ``&quot;multiclass&quot;``. Defaults to ``None``.</span>
+<span class="sd">            ignore_index: Index to ignore during calculations. Defaults to ``None``.</span>
+<span class="sd">            validate_args: Whether to validate input arguments. Defaults to ``True``.</span>
 <span class="sd">            **kwargs: Additional keyword arguments for the metric.</span>
 
 <span class="sd">        Example:</span>
@@ -781,12 +783,12 @@
 <span class="sd">            # Output: Calibration Error: 0.199</span>
 
 <span class="sd">        Note:</span>
-<span class="sd">            Bins are either uniformly distributed in :math:`[0, 1]` or adaptively sized</span>
-<span class="sd">            (if `adaptive=True`).</span>
+<span class="sd">            Bins are either uniformly distributed in :math:`[0, 1]` or</span>
+<span class="sd">            adaptively sized (if ``adaptive=True``).</span>
 
 <span class="sd">        Warning:</span>
-<span class="sd">            If `task=&quot;multiclass&quot;`, `num_classes` must be an integer; otherwise, a :class:`TypeError`</span>
-<span class="sd">            is raised.</span>
+<span class="sd">            If ``task=&quot;multiclass&quot;``, ``num_classes`` must be an integer;</span>
+<span class="sd">            otherwise, a :class:`TypeError` is raised.</span>
 
 <span class="sd">        References:</span>
 <span class="sd">            [1] `Naeini et al. Obtaining well calibrated probabilities using Bayesian binning. In AAAI, 2015</span>
@@ -794,7 +796,8 @@
 
 <span class="sd">        .. seealso::</span>
 <span class="sd">            See `CalibrationError &lt;https://torchmetrics.readthedocs.io/en/stable/classification/calibration_error.html&gt;`_</span>
-<span class="sd">            for details. Our version of the metric is a wrapper around the original metric providing an improved plotting functionality.</span>
+<span class="sd">            for details. This implementation wraps the original metric and</span>
+<span class="sd">            provides improved plotting functionality.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;n_bins&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`n_bins` does not exist in TorchUncertainty, use `num_bins`.&quot;</span><span class="p">)</span>

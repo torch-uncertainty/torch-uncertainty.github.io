@@ -635,7 +635,7 @@ depth estimation, and object detection.</p>
 </section>
 <section id="compute-class-weights-to-mitigate-class-inbalance">
 <h2>4. Compute class weights to mitigate class inbalance<a class="headerlink" href="#compute-class-weights-to-mitigate-class-inbalance" title="Link to this heading">#</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">enet_weighing</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">1.02</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">enet_weighting</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">1.02</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes class weights as described in the ENet paper.</span>
 
 <span class="sd">        w_class = 1 / (ln(c + p_class)),</span>
@@ -678,7 +678,7 @@ depth estimation, and object detection.</p>
     <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="n">propensity_score</span><span class="p">))</span>
 
 
-<span class="n">class_weights</span> <span class="o">=</span> <span class="n">enet_weighing</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">(),</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">)</span>
+<span class="n">class_weights</span> <span class="o">=</span> <span class="n">enet_weighting</span><span class="p">(</span><span class="n">datamodule</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">(),</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">num_classes</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">class_weights</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -751,27 +751,27 @@ Total FLOPs: 0
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.69858          │
-│     NLL      │          1.73855          │
-│     mAcc     │          27.815%          │
-│     mIoU     │          16.698%          │
-│    pixAcc    │          51.642%          │
+│    Brier     │          0.60971          │
+│     NLL      │          1.46584          │
+│     mAcc     │          30.654%          │
+│     mIoU     │          18.509%          │
+│    pixAcc    │          58.855%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          24.465%          │
-│     MCE      │          37.661%          │
-│    SmECE     │          24.464%          │
-│     aECE     │          24.465%          │
+│     ECE      │          18.191%          │
+│     MCE      │          29.035%          │
+│    SmECE     │          17.900%          │
+│     aECE     │          18.191%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          20.256%          │
-│     AURC     │          32.580%          │
+│    AUGRC     │          16.396%          │
+│     AURC     │          26.631%          │
 │  Cov@5Risk   │           nan%            │
-│  Risk@80Cov  │          44.054%          │
+│  Risk@80Cov  │          36.047%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -796,8 +796,8 @@ Total FLOPs: 0
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.20496          │
-│     NLL      │          0.39997          │
+│    Brier     │          0.20541          │
+│     NLL      │          0.40002          │
 │     mAcc     │          68.772%          │
 │     mIoU     │          50.739%          │
 │    pixAcc    │          85.701%          │
@@ -805,18 +805,18 @@ Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          1.746%           │
-│     MCE      │          19.541%          │
-│    SmECE     │          1.897%           │
-│     aECE     │          1.866%           │
+│     ECE      │          1.648%           │
+│     MCE      │          7.596%           │
+│    SmECE     │          1.748%           │
+│     aECE     │          1.734%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          2.706%           │
+│    AUGRC     │          2.716%           │
 │     AURC     │          3.346%           │
-│  Cov@5Risk   │          72.445%          │
-│  Risk@80Cov  │          7.097%           │
+│  Cov@5Risk   │          72.101%          │
+│  Risk@80Cov  │          7.096%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -909,27 +909,27 @@ allow us to have a better confidence score by using the dropout during test time
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.20370          │
-│     NLL      │          0.39867          │
-│     mAcc     │          68.400%          │
-│     mIoU     │          50.692%          │
-│    pixAcc    │          85.756%          │
+│    Brier     │          0.20439          │
+│     NLL      │          0.40128          │
+│     mAcc     │          68.461%          │
+│     mIoU     │          50.817%          │
+│    pixAcc    │          85.774%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          2.836%           │
-│     MCE      │          13.005%          │
-│    SmECE     │          2.830%           │
-│     aECE     │          2.831%           │
+│     ECE      │          2.820%           │
+│     MCE      │          13.198%          │
+│    SmECE     │          2.819%           │
+│     aECE     │          2.820%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          2.656%           │
-│     AURC     │          3.258%           │
-│  Cov@5Risk   │          73.125%          │
-│  Risk@80Cov  │          6.881%           │
+│    AUGRC     │          2.662%           │
+│     AURC     │          3.276%           │
+│  Cov@5Risk   │          73.035%          │
+│  Risk@80Cov  │          6.877%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -993,7 +993,7 @@ of the different estimators.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" srcset="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" alt="tutorial muad mc drop" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 54.804 seconds)</p>
+<img src="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" srcset="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" alt="tutorial muad mc drop" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 54.889 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-bayesian-methods-tutorial-muad-mc-drop-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/3cc96ba0ee86ad145779685dc1a694fe/tutorial_muad_mc_drop.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_muad_mc_drop.ipynb</span></code></a></p>

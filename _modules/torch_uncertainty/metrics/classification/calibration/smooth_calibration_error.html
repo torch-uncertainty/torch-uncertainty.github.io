@@ -474,7 +474,7 @@
         <span class="n">refine_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Smooth Expected Calibration Error (SmECE).</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Smooth Expected Calibration Error (SmECE).</span>
 
 <span class="sd">        This metric implements the Kernel Density Estimation based ECE as</span>
 <span class="sd">        proposed by Błasiok &amp; Nakkiran (2023). It addresses the limitations of</span>
@@ -483,29 +483,31 @@
 <span class="sd">        bandwidth selection strategy. Computed on the top label.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            kernel_type (str): The kernel to use. Choose between:</span>
-<span class="sd">                - ``&#39;logit&#39;``: Applies a Gaussian kernel in log-odds space. This</span>
-<span class="sd">                    effectively uses an adaptive bandwidth that is narrower near 1.0,</span>
-<span class="sd">                    making it ideal for modern overconfident models. (Default)</span>
-<span class="sd">                - ``&#39;reflected&#39;``: Applies a Gaussian kernel in probability space</span>
-<span class="sd">                    with reflections at 0 and 1 to prevent boundary bias.</span>
-<span class="sd">                Note that relplot&#39;s original implementation has ``&#39;reflected&#39;`` as default.</span>
-<span class="sd">            bandwidth (Literal[auto] | float): The kernel bandwidth $h$. If set to</span>
+<span class="sd">            kernel_type: The kernel to use. Choose between:</span>
+<span class="sd">            - ``&#39;logit&#39;``: Applies a Gaussian kernel in log-odds space. This</span>
+<span class="sd">                effectively uses an adaptive bandwidth that is narrower near 1.0,</span>
+<span class="sd">                making it ideal for modern overconfident models. (Default)</span>
+<span class="sd">            - ``&#39;reflected&#39;``: Applies a Gaussian kernel in probability space</span>
+<span class="sd">                with reflections at 0 and 1 to prevent boundary bias.</span>
+
+<span class="sd">                Note that relplot&#39;s original implementation uses ``&#39;reflected&#39;`` by default.</span>
+<span class="sd">            bandwidth: The kernel bandwidth :math:`h`. If set to</span>
 <span class="sd">                ``&#39;auto&#39;``, it uses a fixed-point binary search to find a bandwidth</span>
 <span class="sd">                consistent with the error level. Defaults to ``&#39;auto&#39;``.</span>
-<span class="sd">            eps (float): The tolerance for the binary search when</span>
+<span class="sd">            eps: The tolerance for the binary search when</span>
 <span class="sd">                bandwidth is ``&#39;auto&#39;``. Defaults to ``0.001``.</span>
-<span class="sd">            mesh_pts (int): The base number of points for the grid</span>
+<span class="sd">            mesh_pts: The base number of points for the grid</span>
 <span class="sd">                discretization. The actual number may be higher depending on the</span>
 <span class="sd">                bandwidth. Defaults to ``200``.</span>
-<span class="sd">            refine_steps (int): Number of binary search iterations for</span>
+<span class="sd">            refine_steps: Number of binary search iterations for</span>
 <span class="sd">                the ``&#39;auto&#39;`` bandwidth. Defaults to ``10``.</span>
 <span class="sd">            **kwargs: Additional arguments for the :class:`torchmetrics.Metric` base.</span>
 
 <span class="sd">        Note:</span>
 <span class="sd">            In the multiclass case, this metric evaluates the calibration of the</span>
 <span class="sd">            maximum probability (top-label calibration). In the binary case, it</span>
-<span class="sd">            evaluates the calibration of the predicted class (i.e., using $max(p, 1-p)$).</span>
+<span class="sd">            evaluates the calibration of the predicted class (i.e., using</span>
+<span class="sd">            :math:`\max(p, 1-p)`).</span>
 
 <span class="sd">        Note:</span>
 <span class="sd">            This implementation has been tested on a use case and provided the same values</span>
@@ -536,10 +538,11 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the state with predictions and targets.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            preds (Tensor): Predictions from the model.</span>
+<span class="sd">            preds: Predictions from the model.</span>
 <span class="sd">                - Multiclass: Shape ``(N, C)`` (logits or probabilities).</span>
 <span class="sd">                - Binary: Shape ``(N,)`` or ``(N, 1)`` (logits or probabilities).</span>
-<span class="sd">            target (Tensor): Ground truth labels.</span>
+
+<span class="sd">            target: Ground truth labels.</span>
 <span class="sd">                - Multiclass: Shape ``(N,)`` containing class indices.</span>
 <span class="sd">                - Binary: Shape ``(N,)`` containing 0 or 1.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

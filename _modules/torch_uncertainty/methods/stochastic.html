@@ -479,7 +479,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that the module has a sampling method, then sample it.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            module (nn.Module): The module to sample.</span>
+<span class="sd">            module: The module to sample.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            TypeError: Triggered when the module doesn&#39;t implement sample.</span>
@@ -497,7 +497,17 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`sample()` must return (weight, bias).&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">weight_bias</span>
 
+<div class="viewcode-block" id="StochasticModel.sample">
+<a class="viewcode-back" href="../../../generated/torch_uncertainty.methods.StochasticModel.html#torch_uncertainty.methods.StochasticModel.sample">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sample the wrapped model multiple times.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            num_samples: Number of samples to generate. Defaults to ``1``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[dict[str, Tensor]]: Sampled model states.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sampled_models</span> <span class="o">=</span> <span class="p">[{}]</span> <span class="o">*</span> <span class="n">num_samples</span>
         <span class="k">for</span> <span class="n">module_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">core_model</span><span class="o">.</span><span class="n">_modules</span><span class="p">:</span>
             <span class="n">module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">core_model</span><span class="o">.</span><span class="n">_modules</span><span class="p">[</span><span class="n">module_name</span><span class="p">]</span>
@@ -518,21 +528,30 @@
                     <span class="n">model</span> <span class="o">|=</span> <span class="p">{</span>
                         <span class="n">module_name</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">module</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
                     <span class="p">}</span>
-        <span class="k">return</span> <span class="n">sampled_models</span>
+        <span class="k">return</span> <span class="n">sampled_models</span></div>
 
+
+<div class="viewcode-block" id="StochasticModel.freeze">
+<a class="viewcode-back" href="../../../generated/torch_uncertainty.methods.StochasticModel.html#torch_uncertainty.methods.StochasticModel.freeze">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">freeze</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Freeze all Bayesian submodules in the wrapped model.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">core_model</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">bayesian_modules</span><span class="p">):</span>
                 <span class="n">freeze_fn</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="s2">&quot;freeze&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">freeze_fn</span><span class="p">):</span>
-                    <span class="n">freeze_fn</span><span class="p">()</span>
+                    <span class="n">freeze_fn</span><span class="p">()</span></div>
 
+
+<div class="viewcode-block" id="StochasticModel.unfreeze">
+<a class="viewcode-back" href="../../../generated/torch_uncertainty.methods.StochasticModel.html#torch_uncertainty.methods.StochasticModel.unfreeze">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">unfreeze</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unfreeze all Bayesian submodules in the wrapped model.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">core_model</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">bayesian_modules</span><span class="p">):</span>
                 <span class="n">unfreeze_fn</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="s2">&quot;unfreeze&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">unfreeze_fn</span><span class="p">):</span>
                     <span class="n">unfreeze_fn</span><span class="p">()</span></div>
+</div>
 
 </pre></div>
 

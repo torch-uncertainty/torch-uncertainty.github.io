@@ -491,32 +491,26 @@
         <span class="n">target_transform</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">transforms</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cityscapes dataset wrapper with train ID color mapping.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cityscapes dataset wrapper with train-ID color mapping.</span>
 
-<span class="sd">        This class extends the `TVCityscapes` dataset to provide a fixed</span>
-<span class="sd">        color palette for visualization and encode/decode utilities for</span>
-<span class="sd">        semantic segmentation targets using Cityscapes train IDs. It also</span>
-<span class="sd">        sets up mapping from train IDs to RGB colors for easier interpretation</span>
-<span class="sd">        of predicted masks.</span>
+<span class="sd">        Extends :class:`torchvision.datasets.Cityscapes` to provide a</span>
+<span class="sd">        stable color palette for visualization and convenience helpers to</span>
+<span class="sd">        encode and decode semantic segmentation targets using Cityscapes</span>
+<span class="sd">        train IDs. A tensor mapping train IDs to RGB colors is constructed</span>
+<span class="sd">        on initialization for decoding predicted masks.</span>
 
 <span class="sd">        Attributes:</span>
-<span class="sd">            color_palette (list[tuple[int, int, int]]):</span>
-<span class="sd">                List of RGB tuples for each class label in the Cityscapes dataset.</span>
-<span class="sd">            train_id_to_color (torch.Tensor):</span>
-<span class="sd">                Tensor mapping train IDs to RGB colors for output decoding.</span>
+<span class="sd">            color_palette: List of RGB tuples for each class label in Cityscapes.</span>
+<span class="sd">            train_id_to_color: Tensor mapping train IDs to RGB colors for decoding.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            root (str): Root directory of the Cityscapes dataset.</span>
-<span class="sd">            split (str): Dataset split to use, such as &quot;train&quot;, &quot;val&quot;, or &quot;test&quot;.</span>
-<span class="sd">            mode (str): Annotation mode, e.g., &quot;fine&quot; or &quot;coarse&quot;.</span>
-<span class="sd">            target_type (list[str] | str):</span>
-<span class="sd">                One or more target types to load (&quot;instance&quot;, &quot;semantic&quot;, etc.).</span>
-<span class="sd">            transform (Callable[..., Any] | None):</span>
-<span class="sd">                Transformation applied to the input image.</span>
-<span class="sd">            target_transform (Callable[..., Any] | None):</span>
-<span class="sd">                Transformation applied to the target.</span>
-<span class="sd">            transforms (Callable[..., Any] | None):</span>
-<span class="sd">                Combined transformation for image and target.</span>
+<span class="sd">            root: Root directory of the Cityscapes dataset.</span>
+<span class="sd">            split: Dataset split to use (e.g., &quot;train&quot;, &quot;val&quot;, or &quot;test&quot;). Defaults to ``&quot;train&quot;``.</span>
+<span class="sd">            mode: Annotation mode (&quot;fine&quot; or &quot;coarse&quot;). Defaults to ``&quot;fine&quot;``.</span>
+<span class="sd">            target_type: One or more target types to load (&quot;instance&quot;, &quot;semantic&quot;, etc.). Defaults to ``&quot;instance&quot;``.</span>
+<span class="sd">            transform: Transformation applied to the input image. Defaults to ``None``.</span>
+<span class="sd">            target_transform: Transformation applied to the target. Defaults to ``None``.</span>
+<span class="sd">            transforms: Combined transformation for image and target. Defaults to ``None``.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -538,13 +532,17 @@
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.datasets.segmentation.Cityscapes.html#torch_uncertainty.datasets.segmentation.Cityscapes.encode_target">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">encode_target</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Encode target image to tensor.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Encode a Cityscapes target PIL image into a train-ID image.</span>
+
+<span class="sd">        The input is a color-coded PIL image (train-ID or label colors). The</span>
+<span class="sd">        method converts it to a single-channel image where each pixel value</span>
+<span class="sd">        is the corresponding train ID.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            target (Image.Image): Target PIL image.</span>
+<span class="sd">            target: A PIL image containing the ground-truth target map.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            torch.Tensor: Encoded target.</span>
+<span class="sd">            A PIL image where pixel values correspond to Cityscapes train IDs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">colored_target</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pil_to_tensor</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
         <span class="n">colored_target</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">colored_target</span><span class="p">,</span> <span class="s2">&quot;c h w -&gt; h w c&quot;</span><span class="p">)</span>
@@ -563,28 +561,33 @@
 <div class="viewcode-block" id="Cityscapes.decode_target">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.datasets.segmentation.Cityscapes.html#torch_uncertainty.datasets.segmentation.Cityscapes.decode_target">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">decode_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Decode target tensor to RGB tensor.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Decode a train-ID tensor into an RGB tensor using the palette.</span>
+
+<span class="sd">        Pixels with value ``255`` are treated as void and mapped to the</span>
+<span class="sd">        last palette entry (black). The returned tensor contains RGB color</span>
+<span class="sd">        values for each pixel according to the dataset palette.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            target (torch.Tensor): Target RGB tensor.</span>
+<span class="sd">            target: Integer tensor of train IDs.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Image.Image: Decoded target.</span>
+<span class="sd">            A tensor of RGB colors with shape ``(H, W, 3)`` mapped from train IDs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">target</span><span class="p">[</span><span class="n">target</span> <span class="o">==</span> <span class="mi">255</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_id_to_color</span><span class="p">[</span><span class="n">target</span><span class="p">]</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the sample at the given index.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sample at the given index.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            index (int): Index</span>
+<span class="sd">            index: Integer index of the sample to retrieve.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple: (image, target) where target is a tuple of all target types if ``target_type``</span>
-<span class="sd">                is a list with more than one item. Otherwise, target is a json object if</span>
-<span class="sd">                ``target_type=&quot;polygon&quot;``, else the image segmentation.</span>
+<span class="sd">            ``(image, target)`` tuple: If ``target_type`` contains multiple</span>
+<span class="sd">            types, ``target`` is a tuple with each corresponding target. If</span>
+<span class="sd">            ``target_type==&quot;polygon&quot;``, the target is a JSON object; for</span>
+<span class="sd">            semantic targets the returned object is a mask or ``tv_tensors.Mask``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">image</span> <span class="o">=</span> <span class="n">tv_tensors</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="p">[</span><span class="n">index</span><span class="p">])</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">))</span>
 
@@ -609,16 +612,25 @@
 <div class="viewcode-block" id="Cityscapes.plot_sample">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.datasets.segmentation.Cityscapes.html#torch_uncertainty.datasets.segmentation.Cityscapes.plot_sample">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">plot_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n">_AX_TYPE</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PLOT_OUT_TYPE</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot a sample from the dataset.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot a dataset sample (image and decoded target) for inspection.</span>
+
+<span class="sd">        Intended behavior: load the sample at ``index``, decode the target</span>
+<span class="sd">        to RGB using :attr:`train_id_to_color`, and render the image and</span>
+<span class="sd">        overlay/target on the provided axis. If ``ax`` is ``None``, a new</span>
+<span class="sd">        matplotlib figure and axis should be created.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            index: The index of the sample to plot.</span>
-<span class="sd">            ax: Optional matplotlib axis to plot on.</span>
+<span class="sd">            index: Index of the sample to plot.</span>
+<span class="sd">            ax: Optional matplotlib axis to draw on. Defaults to ``None``.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            The axis on which the sample was plotted.</span>
+<span class="sd">            A tuple ``(fig, ax)`` or the axis object used for plotting, depending on</span>
+<span class="sd">            the plotting utility in use.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotImplementedError: This plotting helper is not implemented yet.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This method is not implemented yet.&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;plot_sample is not implemented yet.&quot;</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

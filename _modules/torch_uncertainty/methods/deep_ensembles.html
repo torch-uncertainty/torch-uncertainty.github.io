@@ -457,7 +457,7 @@
         <span class="n">core_models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
         <span class="n">store_on_cpu</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a classification deep ensembles from a list of models.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a classification deep ensemble from a list of models.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">core_models</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span><span class="n">core_models</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">core_models</span><span class="p">)</span>
@@ -470,7 +470,7 @@
 <span class="sd">            dict.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            x (Tensor): The input of the model.</span>
+<span class="sd">            x: The input of the model.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: The output of the model with shape :math:`(N \times B, C)`,</span>
@@ -512,7 +512,7 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the logits of the ensemble.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            x (Tensor): The input of the model.</span>
+<span class="sd">            x: The input of the model.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor | dict[str, Tensor]: The output of the model with shape :math:`(N \times B, *)`</span>
@@ -552,20 +552,20 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a Deep Ensembles out of the original models.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        core_models (list[nn.Module] | nn.Module): The model to be ensembled.</span>
-<span class="sd">        num_estimators (int | None): The number of estimators in the ensemble.</span>
-<span class="sd">        task (Literal[``&quot;classification&quot;``, ``&quot;regression&quot;``, ``&quot;segmentation&quot;``, ``&quot;pixel_regression&quot;``]): The model task. Defaults to ``&quot;classification&quot;``.</span>
-<span class="sd">        probabilistic (bool): Whether the regression model is probabilistic.</span>
-<span class="sd">        reset_model_parameters (bool): Whether to reset the model parameters</span>
-<span class="sd">            when :attr:core_models is a module or a list of length 1. Defaults to ``True``.</span>
-<span class="sd">        store_on_cpu (bool): Whether to store the models on CPU. Defaults to ``False``.</span>
-<span class="sd">            This is useful for large models that do not fit in GPU memory. Only one</span>
-<span class="sd">            model will be stored on GPU at a time during forward. The rest will be stored on CPU.</span>
+<span class="sd">        core_models: The model to be ensembled.</span>
+<span class="sd">        num_estimators: The number of estimators in the ensemble.</span>
+<span class="sd">        task: The model task. Defaults to ``&quot;classification&quot;``.</span>
+<span class="sd">        probabilistic: Whether the regression model is probabilistic.</span>
+<span class="sd">        reset_model_parameters: Whether to reset the model parameters when :attr:`core_models` is a module or</span>
+<span class="sd">            a list of length 1. Defaults to ``True``.</span>
+<span class="sd">        store_on_cpu: Whether to store the models on CPU. Defaults to ``False``.</span>
+<span class="sd">        This is useful for large models that do not fit in GPU memory. Only one</span>
+<span class="sd">        model will be stored on GPU at a time during forward. The rest will be stored on CPU.</span>
 <span class="sd">        ckpt_paths (list[str | Path] | None): The paths to the checkpoints of the models.</span>
 <span class="sd">            If provided, the models will be loaded from the checkpoints. The number of</span>
 <span class="sd">            models and the number of checkpoint paths must be the same. If not provided,</span>
 <span class="sd">            the models will be used as is. Defaults to ``None``.</span>
-<span class="sd">        use_tu_ckpt_format (bool): Whether the checkpoint is from torch-uncertainty. If ``True``,</span>
+<span class="sd">        use_tu_ckpt_format: Whether the checkpoint is from torch-uncertainty. If ``True``,</span>
 <span class="sd">            the checkpoint will be loaded using the torch-uncertainty loading function. If</span>
 <span class="sd">            ``False``, the checkpoint will be loaded using the default PyTorch loading function.</span>
 <span class="sd">            Note that this option is only used if :attr:ckpt_paths is provided. Defaults to</span>
@@ -583,8 +583,7 @@
 <span class="sd">            a (non-singleton) list.</span>
 
 <span class="sd">    Warning:</span>
-<span class="sd">        The :attr:`store_on_cpu` option is not supported for training. It is</span>
-<span class="sd">        only supported for inference.</span>
+<span class="sd">        The :attr:`store_on_cpu` option is not supported for training. It is only supported for evaluation.</span>
 
 <span class="sd">    References:</span>
 <span class="sd">            [1] `Simple and scalable predictive uncertainty estimation using deep ensembles. In NeurIPS, 2017</span>

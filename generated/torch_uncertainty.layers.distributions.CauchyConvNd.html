@@ -52,8 +52,6 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.layers.distributions.CauchyConvNd';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -707,35 +705,14 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.layers.distributions.CauchyConvNd">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.layers.distributions.</span></span><span class="sig-name descname"><span class="pre">CauchyConvNd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_layer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">layer_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/layers/distributions.html#CauchyConvNd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.layers.distributions.CauchyConvNd" title="Link to this definition">#</a></dt>
-<dd><p>Cauchy Distribution Convolutional Density Layer.</p>
+<dd><p>Base Convolutional layer for any distribution with loc and scale parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>in_channels</strong> (<em>int</em>) – The number of input channels.</p></li>
-<li><p><strong>out_channels</strong> (<em>int</em>) – The number of event channels.</p></li>
-<li><p><strong>kernel_size</strong> (<em>int</em><em> | </em><em>tuple</em><em>[</em><em>int</em><em>]</em>) – The size of the convolutional kernel.</p></li>
-<li><p><strong>stride</strong> (<em>int</em><em> | </em><em>tuple</em><em>[</em><em>int</em><em>]</em>) – The stride of the convolution.</p></li>
-<li><p><strong>padding</strong> (<em>int</em><em> | </em><em>tuple</em><em>[</em><em>int</em><em>]</em>) – The padding of the convolution.</p></li>
-<li><p><strong>dilation</strong> (<em>int</em><em> | </em><em>tuple</em><em>[</em><em>int</em><em>]</em>) – The dilation of the convolution.</p></li>
-<li><p><strong>groups</strong> (<em>int</em>) – The number of groups in the convolution.</p></li>
-<li><p><strong>min_scale</strong> (<em>float</em>) – The minimal value of the scale parameter.</p></li>
-<li><p><strong>device</strong> (<em>torch.device</em>) – The device where the layer is stored.</p></li>
-<li><p><strong>dtype</strong> (<em>torch.dtype</em>) – The datatype of the layer.</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="simple">
-<dt>Shape:</dt><dd><ul class="simple">
-<li><p>Input: <span class="math notranslate nohighlight">\((N, C_{in}, \ast)\)</span> where <span class="math notranslate nohighlight">\(\ast\)</span> means any number of dimensions and
-<span class="math notranslate nohighlight">\(C_{in} = \text{in_channels}\)</span> and <span class="math notranslate nohighlight">\(N\)</span> is the batch size.</p></li>
-<li><p>Output: A dict with the following keys</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;loc&quot;</span></code>: The mean of the Cauchy distribution of shape <span class="math notranslate nohighlight">\((N, C_{out}, \ast)\)</span> where
-<span class="math notranslate nohighlight">\(C_{out} = \text{out_channels}\)</span>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;scale&quot;</span></code>: The standard deviation of the Cauchy distribution of shape
-<span class="math notranslate nohighlight">\((\ast, C_{out}, \ast)\)</span>.</p></li>
-</ul>
-</li>
+<li><p><strong>base_layer</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>]</span>) – The base layer class.</p></li>
+<li><p><strong>event_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – The number of event dimensions.</p></li>
+<li><p><strong>min_scale</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – The minimal value of the scale parameter.</p></li>
+<li><p><strong>**layer_args</strong> – Additional arguments for the base layer.</p></li>
 </ul>
 </dd>
 </dl>

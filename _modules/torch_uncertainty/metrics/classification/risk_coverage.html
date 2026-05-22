@@ -502,8 +502,7 @@
 <span class="sd">            tensor(0.0833)  # Example output</span>
 
 <span class="sd">        References:</span>
-<span class="sd">            [1] `Geifman &amp; El-Yaniv.`Selective classification for deep neural networks. In NeurIPS, 2017</span>
-<span class="sd">            &lt;https://papers.nips.cc/paper_files/paper/2017/file/4a8423d5e91fda00bb7e46540e2b0cf1-Paper.pdf&gt;`_.</span>
+<span class="sd">            [1] `Geifman &amp; El-Yaniv. Selective classification for deep neural networks. In NeurIPS, 2017 &lt;https://papers.nips.cc/paper_files/paper/2017/file/4a8423d5e91fda00bb7e46540e2b0cf1-Paper.pdf&gt;`_.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;scores&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;cat&quot;</span><span class="p">)</span>
@@ -515,8 +514,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the scores and their associated errors for later computation.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            probs (Tensor): The predicted probabilities of shape :math:`(N, C)`.</span>
-<span class="sd">            targets (Tensor): The ground truth labels of shape :math:`(N,)`.</span>
+<span class="sd">            probs: The predicted probabilities of shape :math:`(N, C)`.</span>
+<span class="sd">            targets: The ground truth labels of shape :math:`(N,)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">probs</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="mi">1</span> <span class="o">-</span> <span class="n">probs</span><span class="p">,</span> <span class="n">probs</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
@@ -571,14 +570,12 @@
 <span class="sd">        ``update``.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            ax (Axes | None): An matplotlib axis object. If provided</span>
-<span class="sd">                will add plot to this axis. Defaults to None.</span>
-<span class="sd">            plot_value (bool): Whether to print the AURC value on the</span>
-<span class="sd">                plot. Defaults to True.</span>
-<span class="sd">            name (str | None): Name of the model. Defaults to None.</span>
+<span class="sd">            ax: A matplotlib axis object. If provided, the plot is added to this axis. Defaults to ``None``.</span>
+<span class="sd">            plot_value: Whether to print the AURC value on the plot. Defaults to ``True``.</span>
+<span class="sd">            name: Name of the model. Defaults to ``None``.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple[[Figure | None], Axes]: Figure object and Axes object</span>
+<span class="sd">            tuple[Figure | None, Axes]: Figure object and axes object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span> <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;plt.Axes&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
@@ -632,8 +629,8 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the cumulative error rates for a given set of scores and errors.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        scores (Tensor): uncertainty scores of shape :math:`(B,)`</span>
-<span class="sd">        errors (Tensor): binary errors of shape :math:`(B,)`</span>
+<span class="sd">        scores: uncertainty scores of shape :math:`(B,)`</span>
+<span class="sd">        errors: binary errors of shape :math:`(B,)`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">errors</span> <span class="o">=</span> <span class="n">errors</span><span class="p">[</span><span class="n">scores</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">descending</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
     <span class="k">return</span> <span class="n">errors</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
@@ -647,8 +644,8 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate The Area Under the Generalized Risk-Coverage curve (AUGRC).</span>
 
-<span class="sd">        The Area Under the Generalized Risk-Coverage curve (AUGRC) for Selective Classification (SC) performance assessment. It avoids putting too much</span>
-<span class="sd">        weight on the most confident samples.</span>
+<span class="sd">        The Area Under the Generalized Risk-Coverage curve (AUGRC) for selective classification</span>
+<span class="sd">        performance assessment. It avoids putting too much weight on the most confident samples.</span>
 
 <span class="sd">        As input to ``forward`` and ``update`` the metric accepts the following input:</span>
 
@@ -667,8 +664,7 @@
 <span class="sd">            kwargs: Additional keyword arguments.</span>
 
 <span class="sd">        References:</span>
-<span class="sd">            [1] `Traub et al. Overcoming Common Flaws in the Evaluation of Selective Classification Systems</span>
-<span class="sd">            &lt;https://arxiv.org/pdf/2407.01032&gt;`_.</span>
+<span class="sd">            [1] `Traub et al. Overcoming Common Flaws in the Evaluation of Selective Classification Systems &lt;https://arxiv.org/pdf/2407.01032&gt;`_.</span>
 
 <span class="sd">        .. seealso::</span>
 <span class="sd">            - :class:`~torch_uncertainty.metrics.classification.AURC` : Parent class, the AURC metric</span>
@@ -704,14 +700,12 @@
 <span class="sd">        ``update``.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            ax (Axes | None): An matplotlib axis object. If provided</span>
-<span class="sd">                will add plot to this axis. Defaults to None.</span>
-<span class="sd">            plot_value (bool): Whether to print the AURC value on the</span>
-<span class="sd">                plot. Defaults to True.</span>
-<span class="sd">            name (str | None): Name of the model. Defaults to None.</span>
+<span class="sd">            ax: A matplotlib axis object. If provided, the plot is added to this axis. Defaults to ``None``.</span>
+<span class="sd">            plot_value: Whether to print the AURC value on the plot. Defaults to ``True``.</span>
+<span class="sd">            name: Name of the model. Defaults to ``None``.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple[[Figure | None], Axes]: Figure object and Axes object</span>
+<span class="sd">            tuple[Figure | None, Axes]: Figure object and axes object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span> <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;plt.Axes&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
@@ -774,11 +768,10 @@
 <span class="sd">        If there are multiple coverage values corresponding to the given risk,</span>
 <span class="sd">        i.e., the risk(coverage) is not monotonic, the coverage at x risk is</span>
 <span class="sd">        the maximum coverage value corresponding to the given risk. If no</span>
-<span class="sd">        there is no coverage value corresponding to the given risk, return</span>
-<span class="sd">        float(&quot;nan&quot;).</span>
+<span class="sd">        there is no coverage value corresponding to the given risk, this metric returns ``float(&quot;nan&quot;)``.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            risk_threshold (float): The risk threshold at which to compute the coverage.</span>
+<span class="sd">            risk_threshold: The risk threshold at which to compute the coverage.</span>
 <span class="sd">            kwargs: Additional arguments to pass to the metric class.</span>
 
 <span class="sd">        Example:</span>
@@ -820,8 +813,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the scores and their associated errors for later computation.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            probs (Tensor): The predicted probabilities of shape :math:`(N, C)`.</span>
-<span class="sd">            targets (Tensor): The ground truth labels of shape :math:`(N,)`.</span>
+<span class="sd">            probs: The predicted probabilities of shape :math:`(N, C)`.</span>
+<span class="sd">            targets: The ground truth labels of shape :math:`(N,)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">probs</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="mi">1</span> <span class="o">-</span> <span class="n">probs</span><span class="p">,</span> <span class="n">probs</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
@@ -863,10 +856,10 @@
 
 <span class="sd">        If there are multiple coverage values corresponding to 5% risk, the</span>
 <span class="sd">        coverage at 5% risk is the maximum coverage value corresponding to 5%</span>
-<span class="sd">        risk. If no there is no coverage value corresponding to the given risk,</span>
-<span class="sd">        this metric returns float(&quot;nan&quot;).</span>
+<span class="sd">        risk. If there is no coverage value corresponding to the given risk,</span>
+<span class="sd">        this metric returns ``float(&quot;nan&quot;)``.</span>
 
-<span class="sd">        This is a specific case of the more general CovAtxRisk metric, where the risk level is fixed at 5%.</span>
+<span class="sd">        This is a specific case of the more general :class:`CovAtxRisk` metric, where the risk level is fixed at 5%.</span>
 
 <span class="sd">        .. seealso::</span>
 <span class="sd">            - :class:`CovAtxRisk` : Parent class, the CovAtxRisk metric</span>
@@ -894,7 +887,7 @@
 <span class="sd">        trade-off between coverage and risk in predictive models.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            cov_threshold (float): The coverage threshold at which to compute the risk.</span>
+<span class="sd">            cov_threshold: The coverage threshold at which to compute the risk.</span>
 <span class="sd">            kwargs: Additional arguments to pass to the metric class.</span>
 
 <span class="sd">        Example:</span>
@@ -946,8 +939,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the scores and their associated errors for later computation.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            probs (Tensor): The predicted probabilities of shape :math:`(N, C)`.</span>
-<span class="sd">            targets (Tensor): The ground truth labels of shape :math:`(N,)`.</span>
+<span class="sd">            probs: The predicted probabilities of shape :math:`(N, C)`.</span>
+<span class="sd">            targets: The ground truth labels of shape :math:`(N,)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">probs</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="mi">1</span> <span class="o">-</span> <span class="n">probs</span><span class="p">,</span> <span class="n">probs</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
@@ -977,7 +970,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the risk at 80% coverage.</span>
 
-<span class="sd">        This is a specific case of the more general RiskAtxCov metric, where the risk level is fixed at 80%.</span>
+<span class="sd">        This is a specific case of the more general :class:`RiskAtxCov` metric, where the coverage level is fixed at 80%.</span>
 
 <span class="sd">        .. seealso::</span>
 <span class="sd">            - :class:`RiskAtxCov` : Parent class, the RiskAtxCov metric</span>

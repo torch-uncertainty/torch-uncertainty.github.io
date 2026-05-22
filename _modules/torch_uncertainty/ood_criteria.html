@@ -456,13 +456,11 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Enum representing the type of input expected by the OOD (Out-of-Distribution) criteria.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        LOGIT (int): The input of the OOD Criterion is in the form of logits (pre-softmax values).</span>
-<span class="sd">        PROB (int): The input is in the form of probabilities (post-softmax values), also called</span>
-<span class="sd">            likelihoods.</span>
-<span class="sd">        ESTIMATOR_PROB (int): The input is in the form of estimated probabilities from an ensemble</span>
+<span class="sd">        LOGIT: The input of the OOD criterion is in the form of logits (pre-softmax values).</span>
+<span class="sd">        PROB: The input is in the form of probabilities (post-softmax values).</span>
+<span class="sd">        ESTIMATOR_PROB: The input is in the form of estimated probabilities from an ensemble</span>
 <span class="sd">            or another probabilistic model.</span>
-<span class="sd">        POST_PROCESSING (int): The input is the prediction score given by the post-processing</span>
-<span class="sd">            method.</span>
+<span class="sd">        POST_PROCESSING: The input is the prediction score given by the post-processing method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">LOGIT</span> <span class="o">=</span> <span class="mi">1</span>
@@ -485,8 +483,8 @@
 <span class="sd">        criteria. Subclasses must implement the `forward` method.</span>
 
 <span class="sd">        Attributes:</span>
-<span class="sd">            input_type (OODCriterionInputType): Type of input expected by the criterion.</span>
-<span class="sd">            ensemble_only (bool): Whether the criterion requires ensemble outputs.</span>
+<span class="sd">            input_type: Type of input expected by the criterion.</span>
+<span class="sd">            ensemble_only: Whether the criterion requires ensemble outputs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -497,7 +495,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass for the OOD criterion.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            inputs (Tensor): The input tensor representing model outputs.</span>
+<span class="sd">            inputs: The input tensor representing model outputs.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: OOD score computed according to the criterion.</span>
@@ -519,7 +517,7 @@
 <span class="sd">        the output dimensions. Lower maximum logits indicate greater uncertainty.</span>
 
 <span class="sd">        Attributes:</span>
-<span class="sd">            input_type (OODCriterionInputType): Expected input type is logits.</span>
+<span class="sd">            input_type: Expected input type is logits.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -529,7 +527,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the negative of the maximum logit value.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            inputs (Tensor): Tensor of logits with shape (batch_size, num_classes).</span>
+<span class="sd">            inputs: Tensor of logits with shape (batch_size, num_classes).</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: Negative of the maximum logit value for each sample.</span>
@@ -557,7 +555,7 @@
 <span class="sd">        where :math:`\mathbf{z} = [z_1, z_2, \dots, z_C]` is the logit vector.</span>
 
 <span class="sd">        Attributes:</span>
-<span class="sd">            input_type (OODCriterionInputType): Expected input type is logits.</span>
+<span class="sd">            input_type: Expected input type is logits.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -567,7 +565,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the negative energy score.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            inputs (Tensor): Tensor of logits with shape (batch_size, num_classes).</span>
+<span class="sd">            inputs: Tensor of logits with shape (batch_size, num_classes).</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: Negative energy score for each sample.</span>
@@ -586,7 +584,7 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;OOD criterion based on maximum softmax probability.</span>
 
 <span class="sd">        This criterion computes the negative of the highest softmax probability.</span>
-<span class="sd">        Lower maximum probabilities indicate greater uncertainty. Probabilities are also called*</span>
+<span class="sd">        Lower maximum probabilities indicate greater uncertainty. Probabilities are also called</span>
 <span class="sd">        likelihoods in a more formal context.</span>
 
 <span class="sd">        .. math::</span>
@@ -595,7 +593,7 @@
 <span class="sd">        where :math:`\mathbf{p} = [p_1, p_2, \dots, p_C]` is the probability vector.</span>
 
 <span class="sd">        Attributes:</span>
-<span class="sd">            input_type (OODCriterionInputType): Expected input type is probabilities.</span>
+<span class="sd">            input_type: Expected input type is probabilities.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -605,7 +603,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the negative of the maximum softmax probability.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            inputs (Tensor): Tensor of probabilities with shape (batch_size, num_classes).</span>
+<span class="sd">            inputs: Tensor of probabilities with shape (batch_size, num_classes).</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: Negative of the highest softmax probability for each sample.</span>
@@ -639,7 +637,7 @@
 <span class="sd">        where :math:`\mathbf{p} = [p_1, p_2, \dots, p_C]` is the probability vector.</span>
 
 <span class="sd">        Attributes:</span>
-<span class="sd">            input_type (OODCriterionInputType): Expected input type is estimated probabilities.</span>
+<span class="sd">            input_type: Expected input type is estimated probabilities.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -649,7 +647,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the entropy of the predicted probability distribution.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            inputs (Tensor): Tensor of estimated probabilities with shape (batch_size, num_classes).</span>
+<span class="sd">            inputs: Tensor of estimated probabilities with shape (batch_size, num_classes).</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: Mean entropy value for each sample.</span>
@@ -677,8 +675,8 @@
 <span class="sd">            I(y, \theta) = H\Big(\frac{1}{K}\sum_{k=1}^{K} \mathbf{p}^{(k)}\Big) - \frac{1}{K}\sum_{k=1}^{K} H(\mathbf{p}^{(k)})</span>
 
 <span class="sd">        Attributes:</span>
-<span class="sd">            ensemble_only (bool): Requires ensemble predictions.</span>
-<span class="sd">            input_type (OODCriterionInputType): Expected input type is estimated probabilities.</span>
+<span class="sd">            ensemble_only: Requires ensemble predictions.</span>
+<span class="sd">            input_type: Expected input type is estimated probabilities.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mi_metric</span> <span class="o">=</span> <span class="n">MutualInformation</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
@@ -689,7 +687,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute mutual information from ensemble predictions.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            inputs (Tensor): Tensor of ensemble probabilities with shape</span>
+<span class="sd">            inputs: Tensor of ensemble probabilities with shape</span>
 <span class="sd">                (ensemble_size, batch_size, num_classes).</span>
 
 <span class="sd">        Returns:</span>
@@ -719,8 +717,8 @@
 <span class="sd">            \text{VR} = 1 - \frac{n_{\text{mode}}}{K}</span>
 
 <span class="sd">        Attributes:</span>
-<span class="sd">            ensemble_only (bool): Requires ensemble predictions.</span>
-<span class="sd">            input_type (OODCriterionInputType): Expected input type is estimated probabilities.</span>
+<span class="sd">            ensemble_only: Requires ensemble predictions.</span>
+<span class="sd">            input_type: Expected input type is estimated probabilities.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vr_metric</span> <span class="o">=</span> <span class="n">VariationRatio</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">probabilistic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -731,7 +729,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute variation ratio from ensemble predictions.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            inputs (Tensor): Tensor of ensemble probabilities with shape</span>
+<span class="sd">            inputs: Tensor of ensemble probabilities with shape</span>
 <span class="sd">                (ensemble_size, batch_size, num_classes).</span>
 
 <span class="sd">        Returns:</span>
@@ -746,7 +744,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get an OOD criterion instance based on a string identifier or class type.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        ood_criterion (str, type or TUOODCriterion): A string identifier for a predefined OOD criterion</span>
+<span class="sd">        ood_criterion: A string identifier for a predefined OOD criterion</span>
 <span class="sd">            or a subclass of `TUOODCriterion`.</span>
 
 <span class="sd">    Returns:</span>

@@ -15,7 +15,7 @@ Through this tutorial, we also see how to use the datamodules outside any Lightn
 and how to use TorchUncertainty's models.
 
 Note:
-~~~~
+~~~~~
 
 The Expected Calibration Error (ECE) is not sufficient to properly assess the calibration properties of a model.
 
