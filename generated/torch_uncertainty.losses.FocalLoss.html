@@ -52,6 +52,8 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.losses.FocalLoss';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -171,15 +173,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../api.html">
-    API Reference
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -191,6 +193,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing
@@ -313,6 +322,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -705,19 +721,27 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.losses.FocalLoss">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.losses.</span></span><span class="sig-name descname"><span class="pre">FocalLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/losses/classification.html#FocalLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.losses.FocalLoss" title="Link to this definition">#</a></dt>
-<dd><p>Focal-Loss for classification tasks.</p>
+<dd><p>Focal Loss for classification tasks.</p>
+<p>Down-weights the contribution of well-classified samples to the cross-entropy
+loss, focusing training on hard examples. For a target class <span class="math notranslate nohighlight">\(y\)</span> with
+predicted probability <span class="math notranslate nohighlight">\(p_y\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\text{FL}(p_y) = -\alpha_y \, (1 - p_y)^\gamma \, \log p_y,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\gamma \geq 0\)</span> is <code class="xref py py-attr docutils literal notranslate"><span class="pre">gamma</span></code> (a larger <span class="math notranslate nohighlight">\(\gamma\)</span>
+suppresses easy examples more aggressively) and <span class="math notranslate nohighlight">\(\alpha_y\)</span> is the
+per-class weight from <code class="xref py py-attr docutils literal notranslate"><span class="pre">alpha</span></code> (defaulting to <code class="docutils literal notranslate"><span class="pre">1</span></code>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>gamma</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – A constant, as described in the paper.</p></li>
-<li><p><strong>alpha</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Weights for each class. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>gamma</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – The focusing parameter <span class="math notranslate nohighlight">\(\gamma\)</span>, as described in the paper.</p></li>
+<li><p><strong>alpha</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Per-class rescaling weights. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 <li><p><strong>reduction</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – <code class="docutils literal notranslate"><span class="pre">'mean'</span></code>, <code class="docutils literal notranslate"><span class="pre">'sum'</span></code> or <code class="docutils literal notranslate"><span class="pre">'none'</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">'mean'</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>[1] <a class="reference external" href="https://openaccess.thecvf.com/content_ICCV_2017/papers/Lin_Focal_Loss_for_ICCV_2017_paper.pdf">Lin, T.-Y., Goyal, P., Girshick, R., He, K., &amp; Dollár, P. (2017). Focal Loss for Dense Object Detection.</a>.</p>
-<p>[2] Inspired by <a class="github reference external" href="https://github.com/AdeelH/pytorch-multi-class-focal-loss">AdeelH/pytorch-multi-class-focal-loss</a> .</p>
+<p>[1] <a class="reference external" href="https://openaccess.thecvf.com/content_ICCV_2017/papers/Lin_Focal_Loss_for_ICCV_2017_paper.pdf">Lin, T.-Y., Goyal, P., Girshick, R., He, K., &amp; Dollár, P. (2017). Focal Loss for Dense Object Detection</a>.</p>
+<p>[2] Inspired by <a class="github reference external" href="https://github.com/AdeelH/pytorch-multi-class-focal-loss">AdeelH/pytorch-multi-class-focal-loss</a>.</p>
 </dd></dl>
 
 </section>

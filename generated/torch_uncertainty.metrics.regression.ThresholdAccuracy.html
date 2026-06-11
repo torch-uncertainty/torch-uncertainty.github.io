@@ -52,6 +52,8 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.metrics.regression.ThresholdAccuracy';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -171,15 +173,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../api.html">
-    API Reference
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -191,6 +193,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing
@@ -313,6 +322,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -705,11 +721,17 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.regression.ThresholdAccuracy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.regression.</span></span><span class="sig-name descname"><span class="pre">ThresholdAccuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">power</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmbda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.25</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/regression/threshold_accuracy.html#ThresholdAccuracy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.regression.ThresholdAccuracy" title="Link to this definition">#</a></dt>
-<dd><p>Compute the Threshold Accuracy metric, also referred to as d1, d2, or d3.</p>
-<p>This metric evaluates the percentage of predictions that fall within a
-specified threshold of their corresponding target values. The threshold
-is determined based on the maximum ratio between predictions and targets
-(or its inverse), raised to a specified power.</p>
+<dd><p>Compute the Threshold Accuracy metric, also referred to as <span class="math notranslate nohighlight">\(\delta_1\)</span>,
+<span class="math notranslate nohighlight">\(\delta_2\)</span>, or <span class="math notranslate nohighlight">\(\delta_3\)</span>.</p>
+<p>This metric is standard in monocular depth estimation. It reports the fraction
+of pixels (or samples) whose prediction <span class="math notranslate nohighlight">\(\hat{y}_i\)</span> and target <span class="math notranslate nohighlight">\(y_i\)</span>
+agree up to a multiplicative factor <span class="math notranslate nohighlight">\(\lambda^k\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\delta_k = \frac{1}{N} \sum_{i=1}^{N}
+\mathbf{1}\!\left[ \max\!\left(\frac{\hat{y}_i}{y_i},
+\frac{y_i}{\hat{y}_i}\right) &lt; \lambda^k \right],\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lambda = 1.25\)</span> by default and <span class="math notranslate nohighlight">\(k\)</span> is the <code class="xref py py-attr docutils literal notranslate"><span class="pre">power</span></code>
+argument. Higher values are better.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

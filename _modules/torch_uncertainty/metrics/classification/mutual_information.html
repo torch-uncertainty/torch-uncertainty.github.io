@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -469,7 +483,20 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the Mutual Information Metric.</span>
 
 <span class="sd">        The Mutual Information Metric estimates the epistemic uncertainty of an</span>
-<span class="sd">        ensemble of estimators.</span>
+<span class="sd">        ensemble of estimators. Given per-estimator predicted probabilities</span>
+<span class="sd">        :math:`\hat{\mathbf{p}}_n \in \Delta^{C-1}` for :math:`n = 1, \dots, N`,</span>
+<span class="sd">        it decomposes the total predictive uncertainty into an epistemic term:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \text{MI} = H\!\left(\frac{1}{N}\sum_{n=1}^{N} \hat{\mathbf{p}}_n\right)</span>
+<span class="sd">            - \frac{1}{N}\sum_{n=1}^{N} H(\hat{\mathbf{p}}_n)</span>
+
+<span class="sd">        where :math:`H(\mathbf{p}) = -\sum_{c=1}^{C} p_c \log p_c` is the</span>
+<span class="sd">        Shannon entropy. The first term is the entropy of the ensemble mean</span>
+<span class="sd">        (total uncertainty) and the second is the mean entropy of individual</span>
+<span class="sd">        estimators (aleatoric uncertainty), so their difference captures the</span>
+<span class="sd">        epistemic uncertainty due to model disagreement.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            reduction: Determines how to reduce over the :math:`B`/batch dimension:</span>

@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -461,13 +475,24 @@
     <span class="n">total</span><span class="p">:</span> <span class="n">Tensor</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos_label</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;FPR95 metric for segmentation tasks.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Image-averaged FPR@95 TPR for dense binary segmentation tasks.</span>
 
-<span class="sd">        Compute the mean FPR95 per batch across all batches.</span>
+<span class="sd">        For each image, a per-pixel False Positive Rate at 95% True Positive Rate is</span>
+<span class="sd">        computed (see :class:`~torch_uncertainty.metrics.classification.FPR95`) from</span>
+<span class="sd">        the pixel scores and binary OOD labels. The metric is then averaged over the</span>
+<span class="sd">        :math:`B` images of the test set:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \text{FPR95} = \frac{1}{B} \sum_{b=1}^{B} \text{FPR95}_b.</span>
+
+<span class="sd">        Image-wise averaging is the convention used in the dense OOD-detection</span>
+<span class="sd">        literature.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            pos_label: The positive label in the segmentation OOD detection task.</span>
-<span class="sd">            **kwargs: Additional keyword arguments for the FPR95 metric.</span>
+<span class="sd">            pos_label: The positive label in the segmentation OOD detection task</span>
+<span class="sd">                (typically ``1`` for OOD pixels).</span>
+<span class="sd">            kwargs: Additional keyword arguments for the underlying</span>
+<span class="sd">                :class:`~torch_uncertainty.metrics.classification.FPR95` metric.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fpr95_metric</span> <span class="o">=</span> <span class="n">FPR95</span><span class="p">(</span><span class="n">pos_label</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>

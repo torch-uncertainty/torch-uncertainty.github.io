@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -476,11 +490,26 @@
     <span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Smooth Expected Calibration Error (SmECE).</span>
 
-<span class="sd">        This metric implements the Kernel Density Estimation based ECE as</span>
-<span class="sd">        proposed by Błasiok &amp; Nakkiran (2023). It addresses the limitations of</span>
-<span class="sd">        standard binned ECE, such as bin-edge effects and poor resolution for</span>
-<span class="sd">        overconfident models, by using a continuous kernel and an adaptive</span>
-<span class="sd">        bandwidth selection strategy. Computed on the top label.</span>
+<span class="sd">        This metric implements the Kernel Density Estimation based ECE proposed by</span>
+<span class="sd">        Błasiok &amp; Nakkiran (2023). It addresses the limitations of the standard binned</span>
+<span class="sd">        ECE — bin-edge effects, poor resolution for overconfident models — by replacing</span>
+<span class="sd">        the histogram with a kernel density estimate of the residuals.</span>
+
+<span class="sd">        Given top-class confidences :math:`\hat{p}_i \in [0, 1]` and accuracies</span>
+<span class="sd">        :math:`a_i \in \{0, 1\}`, define the kernel-smoothed conditional gap</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            r_h(t) = \frac{\sum_{i=1}^{N} K_h(t, \hat{p}_i) (\hat{p}_i - a_i)}</span>
+<span class="sd">                          {\sum_{i=1}^{N} K_h(t, \hat{p}_i)},</span>
+
+<span class="sd">        where :math:`K_h` is a kernel of bandwidth :math:`h`. The Smooth ECE is then</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \text{SmECE} = \int_0^1 |r_h(t)| \, \hat{f}(t) \, \mathrm{d}t,</span>
+
+<span class="sd">        with :math:`\hat{f}(t) = \tfrac{1}{N}\sum_i K_h(t, \hat{p}_i)` the kernel</span>
+<span class="sd">        density of confidences. The bandwidth :math:`h` can be fixed or selected</span>
+<span class="sd">        adaptively via a fixed-point binary search.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            kernel_type: The kernel to use. Choose between:</span>
@@ -510,12 +539,12 @@
 <span class="sd">            :math:`\max(p, 1-p)`).</span>
 
 <span class="sd">        Note:</span>
-<span class="sd">            This implementation has been tested on a use case and provided the same values</span>
-<span class="sd">            (with 6 equal significant figures) as relplot&#39;s original implementation.</span>
+<span class="sd">            This implementation has been tested on a use case and provides the same values</span>
+<span class="sd">            as relplot&#39;s original implementation (to 6 significant figures).</span>
 
 <span class="sd">        References:</span>
 <span class="sd">            - Błasiok, J. &amp; Nakkiran, P. Smooth ECE: Principled Reliability</span>
-<span class="sd">            Diagrams. ICLR 2024.</span>
+<span class="sd">              Diagrams via Kernel Smoothing. ICLR 2024.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">kernel_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;logit&quot;</span><span class="p">,</span> <span class="s2">&quot;reflected&quot;</span><span class="p">]:</span>

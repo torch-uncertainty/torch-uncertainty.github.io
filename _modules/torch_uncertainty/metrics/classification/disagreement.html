@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -470,7 +484,26 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the Disagreement Metric.</span>
 
 <span class="sd">        The Disagreement Metric estimates the confidence of an ensemble of</span>
-<span class="sd">        estimators.</span>
+<span class="sd">        estimators. Given the predicted classes :math:`\hat{y}_{b,n} =</span>
+<span class="sd">        \arg\max_c \hat{p}_{b,n,c}` for sample :math:`b` and estimator</span>
+<span class="sd">        :math:`n`, the disagreement is the fraction of estimator pairs that</span>
+<span class="sd">        predict different classes:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \text{Disagreement} = \frac{2}{N(N-1)}</span>
+<span class="sd">            \sum_{1 \le n &lt; m \le N} \mathbf{1}\!\left[</span>
+<span class="sd">            \hat{y}_{b,n} \neq \hat{y}_{b,m} \right]</span>
+
+<span class="sd">        where :math:`N` is the number of estimators. Equivalently, this equals</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \text{Disagreement} = 1 - \frac{1}{\binom{N}{2}}</span>
+<span class="sd">            \sum_{c=1}^{C} \binom{n_c}{2}</span>
+
+<span class="sd">        where :math:`n_c = \sum_{n=1}^{N} \mathbf{1}[\hat{y}_{b,n} = c]`</span>
+<span class="sd">        is the number of estimators predicting class :math:`c`.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            reduction: Determines how to reduce over the :math:`B`/batch dimension:</span>

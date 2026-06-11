@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -670,9 +684,9 @@
             <span class="n">metrics_dict</span> <span class="o">|=</span> <span class="p">{</span>
                 <span class="s2">&quot;cls/AUROC&quot;</span><span class="p">:</span> <span class="n">BinaryAUROC</span><span class="p">(),</span>
                 <span class="s2">&quot;cls/AUPR&quot;</span><span class="p">:</span> <span class="n">BinaryAveragePrecision</span><span class="p">(),</span>
-                <span class="s2">&quot;cls/FRP95&quot;</span><span class="p">:</span> <span class="n">FPR95</span><span class="p">(</span><span class="n">pos_label</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="s2">&quot;cls/FPR95&quot;</span><span class="p">:</span> <span class="n">FPR95</span><span class="p">(</span><span class="n">pos_label</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
             <span class="p">}</span>
-            <span class="n">groups</span><span class="o">.</span><span class="n">extend</span><span class="p">([[</span><span class="s2">&quot;cls/AUROC&quot;</span><span class="p">,</span> <span class="s2">&quot;cls/AUPR&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;cls/FRP95&quot;</span><span class="p">]])</span>
+            <span class="n">groups</span><span class="o">.</span><span class="n">extend</span><span class="p">([[</span><span class="s2">&quot;cls/AUROC&quot;</span><span class="p">,</span> <span class="s2">&quot;cls/AUPR&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;cls/FPR95&quot;</span><span class="p">]])</span>
 
         <span class="n">cls_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span><span class="n">metrics_dict</span><span class="p">,</span> <span class="n">compute_groups</span><span class="o">=</span><span class="n">groups</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_cls_metrics</span> <span class="o">=</span> <span class="n">cls_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;val/&quot;</span><span class="p">)</span>
@@ -1086,7 +1100,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_plot_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot uncertainty quantification metrics.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
-            <span class="s2">&quot;Reliabity diagram&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span><span class="p">[</span><span class="s2">&quot;cal/ECE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="s2">&quot;Reliability diagram&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span><span class="p">[</span><span class="s2">&quot;cal/ECE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
             <span class="s2">&quot;Risk-Coverage curve&quot;</span><span class="p">,</span>
@@ -1099,7 +1113,7 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">,</span> <span class="n">Conformal</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
-                <span class="s2">&quot;Reliabity diagram after calibration&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Reliability diagram after calibration&quot;</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">post_cls_metrics</span><span class="p">[</span><span class="s2">&quot;cal/ECE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
             <span class="p">)</span>
 

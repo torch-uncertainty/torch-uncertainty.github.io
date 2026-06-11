@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -455,11 +469,31 @@
 <a class="viewcode-back" href="../../../generated/torch_uncertainty.losses.KLDiv.html#torch_uncertainty.losses.KLDiv">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">KLDiv</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;KL divergence loss for Bayesian Neural Networks. Gathers the KL from the</span>
-<span class="sd">        modules computed in the forward passes.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;KL divergence loss for Bayesian Neural Networks.</span>
+
+<span class="sd">        Aggregates the per-layer Kullback-Leibler divergences between the variational</span>
+<span class="sd">        posterior :math:`q_\phi(\mathbf{w})` and the prior :math:`p(\mathbf{w})`:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \mathrm{KL}\!\left[ q_\phi(\mathbf{w}) \;\|\; p(\mathbf{w}) \right]</span>
+<span class="sd">            = \frac{1}{L} \sum_{\ell=1}^{L} \mathrm{KL}\!\left[ q_\phi^{(\ell)} \;\|\; p^{(\ell)} \right].</span>
+
+<span class="sd">        Each Bayesian layer caches a single-sample Monte Carlo estimate of its KL term</span>
+<span class="sd">        during the forward pass via two scalars:</span>
+
+<span class="sd">        - ``log_variational_posterior`` — :math:`\log q_\phi(\mathbf{w}^{(s)})`, the **log variational</span>
+<span class="sd">          posterior** evaluated at the sampled weight,</span>
+<span class="sd">        - ``log_prior`` — :math:`\log p(\mathbf{w}^{(s)})`, the **log prior** at the same</span>
+<span class="sd">          sample,</span>
+
+<span class="sd">        so that ``log_variational_posterior - log_prior`` is a one-sample estimate of the layer&#39;s KL.</span>
+<span class="sd">        ``KLDiv`` simply averages these contributions over the :math:`L` Bayesian</span>
+<span class="sd">        layers of :attr:`model`. The result is intended to be added to the data-fit</span>
+<span class="sd">        term of an ELBO objective — see :class:`ELBOLoss`.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            model: Bayesian Neural Network</span>
+<span class="sd">            model: The Bayesian Neural Network whose layers expose ``log_variational_posterior`` and</span>
+<span class="sd">                ``log_prior`` log-probabilities.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
@@ -473,8 +507,8 @@
         <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">bayesian_modules</span><span class="p">):</span>
-                <span class="n">kl_divergence</span> <span class="o">=</span> <span class="n">kl_divergence</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">module</span><span class="o">.</span><span class="n">lvposterior</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-                <span class="n">kl_divergence</span> <span class="o">+=</span> <span class="n">module</span><span class="o">.</span><span class="n">lvposterior</span> <span class="o">-</span> <span class="n">module</span><span class="o">.</span><span class="n">lprior</span>
+                <span class="n">kl_divergence</span> <span class="o">=</span> <span class="n">kl_divergence</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">module</span><span class="o">.</span><span class="n">log_variational_posterior</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">kl_divergence</span> <span class="o">+=</span> <span class="n">module</span><span class="o">.</span><span class="n">log_variational_posterior</span> <span class="o">-</span> <span class="n">module</span><span class="o">.</span><span class="n">log_prior</span>
                 <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">kl_divergence</span> <span class="o">/</span> <span class="n">count</span></div>
 
@@ -493,22 +527,34 @@
         <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">dist_family</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The Evidence Lower Bound (ELBO) loss for Bayesian Neural Networks.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The (negative) Evidence Lower Bound (ELBO) loss for Bayesian Neural Networks.</span>
 
-<span class="sd">        ELBO loss for Bayesian Neural Networks. Use this loss function with the</span>
-<span class="sd">        objective that you seek to minimize as :attr:`inner_loss`.</span>
+<span class="sd">        Combines an inner data-fit loss (e.g., cross-entropy or a distribution NLL)</span>
+<span class="sd">        with the Kullback-Leibler regulariser :math:`\mathrm{KL}[q_\phi(\mathbf{w}) \|</span>
+<span class="sd">        p(\mathbf{w})]`, estimated by Monte Carlo over :attr:`num_samples` weight</span>
+<span class="sd">        samples:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \mathcal{L}_{\text{ELBO}} = \frac{1}{S} \sum_{s=1}^{S}</span>
+<span class="sd">            \mathcal{L}_\text{inner}\!\left(f_{\mathbf{w}^{(s)}}(\mathbf{x}), y\right)</span>
+<span class="sd">            + \beta_\text{KL} \cdot \mathrm{KL}\!\left[ q_\phi(\mathbf{w}) \;\|\; p(\mathbf{w}) \right],</span>
+
+<span class="sd">        with :math:`\mathbf{w}^{(s)} \sim q_\phi`. The KL weight :math:`\beta_\text{KL}`</span>
+<span class="sd">        is typically set to the inverse of the number of training points (or a</span>
+<span class="sd">        manually annealed schedule).</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            model: The Bayesian Neural Network to compute the loss for</span>
-<span class="sd">            inner_loss: The loss function to use during training</span>
-<span class="sd">            kl_weight: The weight of the KL divergence term</span>
-<span class="sd">            num_samples: The number of samples to use for the ELBO loss</span>
-<span class="sd">            dist_family: The distribution family to use for the output of the</span>
-<span class="sd">                model. ``None`` means point-wise prediction. Defaults to ``None``.</span>
+<span class="sd">            model: The Bayesian Neural Network to compute the loss for.</span>
+<span class="sd">            inner_loss: The data-fit loss to use during training.</span>
+<span class="sd">            kl_weight: The weight :math:`\beta_\text{KL}` of the KL-divergence term.</span>
+<span class="sd">            num_samples: The number of weight samples :math:`S` used to estimate the</span>
+<span class="sd">                expectation.</span>
+<span class="sd">            dist_family: The distribution family to use for the output of the model.</span>
+<span class="sd">                ``None`` means point-wise prediction. Defaults to ``None``.</span>
 
 <span class="sd">        Note:</span>
-<span class="sd">            Set the model to ``None`` if you use the ELBOLoss within the ClassificationRoutine.</span>
-<span class="sd">            It will get filled automatically.</span>
+<span class="sd">            Set :attr:`model` to ``None`` when using ``ELBOLoss`` inside a</span>
+<span class="sd">            ``ClassificationRoutine`` — it will be filled in automatically.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">_elbo_loss_checks</span><span class="p">(</span><span class="n">inner_loss</span><span class="p">,</span> <span class="n">kl_weight</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>

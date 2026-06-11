@@ -52,6 +52,8 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.losses.BetaNLL';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -171,15 +173,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../api.html">
-    API Reference
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -191,6 +193,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing
@@ -313,6 +322,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -705,19 +721,32 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.losses.BetaNLL">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.losses.</span></span><span class="sig-name descname"><span class="pre">BetaNLL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/losses/regression.html#BetaNLL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.losses.BetaNLL" title="Link to this definition">#</a></dt>
-<dd><p>The Beta Negative Log-likelihood loss.</p>
+<dd><p>The <span class="math notranslate nohighlight">\(\beta\)</span>-Negative Log-Likelihood loss (Seitzer et al., 2022).</p>
+<p>A re-weighted version of the Gaussian NLL that scales each per-sample loss by
+the (stop-gradient) predicted variance raised to the power <span class="math notranslate nohighlight">\(\beta\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{L}_i = \sigma_i^{2\beta} \cdot
+\left( \frac{(y_i - \mu_i)^2}{2 \sigma_i^2} + \frac{1}{2} \log \sigma_i^2 \right),\]</div>
+<p>where <span class="math notranslate nohighlight">\((\mu_i, \sigma_i^2)\)</span> are the predicted mean and variance.
+<span class="math notranslate nohighlight">\(\beta = 0\)</span> recovers the standard Gaussian NLL (which down-weights
+high-variance — i.e. uncertain — samples); <span class="math notranslate nohighlight">\(\beta = 1\)</span> recovers the MSE
+scaled by <span class="math notranslate nohighlight">\(\sigma^2\)</span>. Intermediate values interpolate between the two
+regimes and counteract the tendency of Gaussian NLL to neglect noisy targets.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>beta</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Parameter from range [0, 1] controlling relative weighting between data points,
-where <code class="docutils literal notranslate"><span class="pre">0</span></code> corresponds to high weight on low error points and <code class="docutils literal notranslate"><span class="pre">1</span></code> to an equal weighting.</p></li>
+<li><p><strong>beta</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Parameter in <span class="math notranslate nohighlight">\([0, 1]\)</span> controlling the relative weighting between
+data points: <code class="docutils literal notranslate"><span class="pre">0</span></code> is the standard Gaussian NLL (high weight on
+low-error points); <code class="docutils literal notranslate"><span class="pre">1</span></code> recovers a variance-scaled MSE with equal
+weighting.</p></li>
 <li><p><strong>reduction</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Specifies the reduction to apply to the output.
 Must be one of <code class="docutils literal notranslate"><span class="pre">'none'</span></code>, <code class="docutils literal notranslate"><span class="pre">'mean'</span></code> or <code class="docutils literal notranslate"><span class="pre">'sum'</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>[1] <a class="reference external" href="https://arxiv.org/abs/2203.09168">Seitzer, M., Tavakoli, A., Antic, D., &amp; Martius, G. (2022). On the pitfalls of heteroscedastic uncertainty estimation with probabilistic neural networks</a>.</p>
+<p>[1] <a class="reference external" href="https://arxiv.org/abs/2203.09168">Seitzer, M., Tavakoli, A., Antic, D., &amp; Martius, G. (2022). On the pitfalls
+of heteroscedastic uncertainty estimation with probabilistic neural networks. ICLR 2022</a>.</p>
 </dd></dl>
 
 </section>

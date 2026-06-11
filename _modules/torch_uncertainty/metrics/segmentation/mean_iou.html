@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -463,7 +477,23 @@
         <span class="n">validate_args</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes Mean Intersection over Union (IoU) score.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes the Mean Intersection over Union (mIoU) score.</span>
+
+<span class="sd">        For a multi-class segmentation task with :math:`C` classes, the per-class</span>
+<span class="sd">        Intersection over Union is</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \text{IoU}_c = \frac{\text{TP}_c}{\text{TP}_c + \text{FP}_c + \text{FN}_c},</span>
+
+<span class="sd">        where :math:`\text{TP}_c`, :math:`\text{FP}_c`, :math:`\text{FN}_c` are the</span>
+<span class="sd">        numbers of true-positive, false-positive and false-negative pixels for class</span>
+<span class="sd">        :math:`c` (aggregated over all images). The mean IoU is the unweighted average</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \text{mIoU} = \frac{1}{C} \sum_{c=1}^{C} \text{IoU}_c.</span>
+
+<span class="sd">        Classes that never appear in the targets are excluded from the average</span>
+<span class="sd">        (``nanmean``).</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            num_classes: Integer specifying the number of classes.</span>
@@ -505,7 +535,7 @@
 <div class="viewcode-block" id="MeanIntersectionOverUnion.compute">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.segmentation.MeanIntersectionOverUnion.html#torch_uncertainty.metrics.segmentation.MeanIntersectionOverUnion.compute">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the Means Intersection over Union (MIoU) based on saved inputs.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the Mean Intersection over Union (mIoU) based on the accumulated state.&quot;&quot;&quot;</span>
         <span class="n">tp</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_final_state</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">_safe_divide</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span> <span class="o">+</span> <span class="n">fn</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">nanmean</span><span class="p">()</span></div>

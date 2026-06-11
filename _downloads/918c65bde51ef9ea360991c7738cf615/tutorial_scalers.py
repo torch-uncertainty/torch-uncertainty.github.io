@@ -139,17 +139,19 @@ fig.show()
 #
 # We plot the learned histogram-binning mapping for a handful of classes.
 # For each selected class we show:
-#  - the bin centers (x-axis) vs. calibrated bin values (y-axis) as a line+marker
-#  - a reference diagonal y=x (perfect calibration)
-#  - marker size scaled by the number of calibration examples that fell into the bin
+#
+# - the bin centers (x-axis) vs. calibrated bin values (y-axis) as a line+marker
+# - a reference diagonal y=x (perfect calibration)
+# - marker size scaled by the number of calibration examples that fell into the bin
 #
 # This visualization helps detect bins with very few samples (small markers)
 # and whether the method systematically under- or over-estimates confidence.
 #
 # Notes:
-#  - The code uses matplotlib only and creates one figure per class.
-#  - If your scaler stores `bin_edges` and `bin_values` under different names,
-#    adjust accordingly.
+#
+# - The code uses matplotlib only and creates one figure per class.
+# - If your scaler stores `bin_edges` and `bin_values` under different names,
+#   adjust accordingly.
 #
 # We'll pick 3 classes.
 

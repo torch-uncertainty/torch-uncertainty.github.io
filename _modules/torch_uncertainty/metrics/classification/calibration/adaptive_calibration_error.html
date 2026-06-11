@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -924,6 +938,38 @@
 <span class="sd">        to the distribution of predicted probabilities. Unlike uniform binning, adaptive binning</span>
 <span class="sd">        ensures a more balanced representation of predictions across bins.</span>
 
+<span class="sd">        Given top-class confidences :math:`\hat{p}_i` and accuracies</span>
+<span class="sd">        :math:`a_i = \mathbf{1}[\hat{y}_i = y_i]`, the :math:`N` samples are sorted by</span>
+<span class="sd">        confidence and split into :math:`M` bins :math:`B_1, \dots, B_M` each containing</span>
+<span class="sd">        (approximately) the same number of samples. Three norms are available:</span>
+
+<span class="sd">        **Adaptive Calibration Error (ACE):**</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \text{ACE} = \sum_{m=1}^{M} \frac{|B_m|}{N}</span>
+<span class="sd">            \left| \operatorname{acc}(B_m) - \operatorname{conf}(B_m) \right|</span>
+
+<span class="sd">        **Maximum Adaptive Calibration Error (MACE):**</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \text{MACE} = \max_{m} \left| \operatorname{acc}(B_m) -</span>
+<span class="sd">            \operatorname{conf}(B_m) \right|</span>
+
+<span class="sd">        **Root Mean Square Adaptive Calibration Error (RMACE):**</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \text{RMACE} = \sqrt{\sum_{m=1}^{M} \frac{|B_m|}{N}</span>
+<span class="sd">            \left( \operatorname{acc}(B_m) - \operatorname{conf}(B_m) \right)^2}</span>
+
+<span class="sd">        where :math:`\operatorname{acc}(B_m) = \tfrac{1}{|B_m|}\sum_{i \in B_m} a_i`</span>
+<span class="sd">        is the fraction of correct predictions in bin :math:`m`,</span>
+<span class="sd">        :math:`\operatorname{conf}(B_m) = \tfrac{1}{|B_m|}\sum_{i \in B_m} \hat{p}_i`</span>
+<span class="sd">        is the mean predicted confidence in bin :math:`m`, and :math:`|B_m|/N` is</span>
+<span class="sd">        the fraction of total samples in bin :math:`m`.</span>
+
 <span class="sd">        This metric is particularly useful for datasets or models where predictions are</span>
 <span class="sd">        concentrated in certain regions of the probability space.</span>
 
@@ -972,7 +1018,7 @@
 <span class="sd">            &lt;https://arxiv.org/abs/1904.01685&gt;`_.</span>
 
 <span class="sd">        .. seealso::</span>
-<span class="sd">            - See `:class:`CalibrationError` for a metric that uses uniform binning.</span>
+<span class="sd">            - :class:`CalibrationError` for a metric that uses uniform binning.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">task_enum</span> <span class="o">=</span> <span class="n">ClassificationTaskNoMultilabel</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>

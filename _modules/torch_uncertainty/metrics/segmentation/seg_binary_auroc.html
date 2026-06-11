@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -469,9 +483,32 @@
         <span class="n">validate_args</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;SegmentationBinaryAUROC computes the Area Under the Receiver Operating Characteristic Curve (AUROC)</span>
-<span class="sd">        for binary segmentation tasks. It aggregates the AUROC across batches and computes the average AUROC</span>
-<span class="sd">        over all batches processed.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Image-averaged binary AUROC for dense binary segmentation tasks.</span>
+
+<span class="sd">        At each image, a per-pixel binary AUROC is computed from the pixel scores</span>
+<span class="sd">        :math:`s_{ij}` and binary labels :math:`y_{ij} \in \{0, 1\}`:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \text{AUROC}_b = \int_0^1 \text{TPR}_b\!\left(\text{FPR}_b^{-1}(u)\right) \mathrm{d}u,</span>
+
+<span class="sd">        where TPR and FPR are computed by sweeping a threshold over the pixel-level</span>
+<span class="sd">        scores of image :math:`b`. The final metric is the average over all images:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \text{AUROC} = \frac{1}{B} \sum_{b=1}^{B} \text{AUROC}_b.</span>
+
+<span class="sd">        This image-wise averaging is the convention used in the dense OOD-detection</span>
+<span class="sd">        literature (e.g., MUAD) and behaves better than computing AUROC over the</span>
+<span class="sd">        flattened set of all pixels when image sizes or OOD prevalences vary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            max_fpr: If set, computes the partial AUROC up to this FPR value</span>
+<span class="sd">                (passed to :class:`~torchmetrics.classification.BinaryAUROC`).</span>
+<span class="sd">            thresholds: Optional explicit thresholds to use when computing the ROC.</span>
+<span class="sd">            ignore_index: Optional label value to ignore.</span>
+<span class="sd">            validate_args: Whether to validate input arguments.</span>
+<span class="sd">            kwargs: Additional keyword arguments, see `Advanced metric settings</span>
+<span class="sd">                &lt;https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs&gt;`_.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">auroc_metric</span> <span class="o">=</span> <span class="n">BinaryAUROC</span><span class="p">(</span>

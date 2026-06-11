@@ -173,15 +173,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../api.html">
-    API Reference
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -193,6 +193,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing
@@ -315,6 +322,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -707,12 +721,16 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.ood_criteria.MutualInformationCriterion">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.ood_criteria.</span></span><span class="sig-name descname"><span class="pre">MutualInformationCriterion</span></span><a class="reference internal" href="../_modules/torch_uncertainty/ood_criteria.html#MutualInformationCriterion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.ood_criteria.MutualInformationCriterion" title="Link to this definition">#</a></dt>
-<dd><p>OOD criterion based on mutual information.</p>
-<p>This criterion computes the mutual information between ensemble predictions.
-Higher mutual information values indicate lower uncertainty.</p>
-<p>Given ensemble predictions <span class="math notranslate nohighlight">\(\{\mathbf{p}^{(k)}\}_{k=1}^{K}\)</span>, the mutual information is computed as:</p>
+<dd><p>OOD criterion based on mutual information (BALD).</p>
+<p>This criterion computes the mutual information between the prediction and the
+model parameters across the ensemble’s predictions — a classical estimator of
+<em>epistemic</em> uncertainty. Higher mutual information values indicate greater
+epistemic uncertainty and thus a higher likelihood of being out-of-distribution.</p>
+<p>Given ensemble predictions <span class="math notranslate nohighlight">\(\{\mathbf{p}^{(k)}\}_{k=1}^{K}\)</span>, the mutual information is</p>
 <div class="math notranslate nohighlight">
-\[I(y, \theta) = H\Big(\frac{1}{K}\sum_{k=1}^{K} \mathbf{p}^{(k)}\Big) - \frac{1}{K}\sum_{k=1}^{K} H(\mathbf{p}^{(k)})\]</div>
+\[I(y, \theta) = H\!\left(\frac{1}{K}\sum_{k=1}^{K} \mathbf{p}^{(k)}\right)
+- \frac{1}{K}\sum_{k=1}^{K} H(\mathbf{p}^{(k)}),\]</div>
+<p>i.e. the total predictive entropy minus the average per-estimator entropy.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

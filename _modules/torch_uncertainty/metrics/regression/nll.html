@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -452,6 +466,31 @@
 <div class="viewcode-block" id="DistributionNLL">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.DistributionNLL.html#torch_uncertainty.metrics.regression.DistributionNLL">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DistributionNLL</span><span class="p">(</span><span class="n">CategoricalNLL</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Negative Log-Likelihood under a predictive distribution.</span>
+
+<span class="sd">    Evaluates a probabilistic regression model by computing the negative log-likelihood</span>
+<span class="sd">    of the targets under the model&#39;s predictive distribution</span>
+<span class="sd">    :math:`p_\theta(y \mid x)`:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \text{NLL} = -\frac{1}{N} \sum_{i=1}^{N} \log p_\theta(y_i \mid x_i).</span>
+
+<span class="sd">    For multi-variate targets, the underlying distribution is typically wrapped in a</span>
+<span class="sd">    :class:`torch.distributions.Independent` so that ``log_prob`` correctly sums the</span>
+<span class="sd">    log-density over the event dimensions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        reduction: How to reduce the per-sample losses (``&quot;mean&quot;``, ``&quot;sum&quot;``,</span>
+<span class="sd">            ``&quot;none&quot;`` or ``None``). Defaults to ``&quot;mean&quot;``.</span>
+<span class="sd">        kwargs: Additional keyword arguments, see `Advanced metric settings</span>
+<span class="sd">            &lt;https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs&gt;`_.</span>
+
+<span class="sd">    Inputs:</span>
+<span class="sd">        - :attr:`dist`: a :class:`torch.distributions.Distribution` over the targets.</span>
+<span class="sd">        - :attr:`target`: ground-truth targets of compatible shape.</span>
+<span class="sd">        - :attr:`padding_mask`: optional boolean mask of positions to ignore (``True`` for padding).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
 <div class="viewcode-block" id="DistributionNLL.update">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.DistributionNLL.html#torch_uncertainty.metrics.regression.DistributionNLL.update">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>  <span class="c1"># pyrefly: ignore[bad-override]</span>

@@ -173,15 +173,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../api.html">
-    API Reference
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -193,6 +193,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing
@@ -315,6 +322,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -709,7 +723,17 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.classification.</span></span><span class="sig-name descname"><span class="pre">MutualInformation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/mutual_information.html#MutualInformation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.MutualInformation" title="Link to this definition">#</a></dt>
 <dd><p>Compute the Mutual Information Metric.</p>
 <p>The Mutual Information Metric estimates the epistemic uncertainty of an
-ensemble of estimators.</p>
+ensemble of estimators. Given per-estimator predicted probabilities
+<span class="math notranslate nohighlight">\(\hat{\mathbf{p}}_n \in \Delta^{C-1}\)</span> for <span class="math notranslate nohighlight">\(n = 1, \dots, N\)</span>,
+it decomposes the total predictive uncertainty into an epistemic term:</p>
+<div class="math notranslate nohighlight">
+\[\text{MI} = H\!\left(\frac{1}{N}\sum_{n=1}^{N} \hat{\mathbf{p}}_n\right)
+- \frac{1}{N}\sum_{n=1}^{N} H(\hat{\mathbf{p}}_n)\]</div>
+<p>where <span class="math notranslate nohighlight">\(H(\mathbf{p}) = -\sum_{c=1}^{C} p_c \log p_c\)</span> is the
+Shannon entropy. The first term is the entropy of the ensemble mean
+(total uncertainty) and the second is the mean entropy of individual
+estimators (aleatoric uncertainty), so their difference captures the
+epistemic uncertainty due to model disagreement.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

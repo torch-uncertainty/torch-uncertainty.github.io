@@ -1,0 +1,895 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Evaluating Models &#8212; TorchUncertainty Docs</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-codeautolink.css?v=b2176991" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="_static/documentation_options.js?v=f3b36f1a"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/sg-tags.js?v=d80f6fa4"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'evaluation';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="CLI Guide" href="cli_guide.html" />
+    <link rel="prev" title="Mixup and MixupMP Training &amp; Ensembles with TorchUncertainty" href="auto_tutorials/Data_Augmentation/tutorial_mixup_ensembles_mixupmp.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="TorchUncertainty Logo"/>
+    <img src="_static/logo_dark.png" class="logo__image only-dark pst-js-only" alt="TorchUncertainty Logo"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Evaluating Models
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="references.html">
+    References
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/torch-uncertainty/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Evaluating Models
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="references.html">
+    References
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/torch-uncertainty/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<div
+    id="pst-page-navigation-heading-3"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-3">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classification">Classification</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#default-test-metrics">Default test metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ood-detection-metrics">OOD detection metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distribution-shift-metrics">Distribution-shift metrics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#segmentation">Segmentation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Default test metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">OOD detection metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distribution-shift">Distribution shift</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#regression">Regression</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Default test metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ood-detection-distribution-shift">OOD detection &amp; distribution shift</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pixelwise-regression">Pixelwise Regression</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Default test metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">OOD detection &amp; distribution shift</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-metrics">Other metrics</a></li>
+</ul>
+  </nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Evaluating Models</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="evaluating-models">
+<h1>Evaluating Models<a class="headerlink" href="#evaluating-models" title="Link to this heading">#</a></h1>
+<p>Evaluation is a first-class citizen of TorchUncertainty. Each routine wraps your model with a
+rich set of metrics that go far beyond plain accuracy or MSE: proper scores, calibration,
+selective prediction, ensemble diversity, OOD detection and shift robustness are all
+computed automatically at validation and test time, and logged to your Lightning logger
+(and optionally to a CSV file via the <code class="docutils literal notranslate"><span class="pre">save_to_csv</span></code> argument).</p>
+<p>This page summarises <strong>which metrics are computed by default</strong> for each supported task, and
+which additional metrics are enabled when you set <code class="docutils literal notranslate"><span class="pre">eval_ood=True</span></code> or <code class="docutils literal notranslate"><span class="pre">eval_shift=True</span></code>
+on the corresponding routine. All metrics live in
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">torch_uncertainty.metrics</span></code> and most of them are documented in the
+<a class="reference internal" href="api.html"><span class="doc">API reference</span></a>. For a list of the papers they come from, see the
+<a class="reference internal" href="references.html"><span class="doc">references</span></a> page.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The metrics computed at validation time are a subset of those computed at test time —
+they are meant to monitor training and are kept lightweight. The breakdown below
+focuses on <strong>test-time</strong> evaluation, which is where uncertainty matters most.</p>
+</div>
+<hr class="docutils" />
+<section id="classification">
+<h2>Classification<a class="headerlink" href="#classification" title="Link to this heading">#</a></h2>
+<p>The <a class="reference internal" href="generated/torch_uncertainty.routines.ClassificationRoutine.html#torch_uncertainty.routines.ClassificationRoutine" title="torch_uncertainty.routines.ClassificationRoutine"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClassificationRoutine</span></code></a> is the most feature-complete
+routine. It is suited for both binary and multi-class classification and supports
+single models, ensembles, post-hoc calibration and conformal prediction.</p>
+<section id="default-test-metrics">
+<h3>Default test metrics<a class="headerlink" href="#default-test-metrics" title="Link to this heading">#</a></h3>
+<p>Whatever the model, the following metrics are always computed on the in-distribution test
+set:</p>
+<p><strong>Performance &amp; proper scores</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cls/Acc</span></code> — top-1 <code class="xref py py-class docutils literal notranslate"><span class="pre">Accuracy</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cls/Brier</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.BrierScore.html#torch_uncertainty.metrics.classification.BrierScore" title="torch_uncertainty.metrics.classification.BrierScore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BrierScore</span></code></a>, a strictly
+proper score measuring the squared distance between the predicted probabilities and the
+one-hot target.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cls/NLL</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.CategoricalNLL.html#torch_uncertainty.metrics.classification.CategoricalNLL" title="torch_uncertainty.metrics.classification.CategoricalNLL"><code class="xref py py-class docutils literal notranslate"><span class="pre">CategoricalNLL</span></code></a>, the
+negative log-likelihood of the categorical predictive distribution.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cls/Entropy</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.Entropy.html#torch_uncertainty.metrics.classification.Entropy" title="torch_uncertainty.metrics.classification.Entropy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Entropy</span></code></a> of the
+predictive distribution, a popular <em>total</em> uncertainty estimator.</p></li>
+</ul>
+<p><strong>Calibration</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cal/ECE</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.CalibrationError.html#torch_uncertainty.metrics.classification.CalibrationError" title="torch_uncertainty.metrics.classification.CalibrationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">CalibrationError</span></code></a>
+(Expected Calibration Error) with equal-width bins.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cal/aECE</span></code> — adaptive (equal-mass) variant of the ECE
+(<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.AdaptiveCalibrationError.html#torch_uncertainty.metrics.classification.AdaptiveCalibrationError" title="torch_uncertainty.metrics.classification.AdaptiveCalibrationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptiveCalibrationError</span></code></a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cal/MCE</span></code> — Maximum Calibration Error (same metric, <code class="docutils literal notranslate"><span class="pre">norm=&quot;max&quot;</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cal/SmECE</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.SmoothCalibrationError.html#torch_uncertainty.metrics.classification.SmoothCalibrationError" title="torch_uncertainty.metrics.classification.SmoothCalibrationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmoothCalibrationError</span></code></a>,
+a kernel-smoothed, bin-free estimator of the calibration error.</p></li>
+</ul>
+<p>The number of bins is controlled by <code class="docutils literal notranslate"><span class="pre">num_bins_calibration_error</span></code> (default <code class="docutils literal notranslate"><span class="pre">15</span></code>). It is
+an argument of the routine itself.</p>
+<p><strong>Selective Classification</strong></p>
+<p>These metrics evaluate the ability of an uncertainty score to <em>reject</em> uncertain inputs
+while keeping accurate predictions.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sc/AURC</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC" title="torch_uncertainty.metrics.classification.AURC"><code class="xref py py-class docutils literal notranslate"><span class="pre">AURC</span></code></a>, Area Under the
+Risk-Coverage curve.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sc/AUGRC</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.AUGRC.html#torch_uncertainty.metrics.classification.AUGRC" title="torch_uncertainty.metrics.classification.AUGRC"><code class="xref py py-class docutils literal notranslate"><span class="pre">AUGRC</span></code></a>, Area Under the
+<em>Generalized</em> Risk-Coverage curve.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sc/Cov&#64;5Risk</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.CovAt5Risk.html#torch_uncertainty.metrics.classification.CovAt5Risk" title="torch_uncertainty.metrics.classification.CovAt5Risk"><code class="xref py py-class docutils literal notranslate"><span class="pre">CovAt5Risk</span></code></a>, maximum
+coverage at which the selective risk stays below 5%.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sc/Risk&#64;80Cov</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.RiskAt80Cov.html#torch_uncertainty.metrics.classification.RiskAt80Cov" title="torch_uncertainty.metrics.classification.RiskAt80Cov"><code class="xref py py-class docutils literal notranslate"><span class="pre">RiskAt80Cov</span></code></a>,
+selective risk at 80% coverage.</p></li>
+</ul>
+<p><strong>Complexity</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">test/cplx/flops</span></code> and <code class="docutils literal notranslate"><span class="pre">test/cplx/params</span></code> are also logged for reference.</p></li>
+</ul>
+<p><strong>Binary classification only</strong></p>
+<p>When <code class="docutils literal notranslate"><span class="pre">num_classes</span> <span class="pre">==</span> <span class="pre">1</span></code>, three additional metrics are logged: <code class="docutils literal notranslate"><span class="pre">cls/AUROC</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cls/AUPR</span></code> and <code class="docutils literal notranslate"><span class="pre">cls/FPR95</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.FPR95.html#torch_uncertainty.metrics.classification.FPR95" title="torch_uncertainty.metrics.classification.FPR95"><code class="xref py py-class docutils literal notranslate"><span class="pre">FPR95</span></code></a>).</p>
+<p><strong>Ensemble-specific metrics</strong></p>
+<p>When <code class="docutils literal notranslate"><span class="pre">is_ensemble=True</span></code> the routine additionally computes per-sample <em>epistemic</em>
+uncertainty estimators that exploit the diversity between estimators:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">test/ens_Disagreement</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.Disagreement.html#torch_uncertainty.metrics.classification.Disagreement" title="torch_uncertainty.metrics.classification.Disagreement"><code class="xref py py-class docutils literal notranslate"><span class="pre">Disagreement</span></code></a>,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test/ens_MI</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.MutualInformation.html#torch_uncertainty.metrics.classification.MutualInformation" title="torch_uncertainty.metrics.classification.MutualInformation"><code class="xref py py-class docutils literal notranslate"><span class="pre">MutualInformation</span></code></a>
+between the prediction and the model parameters,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test/ens_Entropy</span></code> — entropy of the <strong>per-estimator</strong> predictions. When <code class="docutils literal notranslate"><span class="pre">is_ensemble=True</span></code>,
+<code class="docutils literal notranslate"><span class="pre">test/Entropy</span></code> corresponds to the final (average) distribution’s entropy over all
+test samples. It follows that <code class="docutils literal notranslate"><span class="pre">test/Entropy</span></code> = <code class="docutils literal notranslate"><span class="pre">test/ens_MI</span></code> + <code class="docutils literal notranslate"><span class="pre">test/ens_Entropy</span></code></p></li>
+</ul>
+<p><strong>Post-processing &amp; conformal prediction</strong></p>
+<p>When a <code class="docutils literal notranslate"><span class="pre">post_processing</span></code> method (e.g., temperature scaling, Laplace) is passed, the
+exact same set of test metrics is recomputed on the post-processed probabilities under
+the <code class="docutils literal notranslate"><span class="pre">test/post/</span></code> prefix. For <a class="reference internal" href="generated/torch_uncertainty.post_processing.Conformal.html#torch_uncertainty.post_processing.Conformal" title="torch_uncertainty.post_processing.Conformal"><code class="xref py py-class docutils literal notranslate"><span class="pre">Conformal</span></code></a>,
+the routine instead logs <code class="docutils literal notranslate"><span class="pre">test/post/CoverageRate</span></code>
+(<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.CoverageRate.html#torch_uncertainty.metrics.classification.CoverageRate" title="torch_uncertainty.metrics.classification.CoverageRate"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoverageRate</span></code></a>) and
+<code class="docutils literal notranslate"><span class="pre">test/post/SetSize</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.SetSize.html#torch_uncertainty.metrics.classification.SetSize" title="torch_uncertainty.metrics.classification.SetSize"><code class="xref py py-class docutils literal notranslate"><span class="pre">SetSize</span></code></a>). See the
+<a class="reference internal" href="auto_tutorials/Post_Hoc_Methods/tutorial_scalers.html"><span class="doc">post-hoc calibration</span></a> and
+<a class="reference internal" href="auto_tutorials/Post_Hoc_Methods/tutorial_conformal.html"><span class="doc">conformal prediction</span></a> tutorials
+for end-to-end examples.</p>
+<p><strong>Grouping Loss (optional)</strong></p>
+<p>Setting <code class="docutils literal notranslate"><span class="pre">eval_grouping_loss=True</span></code> enables
+<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.GroupingLoss.html#torch_uncertainty.metrics.classification.GroupingLoss" title="torch_uncertainty.metrics.classification.GroupingLoss"><code class="xref py py-class docutils literal notranslate"><span class="pre">GroupingLoss</span></code></a>, a finer-grained calibration
+metric that quantifies how much information is <em>lost</em> by reducing predictions to their
+confidence: see Perez-Lebel et al., ICLR 2023.</p>
+</section>
+<section id="ood-detection-metrics">
+<h3>OOD detection metrics<a class="headerlink" href="#ood-detection-metrics" title="Link to this heading">#</a></h3>
+<p>When <code class="docutils literal notranslate"><span class="pre">eval_ood=True</span></code> and the datamodule exposes an OOD dataloader, a binary
+ID-vs-OOD detection task is constructed from an <em>OOD score</em> derived from the model
+(controlled by the <code class="docutils literal notranslate"><span class="pre">ood_criterion</span></code> argument, see
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">torch_uncertainty.ood_criteria</span></code> — MSP, max-logit, energy, mutual information,
+post-processing-based, etc.). The following metrics are logged under the <code class="docutils literal notranslate"><span class="pre">ood/</span></code> prefix:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ood/AUROC</span></code> — Area Under the ROC Curve of the binary detector.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ood/AUPR</span></code> — Area Under the Precision-Recall Curve.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ood/FPR95</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.FPR95.html#torch_uncertainty.metrics.classification.FPR95" title="torch_uncertainty.metrics.classification.FPR95"><code class="xref py py-class docutils literal notranslate"><span class="pre">FPR95</span></code></a>,
+false-positive rate at 95% true-positive rate, the standard OOD-detection threshold
+metric.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ood/Entropy</span></code> — average entropy of the predictive distribution over OOD samples.</p></li>
+<li><p>For ensembles, the diversity metrics above are also recomputed under the
+<code class="docutils literal notranslate"><span class="pre">ood/ens_</span></code> prefix.</p></li>
+</ul>
+<p>Have a look at the <a class="reference internal" href="auto_tutorials/Classification/tutorial_ood_detection.html"><span class="doc">OOD detection tutorial</span></a>
+for a full example.</p>
+</section>
+<section id="distribution-shift-metrics">
+<h3>Distribution-shift metrics<a class="headerlink" href="#distribution-shift-metrics" title="Link to this heading">#</a></h3>
+<p>Setting <code class="docutils literal notranslate"><span class="pre">eval_shift=True</span></code> evaluates the model on a shifted version of the test set
+(e.g., CIFAR-10-C, ImageNet-C). The full classification metric collection is recomputed
+under the <code class="docutils literal notranslate"><span class="pre">shift/</span></code> prefix (<code class="docutils literal notranslate"><span class="pre">shift/cls/Acc</span></code>, <code class="docutils literal notranslate"><span class="pre">shift/cal/ECE</span></code>, …), along with:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">shift/Entropy</span></code> — average predictive entropy under shift.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shift/severity</span></code> — the corruption severity reported by the datamodule.</p></li>
+<li><p>For ensembles, diversity metrics under the <code class="docutils literal notranslate"><span class="pre">shift/ens_</span></code> prefix.</p></li>
+</ul>
+<p>See the <a class="reference internal" href="auto_tutorials/Classification/tutorial_distribution_shift.html"><span class="doc">distribution-shift tutorial</span></a>
+for context.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="segmentation">
+<h2>Segmentation<a class="headerlink" href="#segmentation" title="Link to this heading">#</a></h2>
+<p>The <a class="reference internal" href="generated/torch_uncertainty.routines.SegmentationRoutine.html#torch_uncertainty.routines.SegmentationRoutine" title="torch_uncertainty.routines.SegmentationRoutine"><code class="xref py py-class docutils literal notranslate"><span class="pre">SegmentationRoutine</span></code></a> reuses much of the
+classification machinery, applied per pixel. Because dense per-pixel storage would be
+prohibitive for the calibration and selective-classification metrics, those are computed
+on a random subsample of pixels controlled by <code class="docutils literal notranslate"><span class="pre">metric_subsampling_rate</span></code> (default
+<code class="docutils literal notranslate"><span class="pre">1e-2</span></code>).</p>
+<section id="id1">
+<h3>Default test metrics<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<p><strong>Segmentation performance</strong> (computed on every pixel)</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">seg/mIoU</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.segmentation.MeanIntersectionOverUnion.html#torch_uncertainty.metrics.segmentation.MeanIntersectionOverUnion" title="torch_uncertainty.metrics.segmentation.MeanIntersectionOverUnion"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeanIntersectionOverUnion</span></code></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">seg/mAcc</span></code> — macro-averaged pixel accuracy.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">seg/pixAcc</span></code> — overall pixel accuracy.</p></li>
+</ul>
+<p><strong>Proper scores, calibration, selective classification</strong> (on subsampled pixels)</p>
+<p>The following metrics are the per-pixel analogues of their classification counterparts and
+are evaluated on a uniformly subsampled subset of pixels:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">seg/Brier</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.BrierScore.html#torch_uncertainty.metrics.classification.BrierScore" title="torch_uncertainty.metrics.classification.BrierScore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BrierScore</span></code></a>),
+<code class="docutils literal notranslate"><span class="pre">seg/NLL</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.CategoricalNLL.html#torch_uncertainty.metrics.classification.CategoricalNLL" title="torch_uncertainty.metrics.classification.CategoricalNLL"><code class="xref py py-class docutils literal notranslate"><span class="pre">CategoricalNLL</span></code></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cal/ECE</span></code>, <code class="docutils literal notranslate"><span class="pre">cal/aECE</span></code>, <code class="docutils literal notranslate"><span class="pre">cal/MCE</span></code>
+(<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.CalibrationError.html#torch_uncertainty.metrics.classification.CalibrationError" title="torch_uncertainty.metrics.classification.CalibrationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">CalibrationError</span></code></a>),
+<code class="docutils literal notranslate"><span class="pre">cal/SmECE</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.SmoothCalibrationError.html#torch_uncertainty.metrics.classification.SmoothCalibrationError" title="torch_uncertainty.metrics.classification.SmoothCalibrationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmoothCalibrationError</span></code></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sc/AURC</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC" title="torch_uncertainty.metrics.classification.AURC"><code class="xref py py-class docutils literal notranslate"><span class="pre">AURC</span></code></a>),
+<code class="docutils literal notranslate"><span class="pre">sc/AUGRC</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.AUGRC.html#torch_uncertainty.metrics.classification.AUGRC" title="torch_uncertainty.metrics.classification.AUGRC"><code class="xref py py-class docutils literal notranslate"><span class="pre">AUGRC</span></code></a>),
+<code class="docutils literal notranslate"><span class="pre">sc/Cov&#64;5Risk</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.CovAt5Risk.html#torch_uncertainty.metrics.classification.CovAt5Risk" title="torch_uncertainty.metrics.classification.CovAt5Risk"><code class="xref py py-class docutils literal notranslate"><span class="pre">CovAt5Risk</span></code></a>),
+<code class="docutils literal notranslate"><span class="pre">sc/Risk&#64;80Cov</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.RiskAt80Cov.html#torch_uncertainty.metrics.classification.RiskAt80Cov" title="torch_uncertainty.metrics.classification.RiskAt80Cov"><code class="xref py py-class docutils literal notranslate"><span class="pre">RiskAt80Cov</span></code></a>).</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>OOD detection metrics<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<p>When <code class="docutils literal notranslate"><span class="pre">eval_ood=True</span></code>, the routine treats pixels whose target label is greater than or
+equal to <code class="docutils literal notranslate"><span class="pre">num_classes</span></code> as OOD (this matches the convention used by the MUAD
+datamodule). Three dense, segmentation-specific binary metrics are then computed:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ood/AUROC</span></code> —
+<a class="reference internal" href="generated/torch_uncertainty.metrics.segmentation.SegmentationBinaryAUROC.html#torch_uncertainty.metrics.segmentation.SegmentationBinaryAUROC" title="torch_uncertainty.metrics.segmentation.SegmentationBinaryAUROC"><code class="xref py py-class docutils literal notranslate"><span class="pre">SegmentationBinaryAUROC</span></code></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ood/AUPR</span></code> —
+<a class="reference internal" href="generated/torch_uncertainty.metrics.segmentation.SegmentationBinaryAveragePrecision.html#torch_uncertainty.metrics.segmentation.SegmentationBinaryAveragePrecision" title="torch_uncertainty.metrics.segmentation.SegmentationBinaryAveragePrecision"><code class="xref py py-class docutils literal notranslate"><span class="pre">SegmentationBinaryAveragePrecision</span></code></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ood/FPR95</span></code> —
+<a class="reference internal" href="generated/torch_uncertainty.metrics.segmentation.SegmentationFPR95.html#torch_uncertainty.metrics.segmentation.SegmentationFPR95" title="torch_uncertainty.metrics.segmentation.SegmentationFPR95"><code class="xref py py-class docutils literal notranslate"><span class="pre">SegmentationFPR95</span></code></a>.</p></li>
+</ul>
+<p>The OOD score is again controlled by <code class="docutils literal notranslate"><span class="pre">ood_criterion</span></code>. See the
+<a class="reference internal" href="auto_tutorials/Segmentation/tutorial_muad_seg.html"><span class="doc">MUAD segmentation tutorial</span></a> for an
+end-to-end example.</p>
+</section>
+<section id="distribution-shift">
+<h3>Distribution shift<a class="headerlink" href="#distribution-shift" title="Link to this heading">#</a></h3>
+<p>Distribution-shift evaluation is not implemented yet for segmentation — passing
+<code class="docutils literal notranslate"><span class="pre">eval_shift=True</span></code> will raise a <code class="xref py py-class docutils literal notranslate"><span class="pre">NotImplementedError</span></code>. Contributions are welcome.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="regression">
+<h2>Regression<a class="headerlink" href="#regression" title="Link to this heading">#</a></h2>
+<p>The <a class="reference internal" href="generated/torch_uncertainty.routines.RegressionRoutine.html#torch_uncertainty.routines.RegressionRoutine" title="torch_uncertainty.routines.RegressionRoutine"><code class="xref py py-class docutils literal notranslate"><span class="pre">RegressionRoutine</span></code></a> supports both <em>point-wise</em>
+regression and <em>probabilistic</em> regression. In the latter case, the model outputs the
+parameters of a PyTorch <code class="xref py py-class docutils literal notranslate"><span class="pre">Distribution</span></code> (e.g., a Normal, a
+Laplace, a NIG, …), enabling calibration evaluation on top of the usual error metrics.</p>
+<section id="id3">
+<h3>Default test metrics<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<p><strong>Point-wise metrics</strong> (always computed)</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">reg/MAE</span></code> — <code class="xref py py-class docutils literal notranslate"><span class="pre">MeanAbsoluteError</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reg/MSE</span></code> — <code class="xref py py-class docutils literal notranslate"><span class="pre">MeanSquaredError</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reg/RMSE</span></code> — root mean squared error.</p></li>
+</ul>
+<p>When the model is probabilistic, these are computed from the
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">dist_estimate</span></code> of the predictive
+distribution (<code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code> by default, <code class="docutils literal notranslate"><span class="pre">&quot;median&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;mode&quot;</span></code> also supported).</p>
+<p><strong>Probabilistic metrics</strong> (when <code class="docutils literal notranslate"><span class="pre">dist_family</span></code> is set)</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">reg/NLL</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.regression.DistributionNLL.html#torch_uncertainty.metrics.regression.DistributionNLL" title="torch_uncertainty.metrics.regression.DistributionNLL"><code class="xref py py-class docutils literal notranslate"><span class="pre">DistributionNLL</span></code></a>, the
+negative log-likelihood of the predictive distribution.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cal/QCE</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.regression.QuantileCalibrationError.html#torch_uncertainty.metrics.regression.QuantileCalibrationError" title="torch_uncertainty.metrics.regression.QuantileCalibrationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuantileCalibrationError</span></code></a>,
+the regression analogue of the ECE based on the empirical CDF of normalized residuals.</p></li>
+</ul>
+<p>See the <a class="reference internal" href="auto_tutorials/Regression/tutorial_probabilistic_regression.html"><span class="doc">probabilistic regression tutorial</span></a>
+and the <a class="reference internal" href="auto_tutorials/Regression/tutorial_der_cubic.html"><span class="doc">Deep Evidential Regression tutorial</span></a> for
+worked examples.</p>
+</section>
+<section id="ood-detection-distribution-shift">
+<h3>OOD detection &amp; distribution shift<a class="headerlink" href="#ood-detection-distribution-shift" title="Link to this heading">#</a></h3>
+<p>OOD detection and shift evaluation are not implemented yet for regression — both will
+raise a <code class="xref py py-class docutils literal notranslate"><span class="pre">NotImplementedError</span></code> if requested. Please open an issue if you need them.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="pixelwise-regression">
+<h2>Pixelwise Regression<a class="headerlink" href="#pixelwise-regression" title="Link to this heading">#</a></h2>
+<p>The <a class="reference internal" href="generated/torch_uncertainty.routines.PixelRegressionRoutine.html#torch_uncertainty.routines.PixelRegressionRoutine" title="torch_uncertainty.routines.PixelRegressionRoutine"><code class="xref py py-class docutils literal notranslate"><span class="pre">PixelRegressionRoutine</span></code></a> is designed for dense
+regression tasks (monocular depth estimation in particular) and ships with the metrics
+commonly reported in the depth-estimation literature.</p>
+<section id="id4">
+<h3>Default test metrics<a class="headerlink" href="#id4" title="Link to this heading">#</a></h3>
+<p><strong>Point-wise metrics</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">reg/SILog</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.regression.SILog.html#torch_uncertainty.metrics.regression.SILog" title="torch_uncertainty.metrics.regression.SILog"><code class="xref py py-class docutils literal notranslate"><span class="pre">SILog</span></code></a>, scale-invariant
+log error (Eigen et al., NeurIPS 2014).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reg/log10</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.regression.Log10.html#torch_uncertainty.metrics.regression.Log10" title="torch_uncertainty.metrics.regression.Log10"><code class="xref py py-class docutils literal notranslate"><span class="pre">Log10</span></code></a> error.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reg/ARE</span></code> — mean <em>absolute relative</em> error
+(<a class="reference internal" href="generated/torch_uncertainty.metrics.regression.MeanGTRelativeAbsoluteError.html#torch_uncertainty.metrics.regression.MeanGTRelativeAbsoluteError" title="torch_uncertainty.metrics.regression.MeanGTRelativeAbsoluteError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeanGTRelativeAbsoluteError</span></code></a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reg/RSRE</span></code> — root <em>squared relative</em> error
+(<a class="reference internal" href="generated/torch_uncertainty.metrics.regression.MeanGTRelativeSquaredError.html#torch_uncertainty.metrics.regression.MeanGTRelativeSquaredError" title="torch_uncertainty.metrics.regression.MeanGTRelativeSquaredError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeanGTRelativeSquaredError</span></code></a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reg/RMSE</span></code> and <code class="docutils literal notranslate"><span class="pre">reg/RMSELog</span></code> — root mean squared error in linear and log space
+(<a class="reference internal" href="generated/torch_uncertainty.metrics.regression.MeanSquaredLogError.html#torch_uncertainty.metrics.regression.MeanSquaredLogError" title="torch_uncertainty.metrics.regression.MeanSquaredLogError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeanSquaredLogError</span></code></a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reg/iMAE</span></code> and <code class="docutils literal notranslate"><span class="pre">reg/iRMSE</span></code> — inverse-depth errors
+(<a class="reference internal" href="generated/torch_uncertainty.metrics.regression.MeanAbsoluteErrorInverse.html#torch_uncertainty.metrics.regression.MeanAbsoluteErrorInverse" title="torch_uncertainty.metrics.regression.MeanAbsoluteErrorInverse"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeanAbsoluteErrorInverse</span></code></a>,
+<a class="reference internal" href="generated/torch_uncertainty.metrics.regression.MeanSquaredErrorInverse.html#torch_uncertainty.metrics.regression.MeanSquaredErrorInverse" title="torch_uncertainty.metrics.regression.MeanSquaredErrorInverse"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeanSquaredErrorInverse</span></code></a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reg/d1</span></code>, <code class="docutils literal notranslate"><span class="pre">reg/d2</span></code>, <code class="docutils literal notranslate"><span class="pre">reg/d3</span></code> —
+<a class="reference internal" href="generated/torch_uncertainty.metrics.regression.ThresholdAccuracy.html#torch_uncertainty.metrics.regression.ThresholdAccuracy" title="torch_uncertainty.metrics.regression.ThresholdAccuracy"><code class="xref py py-class docutils literal notranslate"><span class="pre">ThresholdAccuracy</span></code></a>, the fraction of pixels
+whose prediction is within <span class="math notranslate nohighlight">\(1.25^k\)</span> of the ground truth (the standard
+<span class="math notranslate nohighlight">\(\delta_k\)</span> accuracies).</p></li>
+</ul>
+<p><strong>Probabilistic metrics</strong> (when <code class="docutils literal notranslate"><span class="pre">dist_family</span></code> is set)</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">reg/NLL</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.regression.DistributionNLL.html#torch_uncertainty.metrics.regression.DistributionNLL" title="torch_uncertainty.metrics.regression.DistributionNLL"><code class="xref py py-class docutils literal notranslate"><span class="pre">DistributionNLL</span></code></a> of the
+per-pixel predictive distribution. For ensembles, predictions from the different
+estimators are combined into a <code class="xref py py-class docutils literal notranslate"><span class="pre">MixtureSameFamily</span></code>
+distribution before the NLL is computed.</p></li>
+</ul>
+</section>
+<section id="id5">
+<h3>OOD detection &amp; distribution shift<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
+<p>Like regression, OOD detection and shift evaluation are not implemented yet for pixel
+regression and will raise <code class="xref py py-class docutils literal notranslate"><span class="pre">NotImplementedError</span></code>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="other-metrics">
+<h2>Other metrics<a class="headerlink" href="#other-metrics" title="Link to this heading">#</a></h2>
+<p>A few additional metrics are implemented but <strong>not</strong> plugged into a routine by default;
+you can use them directly on stored predictions, or wire them into a custom routine:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="generated/torch_uncertainty.metrics.AUSE.html#torch_uncertainty.metrics.AUSE" title="torch_uncertainty.metrics.AUSE"><code class="xref py py-class docutils literal notranslate"><span class="pre">AUSE</span></code></a> — Area Under the Sparsification Error curve,
+a task-agnostic metric measuring how well an uncertainty score ranks samples by their
+true error.</p></li>
+<li><p><a class="reference internal" href="generated/torch_uncertainty.metrics.classification.AdaptiveCalibrationError.html#torch_uncertainty.metrics.classification.AdaptiveCalibrationError" title="torch_uncertainty.metrics.classification.AdaptiveCalibrationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptiveCalibrationError</span></code></a>,
+<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.ClasswiseCalibrationError.html#torch_uncertainty.metrics.classification.ClasswiseCalibrationError" title="torch_uncertainty.metrics.classification.ClasswiseCalibrationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClasswiseCalibrationError</span></code></a>,
+<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.VariationRatio.html#torch_uncertainty.metrics.classification.VariationRatio" title="torch_uncertainty.metrics.classification.VariationRatio"><code class="xref py py-class docutils literal notranslate"><span class="pre">VariationRatio</span></code></a>,
+<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.CovAtxRisk.html#torch_uncertainty.metrics.classification.CovAtxRisk" title="torch_uncertainty.metrics.classification.CovAtxRisk"><code class="xref py py-class docutils literal notranslate"><span class="pre">CovAtxRisk</span></code></a>,
+<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.RiskAtxCov.html#torch_uncertainty.metrics.classification.RiskAtxCov" title="torch_uncertainty.metrics.classification.RiskAtxCov"><code class="xref py py-class docutils literal notranslate"><span class="pre">RiskAtxCov</span></code></a>,
+<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.FPRx.html#torch_uncertainty.metrics.classification.FPRx" title="torch_uncertainty.metrics.classification.FPRx"><code class="xref py py-class docutils literal notranslate"><span class="pre">FPRx</span></code></a> — variants of the default
+metrics with user-controlled thresholds.</p></li>
+</ul>
+<p>See the <a class="reference internal" href="api.html"><span class="doc">API reference</span></a> for the full list and the
+<a class="reference internal" href="references.html"><span class="doc">references</span></a> page for citations.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="auto_tutorials/Data_Augmentation/tutorial_mixup_ensembles_mixupmp.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Mixup and MixupMP Training &amp; Ensembles with TorchUncertainty</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="cli_guide.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">CLI Guide</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-4"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-4">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classification">Classification</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#default-test-metrics">Default test metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ood-detection-metrics">OOD detection metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distribution-shift-metrics">Distribution-shift metrics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#segmentation">Segmentation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Default test metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">OOD detection metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distribution-shift">Distribution shift</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#regression">Regression</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Default test metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ood-detection-distribution-shift">OOD detection &amp; distribution shift</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pixelwise-regression">Pixelwise Regression</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Default test metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">OOD detection &amp; distribution shift</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-metrics">Other metrics</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/evaluation.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2026, Adrien Lafage and Olivier Laurent.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

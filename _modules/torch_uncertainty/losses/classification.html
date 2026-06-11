@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -458,7 +472,17 @@
         <span class="n">loss_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span>
         <span class="n">reduction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The Deep Evidential Classification loss.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The Deep Evidential Classification (DEC) loss.</span>
+
+<span class="sd">        Trains a classifier to output Dirichlet evidence :math:`\mathbf{e} \in</span>
+<span class="sd">        \mathbb{R}_{\geq 0}^C` instead of class probabilities. The Dirichlet parameters</span>
+<span class="sd">        are :math:`\boldsymbol{\alpha} = \mathbf{e} + 1` and the total evidence</span>
+<span class="sd">        :math:`S = \sum_c \alpha_c` controls the predictive uncertainty (smaller</span>
+<span class="sd">        :math:`S` ⇒ more uncertainty). The full loss is the sum of an expected</span>
+<span class="sd">        cross-entropy term (selected by :attr:`loss_type`) and a KL regulariser that</span>
+<span class="sd">        pushes evidence on incorrect classes towards zero, annealed by either a</span>
+<span class="sd">        constant :attr:`reg_weight` or a linear schedule of length</span>
+<span class="sd">        :attr:`annealing_step`.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            annealing_step: Annealing step for the weight of the</span>
@@ -467,7 +491,7 @@
 <span class="sd">            loss_type: Specifies the loss type to apply to the</span>
 <span class="sd">                Dirichlet parameters: ``&#39;mse&#39;`` | ``&#39;log&#39;`` | ``&#39;digamma&#39;``.</span>
 <span class="sd">            reduction: Specifies the reduction to apply to the</span>
-<span class="sd">                output:``&#39;none&#39;`` | ``&#39;mean&#39;`` | ``&#39;sum&#39;``.</span>
+<span class="sd">                output: ``&#39;none&#39;`` | ``&#39;mean&#39;`` | ``&#39;sum&#39;``.</span>
 
 <span class="sd">        References:</span>
 <span class="sd">            [1] `Sensoy, M., Kaplan, L., &amp; Kandemir, M. (2018). Evidential deep learning to quantify classification uncertainty. NeurIPS 2018</span>
@@ -621,19 +645,30 @@
         <span class="n">reduction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
         <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The Confidence Penalty Loss.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The Confidence Penalty loss.</span>
+
+<span class="sd">        Augments the standard cross-entropy loss with a regulariser that penalises</span>
+<span class="sd">        low-entropy (over-confident) predictive distributions:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \mathcal{L} = \text{CE}(\mathbf{z}, y)</span>
+<span class="sd">            + \lambda \left( \log C + \sum_{i=1}^{C} p_i \log(p_i + \varepsilon) \right),</span>
+
+<span class="sd">        where :math:`\mathbf{p} = \mathrm{softmax}(\mathbf{z})`, :math:`C` is the number</span>
+<span class="sd">        of classes, :math:`\lambda` is :attr:`reg_weight`, and :math:`\varepsilon` is</span>
+<span class="sd">        :attr:`eps`. The regulariser equals the negative entropy of :math:`\mathbf{p}`</span>
+<span class="sd">        shifted by :math:`\log C` so that it is non-negative.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            reg_weight: The weight of the regularization term.</span>
-<span class="sd">            reduction: specifies the reduction to apply to the</span>
-<span class="sd">                output:``&#39;none&#39;`` | ``&#39;mean&#39;`` | ``&#39;sum&#39;``. Defaults to &quot;mean&quot;.</span>
+<span class="sd">            reg_weight: The weight :math:`\lambda` of the regularization term.</span>
+<span class="sd">            reduction: Specifies the reduction to apply to the output:</span>
+<span class="sd">                ``&#39;none&#39;`` | ``&#39;mean&#39;`` | ``&#39;sum&#39;``. Defaults to ``&#39;mean&#39;``.</span>
 <span class="sd">            eps: A small value to avoid numerical instability.</span>
-<span class="sd">                Defaults to ``1e-6.``</span>
+<span class="sd">                Defaults to ``1e-6``.</span>
 
 <span class="sd">        References:</span>
-<span class="sd">            [1] `Gabriel Pereyra: Regularizing neural networks by penalizing confident output distributions</span>
-<span class="sd">            &lt;https://arxiv.org/pdf/1701.06548&gt;`_.</span>
-
+<span class="sd">            [1] `Pereyra, G., et al. (2017). Regularizing neural networks by penalizing</span>
+<span class="sd">            confident output distributions &lt;https://arxiv.org/pdf/1701.06548&gt;`_.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">reduction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -687,15 +722,27 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The Conflictual Loss.</span>
 
+<span class="sd">        Combines the standard cross-entropy with a *conflictual* regulariser that</span>
+<span class="sd">        encourages the model to assign non-negligible probability to a uniformly random</span>
+<span class="sd">        class :math:`c^\star`:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \mathcal{L} = \text{CE}(\mathbf{z}, y)</span>
+<span class="sd">            - \lambda \log p_{c^\star}, \quad c^\star \sim \mathrm{Uniform}(1, C).</span>
+
+<span class="sd">        This counteracts the natural tendency of cross-entropy to collapse all</span>
+<span class="sd">        probability mass on a single class and improves the calibration of epistemic</span>
+<span class="sd">        uncertainty estimates.</span>
+
 <span class="sd">        Args:</span>
-<span class="sd">            reg_weight: The weight of the regularization term.</span>
-<span class="sd">            reduction: specifies the reduction to apply to the</span>
-<span class="sd">                output:``&#39;none&#39;`` | ``&#39;mean&#39;`` | ``&#39;sum&#39;``.</span>
+<span class="sd">            reg_weight: The weight :math:`\lambda` of the regularization term.</span>
+<span class="sd">            reduction: Specifies the reduction to apply to the output:</span>
+<span class="sd">                ``&#39;none&#39;`` | ``&#39;mean&#39;`` | ``&#39;sum&#39;``.</span>
 
 <span class="sd">        References:</span>
-<span class="sd">            [1] `Mohammed Fellaji et al. On the Calibration of Epistemic Uncertainty: Principles, Paradoxes and Conflictual Loss</span>
+<span class="sd">            [1] `Fellaji, M., et al. (2024). On the Calibration of Epistemic Uncertainty:</span>
+<span class="sd">            Principles, Paradoxes and Conflictual Loss</span>
 <span class="sd">            &lt;https://arxiv.org/pdf/2407.12211&gt;`_.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">reduction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -744,19 +791,29 @@
         <span class="n">alpha</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">reduction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Focal-Loss for classification tasks.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Focal Loss for classification tasks.</span>
+
+<span class="sd">        Down-weights the contribution of well-classified samples to the cross-entropy</span>
+<span class="sd">        loss, focusing training on hard examples. For a target class :math:`y` with</span>
+<span class="sd">        predicted probability :math:`p_y`,</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \text{FL}(p_y) = -\alpha_y \, (1 - p_y)^\gamma \, \log p_y,</span>
+
+<span class="sd">        where :math:`\gamma \geq 0` is :attr:`gamma` (a larger :math:`\gamma`</span>
+<span class="sd">        suppresses easy examples more aggressively) and :math:`\alpha_y` is the</span>
+<span class="sd">        per-class weight from :attr:`alpha` (defaulting to ``1``).</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            gamma: A constant, as described in the paper.</span>
-<span class="sd">            alpha: Weights for each class. Defaults to ``None``.</span>
+<span class="sd">            gamma: The focusing parameter :math:`\gamma`, as described in the paper.</span>
+<span class="sd">            alpha: Per-class rescaling weights. Defaults to ``None``.</span>
 <span class="sd">            reduction: ``&#39;mean&#39;``, ``&#39;sum&#39;`` or ``&#39;none&#39;``. Defaults to ``&#39;mean&#39;``.</span>
 
 <span class="sd">        References:</span>
-<span class="sd">            [1] `Lin, T.-Y., Goyal, P., Girshick, R., He, K., &amp; Dollár, P. (2017). Focal Loss for Dense Object Detection.</span>
+<span class="sd">            [1] `Lin, T.-Y., Goyal, P., Girshick, R., He, K., &amp; Dollár, P. (2017). Focal Loss for Dense Object Detection</span>
 <span class="sd">            &lt;https://openaccess.thecvf.com/content_ICCV_2017/papers/Lin_Focal_Loss_for_ICCV_2017_paper.pdf&gt;`_.</span>
 
-<span class="sd">            [2] Inspired by https://github.com/AdeelH/pytorch-multi-class-focal-loss .</span>
-
+<span class="sd">            [2] Inspired by https://github.com/AdeelH/pytorch-multi-class-focal-loss.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">reduction</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">reduction</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">reduction</span><span class="si">}</span><span class="s2"> is not a valid value for reduction.&quot;</span><span class="p">)</span>

@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -475,6 +489,25 @@
 <span class="sd">        probabilities and actual target values. It is used to evaluate the</span>
 <span class="sd">        accuracy of probabilistic predictions, where a lower score indicates</span>
 <span class="sd">        better calibration and prediction quality.</span>
+
+<span class="sd">        Given predicted probabilities :math:`\hat{p}_{i,c}` and one-hot encoded</span>
+<span class="sd">        targets :math:`y_{i,c}` for :math:`N` samples and :math:`C` classes:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \text{BS} = \frac{1}{N} \sum_{i=1}^{N} \sum_{c=1}^{C}</span>
+<span class="sd">            \left( \hat{p}_{i,c} - y_{i,c} \right)^2</span>
+
+<span class="sd">        When ``top_class=True``, only the top predicted class is considered:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \text{BS}_{\text{top}} = \frac{1}{N} \sum_{i=1}^{N}</span>
+<span class="sd">            \left( \hat{p}_i - a_i \right)^2</span>
+
+<span class="sd">        where :math:`\hat{p}_i = \max_c \hat{p}_{i,c}` is the highest predicted</span>
+<span class="sd">        probability and :math:`a_i = \mathbf{1}[\hat{y}_i = y_i]` indicates</span>
+<span class="sd">        whether the top prediction is correct.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            num_classes: Number of classes.</span>

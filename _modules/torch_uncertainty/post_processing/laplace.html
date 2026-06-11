@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -472,23 +486,37 @@
         <span class="n">link_approx</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;mc&quot;</span><span class="p">,</span> <span class="s2">&quot;probit&quot;</span><span class="p">,</span> <span class="s2">&quot;bridge&quot;</span><span class="p">,</span> <span class="s2">&quot;bridge_norm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;probit&quot;</span><span class="p">,</span>
         <span class="n">optimize_prior_precision</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Laplace approximation for uncertainty estimation.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Laplace approximation for post-hoc Bayesian uncertainty estimation.</span>
 
-<span class="sd">        This class is a wrapper of Laplace classes from the laplace-torch library.</span>
+<span class="sd">        Fits a Gaussian posterior :math:`\mathcal{N}(\boldsymbol{\theta}_\text{MAP},</span>
+<span class="sd">        \mathbf{H}^{-1})` around the MAP estimate of a trained network, where</span>
+<span class="sd">        :math:`\mathbf{H}` is (an approximation of) the Hessian of the negative</span>
+<span class="sd">        log-posterior, computed on the calibration set. Predictions are then obtained</span>
+<span class="sd">        by marginalising over the posterior — analytically for regression (and the</span>
+<span class="sd">        ``&quot;probit&quot;`` / ``&quot;bridge&quot;`` classification approximations), or by Monte Carlo</span>
+<span class="sd">        for ``&quot;mc&quot;``.</span>
+
+<span class="sd">        This class is a thin wrapper around the</span>
+<span class="sd">        `laplace-torch &lt;https://github.com/aleximmer/Laplace&gt;`_ library.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            task: task type.</span>
-<span class="sd">            model: model to be converted.</span>
-<span class="sd">            weight_subset: subset of weights to be considered. Defaults to ``&quot;last_layer&quot;``.</span>
-<span class="sd">            hessian_struct: structure of the Hessian matrix. Defaults to ``&quot;kron&quot;``.</span>
-<span class="sd">            pred_type: type of posterior predictive, see the Laplace library for more details.</span>
-<span class="sd">                Defaults to ``&quot;glm&quot;``.</span>
-<span class="sd">            link_approx: how to approximate the classification link function for the ``&quot;glm&quot;``.</span>
-<span class="sd">                See the Laplace library for more details. Defaults to &quot;probit&quot;.</span>
-<span class="sd">            optimize_prior_precision: whether to optimize the prior precision. Defaults to ``True``.</span>
+<span class="sd">            task: Task type. Either ``&quot;classification&quot;`` or ``&quot;regression&quot;``.</span>
+<span class="sd">            model: Model to be converted.</span>
+<span class="sd">            weight_subset: Subset of weights to be considered (e.g. ``&quot;last_layer&quot;``</span>
+<span class="sd">                or ``&quot;all&quot;``). Defaults to ``&quot;last_layer&quot;``.</span>
+<span class="sd">            hessian_struct: Structure of the Hessian approximation (e.g. ``&quot;kron&quot;``,</span>
+<span class="sd">                ``&quot;diag&quot;``, ``&quot;full&quot;``). Defaults to ``&quot;kron&quot;``.</span>
+<span class="sd">            pred_type: Type of posterior predictive. See the Laplace library for</span>
+<span class="sd">                details. Defaults to ``&quot;glm&quot;``.</span>
+<span class="sd">            link_approx: How to approximate the classification link function for the</span>
+<span class="sd">                ``&quot;glm&quot;`` predictive. See the Laplace library for details. Defaults to</span>
+<span class="sd">                ``&quot;probit&quot;``.</span>
+<span class="sd">            optimize_prior_precision: Whether to optimize the prior precision by</span>
+<span class="sd">                marginal likelihood. Defaults to ``True``.</span>
 
 <span class="sd">        References:</span>
-<span class="sd">            [1] `Daxberger et al. Laplace Redux - Effortless Bayesian Deep Learning. In NeurIPS 2021</span>
+<span class="sd">            [1] `Daxberger, E., Kristiadi, A., Immer, A., Eschenhagen, R., Bauer, M., &amp;</span>
+<span class="sd">            Hennig, P. (2021). Laplace Redux — Effortless Bayesian Deep Learning. NeurIPS 2021</span>
 <span class="sd">            &lt;https://arxiv.org/abs/2106.14806&gt;`_.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>

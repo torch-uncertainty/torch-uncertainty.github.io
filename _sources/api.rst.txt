@@ -6,9 +6,11 @@ API Reference
 Routines
 --------
 
-The routine are the main building blocks of the library. They define the framework
-in which the models are trained and evaluated. They allow for easy computation of different
-metrics crucial for uncertainty estimation in different contexts, namely classification, regression and segmentation.
+Routines are the main building blocks of the library. They define the framework in which
+models are trained and evaluated, and make it easy to compute the metrics crucial for
+uncertainty estimation across the supported tasks: classification, regression, segmentation,
+and pixelwise regression. See the :doc:`Evaluating Models <evaluation>` page for a full
+breakdown of the metrics computed by each routine.
 
 .. currentmodule:: torch_uncertainty.routines
 

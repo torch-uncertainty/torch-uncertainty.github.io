@@ -52,6 +52,8 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.metrics.segmentation.MeanIntersectionOverUnion';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -171,15 +173,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../api.html">
-    API Reference
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -191,6 +193,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing
@@ -313,6 +322,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -705,7 +721,18 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.segmentation.MeanIntersectionOverUnion">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.segmentation.</span></span><span class="sig-name descname"><span class="pre">MeanIntersectionOverUnion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/segmentation/mean_iou.html#MeanIntersectionOverUnion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.segmentation.MeanIntersectionOverUnion" title="Link to this definition">#</a></dt>
-<dd><p>Computes Mean Intersection over Union (IoU) score.</p>
+<dd><p>Computes the Mean Intersection over Union (mIoU) score.</p>
+<p>For a multi-class segmentation task with <span class="math notranslate nohighlight">\(C\)</span> classes, the per-class
+Intersection over Union is</p>
+<div class="math notranslate nohighlight">
+\[\text{IoU}_c = \frac{\text{TP}_c}{\text{TP}_c + \text{FP}_c + \text{FN}_c},\]</div>
+<p>where <span class="math notranslate nohighlight">\(\text{TP}_c\)</span>, <span class="math notranslate nohighlight">\(\text{FP}_c\)</span>, <span class="math notranslate nohighlight">\(\text{FN}_c\)</span> are the
+numbers of true-positive, false-positive and false-negative pixels for class
+<span class="math notranslate nohighlight">\(c\)</span> (aggregated over all images). The mean IoU is the unweighted average</p>
+<div class="math notranslate nohighlight">
+\[\text{mIoU} = \frac{1}{C} \sum_{c=1}^{C} \text{IoU}_c.\]</div>
+<p>Classes that never appear in the targets are excluded from the average
+(<code class="docutils literal notranslate"><span class="pre">nanmean</span></code>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -742,7 +769,7 @@ A tensor containing a single float value.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.segmentation.MeanIntersectionOverUnion.compute">
 <span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/segmentation/mean_iou.html#MeanIntersectionOverUnion.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.segmentation.MeanIntersectionOverUnion.compute" title="Link to this definition">#</a></dt>
-<dd><p>Compute the Means Intersection over Union (MIoU) based on saved inputs.</p>
+<dd><p>Compute the Mean Intersection over Union (mIoU) based on the accumulated state.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span></p>

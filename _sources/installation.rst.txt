@@ -6,14 +6,14 @@ Installation
 
 
 You can install the package either from PyPI or from source. Choose the latter if you
-want to access the files included the `experiments <https://github.com/torch-uncertainty/torch-uncertainty/tree/main/experiments>`_
+want to access the files in the `experiments <https://github.com/torch-uncertainty/torch-uncertainty/tree/main/experiments>`_
 folder or if you want to contribute to the project.
 
 
 From PyPI
 ---------
 
-Check that you have Python 3.10 (or later) and  PyTorch (cpu or gpu) installed on your system. Then, install
+Check that you have Python 3.10 (or later) and PyTorch (CPU or GPU) installed on your system. Then, install
 the package via pip:
 
 .. parsed-literal::

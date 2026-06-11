@@ -52,6 +52,8 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.losses.DERLoss';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -171,15 +173,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../api.html">
-    API Reference
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -191,6 +193,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing
@@ -313,6 +322,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -705,20 +721,29 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.losses.DERLoss">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.losses.</span></span><span class="sig-name descname"><span class="pre">DERLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reg_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/losses/regression.html#DERLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.losses.DERLoss" title="Link to this definition">#</a></dt>
-<dd><p>The Deep Evidential Regression loss.</p>
-<p>This loss combines the negative log-likelihood loss of the normal
-inverse gamma distribution and a weighted regularization term.</p>
+<dd><p>The Deep Evidential Regression (DER) loss.</p>
+<p>Combines the negative log-likelihood of a Normal-Inverse-Gamma (NIG) predictive
+distribution with a regulariser that penalises evidence on incorrect predictions:</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{L}(\boldsymbol{\theta}, y) = -\log p_\text{NIG}(y \mid \boldsymbol{\theta})
++ \lambda \, |y - \mu| \, (2\lambda_\text{NIG} + \alpha),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\boldsymbol{\theta} = (\mu, \lambda_\text{NIG}, \alpha, \beta)\)</span> are
+the NIG parameters predicted by the model and <span class="math notranslate nohighlight">\(\lambda\)</span> is
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">reg_weight</span></code>. The regulariser shrinks the <em>virtual observation count</em>
+<span class="math notranslate nohighlight">\(2\lambda_\text{NIG} + \alpha\)</span> whenever the prediction is wrong, thereby
+increasing the predictive variance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>reg_weight</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – The weight of the regularization term.</p></li>
+<li><p><strong>reg_weight</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – The weight <span class="math notranslate nohighlight">\(\lambda\)</span> of the regularization term.</p></li>
 <li><p><strong>reduction</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Specifies the reduction to apply to the output.
 Must be one of <code class="docutils literal notranslate"><span class="pre">'none'</span></code>, <code class="docutils literal notranslate"><span class="pre">'mean'</span></code> or <code class="docutils literal notranslate"><span class="pre">'sum'</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>[1] <a class="reference external" href="https://arxiv.org/abs/1910.02600">Amini, A., Schwarting, W., Soleimany, A., &amp; Rus, D. (2019). Deep evidential regression</a>.</p>
+<p>[1] <a class="reference external" href="https://arxiv.org/abs/1910.02600">Amini, A., Schwarting, W., Soleimany, A., &amp; Rus, D. (2020). Deep evidential
+regression. NeurIPS 2020</a>.</p>
 </dd></dl>
 
 </section>

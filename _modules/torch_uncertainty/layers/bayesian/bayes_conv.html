@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -502,8 +516,8 @@
     <span class="n">padding_mode</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">weight</span><span class="p">:</span> <span class="n">Tensor</span>
     <span class="n">bias</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span>
-    <span class="n">lprior</span><span class="p">:</span> <span class="n">Tensor</span>
-    <span class="n">lvposterior</span><span class="p">:</span> <span class="n">Tensor</span>
+    <span class="n">log_prior</span><span class="p">:</span> <span class="n">Tensor</span>
+    <span class="n">log_variational_posterior</span><span class="p">:</span> <span class="n">Tensor</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -721,12 +735,12 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_mu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_sampler</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
                 <span class="n">bias_lposterior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_sampler</span><span class="o">.</span><span class="n">log_posterior</span><span class="p">()</span>
-                <span class="n">bias_lprior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_prior_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">bias</span><span class="p">)</span>
+                <span class="n">bias_log_prior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_prior_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">bias</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">bias</span><span class="p">,</span> <span class="n">bias_lposterior</span><span class="p">,</span> <span class="n">bias_lprior</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+                <span class="n">bias</span><span class="p">,</span> <span class="n">bias_lposterior</span><span class="p">,</span> <span class="n">bias_log_prior</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">lvposterior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_sampler</span><span class="o">.</span><span class="n">log_posterior</span><span class="p">()</span> <span class="o">+</span> <span class="n">bias_lposterior</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lprior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_prior_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="o">+</span> <span class="n">bias_lprior</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_variational_posterior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_sampler</span><span class="o">.</span><span class="n">log_posterior</span><span class="p">()</span> <span class="o">+</span> <span class="n">bias_lposterior</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_prior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_prior_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="o">+</span> <span class="n">bias_log_prior</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv_forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">bias</span><span class="p">)</span></div>
 
@@ -817,12 +831,12 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_mu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_sampler</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
                 <span class="n">bias_lposterior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_sampler</span><span class="o">.</span><span class="n">log_posterior</span><span class="p">()</span>
-                <span class="n">bias_lprior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_prior_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">bias</span><span class="p">)</span>
+                <span class="n">bias_log_prior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_prior_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">bias</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">bias</span><span class="p">,</span> <span class="n">bias_lposterior</span><span class="p">,</span> <span class="n">bias_lprior</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+                <span class="n">bias</span><span class="p">,</span> <span class="n">bias_lposterior</span><span class="p">,</span> <span class="n">bias_log_prior</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">lvposterior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_sampler</span><span class="o">.</span><span class="n">log_posterior</span><span class="p">()</span> <span class="o">+</span> <span class="n">bias_lposterior</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lprior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_prior_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="o">+</span> <span class="n">bias_lprior</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_variational_posterior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_sampler</span><span class="o">.</span><span class="n">log_posterior</span><span class="p">()</span> <span class="o">+</span> <span class="n">bias_lposterior</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_prior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_prior_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="o">+</span> <span class="n">bias_log_prior</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv_forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">bias</span><span class="p">)</span></div>
 
@@ -913,12 +927,12 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_mu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_sampler</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
                 <span class="n">bias_lposterior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_sampler</span><span class="o">.</span><span class="n">log_posterior</span><span class="p">()</span>
-                <span class="n">bias_lprior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_prior_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">bias</span><span class="p">)</span>
+                <span class="n">bias_log_prior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_prior_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">bias</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">bias</span><span class="p">,</span> <span class="n">bias_lposterior</span><span class="p">,</span> <span class="n">bias_lprior</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+                <span class="n">bias</span><span class="p">,</span> <span class="n">bias_lposterior</span><span class="p">,</span> <span class="n">bias_log_prior</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">lvposterior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_sampler</span><span class="o">.</span><span class="n">log_posterior</span><span class="p">()</span> <span class="o">+</span> <span class="n">bias_lposterior</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lprior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_prior_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="o">+</span> <span class="n">bias_lprior</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_variational_posterior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_sampler</span><span class="o">.</span><span class="n">log_posterior</span><span class="p">()</span> <span class="o">+</span> <span class="n">bias_lposterior</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_prior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_prior_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="o">+</span> <span class="n">bias_log_prior</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conv_forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">bias</span><span class="p">)</span></div>
 

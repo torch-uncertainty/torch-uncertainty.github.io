@@ -173,15 +173,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../api.html">
-    API Reference
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -193,6 +193,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing
@@ -315,6 +322,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -709,7 +723,20 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.classification.</span></span><span class="sig-name descname"><span class="pre">Disagreement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/disagreement.html#Disagreement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.Disagreement" title="Link to this definition">#</a></dt>
 <dd><p>Calculate the Disagreement Metric.</p>
 <p>The Disagreement Metric estimates the confidence of an ensemble of
-estimators.</p>
+estimators. Given the predicted classes <span class="math notranslate nohighlight">\(\hat{y}_{b,n} =
+\arg\max_c \hat{p}_{b,n,c}\)</span> for sample <span class="math notranslate nohighlight">\(b\)</span> and estimator
+<span class="math notranslate nohighlight">\(n\)</span>, the disagreement is the fraction of estimator pairs that
+predict different classes:</p>
+<div class="math notranslate nohighlight">
+\[\text{Disagreement} = \frac{2}{N(N-1)}
+\sum_{1 \le n &lt; m \le N} \mathbf{1}\!\left[
+\hat{y}_{b,n} \neq \hat{y}_{b,m} \right]\]</div>
+<p>where <span class="math notranslate nohighlight">\(N\)</span> is the number of estimators. Equivalently, this equals</p>
+<div class="math notranslate nohighlight">
+\[\text{Disagreement} = 1 - \frac{1}{\binom{N}{2}}
+\sum_{c=1}^{C} \binom{n_c}{2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(n_c = \sum_{n=1}^{N} \mathbf{1}[\hat{y}_{b,n} = c]\)</span>
+is the number of estimators predicting class <span class="math notranslate nohighlight">\(c\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

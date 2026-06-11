@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -465,23 +479,40 @@
         <span class="n">enable_ts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Conformal prediction post-processing for calibrated models.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Threshold-based conformal classifier (THR; Sadinle et al., 2019).</span>
+
+<span class="sd">        The simplest conformal classification rule. Defines the non-conformity score</span>
+<span class="sd">        of class :math:`c` as :math:`s(\mathbf{x}, c) = 1 - \hat{p}_c(\mathbf{x})`,</span>
+<span class="sd">        calibrates the empirical :math:`(1 - \alpha)`-quantile :math:`\hat{q}` of the</span>
+<span class="sd">        scores at the true class on a held-out calibration set, and at test time</span>
+<span class="sd">        outputs the prediction set</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \mathcal{C}(\mathbf{x}) = \{ c : \hat{p}_c(\mathbf{x}) \geq 1 - \hat{q} \},</span>
+
+<span class="sd">        guaranteeing marginal coverage of :math:`1 - \alpha`. The top-1 class is</span>
+<span class="sd">        always included to avoid empty sets. Probabilities can optionally be calibrated</span>
+<span class="sd">        first via temperature scaling (``enable_ts=True``), which usually yields smaller</span>
+<span class="sd">        prediction sets.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            alpha: The confidence level, meaning we allow :math:`1-\alpha` error.</span>
+<span class="sd">            alpha: Target mis-coverage level :math:`\alpha \in (0, 1)`.</span>
 <span class="sd">            model: Model to be calibrated. Defaults to ``None``.</span>
 <span class="sd">            ts_init_val: Initial value for the temperature. Defaults to ``1.0``.</span>
 <span class="sd">            ts_lr: Learning rate for the temperature scaling optimizer. Defaults to ``0.1``.</span>
 <span class="sd">            ts_max_iter: Maximum number of iterations for the temperature scaling</span>
 <span class="sd">                optimizer. Defaults to ``100``.</span>
-<span class="sd">            enable_ts: Whether to scale the logits. Defaults to ``True``.</span>
-<span class="sd">            device: device. Defaults to ``None``.</span>
+<span class="sd">            enable_ts: Whether to scale the logits via temperature scaling before</span>
+<span class="sd">                computing the conformal scores. Defaults to ``True``.</span>
+<span class="sd">            device: Device to use. Defaults to ``None``.</span>
 
 <span class="sd">        Warning:</span>
-<span class="sd">            This implementation only works in the multiclass setting. Raise an issue if binary is needed.</span>
+<span class="sd">            This implementation only works in the multiclass setting. Raise an issue</span>
+<span class="sd">            if binary support is needed.</span>
 
 <span class="sd">        Reference:</span>
-<span class="sd">            - `Least ambiguous set-valued classifiers with bounded error levels, Sadinle, M. et al., (2016) &lt;https://arxiv.org/abs/1609.00451&gt;`_.</span>
+<span class="sd">            - `Sadinle, M., Lei, J., &amp; Wasserman, L. (2019). Least Ambiguous Set-Valued</span>
+<span class="sd">              Classifiers with Bounded Error Levels &lt;https://arxiv.org/abs/1609.00451&gt;`_.</span>
 
 <span class="sd">        Code inspired by TorchCP.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

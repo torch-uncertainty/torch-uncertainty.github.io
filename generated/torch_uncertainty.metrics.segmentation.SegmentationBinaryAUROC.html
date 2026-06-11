@@ -52,6 +52,8 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.metrics.segmentation.SegmentationBinaryAUROC';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -171,15 +173,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../api.html">
-    API Reference
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -191,6 +193,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing
@@ -313,6 +322,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -705,9 +721,30 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.segmentation.SegmentationBinaryAUROC">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.segmentation.</span></span><span class="sig-name descname"><span class="pre">SegmentationBinaryAUROC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_fpr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresholds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/segmentation/seg_binary_auroc.html#SegmentationBinaryAUROC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.segmentation.SegmentationBinaryAUROC" title="Link to this definition">#</a></dt>
-<dd><p>SegmentationBinaryAUROC computes the Area Under the Receiver Operating Characteristic Curve (AUROC)
-for binary segmentation tasks. It aggregates the AUROC across batches and computes the average AUROC
-over all batches processed.</p>
+<dd><p>Image-averaged binary AUROC for dense binary segmentation tasks.</p>
+<p>At each image, a per-pixel binary AUROC is computed from the pixel scores
+<span class="math notranslate nohighlight">\(s_{ij}\)</span> and binary labels <span class="math notranslate nohighlight">\(y_{ij} \in \{0, 1\}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\text{AUROC}_b = \int_0^1 \text{TPR}_b\!\left(\text{FPR}_b^{-1}(u)\right) \mathrm{d}u,\]</div>
+<p>where TPR and FPR are computed by sweeping a threshold over the pixel-level
+scores of image <span class="math notranslate nohighlight">\(b\)</span>. The final metric is the average over all images:</p>
+<div class="math notranslate nohighlight">
+\[\text{AUROC} = \frac{1}{B} \sum_{b=1}^{B} \text{AUROC}_b.\]</div>
+<p>This image-wise averaging is the convention used in the dense OOD-detection
+literature (e.g., MUAD) and behaves better than computing AUROC over the
+flattened set of all pixels when image sizes or OOD prevalences vary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_fpr</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – If set, computes the partial AUROC up to this FPR value
+(passed to <code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryAUROC</span></code>).</p></li>
+<li><p><strong>thresholds</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>] | <code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Optional explicit thresholds to use when computing the ROC.</p></li>
+<li><p><strong>ignore_index</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Optional label value to ignore.</p></li>
+<li><p><strong>validate_args</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Whether to validate input arguments.</p></li>
+<li><p><strong>kwargs</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – Additional keyword arguments, see <a class="reference external" href="https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs">Advanced metric settings</a>.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

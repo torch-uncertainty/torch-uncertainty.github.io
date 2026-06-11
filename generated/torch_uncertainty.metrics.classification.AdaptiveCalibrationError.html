@@ -52,6 +52,8 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.metrics.classification.AdaptiveCalibrationError';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -171,15 +173,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../api.html">
-    API Reference
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -191,6 +193,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing
@@ -313,6 +322,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -710,6 +726,27 @@
 of predicted probabilities by dividing the probability space into bins that adapt
 to the distribution of predicted probabilities. Unlike uniform binning, adaptive binning
 ensures a more balanced representation of predictions across bins.</p>
+<p>Given top-class confidences <span class="math notranslate nohighlight">\(\hat{p}_i\)</span> and accuracies
+<span class="math notranslate nohighlight">\(a_i = \mathbf{1}[\hat{y}_i = y_i]\)</span>, the <span class="math notranslate nohighlight">\(N\)</span> samples are sorted by
+confidence and split into <span class="math notranslate nohighlight">\(M\)</span> bins <span class="math notranslate nohighlight">\(B_1, \dots, B_M\)</span> each containing
+(approximately) the same number of samples. Three norms are available:</p>
+<p><strong>Adaptive Calibration Error (ACE):</strong></p>
+<div class="math notranslate nohighlight">
+\[\text{ACE} = \sum_{m=1}^{M} \frac{|B_m|}{N}
+\left| \operatorname{acc}(B_m) - \operatorname{conf}(B_m) \right|\]</div>
+<p><strong>Maximum Adaptive Calibration Error (MACE):</strong></p>
+<div class="math notranslate nohighlight">
+\[\text{MACE} = \max_{m} \left| \operatorname{acc}(B_m) -
+\operatorname{conf}(B_m) \right|\]</div>
+<p><strong>Root Mean Square Adaptive Calibration Error (RMACE):</strong></p>
+<div class="math notranslate nohighlight">
+\[\text{RMACE} = \sqrt{\sum_{m=1}^{M} \frac{|B_m|}{N}
+\left( \operatorname{acc}(B_m) - \operatorname{conf}(B_m) \right)^2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\operatorname{acc}(B_m) = \tfrac{1}{|B_m|}\sum_{i \in B_m} a_i\)</span>
+is the fraction of correct predictions in bin <span class="math notranslate nohighlight">\(m\)</span>,
+<span class="math notranslate nohighlight">\(\operatorname{conf}(B_m) = \tfrac{1}{|B_m|}\sum_{i \in B_m} \hat{p}_i\)</span>
+is the mean predicted confidence in bin <span class="math notranslate nohighlight">\(m\)</span>, and <span class="math notranslate nohighlight">\(|B_m|/N\)</span> is
+the fraction of total samples in bin <span class="math notranslate nohighlight">\(m\)</span>.</p>
 <p>This metric is particularly useful for datasets or models where predictions are
 concentrated in certain regions of the probability space.</p>
 <dl class="field-list simple">
@@ -764,7 +801,7 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;l
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
-<li><p>See <cite>:class:`CalibrationError</cite> for a metric that uses uniform binning.</p></li>
+<li><p><a class="reference internal" href="torch_uncertainty.metrics.classification.CalibrationError.html#torch_uncertainty.metrics.classification.CalibrationError" title="torch_uncertainty.metrics.classification.CalibrationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">CalibrationError</span></code></a> for a metric that uses uniform binning.</p></li>
 </ul>
 </div>
 </dd></dl>

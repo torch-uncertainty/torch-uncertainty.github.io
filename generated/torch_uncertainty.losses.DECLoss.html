@@ -52,6 +52,8 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.losses.DECLoss';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -171,15 +173,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../api.html">
-    API Reference
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -191,6 +193,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing
@@ -313,6 +322,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -705,7 +721,16 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.losses.DECLoss">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.losses.</span></span><span class="sig-name descname"><span class="pre">DECLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annealing_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'log'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/losses/classification.html#DECLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.losses.DECLoss" title="Link to this definition">#</a></dt>
-<dd><p>The Deep Evidential Classification loss.</p>
+<dd><p>The Deep Evidential Classification (DEC) loss.</p>
+<p>Trains a classifier to output Dirichlet evidence <span class="math notranslate nohighlight">\(\mathbf{e} \in
+\mathbb{R}_{\geq 0}^C\)</span> instead of class probabilities. The Dirichlet parameters
+are <span class="math notranslate nohighlight">\(\boldsymbol{\alpha} = \mathbf{e} + 1\)</span> and the total evidence
+<span class="math notranslate nohighlight">\(S = \sum_c \alpha_c\)</span> controls the predictive uncertainty (smaller
+<span class="math notranslate nohighlight">\(S\)</span> ⇒ more uncertainty). The full loss is the sum of an expected
+cross-entropy term (selected by <code class="xref py py-attr docutils literal notranslate"><span class="pre">loss_type</span></code>) and a KL regulariser that
+pushes evidence on incorrect classes towards zero, annealed by either a
+constant <code class="xref py py-attr docutils literal notranslate"><span class="pre">reg_weight</span></code> or a linear schedule of length
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">annealing_step</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -715,7 +740,7 @@ regularization term. Defaults to <code class="docutils literal notranslate"><spa
 <li><p><strong>loss_type</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Specifies the loss type to apply to the
 Dirichlet parameters: <code class="docutils literal notranslate"><span class="pre">'mse'</span></code> | <code class="docutils literal notranslate"><span class="pre">'log'</span></code> | <code class="docutils literal notranslate"><span class="pre">'digamma'</span></code>.</p></li>
 <li><p><strong>reduction</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Specifies the reduction to apply to the
-output:<code class="docutils literal notranslate"><span class="pre">'none'</span></code> | <code class="docutils literal notranslate"><span class="pre">'mean'</span></code> | <code class="docutils literal notranslate"><span class="pre">'sum'</span></code>.</p></li>
+output: <code class="docutils literal notranslate"><span class="pre">'none'</span></code> | <code class="docutils literal notranslate"><span class="pre">'mean'</span></code> | <code class="docutils literal notranslate"><span class="pre">'sum'</span></code>.</p></li>
 </ul>
 </dd>
 </dl>

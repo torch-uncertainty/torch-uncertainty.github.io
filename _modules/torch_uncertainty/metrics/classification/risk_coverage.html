@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -474,6 +488,23 @@
 <span class="sd">        quality of uncertainty estimates by measuring the ability to</span>
 <span class="sd">        discriminate between correct and incorrect predictions based on their</span>
 <span class="sd">        rank (and not their values in contrast with calibration).</span>
+
+<span class="sd">        Let :math:`\sigma` be the permutation sorting the :math:`N` samples by</span>
+<span class="sd">        descending top-class confidence, so that</span>
+<span class="sd">        :math:`\hat{p}_{\sigma(1)} \geq \cdots \geq \hat{p}_{\sigma(N)}`.</span>
+<span class="sd">        The error rate at coverage :math:`\kappa = k/N` is</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            r\!\left(\tfrac{k}{N}\right) = \frac{1}{k}</span>
+<span class="sd">            \sum_{i=1}^{k} \mathbf{1}\!\left[\hat{y}_{\sigma(i)} \neq y_{\sigma(i)}\right]</span>
+
+<span class="sd">        and the AURC is</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \text{AURC} = \int_0^1 r(\kappa)\,\mathrm{d}\kappa</span>
+<span class="sd">            \approx \frac{1}{N} \sum_{k=1}^{N} r\!\left(\tfrac{k}{N}\right)</span>
 
 <span class="sd">        As input to ``forward`` and ``update`` the metric accepts the following input:</span>
 
@@ -645,7 +676,16 @@
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate The Area Under the Generalized Risk-Coverage curve (AUGRC).</span>
 
 <span class="sd">        The Area Under the Generalized Risk-Coverage curve (AUGRC) for selective classification</span>
-<span class="sd">        performance assessment. It avoids putting too much weight on the most confident samples.</span>
+<span class="sd">        performance assessment. Unlike AURC, it weights the error rate at each coverage level</span>
+<span class="sd">        by the coverage itself, reducing the influence of the most confident samples and</span>
+<span class="sd">        making the metric more sensitive to performance at intermediate coverage levels.</span>
+
+<span class="sd">        Using the same notation as :class:`AURC`, the AUGRC is defined as</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \text{AUGRC} = \int_0^1 \kappa \cdot r(\kappa)\,\mathrm{d}\kappa</span>
+<span class="sd">            \approx \frac{1}{N} \sum_{k=1}^{N} \frac{k}{N} \cdot r\!\left(\tfrac{k}{N}\right)</span>
 
 <span class="sd">        As input to ``forward`` and ``update`` the metric accepts the following input:</span>
 
@@ -970,11 +1010,15 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the risk at 80% coverage.</span>
 
-<span class="sd">        This is a specific case of the more general :class:`RiskAtxCov` metric, where the coverage level is fixed at 80%.</span>
+<span class="sd">        The risk at 80% coverage is the error rate among the 80% most confident</span>
+<span class="sd">        predictions. Samples are ranked by descending top-class confidence and</span>
+<span class="sd">        the error rate is computed over the top 80%.</span>
+
+<span class="sd">        This is a specific case of the more general :class:`RiskAtxCov` metric,</span>
+<span class="sd">        where the coverage level is fixed at 80%.</span>
 
 <span class="sd">        .. seealso::</span>
 <span class="sd">            - :class:`RiskAtxCov` : Parent class, the RiskAtxCov metric</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">cov_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 

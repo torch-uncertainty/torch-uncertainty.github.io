@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -468,8 +482,30 @@
         <span class="n">validate_args</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;SegmentationBinaryAveragePrecision computes the Average Precision (AP) for binary segmentation tasks.</span>
-<span class="sd">        It aggregates the mean AP across batches and computes the average AP over all batches processed.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Image-averaged binary Average Precision for dense segmentation tasks.</span>
+
+<span class="sd">        Per-image Average Precision summarises the precision-recall curve obtained by</span>
+<span class="sd">        sweeping a threshold over the pixel scores of image :math:`b`:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \text{AP}_b = \sum_{k} \left( R_b(k) - R_b(k-1) \right) P_b(k),</span>
+
+<span class="sd">        where :math:`P_b(k)` and :math:`R_b(k)` are the precision and recall at the</span>
+<span class="sd">        :math:`k`-th threshold. The final metric is averaged over all :math:`B` images:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \text{AP} = \frac{1}{B} \sum_{b=1}^{B} \text{AP}_b.</span>
+
+<span class="sd">        As for :class:`SegmentationBinaryAUROC`, image-wise averaging is the convention</span>
+<span class="sd">        used in the dense OOD-detection literature.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            thresholds: Optional explicit thresholds for the PR curve, see</span>
+<span class="sd">                :class:`~torchmetrics.classification.BinaryAveragePrecision`.</span>
+<span class="sd">            ignore_index: Optional label value to ignore.</span>
+<span class="sd">            validate_args: Whether to validate input arguments.</span>
+<span class="sd">            kwargs: Additional keyword arguments, see `Advanced metric settings</span>
+<span class="sd">                &lt;https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs&gt;`_.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">aupr_metric</span> <span class="o">=</span> <span class="n">BinaryAveragePrecision</span><span class="p">(</span>

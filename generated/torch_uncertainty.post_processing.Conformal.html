@@ -52,6 +52,8 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.post_processing.Conformal';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -171,15 +173,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../api.html">
-    API Reference
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -191,6 +193,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing
@@ -313,6 +322,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -705,10 +721,36 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.post_processing.Conformal">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.post_processing.</span></span><span class="sig-name descname"><span class="pre">Conformal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_init_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_lr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_max_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/post_processing/conformal/abstract.html#Conformal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.post_processing.Conformal" title="Link to this definition">#</a></dt>
-<dd><p>Conformal base class.</p>
+<dd><p>Abstract base class for split-conformal classification predictors.</p>
+<p>Builds prediction sets <span class="math notranslate nohighlight">\(\mathcal{C}(\mathbf{x}) \subseteq \{1, \dots, C\}\)</span>
+with the <em>marginal coverage guarantee</em></p>
+<div class="math notranslate nohighlight">
+\[\mathbb{P}\!\left[ Y \in \mathcal{C}(X) \right] \geq 1 - \alpha,\]</div>
+<p>provided that the calibration and test points are exchangeable. At fit time,
+non-conformity scores are computed on a held-out calibration set and the
+empirical <span class="math notranslate nohighlight">\((1 - \alpha)\)</span>-quantile <span class="math notranslate nohighlight">\(\hat{q}\)</span> is stored in
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">q_hat</span></code>. At test time, the prediction set is built by including all
+classes whose conformal score is below <span class="math notranslate nohighlight">\(\hat{q}\)</span>. See <a class="reference internal" href="torch_uncertainty.post_processing.ConformalClsTHR.html#torch_uncertainty.post_processing.ConformalClsTHR" title="torch_uncertainty.post_processing.ConformalClsTHR"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConformalClsTHR</span></code></a>,
+<a class="reference internal" href="torch_uncertainty.post_processing.ConformalClsAPS.html#torch_uncertainty.post_processing.ConformalClsAPS" title="torch_uncertainty.post_processing.ConformalClsAPS"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConformalClsAPS</span></code></a>, and <a class="reference internal" href="torch_uncertainty.post_processing.ConformalClsRAPS.html#torch_uncertainty.post_processing.ConformalClsRAPS" title="torch_uncertainty.post_processing.ConformalClsRAPS"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConformalClsRAPS</span></code></a> for concrete scores.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alpha</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Target mis-coverage level <span class="math notranslate nohighlight">\(\alpha \in (0, 1)\)</span>. A smaller
+<span class="math notranslate nohighlight">\(\alpha\)</span> yields larger prediction sets.</p></li>
+<li><p><strong>model</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Underlying classifier.</p></li>
+<li><p><strong>ts_init_val</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Initial temperature used when <code class="xref py py-attr docutils literal notranslate"><span class="pre">enable_ts</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>ts_lr</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Learning rate for the temperature optimizer.</p></li>
+<li><p><strong>ts_max_iter</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Maximum number of iterations for the temperature optimizer.</p></li>
+<li><p><strong>enable_ts</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, wraps the model in a <a class="reference internal" href="torch_uncertainty.post_processing.TemperatureScaler.html#torch_uncertainty.post_processing.TemperatureScaler" title="torch_uncertainty.post_processing.TemperatureScaler"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemperatureScaler</span></code></a>
+fit on the calibration set before computing the conformal scores.</p></li>
+<li><p><strong>device</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>, <code class="docutils literal notranslate"><span class="pre">'cuda'</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">device</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]</span>) – Device to run the post-processing on.</p></li>
+</ul>
+</dd>
+</dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>This implementation only works in the multiclass setting. Raise an issue if binary is needed.</p>
+<p>This implementation only works in the multiclass setting. Raise an issue
+if binary support is needed.</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.post_processing.Conformal.conformal">
@@ -726,8 +768,13 @@
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#torch_uncertainty.post_processing.Conformal.fit" title="Link to this definition">#</a></dt>
 <dd><p>Fit the post-processing module on a calibration dataloader.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dataloader</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataLoader</span></code></span>) – A dataloader yielding <code class="docutils literal notranslate"><span class="pre">(inputs,</span> <span class="pre">targets)</span></code> pairs from a
+held-out calibration set, disjoint from both the training and the
+test sets.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
 </dl>
 </dd></dl>

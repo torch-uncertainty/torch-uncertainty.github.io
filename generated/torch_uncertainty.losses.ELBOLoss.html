@@ -52,6 +52,8 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.losses.ELBOLoss';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -171,15 +173,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../api.html">
-    API Reference
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -191,6 +193,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing
@@ -313,6 +322,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -705,25 +721,35 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.losses.ELBOLoss">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.losses.</span></span><span class="sig-name descname"><span class="pre">ELBOLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kl_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_family</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/losses/bayesian.html#ELBOLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.losses.ELBOLoss" title="Link to this definition">#</a></dt>
-<dd><p>The Evidence Lower Bound (ELBO) loss for Bayesian Neural Networks.</p>
-<p>ELBO loss for Bayesian Neural Networks. Use this loss function with the
-objective that you seek to minimize as <code class="xref py py-attr docutils literal notranslate"><span class="pre">inner_loss</span></code>.</p>
+<dd><p>The (negative) Evidence Lower Bound (ELBO) loss for Bayesian Neural Networks.</p>
+<p>Combines an inner data-fit loss (e.g., cross-entropy or a distribution NLL)
+with the Kullback-Leibler regulariser <span class="math notranslate nohighlight">\(\mathrm{KL}[q_\phi(\mathbf{w}) \|
+p(\mathbf{w})]\)</span>, estimated by Monte Carlo over <code class="xref py py-attr docutils literal notranslate"><span class="pre">num_samples</span></code> weight
+samples:</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{L}_{\text{ELBO}} = \frac{1}{S} \sum_{s=1}^{S}
+\mathcal{L}_\text{inner}\!\left(f_{\mathbf{w}^{(s)}}(\mathbf{x}), y\right)
++ \beta_\text{KL} \cdot \mathrm{KL}\!\left[ q_\phi(\mathbf{w}) \;\|\; p(\mathbf{w}) \right],\]</div>
+<p>with <span class="math notranslate nohighlight">\(\mathbf{w}^{(s)} \sim q_\phi\)</span>. The KL weight <span class="math notranslate nohighlight">\(\beta_\text{KL}\)</span>
+is typically set to the inverse of the number of training points (or a
+manually annealed schedule).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – The Bayesian Neural Network to compute the loss for</p></li>
-<li><p><strong>inner_loss</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></span>) – The loss function to use during training</p></li>
-<li><p><strong>kl_weight</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – The weight of the KL divergence term</p></li>
-<li><p><strong>num_samples</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – The number of samples to use for the ELBO loss</p></li>
-<li><p><strong>dist_family</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – The distribution family to use for the output of the
-model. <code class="docutils literal notranslate"><span class="pre">None</span></code> means point-wise prediction. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>model</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – The Bayesian Neural Network to compute the loss for.</p></li>
+<li><p><strong>inner_loss</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></span>) – The data-fit loss to use during training.</p></li>
+<li><p><strong>kl_weight</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – The weight <span class="math notranslate nohighlight">\(\beta_\text{KL}\)</span> of the KL-divergence term.</p></li>
+<li><p><strong>num_samples</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – The number of weight samples <span class="math notranslate nohighlight">\(S\)</span> used to estimate the
+expectation.</p></li>
+<li><p><strong>dist_family</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – The distribution family to use for the output of the model.
+<code class="docutils literal notranslate"><span class="pre">None</span></code> means point-wise prediction. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Set the model to <code class="docutils literal notranslate"><span class="pre">None</span></code> if you use the ELBOLoss within the ClassificationRoutine.
-It will get filled automatically.</p>
+<p>Set <code class="xref py py-attr docutils literal notranslate"><span class="pre">model</span></code> to <code class="docutils literal notranslate"><span class="pre">None</span></code> when using <code class="docutils literal notranslate"><span class="pre">ELBOLoss</span></code> inside a
+<code class="docutils literal notranslate"><span class="pre">ClassificationRoutine</span></code> — it will be filled in automatically.</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.losses.ELBOLoss.forward">

@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -475,10 +489,25 @@
         <span class="n">validate_args</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Quantile Calibration Error for regression tasks.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Quantile Calibration Error for regression tasks.</span>
 
-<span class="sd">        This metric computes the calibration error of quantile predictions</span>
-<span class="sd">        against the ground truth values.</span>
+<span class="sd">        For each confidence level :math:`\alpha \in (0, 1)`, a well-calibrated</span>
+<span class="sd">        probabilistic regressor should ensure that a fraction :math:`\alpha` of the</span>
+<span class="sd">        ground-truth targets lies inside the centered :math:`\alpha`-credible interval</span>
+<span class="sd">        of the predicted distribution :math:`p_\theta(\cdot \mid x)`. Concretely, let</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \hat{c}(\alpha) = \frac{1}{N} \sum_{i=1}^{N}</span>
+<span class="sd">            \mathbf{1}\!\left[ y_i \in</span>
+<span class="sd">            \left[ F^{-1}_{\theta, x_i}\!\left(\tfrac{1 - \alpha}{2}\right),</span>
+<span class="sd">                   F^{-1}_{\theta, x_i}\!\left(\tfrac{1 + \alpha}{2}\right) \right]</span>
+<span class="sd">            \right],</span>
+
+<span class="sd">        where :math:`F^{-1}_{\theta, x_i}` is the predictive inverse CDF (computed via</span>
+<span class="sd">        the distribution&#39;s ``icdf`` method). The Quantile Calibration Error then</span>
+<span class="sd">        aggregates the gap :math:`|\hat{c}(\alpha) - \alpha|` over a regular grid of</span>
+<span class="sd">        :attr:`num_bins` confidence levels using the chosen :attr:`norm` — the regression</span>
+<span class="sd">        counterpart of the :class:`~torch_uncertainty.metrics.classification.CalibrationError`.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            num_bins: Number of bins to use for calibration. Defaults to ``15``.</span>

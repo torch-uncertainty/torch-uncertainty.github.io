@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -469,31 +483,42 @@
         <span class="n">mc_batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Monte Carlo Batch Normalization wrapper for 2d inputs.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Monte Carlo Batch Normalization (MCBN) wrapper for 2D inputs</span>
+<span class="sd">        (Teye, Azizpour &amp; Smith, ICML 2018).</span>
+
+<span class="sd">        Replaces the standard ``BatchNorm2d`` layers with stochastic</span>
+<span class="sd">        :class:`~torch_uncertainty.layers.mc_batch_norm.MCBatchNorm2d` layers whose</span>
+<span class="sd">        running statistics are re-sampled at every forward pass from random</span>
+<span class="sd">        mini-batches of the training/calibration set. This turns the model into a</span>
+<span class="sd">        stochastic predictor at test time and provides a cheap Bayesian-style</span>
+<span class="sd">        uncertainty estimate equivalent to MC Dropout but for batch-normalised</span>
+<span class="sd">        networks.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            model: model to be converted.</span>
-<span class="sd">            num_estimators: number of estimators.</span>
-<span class="sd">            convert: whether to convert the model. Defaults to ``True``.</span>
-<span class="sd">            mc_batch_size: Monte-Carlo batch size. The smaller the more variability in the</span>
-<span class="sd">                predictions. Defaults to ``32``.</span>
-<span class="sd">            device: device. Defaults to ``None``.</span>
+<span class="sd">            model: Model to be converted.</span>
+<span class="sd">            num_estimators: Number of MC estimators to draw at test time.</span>
+<span class="sd">            convert: Whether to convert the model&#39;s ``BatchNorm2d`` layers in place.</span>
+<span class="sd">                Defaults to ``True``.</span>
+<span class="sd">            mc_batch_size: Monte-Carlo batch size. Smaller batches yield more</span>
+<span class="sd">                variability in the predictions. Defaults to ``32``.</span>
+<span class="sd">            device: Device to use. Defaults to ``None``.</span>
 
 <span class="sd">        Warning:</span>
-<span class="sd">            The update of the batch statistics slightly differs from the method as worded in the</span>
-<span class="sd">            original paper but sticks to its implementation. Instead of updating the training-based</span>
-<span class="sd">            statistics with 1 new batch of data, we perform a direct replacement.</span>
-<span class="sd">            See `this issue/discussion &lt;https://github.com/torch-uncertainty/torch-uncertainty/issues/218&gt;`_.</span>
+<span class="sd">            The update of the batch statistics slightly differs from the description</span>
+<span class="sd">            in the original paper but matches its reference implementation: instead of</span>
+<span class="sd">            updating the training-based statistics with one new batch, we perform a</span>
+<span class="sd">            direct replacement. See</span>
+<span class="sd">            `this issue/discussion &lt;https://github.com/torch-uncertainty/torch-uncertainty/issues/218&gt;`_.</span>
 
 <span class="sd">        Note:</span>
-<span class="sd">            This wrapper will be stochastic in eval mode only.</span>
+<span class="sd">            This wrapper is stochastic in eval mode only.</span>
 
 <span class="sd">        Note:</span>
-<span class="sd">            Raise an issue if you would like a wrapper for 1d and 3d inputs.</span>
+<span class="sd">            Raise an issue if you need a wrapper for 1D or 3D inputs.</span>
 
 <span class="sd">        References:</span>
-<span class="sd">            [1] `Teye M, Azizpour H, Smith K. Bayesian uncertainty estimation for batch normalized deep networks. In ICML 2018</span>
-<span class="sd">            &lt;https://arxiv.org/abs/1802.06455&gt;`_.</span>
+<span class="sd">            [1] `Teye, M., Azizpour, H., &amp; Smith, K. (2018). Bayesian uncertainty estimation</span>
+<span class="sd">            for batch normalized deep networks. ICML 2018 &lt;https://arxiv.org/abs/1802.06455&gt;`_.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_estimators</span> <span class="o">=</span> <span class="n">num_estimators</span>

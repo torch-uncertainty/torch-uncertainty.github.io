@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -476,12 +490,20 @@
         <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Isotonic Regression post-processing for calibrated probabilities.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Isotonic Regression post-processing for calibrated probabilities</span>
+<span class="sd">        (Zadrozny &amp; Elkan, 2002).</span>
 
-<span class="sd">        Isotonic regression is a non-parametric calibration method that fits a</span>
-<span class="sd">        piecewise-constant, non-decreasing function to map uncalibrated</span>
-<span class="sd">        probabilities to calibrated ones. It minimizes the mean squared error.</span>
-<span class="sd">        Multi-class calibration is handled using a one-vs-rest approach per class.</span>
+<span class="sd">        A non-parametric calibration method that fits a piecewise-constant,</span>
+<span class="sd">        monotonically non-decreasing mapping :math:`f` from the uncalibrated</span>
+<span class="sd">        probabilities to the calibrated ones by minimising the mean squared error:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \min_{f \text{ non-decreasing}} \sum_{i=1}^{N} \left( y_i - f(\hat{p}_i) \right)^2.</span>
+
+<span class="sd">        Compared to :class:`HistogramBinningScaler`, the bins are not pre-defined and</span>
+<span class="sd">        the resulting mapping is smoother. Multi-class calibration is handled with a</span>
+<span class="sd">        one-vs-rest approach: one isotonic regressor is fit per class and the</span>
+<span class="sd">        calibrated probabilities are renormalised to sum to one.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            model: Model to calibrate. Defaults to ``None``.</span>
@@ -490,17 +512,17 @@
 <span class="sd">            device: Device to use for tensor operations. Defaults to ``None``.</span>
 
 <span class="sd">        References:</span>
-<span class="sd">            [1] Transforming Classifier Scores into Accurate Multiclass</span>
-<span class="sd">            Probability Estimates. In KDD 2002.</span>
+<span class="sd">            [1] `Zadrozny, B., &amp; Elkan, C. (2002). Transforming classifier scores into</span>
+<span class="sd">            accurate multiclass probability estimates. KDD 2002</span>
 <span class="sd">            &lt;https://dl.acm.org/doi/10.1145/775047.775151&gt;`_.</span>
 
 <span class="sd">        Note:</span>
-<span class="sd">            This implementation uses Scikit-Learn&#39;s ``IsotonicRegression`` as the</span>
-<span class="sd">            underlying solver.</span>
+<span class="sd">            This implementation uses scikit-learn&#39;s</span>
+<span class="sd">            :class:`~sklearn.isotonic.IsotonicRegression` as the underlying solver.</span>
 
-<span class="sd">        Remark:</span>
+<span class="sd">        Warning:</span>
 <span class="sd">            Isotonic regression requires a sufficient amount of calibration data</span>
-<span class="sd">            to avoid overfitting the step function, especially in multiclass</span>
+<span class="sd">            to avoid overfitting the step function, especially in multi-class</span>
 <span class="sd">            scenarios.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">sklearn_installed</span><span class="p">:</span>

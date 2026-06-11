@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -719,30 +733,37 @@
 <span class="sd">        the reliability of probabilistic predictions, especially for downstream</span>
 <span class="sd">        decision-making tasks.</span>
 
-<span class="sd">        Three norms are available for measuring calibration error:</span>
+<span class="sd">        Given top-class confidences :math:`\hat{p}_i` and accuracies</span>
+<span class="sd">        :math:`a_i = \mathbf{1}[\hat{y}_i = y_i]`, the :math:`N` samples are</span>
+<span class="sd">        assigned to :math:`M` bins :math:`B_1, \dots, B_M` uniformly spaced in</span>
+<span class="sd">        :math:`[0, 1]`. Three norms are available:</span>
 
 <span class="sd">        **Expected Calibration Error (ECE):**</span>
 
 <span class="sd">        .. math::</span>
 
-<span class="sd">            \text{ECE} = \sum_{i=1}^N b_i \lvert p_i - c_i \rvert</span>
+<span class="sd">            \text{ECE} = \sum_{m=1}^{M} \frac{|B_m|}{N}</span>
+<span class="sd">            \left| \operatorname{acc}(B_m) - \operatorname{conf}(B_m) \right|</span>
 
 <span class="sd">        **Maximum Calibration Error (MCE):**</span>
 
 <span class="sd">        .. math::</span>
 
-<span class="sd">            \text{MCE} = \max_{i} \lvert p_i - c_i \rvert</span>
+<span class="sd">            \text{MCE} = \max_{m} \left| \operatorname{acc}(B_m) -</span>
+<span class="sd">            \operatorname{conf}(B_m) \right|</span>
 
 <span class="sd">        **Root Mean Square Calibration Error (RMSCE):**</span>
 
 <span class="sd">        .. math::</span>
 
-<span class="sd">            \text{RMSCE} = \sqrt{\sum_{i=1}^N b_i (p_i - c_i)^2}</span>
+<span class="sd">            \text{RMSCE} = \sqrt{\sum_{m=1}^{M} \frac{|B_m|}{N}</span>
+<span class="sd">            \left( \operatorname{acc}(B_m) - \operatorname{conf}(B_m) \right)^2}</span>
 
-<span class="sd">        Here:</span>
-<span class="sd">            - :math:`p_i` is the accuracy of bin :math:`i` (fraction of correct predictions).</span>
-<span class="sd">            - :math:`c_i` is the mean predicted confidence in bin :math:`i`.</span>
-<span class="sd">            - :math:`b_i` is the fraction of total samples falling into bin :math:`i`.</span>
+<span class="sd">        where :math:`\operatorname{acc}(B_m) = \tfrac{1}{|B_m|}\sum_{i \in B_m} a_i`</span>
+<span class="sd">        is the fraction of correct predictions in bin :math:`m`,</span>
+<span class="sd">        :math:`\operatorname{conf}(B_m) = \tfrac{1}{|B_m|}\sum_{i \in B_m} \hat{p}_i`</span>
+<span class="sd">        is the mean predicted confidence in bin :math:`m`, and :math:`|B_m|/N` is</span>
+<span class="sd">        the fraction of total samples in bin :math:`m`.</span>
 
 <span class="sd">        Bins are constructed either uniformly in the range :math:`[0, 1]` or</span>
 <span class="sd">        adaptively (if ``adaptive=True``).</span>

@@ -171,15 +171,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../api.html">
-    API Reference
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -191,6 +191,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing
@@ -313,6 +320,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -705,36 +719,47 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.post_processing.MCBatchNorm">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.post_processing.</span></span><span class="sig-name descname"><span class="pre">MCBatchNorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mc_batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/post_processing/mc_batch_norm.html#MCBatchNorm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.post_processing.MCBatchNorm" title="Link to this definition">#</a></dt>
-<dd><p>Monte Carlo Batch Normalization wrapper for 2d inputs.</p>
+<dd><p>Monte Carlo Batch Normalization (MCBN) wrapper for 2D inputs
+(Teye, Azizpour &amp; Smith, ICML 2018).</p>
+<p>Replaces the standard <code class="docutils literal notranslate"><span class="pre">BatchNorm2d</span></code> layers with stochastic
+<code class="xref py py-class docutils literal notranslate"><span class="pre">MCBatchNorm2d</span></code> layers whose
+running statistics are re-sampled at every forward pass from random
+mini-batches of the training/calibration set. This turns the model into a
+stochastic predictor at test time and provides a cheap Bayesian-style
+uncertainty estimate equivalent to MC Dropout but for batch-normalised
+networks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – model to be converted.</p></li>
-<li><p><strong>num_estimators</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – number of estimators.</p></li>
-<li><p><strong>convert</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – whether to convert the model. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
-<li><p><strong>mc_batch_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Monte-Carlo batch size. The smaller the more variability in the
-predictions. Defaults to <code class="docutils literal notranslate"><span class="pre">32</span></code>.</p></li>
-<li><p><strong>device</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>, <code class="docutils literal notranslate"><span class="pre">'cuda'</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">device</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]</span>) – device. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>model</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Model to be converted.</p></li>
+<li><p><strong>num_estimators</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Number of MC estimators to draw at test time.</p></li>
+<li><p><strong>convert</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Whether to convert the model’s <code class="docutils literal notranslate"><span class="pre">BatchNorm2d</span></code> layers in place.
+Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>mc_batch_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Monte-Carlo batch size. Smaller batches yield more
+variability in the predictions. Defaults to <code class="docutils literal notranslate"><span class="pre">32</span></code>.</p></li>
+<li><p><strong>device</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'cpu'</span></code>, <code class="docutils literal notranslate"><span class="pre">'cuda'</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">device</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]</span>) – Device to use. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The update of the batch statistics slightly differs from the method as worded in the
-original paper but sticks to its implementation. Instead of updating the training-based
-statistics with 1 new batch of data, we perform a direct replacement.
-See <a class="reference external" href="https://github.com/torch-uncertainty/torch-uncertainty/issues/218">this issue/discussion</a>.</p>
+<p>The update of the batch statistics slightly differs from the description
+in the original paper but matches its reference implementation: instead of
+updating the training-based statistics with one new batch, we perform a
+direct replacement. See
+<a class="reference external" href="https://github.com/torch-uncertainty/torch-uncertainty/issues/218">this issue/discussion</a>.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This wrapper will be stochastic in eval mode only.</p>
+<p>This wrapper is stochastic in eval mode only.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Raise an issue if you would like a wrapper for 1d and 3d inputs.</p>
+<p>Raise an issue if you need a wrapper for 1D or 3D inputs.</p>
 </div>
 <p class="rubric">References</p>
-<p>[1] <a class="reference external" href="https://arxiv.org/abs/1802.06455">Teye M, Azizpour H, Smith K. Bayesian uncertainty estimation for batch normalized deep networks. In ICML 2018</a>.</p>
+<p>[1] <a class="reference external" href="https://arxiv.org/abs/1802.06455">Teye, M., Azizpour, H., &amp; Smith, K. (2018). Bayesian uncertainty estimation
+for batch normalized deep networks. ICML 2018</a>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.post_processing.MCBatchNorm.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/post_processing/mc_batch_norm.html#MCBatchNorm.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.post_processing.MCBatchNorm.fit" title="Link to this definition">#</a></dt>

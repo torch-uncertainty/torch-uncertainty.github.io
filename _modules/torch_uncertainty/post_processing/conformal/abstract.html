@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -468,10 +482,35 @@
         <span class="n">enable_ts</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Conformal base class.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Abstract base class for split-conformal classification predictors.</span>
+
+<span class="sd">        Builds prediction sets :math:`\mathcal{C}(\mathbf{x}) \subseteq \{1, \dots, C\}`</span>
+<span class="sd">        with the *marginal coverage guarantee*</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \mathbb{P}\!\left[ Y \in \mathcal{C}(X) \right] \geq 1 - \alpha,</span>
+
+<span class="sd">        provided that the calibration and test points are exchangeable. At fit time,</span>
+<span class="sd">        non-conformity scores are computed on a held-out calibration set and the</span>
+<span class="sd">        empirical :math:`(1 - \alpha)`-quantile :math:`\hat{q}` is stored in</span>
+<span class="sd">        :attr:`q_hat`. At test time, the prediction set is built by including all</span>
+<span class="sd">        classes whose conformal score is below :math:`\hat{q}`. See :class:`ConformalClsTHR`,</span>
+<span class="sd">        :class:`ConformalClsAPS`, and :class:`ConformalClsRAPS` for concrete scores.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            alpha: Target mis-coverage level :math:`\alpha \in (0, 1)`. A smaller</span>
+<span class="sd">                :math:`\alpha` yields larger prediction sets.</span>
+<span class="sd">            model: Underlying classifier.</span>
+<span class="sd">            ts_init_val: Initial temperature used when :attr:`enable_ts` is ``True``.</span>
+<span class="sd">            ts_lr: Learning rate for the temperature optimizer.</span>
+<span class="sd">            ts_max_iter: Maximum number of iterations for the temperature optimizer.</span>
+<span class="sd">            enable_ts: If ``True``, wraps the model in a :class:`TemperatureScaler`</span>
+<span class="sd">                fit on the calibration set before computing the conformal scores.</span>
+<span class="sd">            device: Device to run the post-processing on.</span>
 
 <span class="sd">        Warning:</span>
-<span class="sd">            This implementation only works in the multiclass setting. Raise an issue if binary is needed.</span>
+<span class="sd">            This implementation only works in the multiclass setting. Raise an issue</span>
+<span class="sd">            if binary support is needed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>

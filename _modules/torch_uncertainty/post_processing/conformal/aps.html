@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -466,24 +480,46 @@
         <span class="n">enable_ts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Conformal prediction with APS scores.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Conformal classification with Adaptive Prediction Sets (APS;</span>
+<span class="sd">        Romano, Sesia &amp; Candès, NeurIPS 2020).</span>
+
+<span class="sd">        Uses as non-conformity score the cumulative probability mass needed to reach</span>
+<span class="sd">        the true class once the predictions are sorted by decreasing probability. For</span>
+<span class="sd">        a sample with predicted probabilities :math:`\hat{\mathbf{p}}` whose true class</span>
+<span class="sd">        ranks at position :math:`k` after sorting,</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            s(\mathbf{x}, y) = \sum_{i=1}^{k} \hat{p}_{(i)} - U \cdot \hat{p}_{(k)},</span>
+
+<span class="sd">        where :math:`U \sim \mathrm{Uniform}(0, 1)` smooths the cumulative score when</span>
+<span class="sd">        :attr:`randomized` is ``True``. The calibrated quantile :math:`\hat{q}` defines</span>
+<span class="sd">        the test-time prediction set</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \mathcal{C}(\mathbf{x}) = \{ c : s(\mathbf{x}, c) \leq \hat{q} \},</span>
+
+<span class="sd">        which adapts in size to the difficulty of each example: easy points get tight</span>
+<span class="sd">        sets, ambiguous points get larger ones.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            alpha: The confidence level meaning we allow :math:`1-\alpha` error.</span>
+<span class="sd">            alpha: Target mis-coverage level :math:`\alpha \in (0, 1)`.</span>
 <span class="sd">            model: Trained classification model. Defaults to ``None``.</span>
-<span class="sd">            randomized: Whether to use randomized smoothing in APS. Defaults to ``True``.</span>
+<span class="sd">            randomized: Whether to use randomised tie-breaking in APS. Defaults to ``True``.</span>
 <span class="sd">            ts_init_val: Initial value for the temperature. Defaults to ``1.0``.</span>
 <span class="sd">            ts_lr: Learning rate for the temperature scaling optimizer. Defaults to ``0.1``.</span>
 <span class="sd">            ts_max_iter: Maximum number of iterations for the temperature scaling optimizer.</span>
 <span class="sd">                Defaults to ``100``.</span>
-<span class="sd">            enable_ts: Whether to scale the logits. Defaults to ``False``.</span>
-<span class="sd">            device: device. Defaults to ``None``.</span>
+<span class="sd">            enable_ts: Whether to apply temperature scaling to the logits before</span>
+<span class="sd">                computing the conformal scores. Defaults to ``True``.</span>
+<span class="sd">            device: Device to use. Defaults to ``None``.</span>
 
 <span class="sd">        Warning:</span>
-<span class="sd">            This implementation only works in the multiclass setting. Raise an issue if binary is needed.</span>
+<span class="sd">            This implementation only works in the multiclass setting. Raise an issue</span>
+<span class="sd">            if binary support is needed.</span>
 
 <span class="sd">        Reference:</span>
-<span class="sd">            - TODO:</span>
+<span class="sd">            - `Romano, Y., Sesia, M., &amp; Candès, E. (2020). Classification with Valid</span>
+<span class="sd">              and Adaptive Coverage. NeurIPS 2020 &lt;https://arxiv.org/abs/2006.02544&gt;`_.</span>
 
 <span class="sd">        Code inspired by TorchCP.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

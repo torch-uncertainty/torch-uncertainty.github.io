@@ -23,9 +23,10 @@ the models and metrics implemented.
 Installation
 ^^^^^^^^^^^^
 
-Make sure you have Python 3.10 or later installed, as well as Pytorch (cpu or gpu).
+Make sure you have Python 3.10 or later installed, as well as PyTorch (CPU or GPU).
 
-.. parsed-literal::
+.. code-block:: bash
+
    pip install torch-uncertainty
 
 To install TorchUncertainty with contribution in mind, check the
@@ -65,6 +66,7 @@ TorchUncertainty also houses multiple official implementations of papers from ma
    installation
    quickstart
    auto_tutorials/index
+   evaluation
    cli_guide
    api
    contributing

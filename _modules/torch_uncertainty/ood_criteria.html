@@ -168,15 +168,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../api.html">
-    API Reference
+  <a class="nav-link nav-internal" href="../../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -188,6 +188,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../contributing.html">
     Contributing
@@ -308,6 +315,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -511,10 +525,15 @@
     <span class="n">input_type</span> <span class="o">=</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">LOGIT</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;OOD criterion based on the maximum logit value.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;OOD criterion based on the Max-Logit score (Hendrycks et al.).</span>
 
-<span class="sd">        This criterion computes the negative of the highest logit value across</span>
-<span class="sd">        the output dimensions. Lower maximum logits indicate greater uncertainty.</span>
+<span class="sd">        Defined as the negative of the highest logit value (averaged over estimators</span>
+<span class="sd">        in the ensemble case):</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \text{score}(\mathbf{z}) = -\max_{i} z_i.</span>
+
+<span class="sd">        Lower maximum logits indicate greater uncertainty.</span>
 
 <span class="sd">        Attributes:</span>
 <span class="sd">            input_type: Expected input type is logits.</span>
@@ -527,7 +546,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the negative of the maximum logit value.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            inputs: Tensor of logits with shape (batch_size, num_classes).</span>
+<span class="sd">            inputs: Tensor of logits with shape ``(batch_size, num_estimators, num_classes)``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: Negative of the maximum logit value for each sample.</span>
@@ -544,15 +563,16 @@
     <span class="n">input_type</span> <span class="o">=</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">LOGIT</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;OOD criterion based on the energy function.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;OOD criterion based on the free-energy score (Liu et al., NeurIPS 2020).</span>
 
-<span class="sd">        This criterion computes the negative log-sum-exp of the logits.</span>
-<span class="sd">        Higher energy values indicate greater uncertainty.</span>
+<span class="sd">        Defined as the negative log-sum-exp of the logits:</span>
 
 <span class="sd">        .. math::</span>
-<span class="sd">            E(\mathbf{z}) = -\log\left(\sum_{i=1}^{C} \exp(z_i)\right)</span>
+<span class="sd">            \text{score}(\mathbf{z}) = -\log\left(\sum_{i=1}^{C} \exp(z_i)\right)</span>
 
-<span class="sd">        where :math:`\mathbf{z} = [z_1, z_2, \dots, z_C]` is the logit vector.</span>
+<span class="sd">        where :math:`\mathbf{z} = [z_1, \dots, z_C]` is the logit vector. Larger values</span>
+<span class="sd">        of the *energy* (i.e. of the score) indicate greater uncertainty and a higher</span>
+<span class="sd">        likelihood of being out-of-distribution.</span>
 
 <span class="sd">        Attributes:</span>
 <span class="sd">            input_type: Expected input type is logits.</span>
@@ -581,16 +601,16 @@
     <span class="n">input_type</span> <span class="o">=</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">PROB</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;OOD criterion based on maximum softmax probability.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;OOD criterion based on the Maximum Softmax Probability (MSP) baseline of</span>
+<span class="sd">        Hendrycks &amp; Gimpel (ICLR 2017).</span>
 
-<span class="sd">        This criterion computes the negative of the highest softmax probability.</span>
-<span class="sd">        Lower maximum probabilities indicate greater uncertainty. Probabilities are also called</span>
-<span class="sd">        likelihoods in a more formal context.</span>
+<span class="sd">        Defined as the negative of the maximum predicted class probability:</span>
 
 <span class="sd">        .. math::</span>
-<span class="sd">            \text{score} = -\max_{i}(p_i)</span>
+<span class="sd">            \text{score}(\mathbf{p}) = -\max_{i} p_i,</span>
 
-<span class="sd">        where :math:`\mathbf{p} = [p_1, p_2, \dots, p_C]` is the probability vector.</span>
+<span class="sd">        where :math:`\mathbf{p} = [p_1, \dots, p_C]` is the predictive distribution.</span>
+<span class="sd">        Lower maximum probabilities indicate greater uncertainty.</span>
 
 <span class="sd">        Attributes:</span>
 <span class="sd">            input_type: Expected input type is probabilities.</span>
@@ -664,15 +684,20 @@
     <span class="n">input_type</span> <span class="o">=</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">ESTIMATOR_PROB</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;OOD criterion based on mutual information.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;OOD criterion based on mutual information (BALD).</span>
 
-<span class="sd">        This criterion computes the mutual information between ensemble predictions.</span>
-<span class="sd">        Higher mutual information values indicate lower uncertainty.</span>
+<span class="sd">        This criterion computes the mutual information between the prediction and the</span>
+<span class="sd">        model parameters across the ensemble&#39;s predictions — a classical estimator of</span>
+<span class="sd">        *epistemic* uncertainty. Higher mutual information values indicate greater</span>
+<span class="sd">        epistemic uncertainty and thus a higher likelihood of being out-of-distribution.</span>
 
-<span class="sd">        Given ensemble predictions :math:`\{\mathbf{p}^{(k)}\}_{k=1}^{K}`, the mutual information is computed as:</span>
+<span class="sd">        Given ensemble predictions :math:`\{\mathbf{p}^{(k)}\}_{k=1}^{K}`, the mutual information is</span>
 
 <span class="sd">        .. math::</span>
-<span class="sd">            I(y, \theta) = H\Big(\frac{1}{K}\sum_{k=1}^{K} \mathbf{p}^{(k)}\Big) - \frac{1}{K}\sum_{k=1}^{K} H(\mathbf{p}^{(k)})</span>
+<span class="sd">            I(y, \theta) = H\!\left(\frac{1}{K}\sum_{k=1}^{K} \mathbf{p}^{(k)}\right)</span>
+<span class="sd">            - \frac{1}{K}\sum_{k=1}^{K} H(\mathbf{p}^{(k)}),</span>
+
+<span class="sd">        i.e. the total predictive entropy minus the average per-estimator entropy.</span>
 
 <span class="sd">        Attributes:</span>
 <span class="sd">            ensemble_only: Requires ensemble predictions.</span>
@@ -770,7 +795,8 @@
             <span class="k">return</span> <span class="n">VariationRatioCriterion</span><span class="p">()</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;The OOD criterion must be one of &#39;msp&#39;, &#39;logit&#39;, &#39;energy&#39;, &#39;entropy&#39;,&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot; &#39;mutual_information&#39; or &#39;variation_ratio&#39;. Got </span><span class="si">{</span><span class="n">ood_criterion</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="s2">&quot; &#39;mutual_information&#39;, &#39;variation_ratio&#39;, or &#39;post_processing&#39;. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">ood_criterion</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ood_criterion</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ood_criterion</span><span class="p">()</span>

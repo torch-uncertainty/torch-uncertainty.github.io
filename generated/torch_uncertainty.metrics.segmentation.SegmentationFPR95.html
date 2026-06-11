@@ -52,6 +52,8 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.metrics.segmentation.SegmentationFPR95';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -171,15 +173,15 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../cli_guide.html">
-    CLI Guide
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../api.html">
-    API Reference
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../cli_guide.html">
+    CLI Guide
   </a>
 </li>
 
@@ -191,6 +193,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
     Contributing
@@ -313,6 +322,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../auto_tutorials/index.html">
     Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../evaluation.html">
+    Evaluating Models
   </a>
 </li>
 
@@ -705,13 +721,22 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.segmentation.SegmentationFPR95">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.segmentation.</span></span><span class="sig-name descname"><span class="pre">SegmentationFPR95</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos_label</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/segmentation/seg_fpr95.html#SegmentationFPR95"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.segmentation.SegmentationFPR95" title="Link to this definition">#</a></dt>
-<dd><p>FPR95 metric for segmentation tasks.</p>
-<p>Compute the mean FPR95 per batch across all batches.</p>
+<dd><p>Image-averaged <a class="reference external" href="mailto:FPR&#37;&#52;&#48;95">FPR<span>&#64;</span>95</a> TPR for dense binary segmentation tasks.</p>
+<p>For each image, a per-pixel False Positive Rate at 95% True Positive Rate is
+computed (see <a class="reference internal" href="torch_uncertainty.metrics.classification.FPR95.html#torch_uncertainty.metrics.classification.FPR95" title="torch_uncertainty.metrics.classification.FPR95"><code class="xref py py-class docutils literal notranslate"><span class="pre">FPR95</span></code></a>) from
+the pixel scores and binary OOD labels. The metric is then averaged over the
+<span class="math notranslate nohighlight">\(B\)</span> images of the test set:</p>
+<div class="math notranslate nohighlight">
+\[\text{FPR95} = \frac{1}{B} \sum_{b=1}^{B} \text{FPR95}_b.\]</div>
+<p>Image-wise averaging is the convention used in the dense OOD-detection
+literature.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pos_label</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – The positive label in the segmentation OOD detection task.</p></li>
-<li><p><strong>**kwargs</strong> – Additional keyword arguments for the FPR95 metric.</p></li>
+<li><p><strong>pos_label</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – The positive label in the segmentation OOD detection task
+(typically <code class="docutils literal notranslate"><span class="pre">1</span></code> for OOD pixels).</p></li>
+<li><p><strong>kwargs</strong> – Additional keyword arguments for the underlying
+<a class="reference internal" href="torch_uncertainty.metrics.classification.FPR95.html#torch_uncertainty.metrics.classification.FPR95" title="torch_uncertainty.metrics.classification.FPR95"><code class="xref py py-class docutils literal notranslate"><span class="pre">FPR95</span></code></a> metric.</p></li>
 </ul>
 </dd>
 </dl>
