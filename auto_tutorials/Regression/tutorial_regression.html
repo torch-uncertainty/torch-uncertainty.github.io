@@ -192,6 +192,13 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../mlflow_guide.html">
+    MLflow Guide
+  </a>
+</li>
+
+
+<li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../api.html">
     API Reference
   </a>
@@ -334,6 +341,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../cli_guide.html">
     CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../mlflow_guide.html">
+    MLflow Guide
   </a>
 </li>
 
@@ -536,7 +550,7 @@ team to implement more features or if you want to contribute!</p>
 <ul class="simple">
 <li><p>the TUTrainer which mostly handles the link with the hardware (accelerators, precision, etc)</p></li>
 <li><p>the regression training &amp; evaluation routine from torch_uncertainty.routines</p></li>
-<li><p>the datamodule handling dataloaders: UCIRegressionDataModule from torch_uncertainty.datamodules</p></li>
+<li><p>the datamodule handling dataloaders: TabularRegressionDatamodule from torch_uncertainty.datamodules</p></li>
 <li><p>the model: mlp from torch_uncertainty.models</p></li>
 </ul>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -545,7 +559,7 @@ team to implement more features or if you want to contribute!</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty</span><span class="w"> </span><span class="kn">import</span> <span class="n">TUTrainer</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.datamodules</span><span class="w"> </span><span class="kn">import</span> <span class="n">UCIRegressionDataModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.datamodules.tabular_regression</span><span class="w"> </span><span class="kn">import</span> <span class="n">YachtDataModule</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models.mlp</span><span class="w"> </span><span class="kn">import</span> <span class="n">mlp</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.routines</span><span class="w"> </span><span class="kn">import</span> <span class="n">RegressionRoutine</span>
 </pre></div>
@@ -558,9 +572,7 @@ dataloaders and transforms.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">TUTrainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="n">devices</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># datamodule providing the dataloaders to the trainer, specifically we use the yacht dataset</span>
-<span class="n">datamodule</span> <span class="o">=</span> <span class="n">UCIRegressionDataModule</span><span class="p">(</span>
-    <span class="n">root</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">),</span> <span class="n">dataset_name</span><span class="o">=</span><span class="s2">&quot;yacht&quot;</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span>
-<span class="p">)</span>
+<span class="n">datamodule</span> <span class="o">=</span> <span class="n">YachtDataModule</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -598,7 +610,7 @@ metrics that you will find in the table below.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0.00B [00:00, ?B/s]
-11.6kB [00:00, 20.0MB/s]
+11.6kB [00:00, 22.3MB/s]
 ┏━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
 ┃   ┃ Name            ┃ Type             ┃ Params ┃ Mode  ┃ FLOPs ┃
 ┡━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
@@ -618,9 +630,9 @@ Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Regression         ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     MAE      │          0.08488          │
-│     MSE      │          0.01283          │
-│     RMSE     │          0.11328          │
+│     MAE      │          0.10180          │
+│     MSE      │          0.02490          │
+│     RMSE     │          0.15778          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -686,15 +698,15 @@ Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Regression         ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     MAE      │          0.04229          │
-│     MSE      │          0.00736          │
-│     NLL      │         -1.92571          │
-│     RMSE     │          0.08579          │
+│     MAE      │          0.08430          │
+│     MSE      │          0.02321          │
+│     NLL      │         -1.44428          │
+│     RMSE     │          0.15234          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     QCE      │          0.03186          │
+│     QCE      │          0.05040          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -708,7 +720,7 @@ Total FLOPs: 0
 represents how likely it would be to obtain the evaluation set with the parameters of the Laplace
 distribution predicted by the model.
 You will get more information on probabilistic regression in the dedicated tutorial.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 2.852 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 2.987 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-regression-tutorial-regression-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/921c4e1cc58846e0222ca3904621f504/tutorial_regression.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_regression.ipynb</span></code></a></p>

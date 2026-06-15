@@ -52,7 +52,7 @@ and computes the soft-label cross entropy under the hood.
 This config snippet focuses on *only* the mixup setup.
 Refer to your standard training setup for other keys.
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-104
+.. GENERATED FROM PYTHON SOURCE LINES 36-103
 
 .. code-block:: Python
 
@@ -69,11 +69,10 @@ Refer to your standard training setup for other keys.
       precision: 16-mixed
       max_epochs: 200
       logger:
-        class_path: lightning.pytorch.loggers.TensorBoardLogger
+        class_path: lightning.pytorch.loggers.MLFlowLogger
         init_args:
-          save_dir: logs/wideresnet28x10
-          name: mixup
-          default_hp_metric: false
+          experiment_name: mixup
+          tracking_uri: logs/wideresnet28x10
       callbacks:
         - class_path: torch_uncertainty.callbacks.TUClsCheckpoint
         - class_path: lightning.pytorch.callbacks.LearningRateMonitor
@@ -131,7 +130,7 @@ Refer to your standard training setup for other keys.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-115
+.. GENERATED FROM PYTHON SOURCE LINES 104-114
 
 2. How to Ensemble Mixup Models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -144,7 +143,7 @@ to your Mixup-trained checkpoints.
 TorchUncertainty's `deep_ensembles` helper will load each checkpoint
 and produce an ensemble model that averages predictions across all members.:contentReference[oaicite:0]{index=0}
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-175
+.. GENERATED FROM PYTHON SOURCE LINES 114-173
 
 .. code-block:: Python
 
@@ -160,11 +159,10 @@ and produce an ensemble model that averages predictions across all members.:cont
       precision: 16-mixed
       max_epochs: 200
       logger:
-        class_path: lightning.pytorch.loggers.TensorBoardLogger
+        class_path: lightning.pytorch.loggers.MLFlowLogger
         init_args:
-          save_dir: logs/wideresnet28x10
-          name: mixup_ensemble
-          default_hp_metric: false
+          experiment_name: mixup_ensemble
+          tracking_uri: logs/wideresnet28x10
       callbacks:
         - class_path: torch_uncertainty.callbacks.TUClsCheckpoint
         - class_path: lightning.pytorch.callbacks.LearningRateMonitor
@@ -215,7 +213,7 @@ and produce an ensemble model that averages predictions across all members.:cont
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-189
+.. GENERATED FROM PYTHON SOURCE LINES 174-187
 
 3. Training with MixupMP
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -231,7 +229,7 @@ The two key differences vs standard Mixup:
 This causes the routine to sample augmented predictive variations as part of
 the MixupMP methodology for uncertainty.
 
-.. GENERATED FROM PYTHON SOURCE LINES 189-258
+.. GENERATED FROM PYTHON SOURCE LINES 187-255
 
 .. code-block:: Python
 
@@ -247,11 +245,10 @@ the MixupMP methodology for uncertainty.
       precision: 16-mixed
       max_epochs: 200
       logger:
-        class_path: lightning.pytorch.loggers.TensorBoardLogger
+        class_path: lightning.pytorch.loggers.MLFlowLogger
         init_args:
-          save_dir: logs/wideresnet28x10
-          name: mixupmp
-          default_hp_metric: false
+          experiment_name: mixupmp
+          tracking_uri: logs/wideresnet28x10
       callbacks:
         - class_path: torch_uncertainty.callbacks.TUClsCheckpoint
         - class_path: lightning.pytorch.callbacks.LearningRateMonitor
@@ -311,7 +308,7 @@ the MixupMP methodology for uncertainty.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 259-291
+.. GENERATED FROM PYTHON SOURCE LINES 256-288
 
 4. How to Ensemble MixupMP Models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -70,9 +70,9 @@ while keeping accurate predictions.
   Risk-Coverage curve.
 - ``sc/AUGRC`` — :class:`~torch_uncertainty.metrics.classification.AUGRC`, Area Under the
   *Generalized* Risk-Coverage curve.
-- ``sc/Cov@5Risk`` — :class:`~torch_uncertainty.metrics.classification.CovAt5Risk`, maximum
+- ``sc/Cov_5Risk`` — :class:`~torch_uncertainty.metrics.classification.CovAt5Risk`, maximum
   coverage at which the selective risk stays below 5%.
-- ``sc/Risk@80Cov`` — :class:`~torch_uncertainty.metrics.classification.RiskAt80Cov`,
+- ``sc/Risk_80Cov`` — :class:`~torch_uncertainty.metrics.classification.RiskAt80Cov`,
   selective risk at 80% coverage.
 
 **Complexity**
@@ -129,6 +129,14 @@ post-processing-based, etc.). The following metrics are logged under the ``ood/`
 - ``ood/FPR95`` — :class:`~torch_uncertainty.metrics.classification.FPR95`,
   false-positive rate at 95% true-positive rate, the standard OOD-detection threshold
   metric.
+- ``ood/SCOD_AURC`` — :class:`~torch_uncertainty.metrics.classification.SCODAURC`,
+  SCOD Area Under the Risk-Coverage curve.
+- ``ood/SCOD_AUGRC`` — :class:`~torch_uncertainty.metrics.classification.SCODAUGRC`,
+  SCOD Area Under the Generalized Risk-Coverage curve.
+- ``ood/SCOD_Cov_5Risk`` —
+  :class:`~torch_uncertainty.metrics.classification.SCODCovAt5Risk`.
+- ``ood/SCOD_Risk_80Cov`` —
+  :class:`~torch_uncertainty.metrics.classification.SCODRiskAt80Cov`.
 - ``ood/Entropy`` — average entropy of the predictive distribution over OOD samples.
 - For ensembles, the diversity metrics above are also recomputed under the
   ``ood/ens_`` prefix.
@@ -182,8 +190,8 @@ are evaluated on a uniformly subsampled subset of pixels:
   ``cal/SmECE`` (:class:`~torch_uncertainty.metrics.classification.SmoothCalibrationError`)
 - ``sc/AURC`` (:class:`~torch_uncertainty.metrics.classification.AURC`),
   ``sc/AUGRC`` (:class:`~torch_uncertainty.metrics.classification.AUGRC`),
-  ``sc/Cov@5Risk`` (:class:`~torch_uncertainty.metrics.classification.CovAt5Risk`),
-  ``sc/Risk@80Cov`` (:class:`~torch_uncertainty.metrics.classification.RiskAt80Cov`).
+  ``sc/Cov_5Risk`` (:class:`~torch_uncertainty.metrics.classification.CovAt5Risk`),
+  ``sc/Risk_80Cov`` (:class:`~torch_uncertainty.metrics.classification.RiskAt80Cov`).
 
 OOD detection metrics
 ^^^^^^^^^^^^^^^^^^^^^
@@ -198,6 +206,12 @@ datamodule). Three dense, segmentation-specific binary metrics are then computed
   :class:`~torch_uncertainty.metrics.segmentation.SegmentationBinaryAveragePrecision`.
 - ``ood/FPR95`` —
   :class:`~torch_uncertainty.metrics.segmentation.SegmentationFPR95`.
+- ``ood/SCOD_AURC`` — :class:`~torch_uncertainty.metrics.classification.SCODAURC`.
+- ``ood/SCOD_AUGRC`` — :class:`~torch_uncertainty.metrics.classification.SCODAUGRC`.
+- ``ood/SCOD_Cov_5Risk`` —
+  :class:`~torch_uncertainty.metrics.classification.SCODCovAt5Risk`.
+- ``ood/SCOD_Risk_80Cov`` —
+  :class:`~torch_uncertainty.metrics.classification.SCODRiskAt80Cov`.
 
 The OOD score is again controlled by ``ood_criterion``. See the
 :doc:`MUAD segmentation tutorial <auto_tutorials/Segmentation/tutorial_muad_seg>` for an

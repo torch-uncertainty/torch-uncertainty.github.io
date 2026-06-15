@@ -192,6 +192,13 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../mlflow_guide.html">
+    MLflow Guide
+  </a>
+</li>
+
+
+<li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../api.html">
     API Reference
   </a>
@@ -334,6 +341,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../cli_guide.html">
     CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../mlflow_guide.html">
+    MLflow Guide
   </a>
 </li>
 
@@ -744,16 +758,17 @@ depth estimation, and object detection.</p>
 │ 1 │ loss                    │ CrossEntropyLoss    │      0 │ train │     0 │
 │ 2 │ format_batch_fn         │ Identity            │      0 │ train │     0 │
 │ 3 │ ood_criterion           │ MaxSoftmaxCriterion │      0 │ train │     0 │
-│ 4 │ val_seg_metrics         │ MetricCollection    │      0 │ train │     0 │
-│ 5 │ val_sbsmpl_seg_metrics  │ MetricCollection    │      0 │ train │     0 │
-│ 6 │ test_seg_metrics        │ MetricCollection    │      0 │ train │     0 │
-│ 7 │ test_sbsmpl_seg_metrics │ MetricCollection    │      0 │ train │     0 │
+│ 4 │ val_seg_metrics         │ SegmentationMetric  │      0 │ train │     0 │
+│ 5 │ val_sbsmpl_seg_metrics  │ SegmentationMetric  │      0 │ train │     0 │
+│ 6 │ test_seg_metrics        │ SegmentationMetric  │      0 │ train │     0 │
+│ 7 │ test_patch_seg_metrics  │ MetricCollection    │      0 │ train │     0 │
+│ 8 │ test_sbsmpl_seg_metrics │ SegmentationMetric  │      0 │ train │     0 │
 └───┴─────────────────────────┴─────────────────────┴────────┴───────┴───────┘
 Trainable params: 4.3 M
 Non-trainable params: 0
 Total params: 4.3 M
 Total estimated model params size (MB): 17.275
-Modules in train mode: 129
+Modules in train mode: 135
 Modules in eval mode: 0
 Total FLOPs: 0
 </pre></div>
@@ -767,27 +782,28 @@ Total FLOPs: 0
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.66255          │
-│     NLL      │          1.68547          │
-│     mAcc     │          25.361%          │
-│     mIoU     │          15.290%          │
-│    pixAcc    │          57.564%          │
+│    Brier     │          0.63247          │
+│     NLL      │          1.52483          │
+│     mAcc     │          27.780%          │
+│     mIoU     │          19.124%          │
+│    pixAcc    │          62.295%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          21.455%          │
-│     MCE      │          34.165%          │
-│    SmECE     │          19.030%          │
-│     aECE     │          20.994%          │
+│     ECE      │          28.703%          │
+│     MCE      │          37.220%          │
+│    PAvPU     │          0.41643          │
+│    SmECE     │          28.691%          │
+│     aECE     │          28.698%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          16.842%          │
-│     AURC     │          27.022%          │
-│  Cov@5Risk   │           nan%            │
-│  Risk@80Cov  │          37.393%          │
+│    AUGRC     │          14.160%          │
+│     AURC     │          24.294%          │
+│  Cov_5Risk   │           nan%            │
+│  Risk_80Cov  │          31.672%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -812,8 +828,8 @@ Total FLOPs: 0
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.20484          │
-│     NLL      │          0.39965          │
+│    Brier     │          0.20584          │
+│     NLL      │          0.40112          │
 │     mAcc     │          68.769%          │
 │     mIoU     │          50.739%          │
 │    pixAcc    │          85.704%          │
@@ -821,18 +837,19 @@ Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          1.720%           │
-│     MCE      │          8.337%           │
-│    SmECE     │          1.764%           │
-│     aECE     │          1.693%           │
+│     ECE      │          1.644%           │
+│     MCE      │          7.245%           │
+│    PAvPU     │          0.90639          │
+│    SmECE     │          1.743%           │
+│     aECE     │          1.715%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          2.698%           │
-│     AURC     │          3.322%           │
-│  Cov@5Risk   │          72.485%          │
-│  Risk@80Cov  │          7.012%           │
+│    AUGRC     │          2.719%           │
+│     AURC     │          3.355%           │
+│  Cov_5Risk   │          72.211%          │
+│  Risk_80Cov  │          7.101%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -897,7 +914,7 @@ Total FLOPs: 0
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_muad_seg_003.png" srcset="../../_images/sphx_glr_tutorial_muad_seg_003.png" alt="tutorial muad seg" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 36.820 seconds)</p>
+<img src="../../_images/sphx_glr_tutorial_muad_seg_003.png" srcset="../../_images/sphx_glr_tutorial_muad_seg_003.png" alt="tutorial muad seg" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 37.232 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-segmentation-tutorial-muad-seg-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ab91300a901b0b50ec4f140c171dae8d/tutorial_muad_seg.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_muad_seg.ipynb</span></code></a></p>

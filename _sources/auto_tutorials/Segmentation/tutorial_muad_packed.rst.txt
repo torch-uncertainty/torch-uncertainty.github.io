@@ -378,16 +378,17 @@ Let's define the training parameters.
     │ 1 │ loss                    │ CrossEntropyLoss    │      0 │ train │     0 │
     │ 2 │ format_batch_fn         │ RepeatTarget        │      0 │ train │     0 │
     │ 3 │ ood_criterion           │ MaxSoftmaxCriterion │      0 │ train │     0 │
-    │ 4 │ val_seg_metrics         │ MetricCollection    │      0 │ train │     0 │
-    │ 5 │ val_sbsmpl_seg_metrics  │ MetricCollection    │      0 │ train │     0 │
-    │ 6 │ test_seg_metrics        │ MetricCollection    │      0 │ train │     0 │
-    │ 7 │ test_sbsmpl_seg_metrics │ MetricCollection    │      0 │ train │     0 │
+    │ 4 │ val_seg_metrics         │ SegmentationMetric  │      0 │ train │     0 │
+    │ 5 │ val_sbsmpl_seg_metrics  │ SegmentationMetric  │      0 │ train │     0 │
+    │ 6 │ test_seg_metrics        │ SegmentationMetric  │      0 │ train │     0 │
+    │ 7 │ test_patch_seg_metrics  │ MetricCollection    │      0 │ train │     0 │
+    │ 8 │ test_sbsmpl_seg_metrics │ SegmentationMetric  │      0 │ train │     0 │
     └───┴─────────────────────────┴─────────────────────┴────────┴───────┴───────┘
     Trainable params: 4.3 M                                                         
     Non-trainable params: 0                                                         
     Total params: 4.3 M                                                             
     Total estimated model params size (MB): 17.316                                  
-    Modules in train mode: 149                                                      
+    Modules in train mode: 155                                                      
     Modules in eval mode: 0                                                         
     Total FLOPs: 0                                                                  
 
@@ -416,27 +417,28 @@ Let's define the training parameters.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       Segmentation        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    Brier     │          0.68350          │
-    │     NLL      │          1.66517          │
-    │     mAcc     │          20.186%          │
-    │     mIoU     │          12.684%          │
-    │    pixAcc    │          47.506%          │
+    │    Brier     │          0.70982          │
+    │     NLL      │          1.69092          │
+    │     mAcc     │          22.409%          │
+    │     mIoU     │          11.647%          │
+    │    pixAcc    │          50.237%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          14.415%          │
-    │     MCE      │          97.563%          │
-    │    SmECE     │          13.702%          │
-    │     aECE     │          14.982%          │
+    │     ECE      │          20.785%          │
+    │     MCE      │          28.343%          │
+    │    PAvPU     │          0.53029          │
+    │    SmECE     │          19.373%          │
+    │     aECE     │          20.192%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          21.373%          │
-    │     AURC     │          33.040%          │
-    │  Cov@5Risk   │           nan%            │
-    │  Risk@80Cov  │          49.221%          │
+    │    AUGRC     │          21.223%          │
+    │     AURC     │          37.582%          │
+    │  Cov_5Risk   │           nan%            │
+    │  Risk_80Cov  │          45.429%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -525,7 +527,7 @@ Here we will just use as confidence score the Maximum class probability (MCP)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 32.931 seconds)
+   **Total running time of the script:** (0 minutes 33.413 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Segmentation_tutorial_muad_packed.py:

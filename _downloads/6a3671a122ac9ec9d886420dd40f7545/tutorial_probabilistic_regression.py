@@ -65,12 +65,10 @@ class NormalMLP(nn.Module):
 # ~~~~~~~~~~~~~~~~~~~~~~
 #
 # We use the UCI Kin8nm dataset, which is a regression dataset with 8 features and 8192 samples.
-from torch_uncertainty.datamodules import UCIRegressionDataModule
+from torch_uncertainty.datamodules.tabular_regression import Kin8NMDataModule
 
 # datamodule
-datamodule = UCIRegressionDataModule(
-    root="data", batch_size=BATCH_SIZE, dataset_name="kin8nm", num_workers=4
-)
+datamodule = Kin8NMDataModule(root="data", batch_size=BATCH_SIZE, num_workers=4)
 
 # %%
 # 4. Setting up the Model and Trainer

@@ -68,6 +68,7 @@ TorchUncertainty also houses multiple official implementations of papers from ma
    auto_tutorials/index
    evaluation
    cli_guide
+   mlflow_guide
    api
    contributing
    references

@@ -37,7 +37,7 @@ First, we have to load the following utilities from TorchUncertainty:
 
 - the TUTrainer which mostly handles the link with the hardware (accelerators, precision, etc)
 - the regression training & evaluation routine from torch_uncertainty.routines
-- the datamodule handling dataloaders: UCIRegressionDataModule from torch_uncertainty.datamodules
+- the datamodule handling dataloaders: TabularRegressionDatamodule from torch_uncertainty.datamodules
 - the model: mlp from torch_uncertainty.models
 
 .. GENERATED FROM PYTHON SOURCE LINES 27-37
@@ -50,7 +50,7 @@ First, we have to load the following utilities from TorchUncertainty:
     from torch import nn
 
     from torch_uncertainty import TUTrainer
-    from torch_uncertainty.datamodules import UCIRegressionDataModule
+    from torch_uncertainty.datamodules.tabular_regression import YachtDataModule
     from torch_uncertainty.models.mlp import mlp
     from torch_uncertainty.routines import RegressionRoutine
 
@@ -69,7 +69,7 @@ First, we have to load the following utilities from TorchUncertainty:
 In the following, we first create the trainer and instantiate the datamodule that handles the UCI regression dataset,
 dataloaders and transforms.
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-51
+.. GENERATED FROM PYTHON SOURCE LINES 43-49
 
 .. code-block:: Python
 
@@ -77,9 +77,7 @@ dataloaders and transforms.
     trainer = TUTrainer(accelerator="gpu", devices=1, max_epochs=20, enable_progress_bar=False)
 
     # datamodule providing the dataloaders to the trainer, specifically we use the yacht dataset
-    datamodule = UCIRegressionDataModule(
-        root=Path("data"), dataset_name="yacht", batch_size=32, num_workers=4
-    )
+    datamodule = YachtDataModule(root=Path("data"), batch_size=32, num_workers=4)
 
 
 
@@ -88,7 +86,7 @@ dataloaders and transforms.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-57
+.. GENERATED FROM PYTHON SOURCE LINES 50-55
 
 3. Instantiating the Pointwise Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -96,7 +94,7 @@ dataloaders and transforms.
 We create the model easily using the blueprint from torch_uncertainty.models. In this first case, we will just
 try to predict a pointwise prediction. Later, we will predict a distribution instead to model the uncertainty.
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-60
+.. GENERATED FROM PYTHON SOURCE LINES 55-58
 
 .. code-block:: Python
 
@@ -110,7 +108,7 @@ try to predict a pointwise prediction. Later, we will predict a distribution ins
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-68
+.. GENERATED FROM PYTHON SOURCE LINES 59-66
 
 4. The Loss and the Training Routine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -120,7 +118,7 @@ We define the training routine using the classification routine from torch_uncer
 We provide the number of classes, the model, the optimization recipe, the loss, and tell the routine
 that our model is an ensemble at evaluation time with the `is_ensemble` flag to get the corresponding metrics.
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-76
+.. GENERATED FROM PYTHON SOURCE LINES 66-74
 
 .. code-block:: Python
 
@@ -139,7 +137,7 @@ that our model is an ensemble at evaluation time with the `is_ensemble` flag to 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-83
+.. GENERATED FROM PYTHON SOURCE LINES 75-81
 
 5. Gathering Everything and Training the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,7 +146,7 @@ We can now train the model using the trainer. We pass the routine and the datamo
 to the fit and test methods of the trainer. It will automatically evaluate uncertainty
 metrics that you will find in the table below.
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-87
+.. GENERATED FROM PYTHON SOURCE LINES 81-85
 
 .. code-block:: Python
 
@@ -164,7 +162,7 @@ metrics that you will find in the table below.
 
  .. code-block:: none
 
-    0.00B [00:00, ?B/s]    11.6kB [00:00, 20.0MB/s]
+    0.00B [00:00, ?B/s]    11.6kB [00:00, 22.3MB/s]
     ┏━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
     ┃   ┃ Name            ┃ Type             ┃ Params ┃ Mode  ┃ FLOPs ┃
     ┡━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
@@ -184,9 +182,9 @@ metrics that you will find in the table below.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Regression         ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     MAE      │          0.08488          │
-    │     MSE      │          0.01283          │
-    │     RMSE     │          0.11328          │
+    │     MAE      │          0.10180          │
+    │     MSE      │          0.02490          │
+    │     RMSE     │          0.15778          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -198,7 +196,7 @@ metrics that you will find in the table below.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-99
+.. GENERATED FROM PYTHON SOURCE LINES 86-97
 
 The performance of the model is much better than random, this means that we have learnt
 patterns from the input data. However, we just provide pointwise estimates and do not model
@@ -212,7 +210,7 @@ Laplace distribution of unknown parameters.
 As before, we create the model easily using the blueprint from torch_uncertainty.models. This time,
 we state that we want to predict a Laplace distribution.
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-114
+.. GENERATED FROM PYTHON SOURCE LINES 97-112
 
 .. code-block:: Python
 
@@ -238,12 +236,12 @@ we state that we want to predict a Laplace distribution.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-117
+.. GENERATED FROM PYTHON SOURCE LINES 113-115
 
 7. Training & Testing the Probabilistic Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-123
+.. GENERATED FROM PYTHON SOURCE LINES 115-121
 
 .. code-block:: Python
 
@@ -282,15 +280,15 @@ we state that we want to predict a Laplace distribution.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Regression         ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     MAE      │          0.04229          │
-    │     MSE      │          0.00736          │
-    │     NLL      │         -1.92571          │
-    │     RMSE     │          0.08579          │
+    │     MAE      │          0.08430          │
+    │     MSE      │          0.02321          │
+    │     NLL      │         -1.44428          │
+    │     RMSE     │          0.15234          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     QCE      │          0.03186          │
+    │     QCE      │          0.05040          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -302,7 +300,7 @@ we state that we want to predict a Laplace distribution.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-128
+.. GENERATED FROM PYTHON SOURCE LINES 122-126
 
 In this case, we get another metric, the negative log-likelihood (the lower the better) that
 represents how likely it would be to obtain the evaluation set with the parameters of the Laplace
@@ -312,7 +310,7 @@ You will get more information on probabilistic regression in the dedicated tutor
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.852 seconds)
+   **Total running time of the script:** (0 minutes 2.987 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Regression_tutorial_regression.py:

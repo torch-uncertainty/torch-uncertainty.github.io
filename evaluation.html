@@ -194,6 +194,13 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="mlflow_guide.html">
+    MLflow Guide
+  </a>
+</li>
+
+
+<li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="api.html">
     API Reference
   </a>
@@ -336,6 +343,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="cli_guide.html">
     CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="mlflow_guide.html">
+    MLflow Guide
   </a>
 </li>
 
@@ -546,9 +560,9 @@ while keeping accurate predictions.</p>
 Risk-Coverage curve.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">sc/AUGRC</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.AUGRC.html#torch_uncertainty.metrics.classification.AUGRC" title="torch_uncertainty.metrics.classification.AUGRC"><code class="xref py py-class docutils literal notranslate"><span class="pre">AUGRC</span></code></a>, Area Under the
 <em>Generalized</em> Risk-Coverage curve.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sc/Cov&#64;5Risk</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.CovAt5Risk.html#torch_uncertainty.metrics.classification.CovAt5Risk" title="torch_uncertainty.metrics.classification.CovAt5Risk"><code class="xref py py-class docutils literal notranslate"><span class="pre">CovAt5Risk</span></code></a>, maximum
+<li><p><code class="docutils literal notranslate"><span class="pre">sc/Cov_5Risk</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.CovAt5Risk.html#torch_uncertainty.metrics.classification.CovAt5Risk" title="torch_uncertainty.metrics.classification.CovAt5Risk"><code class="xref py py-class docutils literal notranslate"><span class="pre">CovAt5Risk</span></code></a>, maximum
 coverage at which the selective risk stays below 5%.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sc/Risk&#64;80Cov</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.RiskAt80Cov.html#torch_uncertainty.metrics.classification.RiskAt80Cov" title="torch_uncertainty.metrics.classification.RiskAt80Cov"><code class="xref py py-class docutils literal notranslate"><span class="pre">RiskAt80Cov</span></code></a>,
+<li><p><code class="docutils literal notranslate"><span class="pre">sc/Risk_80Cov</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.RiskAt80Cov.html#torch_uncertainty.metrics.classification.RiskAt80Cov" title="torch_uncertainty.metrics.classification.RiskAt80Cov"><code class="xref py py-class docutils literal notranslate"><span class="pre">RiskAt80Cov</span></code></a>,
 selective risk at 80% coverage.</p></li>
 </ul>
 <p><strong>Complexity</strong></p>
@@ -598,6 +612,14 @@ post-processing-based, etc.). The following metrics are logged under the <code c
 <li><p><code class="docutils literal notranslate"><span class="pre">ood/FPR95</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.FPR95.html#torch_uncertainty.metrics.classification.FPR95" title="torch_uncertainty.metrics.classification.FPR95"><code class="xref py py-class docutils literal notranslate"><span class="pre">FPR95</span></code></a>,
 false-positive rate at 95% true-positive rate, the standard OOD-detection threshold
 metric.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ood/SCOD_AURC</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.SCODAURC.html#torch_uncertainty.metrics.classification.SCODAURC" title="torch_uncertainty.metrics.classification.SCODAURC"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCODAURC</span></code></a>,
+SCOD Area Under the Risk-Coverage curve.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ood/SCOD_AUGRC</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.SCODAUGRC.html#torch_uncertainty.metrics.classification.SCODAUGRC" title="torch_uncertainty.metrics.classification.SCODAUGRC"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCODAUGRC</span></code></a>,
+SCOD Area Under the Generalized Risk-Coverage curve.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ood/SCOD_Cov_5Risk</span></code> —
+<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.SCODCovAt5Risk.html#torch_uncertainty.metrics.classification.SCODCovAt5Risk" title="torch_uncertainty.metrics.classification.SCODCovAt5Risk"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCODCovAt5Risk</span></code></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ood/SCOD_Risk_80Cov</span></code> —
+<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.SCODRiskAt80Cov.html#torch_uncertainty.metrics.classification.SCODRiskAt80Cov" title="torch_uncertainty.metrics.classification.SCODRiskAt80Cov"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCODRiskAt80Cov</span></code></a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ood/Entropy</span></code> — average entropy of the predictive distribution over OOD samples.</p></li>
 <li><p>For ensembles, the diversity metrics above are also recomputed under the
 <code class="docutils literal notranslate"><span class="pre">ood/ens_</span></code> prefix.</p></li>
@@ -646,8 +668,8 @@ are evaluated on a uniformly subsampled subset of pixels:</p>
 <code class="docutils literal notranslate"><span class="pre">cal/SmECE</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.SmoothCalibrationError.html#torch_uncertainty.metrics.classification.SmoothCalibrationError" title="torch_uncertainty.metrics.classification.SmoothCalibrationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SmoothCalibrationError</span></code></a>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">sc/AURC</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC" title="torch_uncertainty.metrics.classification.AURC"><code class="xref py py-class docutils literal notranslate"><span class="pre">AURC</span></code></a>),
 <code class="docutils literal notranslate"><span class="pre">sc/AUGRC</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.AUGRC.html#torch_uncertainty.metrics.classification.AUGRC" title="torch_uncertainty.metrics.classification.AUGRC"><code class="xref py py-class docutils literal notranslate"><span class="pre">AUGRC</span></code></a>),
-<code class="docutils literal notranslate"><span class="pre">sc/Cov&#64;5Risk</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.CovAt5Risk.html#torch_uncertainty.metrics.classification.CovAt5Risk" title="torch_uncertainty.metrics.classification.CovAt5Risk"><code class="xref py py-class docutils literal notranslate"><span class="pre">CovAt5Risk</span></code></a>),
-<code class="docutils literal notranslate"><span class="pre">sc/Risk&#64;80Cov</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.RiskAt80Cov.html#torch_uncertainty.metrics.classification.RiskAt80Cov" title="torch_uncertainty.metrics.classification.RiskAt80Cov"><code class="xref py py-class docutils literal notranslate"><span class="pre">RiskAt80Cov</span></code></a>).</p></li>
+<code class="docutils literal notranslate"><span class="pre">sc/Cov_5Risk</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.CovAt5Risk.html#torch_uncertainty.metrics.classification.CovAt5Risk" title="torch_uncertainty.metrics.classification.CovAt5Risk"><code class="xref py py-class docutils literal notranslate"><span class="pre">CovAt5Risk</span></code></a>),
+<code class="docutils literal notranslate"><span class="pre">sc/Risk_80Cov</span></code> (<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.RiskAt80Cov.html#torch_uncertainty.metrics.classification.RiskAt80Cov" title="torch_uncertainty.metrics.classification.RiskAt80Cov"><code class="xref py py-class docutils literal notranslate"><span class="pre">RiskAt80Cov</span></code></a>).</p></li>
 </ul>
 </section>
 <section id="id2">
@@ -662,6 +684,12 @@ datamodule). Three dense, segmentation-specific binary metrics are then computed
 <a class="reference internal" href="generated/torch_uncertainty.metrics.segmentation.SegmentationBinaryAveragePrecision.html#torch_uncertainty.metrics.segmentation.SegmentationBinaryAveragePrecision" title="torch_uncertainty.metrics.segmentation.SegmentationBinaryAveragePrecision"><code class="xref py py-class docutils literal notranslate"><span class="pre">SegmentationBinaryAveragePrecision</span></code></a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ood/FPR95</span></code> —
 <a class="reference internal" href="generated/torch_uncertainty.metrics.segmentation.SegmentationFPR95.html#torch_uncertainty.metrics.segmentation.SegmentationFPR95" title="torch_uncertainty.metrics.segmentation.SegmentationFPR95"><code class="xref py py-class docutils literal notranslate"><span class="pre">SegmentationFPR95</span></code></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ood/SCOD_AURC</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.SCODAURC.html#torch_uncertainty.metrics.classification.SCODAURC" title="torch_uncertainty.metrics.classification.SCODAURC"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCODAURC</span></code></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ood/SCOD_AUGRC</span></code> — <a class="reference internal" href="generated/torch_uncertainty.metrics.classification.SCODAUGRC.html#torch_uncertainty.metrics.classification.SCODAUGRC" title="torch_uncertainty.metrics.classification.SCODAUGRC"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCODAUGRC</span></code></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ood/SCOD_Cov_5Risk</span></code> —
+<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.SCODCovAt5Risk.html#torch_uncertainty.metrics.classification.SCODCovAt5Risk" title="torch_uncertainty.metrics.classification.SCODCovAt5Risk"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCODCovAt5Risk</span></code></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ood/SCOD_Risk_80Cov</span></code> —
+<a class="reference internal" href="generated/torch_uncertainty.metrics.classification.SCODRiskAt80Cov.html#torch_uncertainty.metrics.classification.SCODRiskAt80Cov" title="torch_uncertainty.metrics.classification.SCODRiskAt80Cov"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCODRiskAt80Cov</span></code></a>.</p></li>
 </ul>
 <p>The OOD score is again controlled by <code class="docutils literal notranslate"><span class="pre">ood_criterion</span></code>. See the
 <a class="reference internal" href="auto_tutorials/Segmentation/tutorial_muad_seg.html"><span class="doc">MUAD segmentation tutorial</span></a> for an

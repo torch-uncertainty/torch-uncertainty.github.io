@@ -270,6 +270,21 @@ Selective Classification
     RiskAtxCov
     RiskAt80Cov
 
+Selective Classification with OOD
+"""""""""""""""""""""""""""""""""
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+    :template: class.rst
+
+    SCODAUGRC
+    SCODAURC
+    SCODCovAtxRisk
+    SCODCovAt5Risk
+    SCODRiskAtxCov
+    SCODRiskAt80Cov
+
 Calibration
 """""""""""
 
@@ -487,19 +502,30 @@ Classification
     TinyImageNetDataModule
     
 
-UCI Tabular Classification
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Tabular Classification
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
     :template: class.rst
 
+    TabularClassificationDataModule
+    AdultCensusIncomeDataModule
+    AmazonAccessDataModule
+    APSFailureDataModule
     BankMarketingDataModule
+    CreditApprovalDataModule
     DOTA2GamesDataModule
+    GermanCreditDataModule
+    HiggsBosonDataModule
     HTRU2DataModule
+    KDDChurnDataModule
     OnlineShoppersDataModule
+    PimaDiabetesDataModule
     SpamBaseDataModule
+    TelcoChurnDataModule
+    WineQualityDataModule
     
 Regression
 ^^^^^^^^^^
@@ -508,7 +534,7 @@ Regression
     :nosignatures:
     :template: class.rst
 
-    UCIRegressionDataModule
+    TabularRegressionDataModule
 
 .. currentmodule:: torch_uncertainty.datamodules.segmentation
 
@@ -554,24 +580,32 @@ Classification
     TinyImageNetC
     OpenImageO
 
+Tabular Classification
+^^^^^^^^^^^^^^^^^^^^^^
 
-UCI Tabular Classification
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. currentmodule:: torch_uncertainty.datasets.classification.uci
-
+.. currentmodule:: torch_uncertainty.datasets.classification.tabular
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
     :template: class.rst
 
+    TabularClassificationDataset
+    AdultCensusIncome
+    AmazonAccess
+    APSFailure
     BankMarketing
+    CreditApproval
     DOTA2Games
+    GermanCredit
+    HiggsBoson
     HTRU2
+    KDDChurn
     OnlineShoppers
+    PimaDiabetes
     SpamBase
-
+    TelcoChurn
+    WineQuality
 
 Regression
 ^^^^^^^^^^
@@ -583,7 +617,7 @@ Regression
     :nosignatures:
     :template: class.rst
 
-    UCIRegression
+    TabularRegressionDataset
 
 Segmentation
 ^^^^^^^^^^^^

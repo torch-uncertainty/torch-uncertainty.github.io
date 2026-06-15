@@ -189,6 +189,13 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../mlflow_guide.html">
+    MLflow Guide
+  </a>
+</li>
+
+
+<li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../api.html">
     API Reference
   </a>
@@ -334,6 +341,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../mlflow_guide.html">
+    MLflow Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../api.html">
     API Reference
   </a>
@@ -459,7 +473,6 @@
   <h1>Source code for torch_uncertainty.routines.regression</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">einops</span><span class="w"> </span><span class="kn">import</span> <span class="n">rearrange</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">lightning.pytorch</span><span class="w"> </span><span class="kn">import</span> <span class="n">LightningModule</span>
@@ -482,7 +495,7 @@
     <span class="n">DistributionNLL</span><span class="p">,</span>
     <span class="n">QuantileCalibrationError</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">csv_writer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">csv_writer</span><span class="p">,</span> <span class="n">get_logger_dir</span><span class="p">,</span> <span class="n">log_figure</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.utils.distributions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DistEstimate</span><span class="p">,</span>
     <span class="n">get_dist_class</span><span class="p">,</span>
@@ -609,7 +622,7 @@
 <div class="viewcode-block" id="RegressionRoutine.on_train_start">
 <a class="viewcode-back" href="../../../generated/torch_uncertainty.routines.RegressionRoutine.html#torch_uncertainty.routines.RegressionRoutine.on_train_start">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">on_train_start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># coverage: ignore</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Put the hyperparameters in tensorboard.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the hyperparameters.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;To train a model, you must specify the `loss` argument in the routine. Got None.&quot;</span>
@@ -851,7 +864,8 @@
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">Logger</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_plots</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">add_figure</span><span class="p">(</span>
+                    <span class="n">log_figure</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
                         <span class="s2">&quot;Calibration/Reliability diagram&quot;</span><span class="p">,</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">test_prob_metrics</span><span class="p">[</span><span class="s2">&quot;cal/QCE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
                     <span class="p">)</span>
@@ -871,10 +885,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">test_prob_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_to_csv</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">csv_writer</span><span class="p">(</span>
-                <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log_dir</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">csv_filename</span><span class="p">,</span>
-                <span class="n">result_dict</span><span class="p">,</span>
-            <span class="p">)</span></div>
+            <span class="n">log_dir</span> <span class="o">=</span> <span class="n">get_logger_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">log_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">log_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">csv_writer</span><span class="p">(</span><span class="n">log_dir</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">csv_filename</span><span class="p">,</span> <span class="n">result_dict</span><span class="p">)</span></div>
 </div>
 
 
