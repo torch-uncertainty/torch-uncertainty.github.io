@@ -519,7 +519,7 @@
     <span class="n">TUOODCriterion</span><span class="p">,</span>
     <span class="n">get_ood_criterion</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.post_processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Conformal</span><span class="p">,</span> <span class="n">LaplaceApprox</span><span class="p">,</span> <span class="n">PostProcessing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.post_processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEUP</span><span class="p">,</span> <span class="n">Conformal</span><span class="p">,</span> <span class="n">LaplaceApprox</span><span class="p">,</span> <span class="n">PostProcessing</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.transforms</span><span class="w"> </span><span class="kn">import</span> <span class="n">MIXUP_PARAMS</span><span class="p">,</span> <span class="n">RepeatTarget</span><span class="p">,</span> <span class="n">build_mixup</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">csv_writer</span><span class="p">,</span> <span class="n">get_logger_dir</span><span class="p">,</span> <span class="n">log_figure</span><span class="p">,</span> <span class="n">plot_hist</span>
 
@@ -717,7 +717,9 @@
                     <span class="s2">&quot;test/post/SetSize&quot;</span><span class="p">:</span> <span class="n">SetSize</span><span class="p">(),</span>
                 <span class="p">},</span>
             <span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="c1"># DEUP is a post-processing method that does not change predictions, no need for more metrics</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">,</span> <span class="n">DEUP</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">post_cls_metrics</span> <span class="o">=</span> <span class="n">cls_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test/post/&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">test_id_entropy</span> <span class="o">=</span> <span class="n">Entropy</span><span class="p">()</span>
@@ -978,12 +980,19 @@
         <span class="n">probs_per_est</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_cls</span> <span class="k">else</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">probs</span> <span class="o">=</span> <span class="n">probs_per_est</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
+        <span class="n">pp_probs</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">pp_epistemic</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">pp_logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">,</span> <span class="n">LaplaceApprox</span> <span class="o">|</span> <span class="n">Conformal</span><span class="p">):</span>
-                <span class="n">pp_probs</span> <span class="o">=</span> <span class="n">pp_logits</span>
+            <span class="n">pp_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">,</span> <span class="n">DEUP</span><span class="p">):</span>
+                <span class="n">pp_probs</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">pp_epistemic</span> <span class="o">=</span> <span class="n">pp_out</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">,</span> <span class="n">LaplaceApprox</span> <span class="o">|</span> <span class="n">Conformal</span><span class="p">):</span>
+                <span class="n">pp_probs</span> <span class="o">=</span> <span class="n">pp_out</span>
+                <span class="n">pp_epistemic</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">pp_probs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">pp_logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">pp_probs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">pp_out</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">pp_epistemic</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="o">.</span><span class="n">input_type</span> <span class="o">==</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">LOGIT</span><span class="p">:</span>
             <span class="n">ood_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
@@ -992,7 +1001,10 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="o">.</span><span class="n">input_type</span> <span class="o">==</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">ESTIMATOR_PROB</span><span class="p">:</span>
             <span class="n">ood_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="p">(</span><span class="n">probs_per_est</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="o">.</span><span class="n">input_type</span> <span class="o">==</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">POST_PROCESSING</span><span class="p">:</span>
-            <span class="n">ood_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="p">(</span><span class="n">pp_probs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">,</span> <span class="n">DEUP</span><span class="p">):</span>
+                <span class="n">ood_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="p">(</span><span class="n">pp_epistemic</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ood_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="p">(</span><span class="n">pp_probs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">dataloader_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># squeeze if binary classification only for binary metrics</span>
@@ -1014,7 +1026,7 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_score_storage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">id_score_storage</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ood_scores</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">pp_probs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">post_cls_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pp_probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="ow">and</span> <span class="n">dataloader_idx</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -1066,7 +1078,7 @@
             <span class="s2">&quot;test/cplx/params&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_params</span><span class="p">,</span>
         <span class="p">}</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;post_cls_metrics&quot;</span><span class="p">):</span>
             <span class="n">result_dict</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_cls_metrics</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_grouping_loss</span><span class="p">:</span>
@@ -1099,7 +1111,7 @@
         <span class="c1"># reset metrics</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_cls_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_id_entropy</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_processing</span><span class="p">,</span> <span class="n">DEUP</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">post_cls_metrics</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_grouping_loss</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_grouping_loss</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>

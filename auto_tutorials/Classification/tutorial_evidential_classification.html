@@ -433,6 +433,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Post_Hoc_Methods/index.html">Post-hoc Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_deup.html">DEUP: Direct Epistemic Uncertainty Prediction with TorchUncertainty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scalers.html">Histogram Binning, Isotonic Regression, and BBQ tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_temperature.html">Improve Top-label Calibration with Temperature Scaling</a></li>
 </ul>
@@ -557,7 +558,8 @@ parameters of the evidential distribution.</p>
 <li><p>the datamodule that handles dataloaders &amp; transforms: MNISTDataModule from torch_uncertainty.datamodules</p></li>
 </ul>
 <p>We also need to define an optimizer using torch.optim, the neural network utils within torch.nn.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">optim</span>
@@ -583,7 +585,7 @@ original DEC paper.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">TUTrainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="n">devices</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="n">MAX_EPOCHS</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># datamodule</span>
-<span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
+<span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TU_DATA_DIR&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">))</span>
 <span class="n">datamodule</span> <span class="o">=</span> <span class="n">MNISTDataModule</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">lenet</span><span class="p">(</span>
@@ -643,26 +645,26 @@ Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          72.530%          │
-│    Brier     │          0.36905          │
-│   Entropy    │          0.22401          │
-│     NLL      │          2.01916          │
+│     Acc      │          30.520%          │
+│    Brier     │          0.72044          │
+│   Entropy    │          1.68732          │
+│     NLL      │          1.84708          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          16.456%          │
-│     MCE      │          53.813%          │
-│    SmECE     │          27.521%          │
-│     aECE     │          16.456%          │
+│     ECE      │          3.208%           │
+│     MCE      │          70.359%          │
+│    SmECE     │          4.949%           │
+│     aECE     │          6.785%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          5.194%           │
-│     AURC     │          6.872%           │
-│  Cov_5Risk   │          66.420%          │
-│  Risk_80Cov  │          13.900%          │
+│    AUGRC     │          25.937%          │
+│     AURC     │          37.943%          │
+│  Cov_5Risk   │           nan%            │
+│  Risk_80Cov  │          62.475%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -671,7 +673,7 @@ Total FLOPs: 0
 │    params    │          44.43 K          │
 └──────────────┴───────────────────────────┘
 
-[{&#39;test/cal/ECE&#39;: 0.16455897688865662, &#39;test/cal/MCE&#39;: 0.5381321907043457, &#39;test/cal/SmECE&#39;: 0.2752112150192261, &#39;test/cal/aECE&#39;: 0.1645589917898178, &#39;test/cls/Acc&#39;: 0.7253000140190125, &#39;test/cls/Brier&#39;: 0.36905190348625183, &#39;test/cls/NLL&#39;: 2.019158363342285, &#39;test/sc/AUGRC&#39;: 0.0519421324133873, &#39;test/sc/AURC&#39;: 0.06872069090604782, &#39;test/sc/Cov_5Risk&#39;: 0.6642000079154968, &#39;test/sc/Risk_80Cov&#39;: 0.13899999856948853, &#39;test/cls/Entropy&#39;: 0.22401073575019836, &#39;test/cplx/flops&#39;: 288399360.0, &#39;test/cplx/params&#39;: 44426.0}]
+[{&#39;test/cal/ECE&#39;: 0.03207787498831749, &#39;test/cal/MCE&#39;: 0.703586220741272, &#39;test/cal/SmECE&#39;: 0.04949198663234711, &#39;test/cal/aECE&#39;: 0.06785459816455841, &#39;test/cls/Acc&#39;: 0.3052000105381012, &#39;test/cls/Brier&#39;: 0.7204406261444092, &#39;test/cls/NLL&#39;: 1.8470813035964966, &#39;test/sc/AUGRC&#39;: 0.2593735456466675, &#39;test/sc/AURC&#39;: 0.3794262409210205, &#39;test/sc/Cov_5Risk&#39;: nan, &#39;test/sc/Risk_80Cov&#39;: 0.624750018119812, &#39;test/cls/Entropy&#39;: 1.687317967414856, &#39;test/cplx/flops&#39;: 288399360.0, &#39;test/cplx/params&#39;: 44426.0}]
 </pre></div>
 </div>
 </section>
@@ -726,20 +728,20 @@ Total FLOPs: 0
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_tutorial_evidential_classification_001.png" srcset="../../_images/sphx_glr_tutorial_evidential_classification_001.png" alt="tutorial evidential classification" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Ground truth:  7 2 1 0
-Predicted digits for the image 0: 7 with strength 50.052 and entropy 0.866.
-Predicted digits for the image 1: 2 with strength 58.231 and entropy 0.770.
-Predicted digits for the image 2: 0 with strength 10.000 and entropy 2.303.
-Predicted digits for the image 3: 0 with strength 62.673 and entropy 1.081.
+Predicted digits for the image 0: 0 with strength 10.000 and entropy 2.303.
+Predicted digits for the image 1: 0 with strength 10.000 and entropy 2.303.
+Predicted digits for the image 2: 1 with strength 53.033 and entropy 0.828.
+Predicted digits for the image 3: 0 with strength 29.362 and entropy 1.290.
 Ground truth:  7 2 1 0
 Predicted digits for the image 0: 0 with strength 10.000 and entropy 2.303.
 Predicted digits for the image 1: 0 with strength 10.000 and entropy 2.303.
 Predicted digits for the image 2: 0 with strength 10.000 and entropy 2.303.
-Predicted digits for the image 3: 0 with strength 18.219 and entropy 1.778.
+Predicted digits for the image 3: 0 with strength 10.000 and entropy 2.303.
 Ground truth:  7 2 1 0
-Predicted digits for the image 0: 0 with strength 24.183 and entropy 1.478.
-Predicted digits for the image 1: 2 with strength 42.520 and entropy 0.981.
-Predicted digits for the image 2: 7 with strength 42.747 and entropy 1.431.
-Predicted digits for the image 3: 0 with strength 33.997 and entropy 1.160.
+Predicted digits for the image 0: 0 with strength 25.518 and entropy 1.424.
+Predicted digits for the image 1: 0 with strength 10.000 and entropy 2.303.
+Predicted digits for the image 2: 0 with strength 10.000 and entropy 2.303.
+Predicted digits for the image 3: 0 with strength 10.000 and entropy 2.303.
 </pre></div>
 </div>
 </section>
@@ -749,7 +751,7 @@ Predicted digits for the image 3: 0 with strength 33.997 and entropy 1.160.
 <ul class="simple">
 <li><p><strong>Deep Evidential Classification:</strong> Murat Sensoy, Lance Kaplan, &amp; Melih Kandemir (2018). Evidential Deep Learning to Quantify Classification Uncertainty <a class="reference external" href="https://arxiv.org/pdf/1806.01768">NeurIPS 2018</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 6.497 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 6.663 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-classification-tutorial-evidential-classification-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/911fedea902d5fd5148110aa3641e71c/tutorial_evidential_classification.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_evidential_classification.ipynb</span></code></a></p>

@@ -1,0 +1,981 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>DEUP: Direct Epistemic Uncertainty Prediction with TorchUncertainty &#8212; TorchUncertainty Docs</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-codeautolink.css?v=b2176991" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=c5b435e8"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_tutorials/Post_Hoc_Methods/tutorial_deup';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Histogram Binning, Isotonic Regression, and BBQ tutorial" href="tutorial_scalers.html" />
+    <link rel="prev" title="Conformal Prediction on CIFAR-10 with TorchUncertainty" href="tutorial_conformal.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="TorchUncertainty Logo"/>
+    <img src="../../_static/logo_dark.png" class="logo__image only-dark pst-js-only" alt="TorchUncertainty Logo"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../evaluation.html">
+    Evaluating Models
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../mlflow_guide.html">
+    MLflow Guide
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../references.html">
+    References
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/torch-uncertainty/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../evaluation.html">
+    Evaluating Models
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../cli_guide.html">
+    CLI Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../mlflow_guide.html">
+    MLflow Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../references.html">
+    References
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/torch-uncertainty/torch-uncertainty" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Classification/index.html">Classification</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_classification.html">Training a LeNet for Image Classification with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_distribution_shift.html">Evaluating Model Performance Under Distribution Shift with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_evidential_classification.html">Deep Evidential Classification on a Toy Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_ood_detection.html">Out-of-distribution detection with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Classification/tutorial_pe_cifar10.html">From a Standard Classifier to a Packed-Ensemble</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Regression/index.html">Regression with Uncertainty</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Regression/tutorial_der_cubic.html">Deep Evidential Regression on a Toy Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Regression/tutorial_probabilistic_regression.html">Deep Probabilistic Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Regression/tutorial_regression.html">Training an MLP for Tabular Regression with TorchUncertainty</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Post-hoc Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">DEUP: Direct Epistemic Uncertainty Prediction with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_scalers.html">Histogram Binning, Isotonic Regression, and BBQ tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_temperature.html">Improve Top-label Calibration with Temperature Scaling</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Bayesian_Methods/index.html">Bayesian Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_bayesian.html">Training a Bayesian Neural Network in 20 seconds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_mc_batch_norm.html">Training a LeNet with Monte Carlo Batch Normalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_mc_dropout.html">Training a LeNet with Monte-Carlo Dropout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Bayesian_Methods/tutorial_muad_mc_drop.html">Monte Carlo Dropout for Semantic Segmentation on MUAD</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Ensemble_Methods/index.html">Ensemble Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Ensemble_Methods/tutorial_from_de_to_pe.html">Improved Ensemble parameter-efficiency with Packed-Ensembles</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Segmentation/index.html">Segmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Segmentation/tutorial_muad_deep_en.html">Deep ensembles Segmentation Tutorial using Muad Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Segmentation/tutorial_muad_packed.html">Packed ensembles Segmentation Tutorial using Muad Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Segmentation/tutorial_muad_seg.html">Segmentation Tutorial using Muad Dataset</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../Data_Augmentation/index.html">Data Augmentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Data_Augmentation/tutorial_corruption.html">Corrupting Images with TorchUncertainty to Benchmark Robustness</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Data_Augmentation/tutorial_mixup_ensembles_mixupmp.html">Mixup and MixupMP Training &amp; Ensembles with TorchUncertainty</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+        <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Post-hoc Methods</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">DEUP: Direct Epistemic Uncertainty Prediction with TorchUncertainty</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-tutorials-post-hoc-methods-tutorial-deup-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="deup-direct-epistemic-uncertainty-prediction-with-torchuncertainty">
+<span id="sphx-glr-auto-tutorials-post-hoc-methods-tutorial-deup-py"></span><h1>DEUP: Direct Epistemic Uncertainty Prediction with TorchUncertainty<a class="headerlink" href="#deup-direct-epistemic-uncertainty-prediction-with-torchuncertainty" title="Link to this heading">#</a></h1>
+<p>DEUP estimates the <em>epistemic</em> component of uncertainty by training a lightweight
+error-predictor <code class="docutils literal notranslate"><span class="pre">g</span></code> on out-of-fold generalization errors collected from a held-out
+calibration set (Algorithm 2 in Lahlou et al. 2023). Once fitted, <code class="docutils literal notranslate"><span class="pre">g(x)</span></code> returns
+a non-negative score: higher means “the base model is more likely to be wrong here.”</p>
+<p>This tutorial has two parts:</p>
+<ol class="arabic simple">
+<li><p><strong>Synthetic walkthrough</strong> - illustrates the DEUP API on random tabular data.</p></li>
+<li><p><strong>CIFAR-10 + ClassificationRoutine</strong> - integrates DEUP with a pretrained ResNet-18
+for OOD detection against SVHN, the standard CIFAR-10 OOD benchmark.</p></li>
+</ol>
+<section id="how-deup-works">
+<h2>How DEUP works:<a class="headerlink" href="#how-deup-works" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Run the (already-trained) base model on a held-out calibration set and compute
+per-sample errors (cross-entropy for classification, squared error for regression).</p></li>
+<li><p>Perform K-fold cross-validation <em>on those calibration errors</em> to train K lightweight
+error-predictor MLPs.  The out-of-fold predictions become the targets for the final
+predictor, acting as generalization-error proxies.</p></li>
+<li><p>Train the final error predictor <code class="docutils literal notranslate"><span class="pre">g</span></code> on all calibration features to predict those
+OOF targets.  At inference, <code class="docutils literal notranslate"><span class="pre">g(x)</span> <span class="pre">≥</span> <span class="pre">0</span></code> is the epistemic uncertainty estimate.</p></li>
+</ol>
+<dl class="simple">
+<dt>Reference:</dt><dd><p>Lahlou et al. (2023). <em>DEUP: Direct Epistemic Uncertainty Prediction.</em>
+TMLR. <a class="reference external" href="https://openreview.net/forum?id=eGLdVRvvfQ">https://openreview.net/forum?id=eGLdVRvvfQ</a></p>
+</dd>
+</dl>
+</section>
+<section id="imports">
+<h2>1. Imports<a class="headerlink" href="#imports" title="Link to this heading">#</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">TensorDataset</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.post_processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEUP</span>
+</pre></div>
+</div>
+</section>
+<section id="synthetic-classification-task">
+<h2>2. Synthetic classification task<a class="headerlink" href="#synthetic-classification-task" title="Link to this heading">#</a></h2>
+<p>We create a small random dataset to illustrate the DEUP API without any
+expensive training.  In practice the base model should be <em>pre-trained</em>;
+here we use random weights just to show the interface.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">n_cal</span><span class="p">,</span> <span class="n">in_dim</span><span class="p">,</span> <span class="n">n_classes</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">5</span>
+
+<span class="n">x_cal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n_cal</span><span class="p">,</span> <span class="n">in_dim</span><span class="p">)</span>
+<span class="n">y_cal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_classes</span><span class="p">,</span> <span class="p">(</span><span class="n">n_cal</span><span class="p">,))</span>
+<span class="n">cal_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">TensorDataset</span><span class="p">(</span><span class="n">x_cal</span><span class="p">,</span> <span class="n">y_cal</span><span class="p">),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_dim</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">n_classes</span><span class="p">))</span>
+<span class="c1"># In a real use-case, load a pre-trained model here.</span>
+</pre></div>
+</div>
+</section>
+<section id="fit-deup-on-the-calibration-split">
+<h2>3. Fit DEUP on the calibration split<a class="headerlink" href="#fit-deup-on-the-calibration-split" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">DEUP.fit</span></code> collects per-sample cross-entropy errors from the base model on the
+calibration loader, runs K-fold cross-validation to build OOF error estimates, and
+trains the final error predictor <code class="docutils literal notranslate"><span class="pre">g</span></code> on those estimates.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">deup</span> <span class="o">=</span> <span class="n">DEUP</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;classification&quot;</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">num_folds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">hidden_dim</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+    <span class="n">max_epochs</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">deup</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cal_loader</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="epistemic-uncertainty-at-inference">
+<h2>4. Epistemic uncertainty at inference<a class="headerlink" href="#epistemic-uncertainty-at-inference" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">deup(x)</span></code> takes raw inputs, runs them through the base model to extract features,
+and returns a non-negative epistemic score per sample.
+Higher scores signal that the base model is more likely to be unreliable on that input.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">x_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">in_dim</span><span class="p">)</span>
+<span class="n">uncertainty</span> <span class="o">=</span> <span class="n">deup</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Epistemic scores g(x):&quot;</span><span class="p">,</span> <span class="n">uncertainty</span><span class="p">)</span>
+
+<span class="n">probs</span> <span class="o">=</span> <span class="n">deup</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Base-model likelihood shape:&quot;</span><span class="p">,</span> <span class="n">probs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epistemic scores g(x): tensor([0.8570, 0.8676, 0.8819, 0.8829, 0.8861, 0.8889, 0.8522, 0.8715, 0.8617,
+        0.8622])
+Base-model likelihood shape: torch.Size([10, 5])
+</pre></div>
+</div>
+</section>
+<section id="apply-deup-on-cifar-10-with-the-classificationroutine">
+<h2>5. Apply DEUP on CIFAR-10 with the ClassificationRoutine<a class="headerlink" href="#apply-deup-on-cifar-10-with-the-classificationroutine" title="Link to this heading">#</a></h2>
+<p>In this section we integrate DEUP with TorchUncertainty’s
+<a class="reference internal" href="../../generated/torch_uncertainty.routines.ClassificationRoutine.html#torch_uncertainty.routines.ClassificationRoutine" title="torch_uncertainty.routines.ClassificationRoutine"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClassificationRoutine</span></code></a> to evaluate OOD
+detection performance on CIFAR-10 versus SVHN.</p>
+<p>The routine fits the error predictor <strong>automatically</strong> on the validation
+split at the start of <code class="docutils literal notranslate"><span class="pre">trainer.test()</span></code>, so no manual <code class="docutils literal notranslate"><span class="pre">fit()</span></code> call is
+needed here.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">huggingface_hub</span><span class="w"> </span><span class="kn">import</span> <span class="n">hf_hub_download</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty</span><span class="w"> </span><span class="kn">import</span> <span class="n">TUTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.datamodules</span><span class="w"> </span><span class="kn">import</span> <span class="n">CIFAR10DataModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.models.classification.resnet</span><span class="w"> </span><span class="kn">import</span> <span class="n">resnet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.post_processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEUP</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.routines</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassificationRoutine</span>
+</pre></div>
+</div>
+</section>
+<section id="load-a-pretrained-resnet-18-from-hugging-face">
+<h2>6. Load a pretrained ResNet-18 from Hugging Face<a class="headerlink" href="#load-a-pretrained-resnet-18-from-hugging-face" title="Link to this heading">#</a></h2>
+<p>We use a CIFAR-style ResNet-18 (3x3 first convolution, no max-pooling) from
+TorchUncertainty’s HuggingFace hub. The CIFAR-style variant preserves more
+spatial information on small 32x32 images than the standard ImageNet variant.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">cifar_model</span> <span class="o">=</span> <span class="n">resnet</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;cifar&quot;</span><span class="p">,</span> <span class="n">conv_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">ckpt_path</span> <span class="o">=</span> <span class="n">hf_hub_download</span><span class="p">(</span><span class="n">repo_id</span><span class="o">=</span><span class="s2">&quot;torch-uncertainty/resnet18_c10&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;resnet18_c10.ckpt&quot;</span><span class="p">)</span>
+<span class="n">weights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ckpt_path</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">weights_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">cifar_model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+<span class="n">cifar_model</span> <span class="o">=</span> <span class="n">cifar_model</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="datamodule-and-trainer">
+<h2>7. DataModule and Trainer<a class="headerlink" href="#datamodule-and-trainer" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="../../generated/torch_uncertainty.datamodules.CIFAR10DataModule.html#torch_uncertainty.datamodules.CIFAR10DataModule" title="torch_uncertainty.datamodules.CIFAR10DataModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CIFAR10DataModule</span></code></a> with <code class="docutils literal notranslate"><span class="pre">eval_ood=True</span></code>
+automatically provides the SVHN out-of-distribution test loader alongside the
+standard CIFAR-10 test loader.</p>
+<p>The key argument here is <code class="docutils literal notranslate"><span class="pre">postprocess_set=&quot;val&quot;</span></code>: it tells the routine to fit
+the DEUP error predictor on the <em>validation</em> split rather than the test set,
+avoiding any data leakage. We reserve 10% of the training set as validation via
+<code class="docutils literal notranslate"><span class="pre">val_split=0.1</span></code>. The routine automatically builds this split before fitting
+DEUP, so no manual <code class="docutils literal notranslate"><span class="pre">setup</span></code> call is needed.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">datamodule</span> <span class="o">=</span> <span class="n">CIFAR10DataModule</span><span class="p">(</span>
+    <span class="n">root</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TU_DATA_DIR&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+    <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">eval_ood</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">val_split</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">postprocess_set</span><span class="o">=</span><span class="s2">&quot;val&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">TUTrainer</span><span class="p">(</span>
+    <span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span>
+    <span class="n">devices</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="classificationroutine-with-deup-post-processing">
+<h2>8. ClassificationRoutine with DEUP post-processing<a class="headerlink" href="#classificationroutine-with-deup-post-processing" title="Link to this heading">#</a></h2>
+<p>Passing <code class="docutils literal notranslate"><span class="pre">post_processing=deup_c10</span></code> and <code class="docutils literal notranslate"><span class="pre">ood_criterion=&quot;deup&quot;</span></code> wires DEUP
+into the routine:</p>
+<ul class="simple">
+<li><p>At the start of <code class="docutils literal notranslate"><span class="pre">trainer.test()</span></code>, the routine calls <code class="docutils literal notranslate"><span class="pre">deup_c10.fit()</span></code> on the
+validation dataloader (<code class="docutils literal notranslate"><span class="pre">postprocess_set=&quot;val&quot;</span></code>).</p></li>
+<li><p>During the test loop, the DEUP epistemic score is used as the OOD detection
+criterion: higher score ⟹ more likely OOD.</p></li>
+</ul>
+<p>No loss or optimizer is needed since we are only running evaluation.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">deup_c10</span> <span class="o">=</span> <span class="n">DEUP</span><span class="p">(</span>
+    <span class="n">task</span><span class="o">=</span><span class="s2">&quot;classification&quot;</span><span class="p">,</span>
+    <span class="n">hidden_dim</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+    <span class="n">max_epochs</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">routine</span> <span class="o">=</span> <span class="n">ClassificationRoutine</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">cifar_model</span><span class="p">,</span>
+    <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">eval_ood</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">post_processing</span><span class="o">=</span><span class="n">deup_c10</span><span class="p">,</span>
+    <span class="n">ood_criterion</span><span class="o">=</span><span class="s2">&quot;deup&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="evaluate-ood-detection-with-deup">
+<h2>9. Evaluate OOD detection with DEUP<a class="headerlink" href="#evaluate-ood-detection-with-deup" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">trainer.test()</span></code> runs the following sequence automatically:</p>
+<ol class="arabic simple">
+<li><p>Fit the DEUP error predictor on the CIFAR-10 validation split.</p></li>
+<li><p>Compute in-distribution classification metrics on the CIFAR-10 test set.</p></li>
+<li><p>Compute OOD detection metrics (AUROC, AUPR, FPR95) using SVHN as OOD data.</p></li>
+</ol>
+<p>OOD detection results are reported under the <code class="docutils literal notranslate"><span class="pre">ood/</span></code> prefix.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">results_deup</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃      Classification       ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     Acc      │          93.380%          │
+│    Brier     │          0.10812          │
+│   Entropy    │          0.08849          │
+│     NLL      │          0.26405          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃        Calibration        ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     ECE      │          3.537%           │
+│     MCE      │          23.670%          │
+│    SmECE     │          10.143%          │
+│     aECE     │          3.500%           │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃       OOD Detection       ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     AUPR     │          81.944%          │
+│    AUROC     │          67.990%          │
+│   Entropy    │          0.35549          │
+│    FPR95     │          79.300%          │
+│  SCOD_AUGRC  │          0.32517          │
+│  SCOD_AURC   │          0.58219          │
+│ SCOD_Cov_5R… │            nan            │
+│ SCOD_Risk_8… │          0.69073          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃ Selective Classification  ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│    AUGRC     │          0.779%           │
+│     AURC     │          0.959%           │
+│  Cov_5Risk   │          96.510%          │
+│  Risk_80Cov  │          1.200%           │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃        Complexity         ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│    flops     │         284.38 G          │
+│    params    │          11.17 M          │
+└──────────────┴───────────────────────────┘
+Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 102/102 0:00:06 • 0:00:00 14.63it/s
+</pre></div>
+</div>
+</section>
+<section id="compare-with-the-maximum-softmax-probability-baseline">
+<h2>10. Compare with the Maximum Softmax Probability baseline<a class="headerlink" href="#compare-with-the-maximum-softmax-probability-baseline" title="Link to this heading">#</a></h2>
+<p>We can swap the OOD criterion to compare DEUP against the Maximum Softmax
+Probability (MSP) baseline — no re-training or re-fitting required.
+Only the OOD detection scores change; in-distribution metrics remain identical.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.ood_criteria</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaxSoftmaxCriterion</span>
+
+<span class="n">routine</span><span class="o">.</span><span class="n">ood_criterion</span> <span class="o">=</span> <span class="n">MaxSoftmaxCriterion</span><span class="p">()</span>
+
+<span class="n">results_msp</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃      Classification       ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     Acc      │          93.380%          │
+│    Brier     │          0.10812          │
+│   Entropy    │          0.08849          │
+│     NLL      │          0.26405          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃        Calibration        ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     ECE      │          3.537%           │
+│     MCE      │          23.670%          │
+│    SmECE     │          10.143%          │
+│     aECE     │          3.500%           │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃       OOD Detection       ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│     AUPR     │          90.246%          │
+│    AUROC     │          82.969%          │
+│   Entropy    │          0.35549          │
+│    FPR95     │          56.050%          │
+│  SCOD_AUGRC  │          0.29513          │
+│  SCOD_AURC   │          0.47860          │
+│ SCOD_Cov_5R… │            nan            │
+│ SCOD_Risk_8… │          0.67224          │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃ Selective Classification  ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│    AUGRC     │          0.779%           │
+│     AURC     │          0.959%           │
+│  Cov_5Risk   │          96.510%          │
+│  Risk_80Cov  │          1.200%           │
+└──────────────┴───────────────────────────┘
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Test metric  ┃        Complexity         ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│    flops     │         284.38 G          │
+│    params    │          11.17 M          │
+└──────────────┴───────────────────────────┘
+Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 102/102 0:00:06 • 0:00:00 14.58it/s
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">ood/</span></code> rows in both tables allow a direct comparison between the DEUP
+epistemic score and the MSP confidence score as OOD detectors on a well-trained
+ResNet-18.  DEUP is expected to complement confidence-based criteria by focusing
+on the epistemic component of the model’s uncertainty.</p>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>DEUP:</strong> Lahlou, S., Jain, M., Nekoei, H., Butoi, V. I., Bertin, P.,
+Rector-Brooks, J., … &amp; Bengio, Y. (2023). DEUP: Direct Epistemic Uncertainty
+Prediction. TMLR. <a class="reference external" href="https://openreview.net/forum?id=eGLdVRvvfQ">openreview</a>.</p></li>
+<li><p><strong>ResNet:</strong> He, K., Zhang, X., Ren, S., &amp; Sun, J. (2016). Deep Residual Learning
+for Image Recognition. CVPR 2016.</p></li>
+<li><p><strong>MSP baseline:</strong> Hendrycks, D., &amp; Gimpel, K. (2017). A Baseline for Detecting
+Misclassified and Out-of-Distribution Examples in Neural Networks. ICLR 2017.</p></li>
+</ul>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 26.760 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-post-hoc-methods-tutorial-deup-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/132b300896b87397827d0dbe0b122b95/tutorial_deup.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_deup.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/88e8ec24326b9dd61d9be574ed72a111/tutorial_deup.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tutorial_deup.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/f0fa17915a25ce70ef9b2357a593c7d1/tutorial_deup.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">tutorial_deup.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="tutorial_conformal.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Conformal Prediction on CIFAR-10 with TorchUncertainty</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="tutorial_scalers.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Histogram Binning, Isotonic Regression, and BBQ tutorial</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-deup-works">How DEUP works:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">1. Imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#synthetic-classification-task">2. Synthetic classification task</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-deup-on-the-calibration-split">3. Fit DEUP on the calibration split</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#epistemic-uncertainty-at-inference">4. Epistemic uncertainty at inference</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#apply-deup-on-cifar-10-with-the-classificationroutine">5. Apply DEUP on CIFAR-10 with the ClassificationRoutine</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-a-pretrained-resnet-18-from-hugging-face">6. Load a pretrained ResNet-18 from Hugging Face</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#datamodule-and-trainer">7. DataModule and Trainer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classificationroutine-with-deup-post-processing">8. ClassificationRoutine with DEUP post-processing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluate-ood-detection-with-deup">9. Evaluate OOD detection with DEUP</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compare-with-the-maximum-softmax-probability-baseline">10. Compare with the Maximum Softmax Probability baseline</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/auto_tutorials/Post_Hoc_Methods/tutorial_deup.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2026, Adrien Lafage and Olivier Laurent.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

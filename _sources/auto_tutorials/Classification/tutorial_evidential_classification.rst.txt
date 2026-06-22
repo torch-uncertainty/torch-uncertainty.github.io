@@ -48,10 +48,11 @@ To train a LeNet with the DEC loss function using TorchUncertainty, we have to l
 
 We also need to define an optimizer using torch.optim, the neural network utils within torch.nn.
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-51
+.. GENERATED FROM PYTHON SOURCE LINES 35-52
 
 .. code-block:: Python
 
+    import os
     from pathlib import Path
 
     import torch
@@ -75,7 +76,7 @@ We also need to define an optimizer using torch.optim, the neural network utils 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-58
+.. GENERATED FROM PYTHON SOURCE LINES 53-59
 
 2. Creating the necessary variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -84,14 +85,14 @@ In the following, we need to define the root of the logs, and to
 We use the same MNIST classification example as that used in the
 original DEC paper.
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-69
+.. GENERATED FROM PYTHON SOURCE LINES 59-70
 
 .. code-block:: Python
 
     trainer = TUTrainer(accelerator="gpu", devices=1, max_epochs=MAX_EPOCHS, enable_progress_bar=False)
 
     # datamodule
-    root = Path() / "data"
+    root = Path(os.environ.get("TU_DATA_DIR", "data"))
     datamodule = MNISTDataModule(root=root, batch_size=BATCH_SIZE, num_workers=8)
 
     model = lenet(
@@ -106,7 +107,7 @@ original DEC paper.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-80
+.. GENERATED FROM PYTHON SOURCE LINES 71-81
 
 3. The Loss and the Training Routine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -119,7 +120,7 @@ and all the default arguments.
 We follow the official implementation in DEC, use the Adam optimizer
 with the default learning rate of 0.002 and a weight decay of 0.005.
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-90
+.. GENERATED FROM PYTHON SOURCE LINES 81-91
 
 .. code-block:: Python
 
@@ -140,12 +141,12 @@ with the default learning rate of 0.002 and a weight decay of 0.005.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-93
+.. GENERATED FROM PYTHON SOURCE LINES 92-94
 
 4. Gathering Everything and Training the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-96
+.. GENERATED FROM PYTHON SOURCE LINES 94-97
 
 .. code-block:: Python
 
@@ -183,26 +184,26 @@ with the default learning rate of 0.002 and a weight decay of 0.005.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃      Classification       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     Acc      │          72.530%          │
-    │    Brier     │          0.36905          │
-    │   Entropy    │          0.22401          │
-    │     NLL      │          2.01916          │
+    │     Acc      │          30.520%          │
+    │    Brier     │          0.72044          │
+    │   Entropy    │          1.68732          │
+    │     NLL      │          1.84708          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          16.456%          │
-    │     MCE      │          53.813%          │
-    │    SmECE     │          27.521%          │
-    │     aECE     │          16.456%          │
+    │     ECE      │          3.208%           │
+    │     MCE      │          70.359%          │
+    │    SmECE     │          4.949%           │
+    │     aECE     │          6.785%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          5.194%           │
-    │     AURC     │          6.872%           │
-    │  Cov_5Risk   │          66.420%          │
-    │  Risk_80Cov  │          13.900%          │
+    │    AUGRC     │          25.937%          │
+    │     AURC     │          37.943%          │
+    │  Cov_5Risk   │           nan%            │
+    │  Risk_80Cov  │          62.475%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -211,17 +212,17 @@ with the default learning rate of 0.002 and a weight decay of 0.005.
     │    params    │          44.43 K          │
     └──────────────┴───────────────────────────┘
 
-    [{'test/cal/ECE': 0.16455897688865662, 'test/cal/MCE': 0.5381321907043457, 'test/cal/SmECE': 0.2752112150192261, 'test/cal/aECE': 0.1645589917898178, 'test/cls/Acc': 0.7253000140190125, 'test/cls/Brier': 0.36905190348625183, 'test/cls/NLL': 2.019158363342285, 'test/sc/AUGRC': 0.0519421324133873, 'test/sc/AURC': 0.06872069090604782, 'test/sc/Cov_5Risk': 0.6642000079154968, 'test/sc/Risk_80Cov': 0.13899999856948853, 'test/cls/Entropy': 0.22401073575019836, 'test/cplx/flops': 288399360.0, 'test/cplx/params': 44426.0}]
+    [{'test/cal/ECE': 0.03207787498831749, 'test/cal/MCE': 0.703586220741272, 'test/cal/SmECE': 0.04949198663234711, 'test/cal/aECE': 0.06785459816455841, 'test/cls/Acc': 0.3052000105381012, 'test/cls/Brier': 0.7204406261444092, 'test/cls/NLL': 1.8470813035964966, 'test/sc/AUGRC': 0.2593735456466675, 'test/sc/AURC': 0.3794262409210205, 'test/sc/Cov_5Risk': nan, 'test/sc/Risk_80Cov': 0.624750018119812, 'test/cls/Entropy': 1.687317967414856, 'test/cplx/flops': 288399360.0, 'test/cplx/params': 44426.0}]
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-100
+.. GENERATED FROM PYTHON SOURCE LINES 98-101
 
 5. Testing the Model
 ~~~~~~~~~~~~~~~~~~~~
 Now that the model is trained, let's test it on MNIST.
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-147
+.. GENERATED FROM PYTHON SOURCE LINES 101-148
 
 .. code-block:: Python
 
@@ -286,25 +287,25 @@ Now that the model is trained, let's test it on MNIST.
  .. code-block:: none
 
     Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 7 with strength 50.052 and entropy 0.866.
-    Predicted digits for the image 1: 2 with strength 58.231 and entropy 0.770.
-    Predicted digits for the image 2: 0 with strength 10.000 and entropy 2.303.
-    Predicted digits for the image 3: 0 with strength 62.673 and entropy 1.081.
+    Predicted digits for the image 0: 0 with strength 10.000 and entropy 2.303.
+    Predicted digits for the image 1: 0 with strength 10.000 and entropy 2.303.
+    Predicted digits for the image 2: 1 with strength 53.033 and entropy 0.828.
+    Predicted digits for the image 3: 0 with strength 29.362 and entropy 1.290.
     Ground truth:  7 2 1 0
     Predicted digits for the image 0: 0 with strength 10.000 and entropy 2.303.
     Predicted digits for the image 1: 0 with strength 10.000 and entropy 2.303.
     Predicted digits for the image 2: 0 with strength 10.000 and entropy 2.303.
-    Predicted digits for the image 3: 0 with strength 18.219 and entropy 1.778.
+    Predicted digits for the image 3: 0 with strength 10.000 and entropy 2.303.
     Ground truth:  7 2 1 0
-    Predicted digits for the image 0: 0 with strength 24.183 and entropy 1.478.
-    Predicted digits for the image 1: 2 with strength 42.520 and entropy 0.981.
-    Predicted digits for the image 2: 7 with strength 42.747 and entropy 1.431.
-    Predicted digits for the image 3: 0 with strength 33.997 and entropy 1.160.
+    Predicted digits for the image 0: 0 with strength 25.518 and entropy 1.424.
+    Predicted digits for the image 1: 0 with strength 10.000 and entropy 2.303.
+    Predicted digits for the image 2: 0 with strength 10.000 and entropy 2.303.
+    Predicted digits for the image 3: 0 with strength 10.000 and entropy 2.303.
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-152
+.. GENERATED FROM PYTHON SOURCE LINES 149-153
 
 References
 ----------
@@ -314,7 +315,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 6.497 seconds)
+   **Total running time of the script:** (0 minutes 6.663 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Classification_tutorial_evidential_classification.py:

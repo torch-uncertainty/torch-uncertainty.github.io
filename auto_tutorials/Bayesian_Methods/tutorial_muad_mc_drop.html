@@ -433,6 +433,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Post_Hoc_Methods/index.html">Post-hoc Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_deup.html">DEUP: Direct Epistemic Uncertainty Prediction with TorchUncertainty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scalers.html">Histogram Binning, Isotonic Regression, and BBQ tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_temperature.html">Improve Top-label Calibration with Temperature Scaling</a></li>
 </ul>
@@ -552,7 +553,9 @@ depth estimation, and object detection.</p>
 <li><p>the model: small_unet from torch_uncertainty.models.segmentation.unet</p></li>
 <li><p>the MC Dropout wrapper from torch_uncertainty.models</p></li>
 </ul>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torchvision.transforms.v2.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">huggingface_hub</span><span class="w"> </span><span class="kn">import</span> <span class="n">hf_hub_download</span>
@@ -608,7 +611,7 @@ depth estimation, and object detection.</p>
 
 <span class="c1"># datamodule providing the dataloaders to the trainer</span>
 <span class="n">datamodule</span> <span class="o">=</span> <span class="n">MUADDataModule</span><span class="p">(</span>
-    <span class="n">root</span><span class="o">=</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span>
+    <span class="n">root</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TU_DATA_DIR&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">version</span><span class="o">=</span><span class="s2">&quot;small&quot;</span><span class="p">,</span>
     <span class="n">train_transform</span><span class="o">=</span><span class="n">train_transform</span><span class="p">,</span>
@@ -780,28 +783,28 @@ Total FLOPs: 0
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.70506          │
-│     NLL      │          1.79070          │
-│     mAcc     │          25.102%          │
-│     mIoU     │          16.777%          │
-│    pixAcc    │          57.876%          │
+│    Brier     │          0.72830          │
+│     NLL      │          1.82856          │
+│     mAcc     │          21.789%          │
+│     mIoU     │          12.672%          │
+│    pixAcc    │          46.105%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          31.641%          │
-│     MCE      │          42.706%          │
-│    PAvPU     │          0.48372          │
-│    SmECE     │          31.602%          │
-│     aECE     │          31.636%          │
+│     ECE      │          14.200%          │
+│     MCE      │          24.090%          │
+│    PAvPU     │          0.58248          │
+│    SmECE     │          13.650%          │
+│     aECE     │          13.639%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          15.652%          │
-│     AURC     │          26.218%          │
+│    AUGRC     │          22.318%          │
+│     AURC     │          38.043%          │
 │  Cov_5Risk   │           nan%            │
-│  Risk_80Cov  │          35.664%          │
+│  Risk_80Cov  │          48.979%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -826,8 +829,8 @@ Total FLOPs: 0
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.20412          │
-│     NLL      │          0.39901          │
+│    Brier     │          0.20569          │
+│     NLL      │          0.40000          │
 │     mAcc     │          68.772%          │
 │     mIoU     │          50.739%          │
 │    pixAcc    │          85.701%          │
@@ -835,19 +838,19 @@ Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          1.743%           │
-│     MCE      │          8.171%           │
+│     ECE      │          1.630%           │
+│     MCE      │          5.418%           │
 │    PAvPU     │          0.90631          │
-│    SmECE     │          1.763%           │
-│     aECE     │          1.786%           │
+│    SmECE     │          1.759%           │
+│     aECE     │          1.726%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          2.683%           │
-│     AURC     │          3.305%           │
-│  Cov_5Risk   │          72.484%          │
-│  Risk_80Cov  │          7.020%           │
+│    AUGRC     │          2.712%           │
+│     AURC     │          3.336%           │
+│  Cov_5Risk   │          72.293%          │
+│  Risk_80Cov  │          7.081%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -940,28 +943,28 @@ allow us to have a better confidence score by using the dropout during test time
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.20448          │
-│     NLL      │          0.40112          │
-│     mAcc     │          68.406%          │
-│     mIoU     │          50.705%          │
-│    pixAcc    │          85.752%          │
+│    Brier     │          0.20571          │
+│     NLL      │          0.40285          │
+│     mAcc     │          68.430%          │
+│     mIoU     │          50.766%          │
+│    pixAcc    │          85.764%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          2.868%           │
-│     MCE      │          7.579%           │
-│    PAvPU     │          0.90689          │
-│    SmECE     │          2.870%           │
-│     aECE     │          2.868%           │
+│     ECE      │          2.759%           │
+│     MCE      │          6.750%           │
+│    PAvPU     │          0.90669          │
+│    SmECE     │          2.757%           │
+│     aECE     │          2.759%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          2.671%           │
-│     AURC     │          3.290%           │
-│  Cov_5Risk   │          72.915%          │
-│  Risk_80Cov  │          6.870%           │
+│    AUGRC     │          2.709%           │
+│     AURC     │          3.337%           │
+│  Cov_5Risk   │          72.528%          │
+│  Risk_80Cov  │          6.993%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -1025,7 +1028,7 @@ of the different estimators.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" srcset="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" alt="tutorial muad mc drop" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 54.413 seconds)</p>
+<img src="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" srcset="../../_images/sphx_glr_tutorial_muad_mc_drop_004.png" alt="tutorial muad mc drop" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 49.280 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-bayesian-methods-tutorial-muad-mc-drop-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/3cc96ba0ee86ad145779685dc1a694fe/tutorial_muad_mc_drop.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_muad_mc_drop.ipynb</span></code></a></p>

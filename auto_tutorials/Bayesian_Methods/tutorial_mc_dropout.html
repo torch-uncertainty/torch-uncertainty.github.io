@@ -433,6 +433,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Post_Hoc_Methods/index.html">Post-hoc Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_deup.html">DEUP: Direct Epistemic Uncertainty Prediction with TorchUncertainty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scalers.html">Histogram Binning, Isotonic Regression, and BBQ tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_temperature.html">Improve Top-label Calibration with Temperature Scaling</a></li>
 </ul>
@@ -557,7 +558,8 @@ to download the full example code.</p>
 <li><p>an optimization recipe in the torch_uncertainty.optim_recipes module.</p></li>
 </ul>
 <p>We also need import the neural network utils within <cite>torch.nn</cite>.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
 
@@ -584,7 +586,7 @@ not functionals. Moreover, <strong>they have to be</strong> instantiated in the 
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">TUTrainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="n">devices</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="n">MAX_EPOCHS</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># datamodule</span>
-<span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+<span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TU_DATA_DIR&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">))</span>
 <span class="n">datamodule</span> <span class="o">=</span> <span class="n">MNISTDataModule</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 
 
@@ -646,26 +648,26 @@ Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          77.500%          │
-│    Brier     │          0.46160          │
-│   Entropy    │          1.71261          │
-│     NLL      │          1.04348          │
+│     Acc      │          76.490%          │
+│    Brier     │          0.44881          │
+│   Entropy    │          1.67979          │
+│     NLL      │          0.99807          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          34.194%          │
-│     MCE      │          87.258%          │
-│    SmECE     │          34.177%          │
-│     aECE     │          34.194%          │
+│     ECE      │          31.576%          │
+│     MCE      │          43.257%          │
+│    SmECE     │          31.568%          │
+│     aECE     │          31.576%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          5.383%           │
-│     AURC     │          6.818%           │
-│  Cov_5Risk   │          54.710%          │
-│  Risk_80Cov  │          14.950%          │
+│    AUGRC     │          5.633%           │
+│     AURC     │          7.321%           │
+│  Cov_5Risk   │          52.370%          │
+│  Risk_80Cov  │          14.700%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -715,17 +717,17 @@ Total FLOPs: 0
     <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_mc_dropout_001.png" srcset="../../_images/sphx_glr_tutorial_mc_dropout_001.png" alt="tutorial mc dropout" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MC-Dropout predictions for the image 1:  1 7 7 7 7 2 7 7 7 7 1 7 7 7 7 7
-MC-Dropout predictions for the image 2:  2 4 6 2 1 0 6 6 6 0 2 2 2 2 2 1
-MC-Dropout predictions for the image 3:  1 1 1 1 1 1 1 1 1 1 1 1 1 8 1 1
-MC-Dropout predictions for the image 4:  0 6 6 0 0 0 0 0 8 8 0 0 0 6 0 0
-MC-Dropout predictions for the image 5:  4 6 4 4 4 1 6 6 6 6 6 4 4 1 4 4
-MC-Dropout predictions for the image 6:  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+<img src="../../_images/sphx_glr_tutorial_mc_dropout_001.png" srcset="../../_images/sphx_glr_tutorial_mc_dropout_001.png" alt="tutorial mc dropout" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MC-Dropout predictions for the image 1:  7 9 7 7 7 7 7 7 9 7 7 7 7 7 7 7
+MC-Dropout predictions for the image 2:  2 6 6 6 2 2 0 0 2 6 6 0 0 2 2 6
+MC-Dropout predictions for the image 3:  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+MC-Dropout predictions for the image 4:  0 0 0 0 0 0 8 0 0 0 1 1 0 0 0 8
+MC-Dropout predictions for the image 5:  4 4 4 6 4 4 4 0 0 6 6 9 4 4 4 4
+MC-Dropout predictions for the image 6:  1 1 1 1 1 1 1 1 1 1 1 7 1 1 1 1
 </pre></div>
 </div>
 <p>Most of the time, we see that there is some disagreement between the samples of the dropout
 approximation of the posterior distribution.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.578 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.670 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-bayesian-methods-tutorial-mc-dropout-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/d3a3ba08353d48467d22e26f836ab9bf/tutorial_mc_dropout.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_mc_dropout.ipynb</span></code></a></p>

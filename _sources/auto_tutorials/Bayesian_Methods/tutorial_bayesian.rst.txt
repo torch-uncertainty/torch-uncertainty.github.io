@@ -55,10 +55,11 @@ To train a BNN using TorchUncertainty, we have to load the following modules:
 We will also need to define an optimizer using torch.optim and Pytorch's
 neural network utils from torch.nn.
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-56
+.. GENERATED FROM PYTHON SOURCE LINES 42-57
 
 .. code-block:: Python
 
+    import os
     from pathlib import Path
 
     from torch import nn, optim
@@ -80,7 +81,7 @@ neural network utils from torch.nn.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-65
+.. GENERATED FROM PYTHON SOURCE LINES 58-66
 
 2. Creating the necessary variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -91,7 +92,7 @@ Please note that the datamodules can also handle OOD detection by setting the `e
 parameter to True, as well as distribution shift with `eval_shift`.
 Finally, we create the model using the blueprint from torch_uncertainty.models.
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-75
+.. GENERATED FROM PYTHON SOURCE LINES 66-76
 
 .. code-block:: Python
 
@@ -99,7 +100,7 @@ Finally, we create the model using the blueprint from torch_uncertainty.models.
     trainer = TUTrainer(accelerator="gpu", devices=1, enable_progress_bar=False, max_epochs=MAX_EPOCHS)
 
     # datamodule
-    root = Path("data")
+    root = Path(os.environ.get("TU_DATA_DIR", "data"))
     datamodule = MNISTDataModule(root=root, batch_size=BATCH_SIZE, num_workers=8)
 
     # model
@@ -112,7 +113,7 @@ Finally, we create the model using the blueprint from torch_uncertainty.models.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-86
+.. GENERATED FROM PYTHON SOURCE LINES 77-87
 
 3. The Loss and the Training Routine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -125,7 +126,7 @@ training routine from torch_uncertainty.classification. We provide the model, th
 loss and the optimizer to the routine.
 We use an Adam optimizer with a learning rate of 0.02.
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-102
+.. GENERATED FROM PYTHON SOURCE LINES 87-103
 
 .. code-block:: Python
 
@@ -152,7 +153,7 @@ We use an Adam optimizer with a learning rate of 0.02.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-112
+.. GENERATED FROM PYTHON SOURCE LINES 104-113
 
 4. Gathering Everything and Training the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -164,7 +165,7 @@ training/eval logic and the datamodule.
 The dataset will be downloaded automatically in the root/data folder, and the
 logs will be saved in the root/logs folder.
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-115
+.. GENERATED FROM PYTHON SOURCE LINES 113-116
 
 .. code-block:: Python
 
@@ -179,10 +180,6 @@ logs will be saved in the root/logs folder.
 
  .. code-block:: none
 
-      0%|          | 0.00/9.91M [00:00<?, ?B/s]      1%|          | 65.5k/9.91M [00:00<00:24, 402kB/s]      4%|▎         | 360k/9.91M [00:00<00:06, 1.41MB/s]      6%|▋         | 623k/9.91M [00:00<00:09, 1.01MB/s]     19%|█▉        | 1.87M/9.91M [00:00<00:02, 2.69MB/s]     23%|██▎       | 2.33M/9.91M [00:01<00:02, 2.72MB/s]     28%|██▊       | 2.75M/9.91M [00:01<00:02, 3.01MB/s]     31%|███       | 3.08M/9.91M [00:01<00:02, 2.75MB/s]     35%|███▌      | 3.47M/9.91M [00:01<00:02, 2.67MB/s]     39%|███▉      | 3.87M/9.91M [00:01<00:02, 2.95MB/s]     42%|████▏     | 4.19M/9.91M [00:01<00:02, 2.72MB/s]     46%|████▋     | 4.59M/9.91M [00:01<00:01, 2.99MB/s]     50%|████▉     | 4.92M/9.91M [00:01<00:01, 2.76MB/s]     54%|█████▎    | 5.31M/9.91M [00:02<00:01, 3.03MB/s]     57%|█████▋    | 5.64M/9.91M [00:02<00:01, 2.89MB/s]     60%|██████    | 5.96M/9.91M [00:02<00:01, 2.92MB/s]     64%|██████▍   | 6.36M/9.91M [00:02<00:01, 3.18MB/s]     67%|██████▋   | 6.68M/9.91M [00:02<00:01, 2.90MB/s]     71%|███████   | 7.05M/9.91M [00:02<00:00, 3.07MB/s]     75%|███████▌  | 7.44M/9.91M [00:02<00:00, 2.97MB/s]     79%|███████▊  | 7.80M/9.91M [00:02<00:00, 3.10MB/s]     83%|████████▎ | 8.22M/9.91M [00:03<00:00, 3.05MB/s]     87%|████████▋ | 8.59M/9.91M [00:03<00:00, 3.16MB/s]     91%|█████████ | 8.98M/9.91M [00:03<00:00, 3.34MB/s]     94%|█████████▍| 9.34M/9.91M [00:03<00:00, 3.02MB/s]     98%|█████████▊| 9.73M/9.91M [00:03<00:00, 3.23MB/s]    100%|██████████| 9.91M/9.91M [00:03<00:00, 2.81MB/s]
-      0%|          | 0.00/28.9k [00:00<?, ?B/s]    100%|██████████| 28.9k/28.9k [00:00<00:00, 354kB/s]
-      0%|          | 0.00/1.65M [00:00<?, ?B/s]      4%|▍         | 65.5k/1.65M [00:00<00:03, 400kB/s]     14%|█▍        | 229k/1.65M [00:00<00:01, 839kB/s]      36%|███▌      | 590k/1.65M [00:00<00:00, 1.79MB/s]     50%|████▉     | 819k/1.65M [00:00<00:00, 1.49MB/s]    100%|██████████| 1.65M/1.65M [00:00<00:00, 2.73MB/s]
-      0%|          | 0.00/4.54k [00:00<?, ?B/s]    100%|██████████| 4.54k/4.54k [00:00<00:00, 12.1MB/s]
     ┏━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
     ┃   ┃ Name                ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
     ┡━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
@@ -206,26 +203,26 @@ logs will be saved in the root/logs folder.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃      Classification       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     Acc      │          94.750%          │
-    │    Brier     │          0.07955          │
-    │   Entropy    │          0.20085          │
-    │     NLL      │          0.17800          │
+    │     Acc      │          94.910%          │
+    │    Brier     │          0.07974          │
+    │   Entropy    │          0.23611          │
+    │     NLL      │          0.17349          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          1.261%           │
-    │     MCE      │          24.852%          │
-    │    SmECE     │          1.625%           │
-    │     aECE     │          0.978%           │
+    │     ECE      │          2.159%           │
+    │     MCE      │          25.559%          │
+    │    SmECE     │          2.221%           │
+    │     aECE     │          2.180%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          0.524%           │
-    │     AURC     │          0.655%           │
-    │  Cov_5Risk   │          99.640%          │
-    │  Risk_80Cov  │          0.800%           │
+    │    AUGRC     │          0.461%           │
+    │     AURC     │          0.553%           │
+    │  Cov_5Risk   │          99.870%          │
+    │  Risk_80Cov  │          0.612%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -234,11 +231,11 @@ logs will be saved in the root/logs folder.
     │    params    │          88.85 K          │
     └──────────────┴───────────────────────────┘
 
-    [{'test/cal/ECE': 0.01261049322783947, 'test/cal/MCE': 0.24852414429187775, 'test/cal/SmECE': 0.016248149797320366, 'test/cal/aECE': 0.009779210202395916, 'test/cls/Acc': 0.9474999904632568, 'test/cls/Brier': 0.07954748719930649, 'test/cls/NLL': 0.1780019849538803, 'test/sc/AUGRC': 0.005237999837845564, 'test/sc/AURC': 0.0065451557748019695, 'test/sc/Cov_5Risk': 0.996399998664856, 'test/sc/Risk_80Cov': 0.00800000037997961, 'test/cls/Entropy': 0.20084843039512634, 'test/cplx/flops': 4614389760.0, 'test/cplx/params': 88852.0, 'test/ens_Disagreement': 0.028873329982161522, 'test/ens_Entropy': 0.18639816343784332, 'test/ens_MI': 0.014450273476541042}]
+    [{'test/cal/ECE': 0.021590979769825935, 'test/cal/MCE': 0.2555893063545227, 'test/cal/SmECE': 0.02220935747027397, 'test/cal/aECE': 0.021803773939609528, 'test/cls/Acc': 0.9491000175476074, 'test/cls/Brier': 0.07974274456501007, 'test/cls/NLL': 0.17348995804786682, 'test/sc/AUGRC': 0.004608986899256706, 'test/sc/AURC': 0.005529928021132946, 'test/sc/Cov_5Risk': 0.9987000226974487, 'test/sc/Risk_80Cov': 0.006124999839812517, 'test/cls/Entropy': 0.23610886931419373, 'test/cplx/flops': 4614389760.0, 'test/cplx/params': 88852.0, 'test/ens_Disagreement': 0.03119916468858719, 'test/ens_Entropy': 0.21799296140670776, 'test/ens_MI': 0.018115950748324394}]
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-123
+.. GENERATED FROM PYTHON SOURCE LINES 117-124
 
 5. Testing the Model
 ~~~~~~~~~~~~~~~~~~~~
@@ -248,7 +245,7 @@ Please note that we apply a reshape to the logits to determine the dimension cor
 and to the batch. As for TorchUncertainty 0.5.2, the ensemble dimension is merged with the batch dimension
 in this order (num_estimator x batch, classes).
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-163
+.. GENERATED FROM PYTHON SOURCE LINES 124-164
 
 .. code-block:: Python
 
@@ -308,12 +305,12 @@ in this order (num_estimator x batch, classes).
     Ground truth:  7 2 1 0
     Output logit shape (Num predictions x Batch) x Classes:  torch.Size([64, 10])
     Predicted digits:  7 2 1 0
-    Std. dev. of the scores over the posterior samples 0.002 0.000 0.001 0.001
+    Std. dev. of the scores over the posterior samples 0.005 0.021 0.012 0.052
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-174
+.. GENERATED FROM PYTHON SOURCE LINES 165-175
 
 Here, we show the variance of the top prediction. This is a non-standard but intuitive way to show the diversity of the predictions
 of the ensemble. Ideally, the variance should be high when the prediction is incorrect.
@@ -329,7 +326,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 19.427 seconds)
+   **Total running time of the script:** (0 minutes 12.067 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Bayesian_Methods_tutorial_bayesian.py:

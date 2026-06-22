@@ -433,6 +433,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Post_Hoc_Methods/index.html">Post-hoc Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_deup.html">DEUP: Direct Epistemic Uncertainty Prediction with TorchUncertainty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scalers.html">Histogram Binning, Isotonic Regression, and BBQ tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_temperature.html">Improve Top-label Calibration with Temperature Scaling</a></li>
 </ul>
@@ -550,7 +551,9 @@ depth estimation, and object detection.</p>
 <li><p>the segmentation training &amp; evaluation routine from torch_uncertainty.routines</p></li>
 <li><p>the datamodule handling dataloaders: MUADDataModule from torch_uncertainty.datamodules</p></li>
 </ul>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torchvision.transforms.v2.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">optim</span>
@@ -606,7 +609,7 @@ depth estimation, and object detection.</p>
 
 <span class="c1"># datamodule providing the dataloaders to the trainer</span>
 <span class="n">datamodule</span> <span class="o">=</span> <span class="n">MUADDataModule</span><span class="p">(</span>
-    <span class="n">root</span><span class="o">=</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span>
+    <span class="n">root</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TU_DATA_DIR&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">version</span><span class="o">=</span><span class="s2">&quot;small&quot;</span><span class="p">,</span>
     <span class="n">train_transform</span><span class="o">=</span><span class="n">train_transform</span><span class="p">,</span>
@@ -791,28 +794,28 @@ Total FLOPs: 0
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃       Segmentation        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    Brier     │          0.71741          │
-│     NLL      │          1.66324          │
-│     mAcc     │          21.641%          │
-│     mIoU     │          11.984%          │
-│    pixAcc    │          51.408%          │
+│    Brier     │          0.71150          │
+│     NLL      │          1.65343          │
+│     mAcc     │          21.597%          │
+│     mIoU     │          12.833%          │
+│    pixAcc    │          54.224%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          21.511%          │
-│     MCE      │          47.291%          │
-│    PAvPU     │          0.49876          │
-│    SmECE     │          18.532%          │
-│     aECE     │          21.484%          │
+│     ECE      │          26.079%          │
+│     MCE      │          67.973%          │
+│    PAvPU     │          0.47491          │
+│    SmECE     │          24.007%          │
+│     aECE     │          25.547%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          22.081%          │
-│     AURC     │          41.100%          │
+│    AUGRC     │          18.977%          │
+│     AURC     │          35.353%          │
 │  Cov_5Risk   │           nan%            │
-│  Risk_80Cov  │          45.520%          │
+│  Risk_80Cov  │          39.428%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -879,7 +882,7 @@ Total FLOPs: 0
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_tutorial_muad_deep_en_003.png" srcset="../../_images/sphx_glr_tutorial_muad_deep_en_003.png" alt="tutorial muad deep en" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 50.209 seconds)</p>
+<img src="../../_images/sphx_glr_tutorial_muad_deep_en_003.png" srcset="../../_images/sphx_glr_tutorial_muad_deep_en_003.png" alt="tutorial muad deep en" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 45.328 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-segmentation-tutorial-muad-deep-en-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c600403fd848d50cfcc5f80a21319f6b/tutorial_muad_deep_en.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_muad_deep_en.ipynb</span></code></a></p>

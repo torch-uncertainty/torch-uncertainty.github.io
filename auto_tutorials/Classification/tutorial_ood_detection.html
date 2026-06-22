@@ -433,6 +433,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Post_Hoc_Methods/index.html">Post-hoc Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_deup.html">DEUP: Direct Epistemic Uncertainty Prediction with TorchUncertainty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scalers.html">Histogram Binning, Isotonic Regression, and BBQ tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_temperature.html">Improve Top-label Calibration with Temperature Scaling</a></li>
 </ul>
@@ -551,7 +552,9 @@ evaluating its performance with SVHN as the OOD dataset.</p>
 <p>First, we need to import the necessary libraries and set up our environment.
 This includes importing PyTorch, TorchUncertainty components, and TorchUncertainty’s Trainer (built on top of Lightning’s),
 as well as two criteria for OOD detection, the maximum softmax probability [1] and the Max Logit [2].</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty</span><span class="w"> </span><span class="kn">import</span> <span class="n">TUTrainer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.datamodules</span><span class="w"> </span><span class="kn">import</span> <span class="n">CIFAR10DataModule</span>
@@ -568,7 +571,9 @@ DataModules handle data loading, preprocessing, and batching, simplifying the da
 also include the corresponding out-of-distribution and distribution shift datasets, which are then used by the routine.
 For CIFAR-10, the corresponding OOD-detection dataset is SVHN as used in the community.
 To enable OOD evaluation, activate the <cite>eval_ood</cite> flag as done below.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">datamodule</span> <span class="o">=</span> <span class="n">CIFAR10DataModule</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s2">&quot;./data&quot;</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">eval_ood</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">datamodule</span> <span class="o">=</span> <span class="n">CIFAR10DataModule</span><span class="p">(</span>
+    <span class="n">root</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TU_DATA_DIR&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">eval_ood</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -628,148 +633,7 @@ we will train for a single epoch and load a model from <a class="reference exter
 <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/64.3M [00:00&lt;?, ?B/s]
-  0%|          | 32.8k/64.3M [00:00&lt;04:34, 234kB/s]
-  0%|          | 65.5k/64.3M [00:00&lt;04:35, 233kB/s]
-  0%|          | 98.3k/64.3M [00:00&lt;04:34, 234kB/s]
-  0%|          | 164k/64.3M [00:00&lt;03:16, 326kB/s]
-  0%|          | 229k/64.3M [00:00&lt;02:48, 379kB/s]
-  1%|          | 393k/64.3M [00:00&lt;01:38, 648kB/s]
-  1%|          | 623k/64.3M [00:00&lt;01:05, 973kB/s]
-  1%|▏         | 819k/64.3M [00:01&lt;01:00, 1.05MB/s]
-  1%|▏         | 950k/64.3M [00:01&lt;01:03, 1.00MB/s]
-  2%|▏         | 1.38M/64.3M [00:01&lt;00:36, 1.72MB/s]
-  3%|▎         | 1.90M/64.3M [00:01&lt;00:34, 1.79MB/s]
-  4%|▎         | 2.39M/64.3M [00:01&lt;00:27, 2.23MB/s]
-  4%|▍         | 2.69M/64.3M [00:01&lt;00:28, 2.19MB/s]
-  5%|▍         | 2.95M/64.3M [00:02&lt;00:29, 2.11MB/s]
-  5%|▌         | 3.24M/64.3M [00:02&lt;00:29, 2.10MB/s]
-  5%|▌         | 3.51M/64.3M [00:02&lt;00:29, 2.04MB/s]
-  6%|▌         | 3.80M/64.3M [00:02&lt;00:29, 2.06MB/s]
-  6%|▋         | 4.10M/64.3M [00:02&lt;00:29, 2.07MB/s]
-  7%|▋         | 4.39M/64.3M [00:02&lt;00:28, 2.08MB/s]
-  7%|▋         | 4.69M/64.3M [00:02&lt;00:28, 2.09MB/s]
-  8%|▊         | 5.01M/64.3M [00:03&lt;00:27, 2.16MB/s]
-  8%|▊         | 5.31M/64.3M [00:03&lt;00:27, 2.15MB/s]
-  9%|▉         | 5.64M/64.3M [00:03&lt;00:26, 2.20MB/s]
-  9%|▉         | 5.93M/64.3M [00:03&lt;00:26, 2.18MB/s]
- 10%|▉         | 6.26M/64.3M [00:03&lt;00:26, 2.22MB/s]
- 10%|█         | 6.59M/64.3M [00:03&lt;00:25, 2.26MB/s]
- 11%|█         | 6.88M/64.3M [00:03&lt;00:24, 2.32MB/s]
- 11%|█         | 7.21M/64.3M [00:04&lt;00:25, 2.23MB/s]
- 12%|█▏        | 7.54M/64.3M [00:04&lt;00:25, 2.26MB/s]
- 12%|█▏        | 7.86M/64.3M [00:04&lt;00:24, 2.28MB/s]
- 13%|█▎        | 8.19M/64.3M [00:04&lt;00:24, 2.30MB/s]
- 13%|█▎        | 8.52M/64.3M [00:04&lt;00:24, 2.31MB/s]
- 14%|█▍        | 8.85M/64.3M [00:04&lt;00:23, 2.32MB/s]
- 14%|█▍        | 9.18M/64.3M [00:04&lt;00:23, 2.33MB/s]
- 15%|█▍        | 9.50M/64.3M [00:05&lt;00:23, 2.33MB/s]
- 15%|█▌        | 9.83M/64.3M [00:05&lt;00:23, 2.33MB/s]
- 16%|█▌        | 10.2M/64.3M [00:05&lt;00:23, 2.33MB/s]
- 16%|█▋        | 10.5M/64.3M [00:05&lt;00:23, 2.34MB/s]
- 17%|█▋        | 10.8M/64.3M [00:05&lt;00:22, 2.34MB/s]
- 17%|█▋        | 11.1M/64.3M [00:05&lt;00:22, 2.34MB/s]
- 18%|█▊        | 11.5M/64.3M [00:05&lt;00:22, 2.34MB/s]
- 18%|█▊        | 11.8M/64.3M [00:06&lt;00:22, 2.34MB/s]
- 19%|█▉        | 12.1M/64.3M [00:06&lt;00:22, 2.34MB/s]
- 19%|█▉        | 12.5M/64.3M [00:06&lt;00:22, 2.34MB/s]
- 20%|█▉        | 12.7M/64.3M [00:06&lt;00:21, 2.38MB/s]
- 20%|██        | 13.1M/64.3M [00:06&lt;00:21, 2.37MB/s]
- 21%|██        | 13.4M/64.3M [00:06&lt;00:21, 2.36MB/s]
- 21%|██▏       | 13.7M/64.3M [00:06&lt;00:21, 2.35MB/s]
- 22%|██▏       | 14.1M/64.3M [00:06&lt;00:21, 2.35MB/s]
- 22%|██▏       | 14.4M/64.3M [00:07&lt;00:21, 2.35MB/s]
- 23%|██▎       | 14.7M/64.3M [00:07&lt;00:21, 2.35MB/s]
- 23%|██▎       | 15.0M/64.3M [00:07&lt;00:21, 2.34MB/s]
- 24%|██▍       | 15.4M/64.3M [00:07&lt;00:20, 2.34MB/s]
- 24%|██▍       | 15.7M/64.3M [00:07&lt;00:20, 2.34MB/s]
- 25%|██▍       | 16.0M/64.3M [00:07&lt;00:20, 2.34MB/s]
- 25%|██▌       | 16.4M/64.3M [00:07&lt;00:18, 2.56MB/s]
- 26%|██▌       | 16.6M/64.3M [00:08&lt;00:17, 2.65MB/s]
- 26%|██▋       | 16.9M/64.3M [00:08&lt;00:18, 2.50MB/s]
- 27%|██▋       | 17.2M/64.3M [00:08&lt;00:20, 2.33MB/s]
- 27%|██▋       | 17.5M/64.3M [00:08&lt;00:20, 2.28MB/s]
- 28%|██▊       | 17.7M/64.3M [00:08&lt;00:21, 2.19MB/s]
- 28%|██▊       | 18.0M/64.3M [00:08&lt;00:20, 2.28MB/s]
- 29%|██▊       | 18.4M/64.3M [00:08&lt;00:19, 2.30MB/s]
- 29%|██▉       | 18.7M/64.3M [00:08&lt;00:17, 2.55MB/s]
- 30%|██▉       | 19.0M/64.3M [00:08&lt;00:17, 2.65MB/s]
- 30%|██▉       | 19.3M/64.3M [00:09&lt;00:18, 2.50MB/s]
- 30%|███       | 19.5M/64.3M [00:09&lt;00:18, 2.40MB/s]
- 31%|███       | 19.8M/64.3M [00:09&lt;00:19, 2.28MB/s]
- 31%|███       | 20.1M/64.3M [00:09&lt;00:19, 2.28MB/s]
- 32%|███▏      | 20.4M/64.3M [00:09&lt;00:19, 2.27MB/s]
- 32%|███▏      | 20.7M/64.3M [00:09&lt;00:18, 2.40MB/s]
- 33%|███▎      | 21.1M/64.3M [00:09&lt;00:17, 2.45MB/s]
- 33%|███▎      | 21.5M/64.3M [00:10&lt;00:17, 2.49MB/s]
- 34%|███▍      | 21.8M/64.3M [00:10&lt;00:16, 2.51MB/s]
- 35%|███▍      | 22.2M/64.3M [00:10&lt;00:16, 2.53MB/s]
- 35%|███▌      | 22.5M/64.3M [00:10&lt;00:16, 2.55MB/s]
- 36%|███▌      | 22.9M/64.3M [00:10&lt;00:16, 2.56MB/s]
- 36%|███▌      | 23.3M/64.3M [00:10&lt;00:16, 2.53MB/s]
- 37%|███▋      | 23.7M/64.3M [00:10&lt;00:15, 2.65MB/s]
- 37%|███▋      | 24.1M/64.3M [00:11&lt;00:14, 2.69MB/s]
- 38%|███▊      | 24.4M/64.3M [00:11&lt;00:14, 2.73MB/s]
- 39%|███▊      | 24.8M/64.3M [00:11&lt;00:14, 2.75MB/s]
- 39%|███▉      | 25.2M/64.3M [00:11&lt;00:14, 2.77MB/s]
- 40%|███▉      | 25.6M/64.3M [00:11&lt;00:13, 2.79MB/s]
- 41%|████      | 26.1M/64.3M [00:11&lt;00:13, 2.86MB/s]
- 41%|████      | 26.5M/64.3M [00:11&lt;00:12, 2.91MB/s]
- 42%|████▏     | 26.9M/64.3M [00:12&lt;00:12, 2.95MB/s]
- 43%|████▎     | 27.3M/64.3M [00:12&lt;00:12, 2.99MB/s]
- 43%|████▎     | 27.8M/64.3M [00:12&lt;00:11, 3.07MB/s]
- 44%|████▍     | 28.2M/64.3M [00:12&lt;00:11, 3.01MB/s]
- 45%|████▍     | 28.7M/64.3M [00:12&lt;00:11, 3.21MB/s]
- 45%|████▌     | 29.2M/64.3M [00:12&lt;00:10, 3.23MB/s]
- 46%|████▌     | 29.7M/64.3M [00:12&lt;00:10, 3.31MB/s]
- 47%|████▋     | 30.1M/64.3M [00:13&lt;00:10, 3.37MB/s]
- 48%|████▊     | 30.6M/64.3M [00:13&lt;00:09, 3.42MB/s]
- 48%|████▊     | 31.2M/64.3M [00:13&lt;00:09, 3.51MB/s]
- 49%|████▉     | 31.7M/64.3M [00:13&lt;00:09, 3.58MB/s]
- 50%|█████     | 32.2M/64.3M [00:13&lt;00:08, 3.64MB/s]
- 51%|█████     | 32.8M/64.3M [00:13&lt;00:08, 3.73MB/s]
- 52%|█████▏    | 33.3M/64.3M [00:13&lt;00:08, 3.81MB/s]
- 53%|█████▎    | 33.9M/64.3M [00:13&lt;00:07, 4.22MB/s]
- 53%|█████▎    | 34.4M/64.3M [00:14&lt;00:06, 4.38MB/s]
- 54%|█████▍    | 34.8M/64.3M [00:14&lt;00:07, 4.14MB/s]
- 55%|█████▍    | 35.3M/64.3M [00:14&lt;00:07, 3.95MB/s]
- 56%|█████▌    | 35.7M/64.3M [00:14&lt;00:07, 4.02MB/s]
- 57%|█████▋    | 36.3M/64.3M [00:14&lt;00:06, 4.17MB/s]
- 58%|█████▊    | 37.0M/64.3M [00:14&lt;00:06, 4.34MB/s]
- 59%|█████▊    | 37.7M/64.3M [00:14&lt;00:05, 4.88MB/s]
- 59%|█████▉    | 38.2M/64.3M [00:14&lt;00:05, 4.96MB/s]
- 60%|██████    | 38.7M/64.3M [00:15&lt;00:05, 4.71MB/s]
- 61%|██████    | 39.2M/64.3M [00:15&lt;00:05, 4.52MB/s]
- 62%|██████▏   | 39.8M/64.3M [00:15&lt;00:05, 4.73MB/s]
- 63%|██████▎   | 40.5M/64.3M [00:15&lt;00:04, 4.93MB/s]
- 64%|██████▍   | 41.3M/64.3M [00:15&lt;00:04, 5.09MB/s]
- 65%|██████▌   | 42.1M/64.3M [00:15&lt;00:04, 5.25MB/s]
- 67%|██████▋   | 42.9M/64.3M [00:15&lt;00:03, 5.38MB/s]
- 68%|██████▊   | 43.7M/64.3M [00:15&lt;00:03, 5.53MB/s]
- 69%|██████▉   | 44.5M/64.3M [00:16&lt;00:03, 5.70MB/s]
- 71%|███████   | 45.4M/64.3M [00:16&lt;00:03, 5.87MB/s]
- 72%|███████▏  | 46.3M/64.3M [00:16&lt;00:02, 6.02MB/s]
- 73%|███████▎  | 47.2M/64.3M [00:16&lt;00:02, 6.18MB/s]
- 75%|███████▍  | 48.2M/64.3M [00:16&lt;00:02, 6.35MB/s]
- 76%|███████▋  | 49.1M/64.3M [00:16&lt;00:02, 6.50MB/s]
- 78%|███████▊  | 50.1M/64.3M [00:16&lt;00:01, 7.29MB/s]
- 79%|███████▉  | 50.9M/64.3M [00:16&lt;00:01, 7.04MB/s]
- 80%|████████  | 51.6M/64.3M [00:17&lt;00:01, 6.85MB/s]
- 81%|████████▏ | 52.3M/64.3M [00:17&lt;00:01, 6.75MB/s]
- 83%|████████▎ | 53.3M/64.3M [00:17&lt;00:01, 7.20MB/s]
- 85%|████████▍ | 54.3M/64.3M [00:17&lt;00:01, 8.02MB/s]
- 86%|████████▌ | 55.1M/64.3M [00:17&lt;00:01, 7.73MB/s]
- 87%|████████▋ | 55.9M/64.3M [00:17&lt;00:01, 7.58MB/s]
- 88%|████████▊ | 56.8M/64.3M [00:17&lt;00:00, 7.61MB/s]
- 90%|█████████ | 57.9M/64.3M [00:17&lt;00:00, 8.12MB/s]
- 92%|█████████▏| 58.9M/64.3M [00:18&lt;00:00, 8.70MB/s]
- 93%|█████████▎| 59.8M/64.3M [00:18&lt;00:00, 8.51MB/s]
- 94%|█████████▍| 60.7M/64.3M [00:18&lt;00:00, 8.44MB/s]
- 96%|█████████▌| 61.7M/64.3M [00:18&lt;00:00, 8.87MB/s]
- 98%|█████████▊| 62.8M/64.3M [00:18&lt;00:00, 9.26MB/s]
- 99%|█████████▉| 63.7M/64.3M [00:18&lt;00:00, 9.15MB/s]
-100%|██████████| 64.3M/64.3M [00:18&lt;00:00, 3.46MB/s]
-/home/chocolatine/actions-runner/_work/torch-uncertainty/torch-uncertainty/.venv/lib/python3.13/site-packages/lightning/pytorch/utilities/model_summary/model_summary.py:242: Precision 16-mixed is not supported by the model summary.  Estimated model size in MB will not be accurate. Using 32 bits instead.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/chocolatine/actions-runner/_work/torch-uncertainty/torch-uncertainty/.venv/lib/python3.13/site-packages/lightning/pytorch/utilities/model_summary/model_summary.py:242: Precision 16-mixed is not supported by the model summary.  Estimated model size in MB will not be accurate. Using 32 bits instead.
 ┏━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
 ┃   ┃ Name             ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
 ┡━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
@@ -930,7 +794,7 @@ logit score compared to the maximum softmax probability but it could depend on t
 <h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
 <p>[1] Hendrycks, D., &amp; Gimpel, K. (2016). A baseline for detecting misclassified and out-of-distribution examples in neural networks. In ICLR 2017.</p>
 <p>[2] Hendrycks, D., Basart, S., Mazeika, M., Zou, A., Kwon, J., Mostajabi, M., … &amp; Song, D. (2019). Scaling out-of-distribution detection for real-world settings. In ICML 2022.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 47.443 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 29.024 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-classification-tutorial-ood-detection-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/36ef1fded00eb519b0338678b78aa0f9/tutorial_ood_detection.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_ood_detection.ipynb</span></code></a></p>

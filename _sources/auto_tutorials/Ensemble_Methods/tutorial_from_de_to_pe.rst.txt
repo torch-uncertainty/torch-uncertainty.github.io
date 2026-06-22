@@ -53,9 +53,11 @@ TorchUncertainty includes datamodules that handle the data loading and preproces
 
 The dataset is automatically downloaded using torchvision. We then visualize a few images to see a bit what we are working with.
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-84
+.. GENERATED FROM PYTHON SOURCE LINES 40-90
 
 .. code-block:: Python
+
+    import os
 
     import torch
     import torchvision.transforms as T
@@ -86,11 +88,15 @@ The dataset is automatically downloaded using torchvision. We then visualize a f
     from torch.utils.data import Subset
     from torchvision.datasets import MNIST, FashionMNIST
 
-    train_data = MNIST(root="./data/", download=True, train=True, transform=train_transform)
-    test_data = MNIST(root="./data/", train=False, transform=test_transform)
+    train_data = MNIST(
+        root=os.environ.get("TU_DATA_DIR", "data"), download=True, train=True, transform=train_transform
+    )
+    test_data = MNIST(root=os.environ.get("TU_DATA_DIR", "data"), train=False, transform=test_transform)
     # We only take the first 10k images to have the same number of samples as the test set using torch Subsets
     ood_data = Subset(
-        FashionMNIST(root="./data/", download=True, transform=test_transform),
+        FashionMNIST(
+            root=os.environ.get("TU_DATA_DIR", "data"), download=True, transform=test_transform
+        ),
         indices=range(10000),
     )
 
@@ -105,35 +111,22 @@ The dataset is automatically downloaded using torchvision. We then visualize a f
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-      0%|          | 0.00/9.91M [00:00<?, ?B/s]      1%|          | 65.5k/9.91M [00:00<00:24, 395kB/s]      4%|▎         | 360k/9.91M [00:00<00:06, 1.42MB/s]      6%|▋         | 623k/9.91M [00:00<00:07, 1.22MB/s]     20%|██        | 2.00M/9.91M [00:00<00:02, 3.70MB/s]     27%|██▋       | 2.65M/9.91M [00:00<00:01, 4.20MB/s]     31%|███▏      | 3.11M/9.91M [00:00<00:01, 4.21MB/s]     36%|███▌      | 3.57M/9.91M [00:01<00:01, 4.21MB/s]     41%|████      | 4.03M/9.91M [00:01<00:01, 4.04MB/s]     45%|████▍     | 4.46M/9.91M [00:01<00:01, 3.98MB/s]     50%|████▉     | 4.95M/9.91M [00:01<00:01, 4.01MB/s]     55%|█████▍    | 5.41M/9.91M [00:01<00:01, 4.12MB/s]     59%|█████▉    | 5.83M/9.91M [00:01<00:01, 4.07MB/s]     64%|██████▍   | 6.32M/9.91M [00:01<00:00, 4.11MB/s]     68%|██████▊   | 6.78M/9.91M [00:01<00:00, 4.20MB/s]     73%|███████▎  | 7.24M/9.91M [00:01<00:00, 4.19MB/s]     78%|███████▊  | 7.70M/9.91M [00:02<00:00, 4.30MB/s]     82%|████████▏ | 8.16M/9.91M [00:02<00:00, 4.22MB/s]     87%|████████▋ | 8.65M/9.91M [00:02<00:00, 4.27MB/s]     92%|█████████▏| 9.11M/9.91M [00:02<00:00, 4.32MB/s]     97%|█████████▋| 9.57M/9.91M [00:02<00:00, 4.34MB/s]    100%|██████████| 9.91M/9.91M [00:02<00:00, 3.88MB/s]
-      0%|          | 0.00/28.9k [00:00<?, ?B/s]    100%|██████████| 28.9k/28.9k [00:00<00:00, 354kB/s]
-      0%|          | 0.00/1.65M [00:00<?, ?B/s]      4%|▍         | 65.5k/1.65M [00:00<00:03, 397kB/s]     22%|██▏       | 360k/1.65M [00:00<00:00, 1.43MB/s]     38%|███▊      | 623k/1.65M [00:00<00:00, 1.56MB/s]     89%|████████▉ | 1.47M/1.65M [00:00<00:00, 3.02MB/s]    100%|██████████| 1.65M/1.65M [00:00<00:00, 2.67MB/s]
-      0%|          | 0.00/4.54k [00:00<?, ?B/s]    100%|██████████| 4.54k/4.54k [00:00<00:00, 10.1MB/s]
-      0%|          | 0.00/26.4M [00:00<?, ?B/s]      3%|▎         | 918k/26.4M [00:00<00:02, 9.13MB/s]      8%|▊         | 2.13M/26.4M [00:00<00:02, 10.7MB/s]     13%|█▎        | 3.34M/26.4M [00:00<00:02, 11.2MB/s]     17%|█▋        | 4.55M/26.4M [00:00<00:01, 11.5MB/s]     22%|██▏       | 5.77M/26.4M [00:00<00:01, 11.6MB/s]     26%|██▋       | 6.98M/26.4M [00:00<00:01, 11.7MB/s]     31%|███       | 8.19M/26.4M [00:00<00:01, 11.8MB/s]     36%|███▌      | 9.40M/26.4M [00:00<00:01, 11.8MB/s]     40%|████      | 10.6M/26.4M [00:00<00:01, 11.8MB/s]     45%|████▍     | 11.8M/26.4M [00:01<00:01, 11.8MB/s]     49%|████▉     | 13.0M/26.4M [00:01<00:01, 11.8MB/s]     54%|█████▍    | 14.3M/26.4M [00:01<00:01, 11.8MB/s]     59%|█████▊    | 15.5M/26.4M [00:01<00:00, 11.8MB/s]     63%|██████▎   | 16.7M/26.4M [00:01<00:00, 11.8MB/s]     68%|██████▊   | 17.9M/26.4M [00:01<00:00, 11.8MB/s]     72%|███████▏  | 19.1M/26.4M [00:01<00:00, 11.8MB/s]     77%|███████▋  | 20.3M/26.4M [00:01<00:00, 11.8MB/s]     81%|████████▏ | 21.5M/26.4M [00:01<00:00, 11.9MB/s]     86%|████████▌ | 22.7M/26.4M [00:01<00:00, 11.9MB/s]     91%|█████████ | 24.0M/26.4M [00:02<00:00, 11.9MB/s]     95%|█████████▌| 25.2M/26.4M [00:02<00:00, 11.9MB/s]    100%|█████████▉| 26.4M/26.4M [00:02<00:00, 11.9MB/s]    100%|██████████| 26.4M/26.4M [00:02<00:00, 11.7MB/s]
-      0%|          | 0.00/29.5k [00:00<?, ?B/s]    100%|██████████| 29.5k/29.5k [00:00<00:00, 2.25MB/s]
-      0%|          | 0.00/4.42M [00:00<?, ?B/s]     20%|██        | 885k/4.42M [00:00<00:00, 8.63MB/s]     44%|████▍     | 1.97M/4.42M [00:00<00:00, 9.29MB/s]     71%|███████   | 3.15M/4.42M [00:00<00:00, 10.3MB/s]     95%|█████████▍| 4.19M/4.42M [00:00<00:00, 9.18MB/s]    100%|██████████| 4.42M/4.42M [00:00<00:00, 9.29MB/s]
-      0%|          | 0.00/5.15k [00:00<?, ?B/s]    100%|██████████| 5.15k/5.15k [00:00<00:00, 22.4MB/s]
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 85-87
+.. GENERATED FROM PYTHON SOURCE LINES 91-93
 
 You could replace all this cell by simply loading the MNIST datamodule from TorchUncertainty.
 Now, let's visualize a few images from the dataset. For this task, we use the viz_data dataset that applies no transformation to the images.
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-94
+.. GENERATED FROM PYTHON SOURCE LINES 93-100
 
 .. code-block:: Python
 
 
     # Datasets without transformation to visualize the unchanged data
-    viz_data = MNIST(root="./data/", train=False)
-    ood_viz_data = FashionMNIST(root="./data/", download=True)
+    viz_data = MNIST(root=os.environ.get("TU_DATA_DIR", "data"), train=False)
+    ood_viz_data = FashionMNIST(root=os.environ.get("TU_DATA_DIR", "data"), download=True)
 
     print("In distribution data:")
     viz_data[0][0]
@@ -147,11 +140,11 @@ Now, let's visualize a few images from the dataset. For this task, we use the vi
 
     In distribution data:
 
-    <PIL.Image.Image image mode=L size=28x28 at 0x7AA2E3AF0410>
+    <PIL.Image.Image image mode=L size=28x28 at 0x71B5B8A38910>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-98
+.. GENERATED FROM PYTHON SOURCE LINES 101-104
 
 .. code-block:: Python
 
@@ -168,18 +161,18 @@ Now, let's visualize a few images from the dataset. For this task, we use the vi
 
     Out of distribution data:
 
-    <PIL.Image.Image image mode=L size=28x28 at 0x7AA2E3AF00F0>
+    <PIL.Image.Image image mode=L size=28x28 at 0x71B5B8A3A170>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-103
+.. GENERATED FROM PYTHON SOURCE LINES 105-109
 
 2. Create & train the model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We will create a simple convolutional neural network (CNN): the LeNet model (also introduced by LeCun).
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-135
+.. GENERATED FROM PYTHON SOURCE LINES 109-141
 
 .. code-block:: Python
 
@@ -222,13 +215,13 @@ We will create a simple convolutional neural network (CNN): the LeNet model (als
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-139
+.. GENERATED FROM PYTHON SOURCE LINES 142-145
 
 We now need to define the optimization recipe:
 - the optimizer, here the standard stochastic gradient descent (SGD) with a learning rate of 0.05
 - the scheduler, here cosine annealing.
 
-.. GENERATED FROM PYTHON SOURCE LINES 139-147
+.. GENERATED FROM PYTHON SOURCE LINES 145-153
 
 .. code-block:: Python
 
@@ -247,7 +240,7 @@ We now need to define the optimization recipe:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-154
+.. GENERATED FROM PYTHON SOURCE LINES 154-160
 
 To train the model, we use `TorchUncertainty <https://torch-uncertainty.github.io/>`_, a library that we have developed to ease
 the training and evaluation of models with uncertainty.
@@ -256,7 +249,7 @@ the training and evaluation of models with uncertainty.
 With weight-decay, minimizing this loss amounts to finding a Maximum a posteriori (MAP) estimate of the model parameters.
 This means that the model is trained to predict the most likely class for each input given a diagonal Gaussian prior on the weights.
 
-.. GENERATED FROM PYTHON SOURCE LINES 154-174
+.. GENERATED FROM PYTHON SOURCE LINES 160-180
 
 .. code-block:: Python
 
@@ -313,11 +306,11 @@ This means that the model is trained to predict the most likely class for each i
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 175-176
+.. GENERATED FROM PYTHON SOURCE LINES 181-182
 
 Evaluate the trained model on the test set - pay attention to the cls/Acc metric
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-178
+.. GENERATED FROM PYTHON SOURCE LINES 182-184
 
 .. code-block:: Python
 
@@ -334,38 +327,38 @@ Evaluate the trained model on the test set - pay attention to the cls/Acc metric
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃      Classification       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     Acc      │          86.150%          │
-    │    Brier     │          0.20478          │
-    │   Entropy    │          0.51492          │
-    │     NLL      │          0.44818          │
+    │     Acc      │          87.620%          │
+    │    Brier     │          0.18776          │
+    │   Entropy    │          0.50781          │
+    │     NLL      │          0.40885          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          3.512%           │
-    │     MCE      │          35.995%          │
-    │    SmECE     │          3.437%           │
-    │     aECE     │          3.473%           │
+    │     ECE      │          4.513%           │
+    │     MCE      │          30.588%          │
+    │    SmECE     │          4.476%           │
+    │     aECE     │          4.484%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       OOD Detection       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     AUPR     │          79.642%          │
-    │    AUROC     │          80.874%          │
-    │   Entropy    │          1.12476          │
-    │    FPR95     │          62.040%          │
-    │  SCOD_AUGRC  │          0.17282          │
-    │  SCOD_AURC   │          0.25880          │
+    │     AUPR     │          56.980%          │
+    │    AUROC     │          56.512%          │
+    │   Entropy    │          0.64130          │
+    │    FPR95     │          88.460%          │
+    │  SCOD_AUGRC  │          0.23373          │
+    │  SCOD_AURC   │          0.42494          │
     │ SCOD_Cov_5R… │            nan            │
-    │ SCOD_Risk_8… │          0.41113          │
+    │ SCOD_Risk_8… │          0.48181          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          2.500%           │
-    │     AURC     │          3.137%           │
-    │  Cov_5Risk   │          76.410%          │
-    │  Risk_80Cov  │          5.962%           │
+    │    AUGRC     │          2.063%           │
+    │     AURC     │          2.541%           │
+    │  Cov_5Risk   │          80.970%          │
+    │  Risk_80Cov  │          4.775%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -377,7 +370,7 @@ Evaluate the trained model on the test set - pay attention to the cls/Acc metric
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-214
+.. GENERATED FROM PYTHON SOURCE LINES 185-220
 
 This table provides a lot of information:
 
@@ -415,7 +408,7 @@ which will take time if you have no GPU, or downloading the pre-trained models t
 To train the ensemble, you will have to use the "deep_ensembles" function from TorchUncertainty, which will
 replicate and change the initialization of your networks to ensure diversity.
 
-.. GENERATED FROM PYTHON SOURCE LINES 214-241
+.. GENERATED FROM PYTHON SOURCE LINES 220-247
 
 .. code-block:: Python
 
@@ -477,47 +470,47 @@ replicate and change the initialization of your networks to ensure diversity.
     Modules in train mode: 62                                                       
     Modules in eval mode: 0                                                         
     Total FLOPs: 0                                                                  
-    Epoch 2/2  ━━━━━━━━━━━━━━━━ 118/118 0:00:01 •       119.93it/s v_num: 1.000     
-                                        0:00:00                    train_loss: 0.701
-                                                                   Acc: 82.620      
+    Epoch 2/2  ━━━━━━━━━━━━━━━━ 118/118 0:00:01 •       120.20it/s v_num: 1.000     
+                                        0:00:00                    train_loss: 0.582
+                                                                   Acc: 89.510      
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃      Classification       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     Acc      │          82.620%          │
-    │    Brier     │          0.25845          │
-    │   Entropy    │          0.66563          │
-    │     NLL      │          0.52426          │
+    │     Acc      │          89.510%          │
+    │    Brier     │          0.16009          │
+    │   Entropy    │          0.48369          │
+    │     NLL      │          0.33916          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          6.520%           │
-    │     MCE      │          19.337%          │
-    │    SmECE     │          6.587%           │
-    │     aECE     │          6.512%           │
+    │     ECE      │          5.510%           │
+    │     MCE      │          17.452%          │
+    │    SmECE     │          5.361%           │
+    │     aECE     │          5.507%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       OOD Detection       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     AUPR     │          65.766%          │
-    │    AUROC     │          66.258%          │
-    │   Entropy    │          1.02787          │
-    │    FPR95     │          86.030%          │
-    │  SCOD_AUGRC  │          0.20937          │
-    │  SCOD_AURC   │          0.36924          │
+    │     AUPR     │          88.784%          │
+    │    AUROC     │          91.574%          │
+    │   Entropy    │          1.31372          │
+    │    FPR95     │          25.750%          │
+    │  SCOD_AUGRC  │          0.14607          │
+    │  SCOD_AURC   │          0.19330          │
     │ SCOD_Cov_5R… │            nan            │
-    │ SCOD_Risk_8… │          0.44706          │
-    │ ens_Disagre… │          0.42550          │
-    │ ens_Entropy  │          0.86932          │
-    │    ens_MI    │          0.15855          │
+    │ SCOD_Risk_8… │          0.39781          │
+    │ ens_Disagre… │          0.69030          │
+    │ ens_Entropy  │          1.14652          │
+    │    ens_MI    │          0.16721          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          3.777%           │
-    │     AURC     │          4.757%           │
-    │  Cov_5Risk   │          63.910%          │
-    │  Risk_80Cov  │          10.638%          │
+    │    AUGRC     │          1.465%           │
+    │     AURC     │          1.713%           │
+    │  Cov_5Risk   │          86.840%          │
+    │  Risk_80Cov  │          3.200%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -525,12 +518,12 @@ replicate and change the initialization of your networks to ensure diversity.
     │    flops     │          2.31 G           │
     │    params    │          88.85 K          │
     └──────────────┴───────────────────────────┘
-    Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5/5 0:00:00 • 0:00:00 39.42it/s 
+    Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5/5 0:00:00 • 0:00:00 41.31it/s 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 242-253
+.. GENERATED FROM PYTHON SOURCE LINES 248-259
 
 Feel free to run the notebook on your machine for a longer duration.
 
@@ -544,7 +537,7 @@ We have put the pre-trained models on Hugging Face that you can download with th
 comparable to the all the others trained in this notebook. The pretrained models can be seen
 on `HuggingFace <https://huggingface.co/ENSTA-U2IS/tutorial-models>`_ and TorchUncertainty's are `there <https://huggingface.co/torch-uncertainty>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 253-295
+.. GENERATED FROM PYTHON SOURCE LINES 259-301
 
 .. code-block:: Python
 
@@ -643,12 +636,12 @@ on `HuggingFace <https://huggingface.co/ENSTA-U2IS/tutorial-models>`_ and TorchU
     │    flops     │          9.23 G           │
     │    params    │         355.41 K          │
     └──────────────┴───────────────────────────┘
-    Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5/5 0:00:00 • 0:00:00 41.19it/s 
+    Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5/5 0:00:00 • 0:00:00 42.17it/s 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 296-308
+.. GENERATED FROM PYTHON SOURCE LINES 302-314
 
 4. From Deep Ensembles to Packed-Ensembles
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -663,7 +656,7 @@ We will need to update the model and replace the layers with their Packed equiva
 documentation of the Packed-Linear layer using this `link <https://torch-uncertainty.github.io/generated/torch_uncertainty.layers.PackedLinear.html>`_,
 and the Packed-Conv2D, `here <https://torch-uncertainty.github.io/generated/torch_uncertainty.layers.PackedLinear.html>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 308-384
+.. GENERATED FROM PYTHON SOURCE LINES 314-390
 
 .. code-block:: Python
 
@@ -774,47 +767,47 @@ and the Packed-Conv2D, `here <https://torch-uncertainty.github.io/generated/torc
     Modules in train mode: 55                                                       
     Modules in eval mode: 0                                                         
     Total FLOPs: 0                                                                  
-    Epoch 2/2  ━━━━━━━━━━━━━━━━ 118/118 0:00:01 •       111.39it/s v_num: 3.000     
-                                        0:00:00                    train_loss: 1.204
-                                                                   Acc: 78.740      
+    Epoch 2/2  ━━━━━━━━━━━━━━━━ 118/118 0:00:01 •       120.97it/s v_num: 3.000     
+                                        0:00:00                    train_loss: 1.120
+                                                                   Acc: 78.710      
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃      Classification       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     Acc      │          78.740%          │
-    │    Brier     │          0.37207          │
-    │   Entropy    │          1.32867          │
-    │     NLL      │          0.80779          │
+    │     Acc      │          78.710%          │
+    │    Brier     │          0.36423          │
+    │   Entropy    │          1.26508          │
+    │     NLL      │          0.78218          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          23.346%          │
-    │     MCE      │          31.995%          │
-    │    SmECE     │          23.276%          │
-    │     aECE     │          23.346%          │
+    │     ECE      │          21.640%          │
+    │     MCE      │          30.779%          │
+    │    SmECE     │          21.594%          │
+    │     aECE     │          21.640%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       OOD Detection       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     AUPR     │          67.232%          │
-    │    AUROC     │          69.969%          │
-    │   Entropy    │          1.68802          │
-    │    FPR95     │          71.420%          │
-    │  SCOD_AUGRC  │          0.20009          │
-    │  SCOD_AURC   │          0.32292          │
+    │     AUPR     │          62.696%          │
+    │    AUROC     │          66.105%          │
+    │   Entropy    │          1.64804          │
+    │    FPR95     │          70.550%          │
+    │  SCOD_AUGRC  │          0.20975          │
+    │  SCOD_AURC   │          0.33683          │
     │ SCOD_Cov_5R… │            nan            │
-    │ SCOD_Risk_8… │          0.44631          │
-    │ ens_Disagre… │          0.63358          │
-    │ ens_Entropy  │          1.31401          │
-    │    ens_MI    │          0.37401          │
+    │ SCOD_Risk_8… │          0.47056          │
+    │ ens_Disagre… │          0.46878          │
+    │ ens_Entropy  │          1.36889          │
+    │    ens_MI    │          0.27915          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          5.175%           │
-    │     AURC     │          6.794%           │
-    │  Cov_5Risk   │          51.840%          │
-    │  Risk_80Cov  │          13.688%          │
+    │    AUGRC     │          5.410%           │
+    │     AURC     │          7.137%           │
+    │  Cov_5Risk   │          50.440%          │
+    │  Risk_80Cov  │          14.288%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -822,12 +815,12 @@ and the Packed-Conv2D, `here <https://torch-uncertainty.github.io/generated/torc
     │    flops     │          1.51 G           │
     │    params    │          45.67 K          │
     └──────────────┴───────────────────────────┘
-    Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5/5 0:00:00 • 0:00:00 41.39it/s 
+    Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5/5 0:00:00 • 0:00:00 42.15it/s 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 385-416
+.. GENERATED FROM PYTHON SOURCE LINES 391-422
 
 The training time should be approximately similar to the one of the single model that you trained before. However, please note that we are working with very small models, hence completely underusing your GPU. As such, the training time is not representative of what you would observe with larger models.
 
@@ -864,7 +857,7 @@ The grouping loss is a measure of uncertainty orthogonal to calibration. Have a 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 34.852 seconds)
+   **Total running time of the script:** (0 minutes 24.015 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Ensemble_Methods_tutorial_from_de_to_pe.py:

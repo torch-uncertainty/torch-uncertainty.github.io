@@ -654,6 +654,19 @@
 
 
 
+<span class="k">class</span><span class="w"> </span><span class="nc">DEUPCriterion</span><span class="p">(</span><span class="n">TUOODCriterion</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;OOD criterion from DEUP epistemic uncertainty scores.</span>
+
+<span class="sd">    Higher values indicate greater epistemic uncertainty (likely OOD or unreliable).</span>
+<span class="sd">    Use with :class:`~torch_uncertainty.post_processing.DEUP`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">input_type</span> <span class="o">=</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">POST_PROCESSING</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">inputs</span>
+
+
 <div class="viewcode-block" id="EntropyCriterion">
 <a class="viewcode-back" href="../../generated/torch_uncertainty.ood_criteria.EntropyCriterion.html#torch_uncertainty.ood_criteria.EntropyCriterion">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EntropyCriterion</span><span class="p">(</span><span class="n">TUOODCriterion</span><span class="p">):</span>
@@ -801,6 +814,8 @@
             <span class="k">return</span> <span class="n">MaxSoftmaxCriterion</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">ood_criterion</span> <span class="o">==</span> <span class="s2">&quot;post_processing&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">PostProcessingCriterion</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ood_criterion</span> <span class="o">==</span> <span class="s2">&quot;deup&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">DEUPCriterion</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">ood_criterion</span> <span class="o">==</span> <span class="s2">&quot;entropy&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">EntropyCriterion</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">ood_criterion</span> <span class="o">==</span> <span class="s2">&quot;mutual_information&quot;</span><span class="p">:</span>
@@ -809,8 +824,8 @@
             <span class="k">return</span> <span class="n">VariationRatioCriterion</span><span class="p">()</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;The OOD criterion must be one of &#39;msp&#39;, &#39;logit&#39;, &#39;energy&#39;, &#39;entropy&#39;,&quot;</span>
-            <span class="s2">&quot; &#39;mutual_information&#39;, &#39;variation_ratio&#39;, or &#39;post_processing&#39;. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">ood_criterion</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="s2">&quot; &#39;mutual_information&#39;, &#39;variation_ratio&#39;, or &#39;post_processing&#39;, or &#39;deup&#39;. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">ood_criterion</span><span class="si">=}</span><span class="s2">.&quot;</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ood_criterion</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ood_criterion</span><span class="p">()</span>

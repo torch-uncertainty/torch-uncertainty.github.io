@@ -39,9 +39,11 @@ First, we load the following utilities from TorchUncertainty:
 - the datamodule handling dataloaders: MUADDataModule from torch_uncertainty.datamodules
 - the model: small_unet from torch_uncertainty.models.segmentation.unet
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-41
+.. GENERATED FROM PYTHON SOURCE LINES 26-43
 
 .. code-block:: Python
+
+    import os
 
     import matplotlib.pyplot as plt
     import torch
@@ -65,12 +67,12 @@ First, we load the following utilities from TorchUncertainty:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-44
+.. GENERATED FROM PYTHON SOURCE LINES 44-46
 
 2. Initializing the DataModule
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-91
+.. GENERATED FROM PYTHON SOURCE LINES 46-93
 
 .. code-block:: Python
 
@@ -111,7 +113,7 @@ First, we load the following utilities from TorchUncertainty:
 
     # datamodule providing the dataloaders to the trainer
     datamodule = MUADDataModule(
-        root="./data",
+        root=os.environ.get("TU_DATA_DIR", "data"),
         batch_size=10,
         version="small",
         train_transform=train_transform,
@@ -128,11 +130,11 @@ First, we load the following utilities from TorchUncertainty:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-93
+.. GENERATED FROM PYTHON SOURCE LINES 94-95
 
 Visualize a validation input sample (and RGB image)
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-107
+.. GENERATED FROM PYTHON SOURCE LINES 95-109
 
 .. code-block:: Python
 
@@ -162,11 +164,11 @@ Visualize a validation input sample (and RGB image)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-109
+.. GENERATED FROM PYTHON SOURCE LINES 110-111
 
 Visualize the same image above but segmented.
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-122
+.. GENERATED FROM PYTHON SOURCE LINES 111-124
 
 .. code-block:: Python
 
@@ -195,13 +197,13 @@ Visualize the same image above but segmented.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-126
+.. GENERATED FROM PYTHON SOURCE LINES 125-128
 
 3. Instantiating the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 We create the model easily using the blueprint from torch_uncertainty.models.
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-134
+.. GENERATED FROM PYTHON SOURCE LINES 128-136
 
 .. code-block:: Python
 
@@ -220,12 +222,12 @@ We create the model easily using the blueprint from torch_uncertainty.models.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-137
+.. GENERATED FROM PYTHON SOURCE LINES 137-139
 
 4. Compute class weights to mitigate class inbalance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-185
+.. GENERATED FROM PYTHON SOURCE LINES 139-187
 
 .. code-block:: Python
 
@@ -291,11 +293,11 @@ We create the model easily using the blueprint from torch_uncertainty.models.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 186-187
+.. GENERATED FROM PYTHON SOURCE LINES 188-189
 
 Let's define the training parameters.
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-194
+.. GENERATED FROM PYTHON SOURCE LINES 189-196
 
 .. code-block:: Python
 
@@ -313,12 +315,12 @@ Let's define the training parameters.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 195-197
+.. GENERATED FROM PYTHON SOURCE LINES 197-199
 
 5. The Loss, the Routine, and the Trainer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 197-219
+.. GENERATED FROM PYTHON SOURCE LINES 199-221
 
 .. code-block:: Python
 
@@ -351,12 +353,12 @@ Let's define the training parameters.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 220-222
+.. GENERATED FROM PYTHON SOURCE LINES 222-224
 
 6. Training the model
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 222-223
+.. GENERATED FROM PYTHON SOURCE LINES 224-225
 
 .. code-block:: Python
 
@@ -393,12 +395,12 @@ Let's define the training parameters.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 224-226
+.. GENERATED FROM PYTHON SOURCE LINES 226-228
 
 7. Testing the model
 ~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 226-227
+.. GENERATED FROM PYTHON SOURCE LINES 228-229
 
 .. code-block:: Python
 
@@ -414,28 +416,28 @@ Let's define the training parameters.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       Segmentation        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    Brier     │          0.67410          │
-    │     NLL      │          1.69727          │
-    │     mAcc     │          24.295%          │
-    │     mIoU     │          14.151%          │
-    │    pixAcc    │          54.671%          │
+    │    Brier     │          0.77318          │
+    │     NLL      │          2.00304          │
+    │     mAcc     │          23.900%          │
+    │     mIoU     │          14.557%          │
+    │    pixAcc    │          51.137%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          18.179%          │
-    │     MCE      │          30.247%          │
-    │    PAvPU     │          0.60477          │
-    │    SmECE     │          16.202%          │
-    │     aECE     │          17.947%          │
+    │     ECE      │          30.653%          │
+    │     MCE      │          60.991%          │
+    │    PAvPU     │          0.50950          │
+    │    SmECE     │          30.468%          │
+    │     aECE     │          30.462%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          19.156%          │
-    │     AURC     │          31.160%          │
+    │    AUGRC     │          18.066%          │
+    │     AURC     │          30.158%          │
     │  Cov_5Risk   │           nan%            │
-    │  Risk_80Cov  │          42.286%          │
+    │  Risk_80Cov  │          41.155%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -447,13 +449,13 @@ Let's define the training parameters.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 228-231
+.. GENERATED FROM PYTHON SOURCE LINES 230-233
 
 8. Loading a pre-trained model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Let's now load a fully trained model to continue this tutorial
 
-.. GENERATED FROM PYTHON SOURCE LINES 231-238
+.. GENERATED FROM PYTHON SOURCE LINES 233-240
 
 .. code-block:: Python
 
@@ -475,8 +477,8 @@ Let's now load a fully trained model to continue this tutorial
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       Segmentation        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    Brier     │          0.20607          │
-    │     NLL      │          0.40149          │
+    │    Brier     │          0.20540          │
+    │     NLL      │          0.39997          │
     │     mAcc     │          68.769%          │
     │     mIoU     │          50.739%          │
     │    pixAcc    │          85.704%          │
@@ -484,19 +486,19 @@ Let's now load a fully trained model to continue this tutorial
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          1.485%           │
-    │     MCE      │          11.889%          │
+    │     ECE      │          1.726%           │
+    │     MCE      │          6.153%           │
     │    PAvPU     │          0.90639          │
-    │    SmECE     │          1.659%           │
-    │     aECE     │          1.653%           │
+    │    SmECE     │          1.811%           │
+    │     aECE     │          1.802%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          2.724%           │
-    │     AURC     │          3.358%           │
-    │  Cov_5Risk   │          72.396%          │
-    │  Risk_80Cov  │          7.103%           │
+    │    AUGRC     │          2.704%           │
+    │     AURC     │          3.314%           │
+    │  Cov_5Risk   │          72.498%          │
+    │  Risk_80Cov  │          7.075%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -508,13 +510,13 @@ Let's now load a fully trained model to continue this tutorial
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 239-242
+.. GENERATED FROM PYTHON SOURCE LINES 241-244
 
 9. Uncertainty evaluations with MCP
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Here we will just use as confidence score the Maximum class probability (MCP)
 
-.. GENERATED FROM PYTHON SOURCE LINES 242-291
+.. GENERATED FROM PYTHON SOURCE LINES 244-293
 
 .. code-block:: Python
 
@@ -582,7 +584,7 @@ Here we will just use as confidence score the Maximum class probability (MCP)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 37.074 seconds)
+   **Total running time of the script:** (0 minutes 36.811 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Segmentation_tutorial_muad_seg.py:

@@ -22,6 +22,7 @@ First, we disable some logging and warnings to keep the output clean.
 
 # %%
 import logging
+import os
 import warnings
 
 import torch
@@ -68,7 +69,9 @@ class NormalMLP(nn.Module):
 from torch_uncertainty.datamodules.tabular_regression import Kin8NMDataModule
 
 # datamodule
-datamodule = Kin8NMDataModule(root="data", batch_size=BATCH_SIZE, num_workers=4)
+datamodule = Kin8NMDataModule(
+    root=os.environ.get("TU_DATA_DIR", "data"), batch_size=BATCH_SIZE, num_workers=4
+)
 
 # %%
 # 4. Setting up the Model and Trainer

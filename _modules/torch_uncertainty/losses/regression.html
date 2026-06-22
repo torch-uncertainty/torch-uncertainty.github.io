@@ -480,6 +480,68 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.utils.distributions</span><span class="w"> </span><span class="kn">import</span> <span class="n">NormalInverseGamma</span>
 
 
+<div class="viewcode-block" id="PinballLoss">
+<a class="viewcode-back" href="../../../generated/torch_uncertainty.losses.PinballLoss.html#torch_uncertainty.losses.PinballLoss">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PinballLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantile</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">reduction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The Pinball loss for quantile regression.</span>
+
+<span class="sd">        Also known as the quantile loss or check loss, the pinball loss at</span>
+<span class="sd">        quantile level :math:`\tau \in (0, 1)` is:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \mathcal{L}_\tau(y, \hat{y}) =</span>
+<span class="sd">            \max\!\left(\tau\,(y - \hat{y}),\,(\tau - 1)\,(y - \hat{y})\right)</span>
+<span class="sd">            = \begin{cases}</span>
+<span class="sd">                \tau\,(y - \hat{y}) &amp; \text{if } y \geq \hat{y}, \\</span>
+<span class="sd">                (1 - \tau)\,(\hat{y} - y) &amp; \text{if } y &lt; \hat{y}.</span>
+<span class="sd">            \end{cases}</span>
+
+<span class="sd">        For :math:`\tau = 0.5` the loss coincides with the mean absolute error</span>
+<span class="sd">        (MAE) scaled by :math:`\tfrac{1}{2}`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quantile: The quantile level :math:`\tau \in (0, 1)`. Defaults to</span>
+<span class="sd">                ``0.5``.</span>
+<span class="sd">            reduction: Specifies the reduction to apply to the output.</span>
+<span class="sd">                Must be one of ``&#39;none&#39;``, ``&#39;mean&#39;`` or ``&#39;sum&#39;``. Defaults</span>
+<span class="sd">                to ``&quot;mean&quot;``.</span>
+
+<span class="sd">        References:</span>
+<span class="sd">            [1] `Koenker, R., &amp; Bassett Jr, G. (1978). Regression quantiles.</span>
+<span class="sd">            Econometrica, &lt;https://www.jstor.org/stable/1913643&gt;`_.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">quantile</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The quantile parameter should be in (0, 1), but got </span><span class="si">{</span><span class="n">quantile</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quantile</span> <span class="o">=</span> <span class="n">quantile</span>
+
+        <span class="k">if</span> <span class="n">reduction</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">reduction</span><span class="si">}</span><span class="s2"> is not a valid value for reduction.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">=</span> <span class="n">reduction</span>
+
+<div class="viewcode-block" id="PinballLoss.forward">
+<a class="viewcode-back" href="../../../generated/torch_uncertainty.losses.PinballLoss.html#torch_uncertainty.losses.PinballLoss.forward">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictions</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the pinball loss.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            predictions: The predicted quantile values.</span>
+<span class="sd">            targets: The target values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">residual</span> <span class="o">=</span> <span class="n">targets</span> <span class="o">-</span> <span class="n">predictions</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quantile</span> <span class="o">*</span> <span class="n">residual</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quantile</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">residual</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">loss</span></div>
+</div>
+
+
+
 <div class="viewcode-block" id="DistributionNLLLoss">
 <a class="viewcode-back" href="../../../generated/torch_uncertainty.losses.DistributionNLLLoss.html#torch_uncertainty.losses.DistributionNLLLoss">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DistributionNLLLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>

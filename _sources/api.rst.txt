@@ -410,6 +410,7 @@ Losses
     ELBOLoss
     FocalLoss
     KLDiv
+    PinballLoss
 
 Post-Processing Methods
 -----------------------
@@ -423,6 +424,7 @@ Post-Processing Methods
     
     LaplaceApprox
     MCBatchNorm
+    DEUP
 
 
 Scaling Methods

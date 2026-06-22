@@ -34,6 +34,8 @@ If you use the classification routine, the plots will be automatically available
 """
 
 # %%
+import os
+
 from torch_uncertainty.datamodules import CIFAR100DataModule
 from torch_uncertainty.metrics import CalibrationError
 from torch_uncertainty.models.classification import resnet
@@ -64,7 +66,7 @@ model.load_state_dict(weights)
 # element if eval_ood is True: the dataloader of in-distribution data and the dataloader
 # of out-of-distribution data. Otherwise, it is a list of 1 element.
 
-dm = CIFAR100DataModule(root="./data", eval_ood=False, batch_size=32)
+dm = CIFAR100DataModule(root=os.environ.get("TU_DATA_DIR", "data"), eval_ood=False, batch_size=32)
 dm.prepare_data()
 dm.setup("test")
 

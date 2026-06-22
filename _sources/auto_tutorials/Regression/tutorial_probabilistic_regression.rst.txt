@@ -37,11 +37,12 @@ the mean and the standard deviation. These values will depend on the data point 
 
 First, we disable some logging and warnings to keep the output clean.
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-37
+.. GENERATED FROM PYTHON SOURCE LINES 24-38
 
 .. code-block:: Python
 
     import logging
+    import os
     import warnings
 
     import torch
@@ -61,7 +62,7 @@ First, we disable some logging and warnings to keep the output clean.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-45
+.. GENERATED FROM PYTHON SOURCE LINES 39-46
 
 2. Building the NormalMLP Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,7 +72,7 @@ This layer is a wrapper around the nn.Linear layer, which outputs the location a
 As you will see in the following, any other distribution layer from TU can be used in the same way. Check out the regression tutorial
 to learn how to create a NormalMLP more easily using the blueprints from torch_uncertainty.models
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-63
+.. GENERATED FROM PYTHON SOURCE LINES 46-64
 
 .. code-block:: Python
 
@@ -100,21 +101,23 @@ to learn how to create a NormalMLP more easily using the blueprints from torch_u
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-68
+.. GENERATED FROM PYTHON SOURCE LINES 65-69
 
 3. Setting up the Data
 ~~~~~~~~~~~~~~~~~~~~~~
 
 We use the UCI Kin8nm dataset, which is a regression dataset with 8 features and 8192 samples.
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-73
+.. GENERATED FROM PYTHON SOURCE LINES 69-76
 
 .. code-block:: Python
 
     from torch_uncertainty.datamodules.tabular_regression import Kin8NMDataModule
 
     # datamodule
-    datamodule = Kin8NMDataModule(root="data", batch_size=BATCH_SIZE, num_workers=4)
+    datamodule = Kin8NMDataModule(
+        root=os.environ.get("TU_DATA_DIR", "data"), batch_size=BATCH_SIZE, num_workers=4
+    )
 
 
 
@@ -123,12 +126,12 @@ We use the UCI Kin8nm dataset, which is a regression dataset with 8 features and
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-76
+.. GENERATED FROM PYTHON SOURCE LINES 77-79
 
 4. Setting up the Model and Trainer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-89
+.. GENERATED FROM PYTHON SOURCE LINES 79-92
 
 .. code-block:: Python
 
@@ -152,7 +155,7 @@ We use the UCI Kin8nm dataset, which is a regression dataset with 8 features and
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-98
+.. GENERATED FROM PYTHON SOURCE LINES 93-101
 
 5. The Loss, the Optimizer and the Training Routine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -163,7 +166,7 @@ For the optimizer, we use the Adam optimizer with a learning rate of 5e-2.
 Finally, we create a RegressionRoutine to train the model.
 We indicate that the output dimension is 1 and the distribution family is "normal".
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-113
+.. GENERATED FROM PYTHON SOURCE LINES 101-116
 
 .. code-block:: Python
 
@@ -189,7 +192,7 @@ We indicate that the output dimension is 1 and the distribution family is "norma
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-120
+.. GENERATED FROM PYTHON SOURCE LINES 117-123
 
 6. Training and Testing the Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -198,7 +201,7 @@ Thanks to the RegressionRoutine, we get the values from 4 metrics, the mean abso
 the mean squared error, its square root (RMSE) and the negative-log-likelihood (NLL). For all these metrics,
 lower is better.
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-125
+.. GENERATED FROM PYTHON SOURCE LINES 123-128
 
 .. code-block:: Python
 
@@ -215,7 +218,6 @@ lower is better.
 
  .. code-block:: none
 
-      0%|          | 0.00/816k [00:00<?, ?B/s]     28%|██▊       | 229k/816k [00:00<00:00, 1.97MB/s]    100%|██████████| 816k/816k [00:00<00:00, 4.22MB/s]
     ┏━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
     ┃   ┃ Name              ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
     ┡━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
@@ -237,15 +239,15 @@ lower is better.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Regression         ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     MAE      │          0.29528          │
-    │     MSE      │          0.15244          │
-    │     NLL      │          0.47163          │
-    │     RMSE     │          0.39044          │
+    │     MAE      │          0.27561          │
+    │     MSE      │          0.13443          │
+    │     NLL      │          0.32509          │
+    │     RMSE     │          0.36664          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     QCE      │          0.06830          │
+    │     QCE      │          0.03024          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -257,7 +259,7 @@ lower is better.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-132
+.. GENERATED FROM PYTHON SOURCE LINES 129-135
 
 7. Benchmarking Different Distributions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -266,7 +268,7 @@ Our NormalMLP model assumes a Normal distribution as the output. However, we cou
 TorchUncertainty provides a simple way to do this using the get_dist_linear_layer() function.
 Let us rewrite the NormalMLP model to use it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-152
+.. GENERATED FROM PYTHON SOURCE LINES 135-155
 
 .. code-block:: Python
 
@@ -297,14 +299,14 @@ Let us rewrite the NormalMLP model to use it.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-157
+.. GENERATED FROM PYTHON SOURCE LINES 156-160
 
 We can now train the model with different distributions.
 Let us train the model with a Laplace, Student's t, and Cauchy distribution.
 Note that we use the mode as the point-wise estimate of the distribution as the mean
 is not defined for the Cauchy distribution.
 
-.. GENERATED FROM PYTHON SOURCE LINES 157-179
+.. GENERATED FROM PYTHON SOURCE LINES 160-182
 
 .. code-block:: Python
 
@@ -344,15 +346,15 @@ is not defined for the Cauchy distribution.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Regression         ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     MAE      │          0.30944          │
-    │     MSE      │          0.16739          │
-    │     NLL      │          0.49653          │
-    │     RMSE     │          0.40913          │
+    │     MAE      │          0.29200          │
+    │     MSE      │          0.14992          │
+    │     NLL      │          0.47158          │
+    │     RMSE     │          0.38720          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     QCE      │          0.09201          │
+    │     QCE      │          0.03640          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -366,15 +368,15 @@ is not defined for the Cauchy distribution.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Regression         ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     MAE      │          0.36284          │
-    │     MSE      │          0.24480          │
-    │     NLL      │          0.71873          │
-    │     RMSE     │          0.49477          │
+    │     MAE      │          0.27906          │
+    │     MSE      │          0.13246          │
+    │     NLL      │          0.43550          │
+    │     RMSE     │          0.36395          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     QCE      │          0.09670          │
+    │     QCE      │          0.03997          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -388,15 +390,15 @@ is not defined for the Cauchy distribution.
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Regression         ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     MAE      │          0.31714          │
-    │     MSE      │          0.17577          │
-    │     NLL      │          0.63058          │
-    │     RMSE     │          0.41925          │
+    │     MAE      │          0.30546          │
+    │     MSE      │          0.16786          │
+    │     NLL      │          0.58880          │
+    │     RMSE     │          0.40971          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     QCE      │          0.06225          │
+    │     QCE      │          0.05958          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -408,7 +410,7 @@ is not defined for the Cauchy distribution.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 180-184
+.. GENERATED FROM PYTHON SOURCE LINES 183-187
 
 The Negative Log-Likelihood (NLL) is a good score to encompass the correctness of the predicted
 distributions, evaluating both the correctness of the mode (the point prediction) and of the predicted uncertainty
@@ -418,7 +420,7 @@ the Normal distribution often performs better.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 10.936 seconds)
+   **Total running time of the script:** (0 minutes 9.700 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Regression_tutorial_probabilistic_regression.py:

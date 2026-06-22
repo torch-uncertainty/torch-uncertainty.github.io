@@ -24,6 +24,7 @@ First, we have to load the following utilities from TorchUncertainty:
 """
 
 # %%
+import os
 from pathlib import Path
 
 import torch
@@ -44,7 +45,9 @@ from torch_uncertainty.routines import RegressionRoutine
 trainer = TUTrainer(accelerator="gpu", devices=1, max_epochs=20, enable_progress_bar=False)
 
 # datamodule providing the dataloaders to the trainer, specifically we use the yacht dataset
-datamodule = YachtDataModule(root=Path("data"), batch_size=32, num_workers=4)
+datamodule = YachtDataModule(
+    root=Path(os.environ.get("TU_DATA_DIR", "data")), batch_size=32, num_workers=4
+)
 
 # %%
 # 3. Instantiating the Pointwise Model

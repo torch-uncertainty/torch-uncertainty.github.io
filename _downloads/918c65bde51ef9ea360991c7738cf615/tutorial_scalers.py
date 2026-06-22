@@ -17,6 +17,8 @@ scalers from the package to calibrate a pretrained ResNet-18 on CIFAR-100.
 # - the resnet builder and load_hf to fetch pretrained weights
 # - BBQScaler, HistogramBinningScaler, and IsotonicRegressionScaler to calibrate predictions
 
+import os
+
 import torch
 from torch.utils.data import DataLoader, random_split
 
@@ -49,7 +51,7 @@ model = model.eval()
 # Prepare CIFAR-100 test set and create DataLoaders. We split the test set
 # into a calibration subset and a held-out test subset for reliable ECE computation.
 
-dm = CIFAR100DataModule(root="./data", eval_ood=False, batch_size=32)
+dm = CIFAR100DataModule(root=os.environ.get("TU_DATA_DIR", "data"), eval_ood=False, batch_size=32)
 dm.prepare_data()
 dm.setup("test")
 

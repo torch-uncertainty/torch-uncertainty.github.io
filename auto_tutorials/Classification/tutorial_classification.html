@@ -433,6 +433,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../Post_Hoc_Methods/index.html">Post-hoc Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_conformal.html">Conformal Prediction on CIFAR-10 with TorchUncertainty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_deup.html">DEUP: Direct Epistemic Uncertainty Prediction with TorchUncertainty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_scalers.html">Histogram Binning, Isotonic Regression, and BBQ tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Post_Hoc_Methods/tutorial_temperature.html">Improve Top-label Calibration with Temperature Scaling</a></li>
 </ul>
@@ -552,7 +553,8 @@ You will discover two of the core tools from TorchUncertainty, namely</p>
 <li><p>the model: lenet from torch_uncertainty.models</p></li>
 <li><p>an optimization recipe in the torch_uncertainty.optim_recipes module.</p></li>
 </ul>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
 
@@ -571,7 +573,7 @@ dataloaders and transforms.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">TUTrainer</span><span class="p">(</span><span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="n">devices</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">enable_progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># datamodule providing the dataloaders to the trainer</span>
-<span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+<span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TU_DATA_DIR&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">))</span>
 <span class="n">datamodule</span> <span class="o">=</span> <span class="n">MNISTDataModule</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -612,38 +614,7 @@ metrics that you will find in the table below.</p>
 <span class="n">results</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">routine</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/9.91M [00:00&lt;?, ?B/s]
-  1%|          | 98.3k/9.91M [00:00&lt;00:16, 590kB/s]
-  4%|▍         | 393k/9.91M [00:00&lt;00:07, 1.31MB/s]
-  6%|▋         | 623k/9.91M [00:00&lt;00:06, 1.35MB/s]
- 13%|█▎        | 1.25M/9.91M [00:00&lt;00:03, 2.31MB/s]
- 26%|██▌       | 2.59M/9.91M [00:00&lt;00:01, 5.13MB/s]
- 33%|███▎      | 3.24M/9.91M [00:00&lt;00:01, 5.27MB/s]
- 39%|███▉      | 3.87M/9.91M [00:00&lt;00:01, 5.27MB/s]
- 45%|████▌     | 4.49M/9.91M [00:01&lt;00:00, 5.51MB/s]
- 52%|█████▏    | 5.11M/9.91M [00:01&lt;00:00, 5.57MB/s]
- 58%|█████▊    | 5.73M/9.91M [00:01&lt;00:00, 5.55MB/s]
- 64%|██████▍   | 6.39M/9.91M [00:01&lt;00:00, 5.81MB/s]
- 71%|███████▏  | 7.08M/9.91M [00:01&lt;00:00, 5.92MB/s]
- 78%|███████▊  | 7.73M/9.91M [00:01&lt;00:00, 5.87MB/s]
- 85%|████████▍ | 8.39M/9.91M [00:01&lt;00:00, 6.03MB/s]
- 92%|█████████▏| 9.11M/9.91M [00:01&lt;00:00, 6.31MB/s]
- 99%|█████████▊| 9.76M/9.91M [00:01&lt;00:00, 6.27MB/s]
-100%|██████████| 9.91M/9.91M [00:01&lt;00:00, 4.99MB/s]
-
-  0%|          | 0.00/28.9k [00:00&lt;?, ?B/s]
-100%|██████████| 28.9k/28.9k [00:00&lt;00:00, 355kB/s]
-
-  0%|          | 0.00/1.65M [00:00&lt;?, ?B/s]
-  4%|▍         | 65.5k/1.65M [00:00&lt;00:03, 400kB/s]
- 22%|██▏       | 360k/1.65M [00:00&lt;00:01, 1.22MB/s]
- 34%|███▍      | 557k/1.65M [00:00&lt;00:00, 1.36MB/s]
- 89%|████████▉ | 1.47M/1.65M [00:00&lt;00:00, 3.52MB/s]
-100%|██████████| 1.65M/1.65M [00:00&lt;00:00, 2.76MB/s]
-
-  0%|          | 0.00/4.54k [00:00&lt;?, ?B/s]
-100%|██████████| 4.54k/4.54k [00:00&lt;00:00, 10.0MB/s]
-┏━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>┏━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
 ┃   ┃ Name                ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
 ┡━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
 │ 0 │ ood_criterion       │ MaxSoftmaxCriterion │      0 │ train │     0 │
@@ -670,26 +641,26 @@ Total FLOPs: 0
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃      Classification       ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     Acc      │          90.290%          │
-│    Brier     │          0.18797          │
-│   Entropy    │          0.79927          │
-│     NLL      │          0.43865          │
+│     Acc      │          92.140%          │
+│    Brier     │          0.17532          │
+│   Entropy    │          0.78987          │
+│     NLL      │          0.41666          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Calibration        ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│     ECE      │          14.532%          │
-│     MCE      │          29.542%          │
-│    SmECE     │          13.640%          │
-│     aECE     │          14.531%          │
+│     ECE      │          16.145%          │
+│     MCE      │          37.686%          │
+│    SmECE     │          16.370%          │
+│     aECE     │          16.145%          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
 ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│    AUGRC     │          1.422%           │
-│     AURC     │          1.804%           │
-│  Cov_5Risk   │          88.320%          │
-│  Risk_80Cov  │          2.937%           │
+│    AUGRC     │          1.041%           │
+│     AURC     │          1.331%           │
+│  Cov_5Risk   │          93.920%          │
+│  Risk_80Cov  │          1.925%           │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃        Complexity         ┃
@@ -740,7 +711,7 @@ Total FLOPs: 0
 LeNet predictions for the first 6 images:  7 2 1 0 4 1
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 25.713 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 18.940 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-classification-tutorial-classification-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/1d73e10cebb64090359837d6682d2001/tutorial_classification.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_classification.ipynb</span></code></a></p>

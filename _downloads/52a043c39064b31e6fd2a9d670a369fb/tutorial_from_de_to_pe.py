@@ -37,6 +37,8 @@ The dataset is automatically downloaded using torchvision. We then visualize a f
 """
 
 # %%
+import os
+
 import torch
 import torchvision.transforms as T
 
@@ -66,11 +68,15 @@ test_transform = T.Compose(
 from torch.utils.data import Subset
 from torchvision.datasets import MNIST, FashionMNIST
 
-train_data = MNIST(root="./data/", download=True, train=True, transform=train_transform)
-test_data = MNIST(root="./data/", train=False, transform=test_transform)
+train_data = MNIST(
+    root=os.environ.get("TU_DATA_DIR", "data"), download=True, train=True, transform=train_transform
+)
+test_data = MNIST(root=os.environ.get("TU_DATA_DIR", "data"), train=False, transform=test_transform)
 # We only take the first 10k images to have the same number of samples as the test set using torch Subsets
 ood_data = Subset(
-    FashionMNIST(root="./data/", download=True, transform=test_transform),
+    FashionMNIST(
+        root=os.environ.get("TU_DATA_DIR", "data"), download=True, transform=test_transform
+    ),
     indices=range(10000),
 )
 
@@ -86,8 +92,8 @@ ood_dl = DataLoader(ood_data, batch_size=2048, shuffle=False, num_workers=4)
 # Now, let's visualize a few images from the dataset. For this task, we use the viz_data dataset that applies no transformation to the images.
 
 # Datasets without transformation to visualize the unchanged data
-viz_data = MNIST(root="./data/", train=False)
-ood_viz_data = FashionMNIST(root="./data/", download=True)
+viz_data = MNIST(root=os.environ.get("TU_DATA_DIR", "data"), train=False)
+ood_viz_data = FashionMNIST(root=os.environ.get("TU_DATA_DIR", "data"), download=True)
 
 print("In distribution data:")
 viz_data[0][0]
