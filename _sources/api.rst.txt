@@ -344,10 +344,13 @@ Regression
     :template: class.rst
 
     DistributionNLL
+    IntervalCoverage
+    IntervalScore
     Log10
     MeanAbsoluteErrorInverse
     MeanGTRelativeAbsoluteError
     MeanGTRelativeSquaredError
+    MeanIntervalWidth
     MeanSquaredErrorInverse
     MeanSquaredLogError
     SILog

@@ -371,6 +371,16 @@ For Adaptive Prediction Sets (APS) and Regularized Adaptive Prediction Sets (RAP
 
 * Paper: `NeurIPS 2020 <https://arxiv.org/abs/2006.02544>`__
 
+Conformalized Quantile Regression (CQR)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For Conformalized Quantile Regression (CQR), consider citing:
+
+**Classification with Valid and Adaptive Coverage**
+
+* Authors: *Yaniv Romano, Evan Patterson, and Emmanuel J. Candès*
+
+* Paper: `NeurIPS 2019 <https://arxiv.org/abs/1905.03222>`__
 
 Losses
 ------
@@ -414,6 +424,16 @@ For the cross-entropy with maximum suppression loss, consider citing:
 
 * Authors: *Yuxuan Zhou, Heng Li, Zhi-Qi Cheng, Xudong Yan, Mario Fritz, and Margret Keuper* 
 * Paper: `ArXiv 2024 <https://openreview.net/pdf?id=zVtwIWyX4S>`__.
+
+Pinball Loss
+^^^^^^^^^^^^
+
+For the pinball loss, consider citing:
+
+**Quantile regression**
+
+* Authors: *Roger Koenker, and Kevin F. Hallock*
+* Paper: `Journal of Economic Perspectives, Fall 2001 <https://pubs.aeaweb.org/doi/pdfplus/10.1257/jep.15.4.143>`__
 
 Metrics
 -------
@@ -491,6 +511,17 @@ For the grouping loss, consider citing:
 
 * Authors: *Alexandre Perez-Lebel, Marine Le Morvan, and Gaël Varoquaux*
 * Paper: `ICLR 2023 <https://arxiv.org/pdf/2210.16315.pdf>`__.
+
+
+Interval (Winkler) Score
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+For the interval (Winkler) score, consider citing:
+
+**Strictly Proper Scoring Rules, Prediction, and Estimation**
+
+* Authors: *Tilman Gneiting and Adrian E. Raftery*
+* Paper: `JASA 2007 <https://doi.org/10.1198/016214506000001437>`__.
 
 
 Datasets

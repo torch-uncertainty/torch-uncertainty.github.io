@@ -68,7 +68,7 @@ routine:
       in_channels: 3
       num_classes: 10
       dropout_rate: 0.0
-      style: cifar
+      style: CIFAR
   num_classes: 10
   loss: CrossEntropyLoss
 
@@ -140,14 +140,14 @@ trainer:
 
 routine:
   model:
-    class_path: torch_uncertainty.models.deep_ensembles
+    class_path: torch_uncertainty.methods.deep_ensembles
     init_args:
       core_models:
         class_path: torch_uncertainty.models.classification.wideresnet28x10
         init_args:
           in_channels: 3
           num_classes: 10
-          style: cifar
+          style: CIFAR
           dropout_rate: 0.0
       num_estimators: 4
       task: classification
@@ -217,7 +217,7 @@ routine:
     init_args:
       in_channels: 3
       num_classes: 10
-      style: cifar
+      style: CIFAR
       dropout_rate: 0.0
 
   num_classes: 10

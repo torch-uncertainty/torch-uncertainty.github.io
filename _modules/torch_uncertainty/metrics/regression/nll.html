@@ -502,7 +502,7 @@
 <span class="sd">    Inputs:</span>
 <span class="sd">        - :attr:`dist`: a :class:`torch.distributions.Distribution` over the targets.</span>
 <span class="sd">        - :attr:`target`: ground-truth targets of compatible shape.</span>
-<span class="sd">        - :attr:`padding_mask`: optional boolean mask of positions to ignore (``True`` for padding).</span>
+<span class="sd">        - :attr:`ignore_mask`: optional boolean mask of positions to ignore (``True`` for padding).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="DistributionNLL.update">
@@ -511,24 +511,24 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dist</span><span class="p">:</span> <span class="n">distributions</span><span class="o">.</span><span class="n">Distribution</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">padding_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ignore_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update state with the predicted distributions and the targets.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            dist: Predicted distributions.</span>
 <span class="sd">            target: Ground truth labels.</span>
-<span class="sd">            padding_mask: Optional padding mask. Sets the loss to 0 for padded values. Defaults to</span>
+<span class="sd">            ignore_mask: Optional padding mask. Sets the loss to 0 for padded values. Defaults to</span>
 <span class="sd">                ``None``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">nlog_prob</span> <span class="o">=</span> <span class="o">-</span><span class="n">dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">padding_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">nlog_prob</span> <span class="o">=</span> <span class="n">nlog_prob</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">padding_mask</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">ignore_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nlog_prob</span> <span class="o">=</span> <span class="n">nlog_prob</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">ignore_mask</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nlog_prob</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">+=</span> <span class="n">nlog_prob</span><span class="o">.</span><span class="n">nansum</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">+=</span> <span class="n">padding_mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">if</span> <span class="n">padding_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">target</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">+=</span> <span class="p">(</span><span class="o">~</span><span class="n">ignore_mask</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">if</span> <span class="n">ignore_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">target</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="DistributionNLL.compute">

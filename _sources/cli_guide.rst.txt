@@ -94,7 +94,7 @@ Taking the previous example, we can create a configuration file named ``config.y
         in_channels: 3
         num_classes: 10
         arch: 18
-        style: cifar
+        style: CIFAR
       num_classes: 10
       loss: CrossEntropyLoss
     data:

@@ -540,14 +540,14 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dist</span><span class="p">:</span> <span class="n">Distribution</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">padding_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ignore_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the metric with new predictions and targets.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            dist: The predicted distribution.</span>
 <span class="sd">            target: The ground truth values.</span>
-<span class="sd">            padding_mask: A mask to ignore certain values. Defaults to ``None``.</span>
+<span class="sd">            ignore_mask: A mask to ignore certain values. Defaults to ``None``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">reduce_event_dims</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">Independent</span><span class="p">):</span>
@@ -585,9 +585,9 @@
 
             <span class="n">correct_mask</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">bound_log_prob</span> <span class="o">&lt;=</span> <span class="n">target_log_prob</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">padding_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">confidences</span> <span class="o">=</span> <span class="n">confidences</span><span class="p">[</span><span class="o">~</span><span class="n">padding_mask</span><span class="p">]</span>
-            <span class="n">correct_mask</span> <span class="o">=</span> <span class="n">correct_mask</span><span class="p">[</span><span class="o">~</span><span class="n">padding_mask</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ignore_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">confidences</span> <span class="o">=</span> <span class="n">confidences</span><span class="p">[</span><span class="o">~</span><span class="n">ignore_mask</span><span class="p">]</span>
+            <span class="n">correct_mask</span> <span class="o">=</span> <span class="n">correct_mask</span><span class="p">[</span><span class="o">~</span><span class="n">ignore_mask</span><span class="p">]</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">confidences</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">correct_mask</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span></div>
 

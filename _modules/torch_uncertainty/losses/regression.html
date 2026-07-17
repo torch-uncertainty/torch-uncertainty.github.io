@@ -555,7 +555,7 @@
 <span class="sd">            \mathcal{L}_i = -\log p_\theta(y_i \mid x_i),</span>
 
 <span class="sd">        reduced over the batch according to :attr:`reduction`. Positions flagged by</span>
-<span class="sd">        :attr:`padding_mask` are excluded from the reduction (``nan``-safe).</span>
+<span class="sd">        :attr:`ignore_mask` are excluded from the reduction (``nan``-safe).</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            reduction: Specifies the reduction to apply to the output.</span>
@@ -570,19 +570,19 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dist</span><span class="p">:</span> <span class="n">Distribution</span><span class="p">,</span>
         <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">padding_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ignore_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the NLL of the targets given predicted distributions.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            dist: The predicted distributions.</span>
 <span class="sd">            targets: The target values.</span>
-<span class="sd">            padding_mask: The padding mask. Sets the loss to ``0`` for padded values.</span>
+<span class="sd">            ignore_mask: The mask of the data to be ignored. Sets the loss to ``0`` for padded values.</span>
 <span class="sd">                Defaults to ``None``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">padding_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">padding_mask</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">ignore_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">ignore_mask</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">nanmean</span><span class="p">()</span>
@@ -645,13 +645,13 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dist</span><span class="p">:</span> <span class="n">Distribution</span><span class="p">,</span>
         <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">padding_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ignore_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">NormalInverseGamma</span> <span class="o">|</span> <span class="n">Independent</span><span class="p">):</span>  <span class="c1"># coverage: ignore</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;DER only works for NormalInverseGamma or Independent[NormalInverseGamma] distributions. Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
             <span class="p">)</span>
-        <span class="n">loss_nll</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">padding_mask</span><span class="o">=</span><span class="n">padding_mask</span><span class="p">)</span>
+        <span class="n">loss_nll</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">ignore_mask</span><span class="o">=</span><span class="n">ignore_mask</span><span class="p">)</span>
         <span class="n">loss_reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reg</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_nll</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">reg_weight</span> <span class="o">*</span> <span class="n">loss_reg</span>
 
