@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=c5b435e8"></script>
+    <script src="../../../../_static/documentation_options.js?v=1019fba8"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -475,7 +475,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">Metric</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">FPR95</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.metrics.classification.fpr</span><span class="w"> </span><span class="kn">import</span> <span class="n">_fprx_compute</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">._binary</span><span class="w"> </span><span class="kn">import</span> <span class="n">binary_images</span><span class="p">,</span> <span class="n">binary_target_has_classes</span>
 
 
 <div class="viewcode-block" id="SegmentationFPR95">
@@ -488,7 +490,7 @@
     <span class="n">fpr95</span><span class="p">:</span> <span class="n">Tensor</span>
     <span class="n">total</span><span class="p">:</span> <span class="n">Tensor</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos_label</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos_label</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ignore_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Image-averaged FPR@95 TPR for dense binary segmentation tasks.</span>
 
 <span class="sd">        For each image, a per-pixel False Positive Rate at 95% True Positive Rate is</span>
@@ -502,21 +504,39 @@
 <span class="sd">        Image-wise averaging is the convention used in the dense OOD-detection</span>
 <span class="sd">        literature.</span>
 
+<span class="sd">        Images without both positive and negative pixels are excluded because FPR@95</span>
+<span class="sd">        is undefined. The metric returns ``nan`` if no valid image was observed. A</span>
+<span class="sd">        one-dimensional input is treated as one image; otherwise, the first dimension</span>
+<span class="sd">        is the image batch dimension.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            pos_label: The positive label in the segmentation OOD detection task</span>
 <span class="sd">                (typically ``1`` for OOD pixels).</span>
+<span class="sd">            ignore_index: Optional label value to ignore.</span>
 <span class="sd">            kwargs: Additional keyword arguments for the underlying</span>
 <span class="sd">                :class:`~torch_uncertainty.metrics.classification.FPR95` metric.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fpr95_metric</span> <span class="o">=</span> <span class="n">FPR95</span><span class="p">(</span><span class="n">pos_label</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_label</span> <span class="o">=</span> <span class="n">pos_label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span> <span class="o">=</span> <span class="n">ignore_index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;fpr95&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;total&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preds</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pyrefly: ignore[bad-override]</span>
-        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fpr95</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fpr95_metric</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">*</span> <span class="n">batch_size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">+=</span> <span class="n">batch_size</span>
+        <span class="k">for</span> <span class="n">image_preds</span><span class="p">,</span> <span class="n">image_target</span> <span class="ow">in</span> <span class="n">binary_images</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">keep</span> <span class="o">=</span> <span class="n">image_target</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span>
+                <span class="n">image_preds</span> <span class="o">=</span> <span class="n">image_preds</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+                <span class="n">image_target</span> <span class="o">=</span> <span class="n">image_target</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">binary_target_has_classes</span><span class="p">(</span><span class="n">image_target</span><span class="p">,</span> <span class="n">pos_label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_label</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fpr95</span> <span class="o">+=</span> <span class="n">_fprx_compute</span><span class="p">(</span>
+                <span class="n">image_preds</span><span class="p">,</span>
+                <span class="n">image_target</span><span class="p">,</span>
+                <span class="n">recall_level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
+                <span class="n">pos_label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_label</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>

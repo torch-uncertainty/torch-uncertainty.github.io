@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=c5b435e8"></script>
+    <script src="../../_static/documentation_options.js?v=1019fba8"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -634,25 +634,26 @@ we will train for a single epoch and load a model from <a class="reference exter
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/chocolatine/actions-runner/_work/torch-uncertainty/torch-uncertainty/.venv/lib/python3.13/site-packages/lightning/pytorch/utilities/model_summary/model_summary.py:242: Precision 16-mixed is not supported by the model summary.  Estimated model size in MB will not be accurate. Using 32 bits instead.
-┏━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
-┃   ┃ Name             ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
-┡━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
-│ 0 │ ood_criterion    │ MaxSoftmaxCriterion │      0 │ train │     0 │
-│ 1 │ model            │ _ResNet             │ 11.2 M │ train │     0 │
-│ 2 │ loss             │ CrossEntropyLoss    │      0 │ train │     0 │
-│ 3 │ format_batch_fn  │ Identity            │      0 │ train │     0 │
-│ 4 │ val_cls_metrics  │ MetricCollection    │      0 │ train │     0 │
-│ 5 │ test_cls_metrics │ MetricCollection    │      0 │ train │     0 │
-│ 6 │ test_id_entropy  │ Entropy             │      0 │ train │     0 │
-│ 7 │ test_ood_metrics │ MetricCollection    │      0 │ train │     0 │
-│ 8 │ test_ood_entropy │ Entropy             │      0 │ train │     0 │
-│ 9 │ mixup            │ Identity            │      0 │ train │     0 │
-└───┴──────────────────┴─────────────────────┴────────┴───────┴───────┘
+┏━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃    ┃ Name              ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
+┡━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ 0  │ ood_criterion     │ MaxSoftmaxCriterion │      0 │ train │     0 │
+│ 1  │ model             │ _ResNet             │ 11.2 M │ train │     0 │
+│ 2  │ loss              │ CrossEntropyLoss    │      0 │ train │     0 │
+│ 3  │ format_batch_fn   │ Identity            │      0 │ train │     0 │
+│ 4  │ val_cls_metrics   │ MetricCollection    │      0 │ train │     0 │
+│ 5  │ test_cls_metrics  │ MetricCollection    │      0 │ train │     0 │
+│ 6  │ test_id_entropy   │ Entropy             │      0 │ train │     0 │
+│ 7  │ test_ood_metrics  │ MetricCollection    │      0 │ train │     0 │
+│ 8  │ test_scod_metrics │ MetricCollection    │      0 │ train │     0 │
+│ 9  │ test_ood_entropy  │ Entropy             │      0 │ train │     0 │
+│ 10 │ mixup             │ Identity            │      0 │ train │     0 │
+└────┴───────────────────┴─────────────────────┴────────┴───────┴───────┘
 Trainable params: 11.2 M
 Non-trainable params: 0
 Total params: 11.2 M
 Total estimated model params size (MB): 44.696
-Modules in train mode: 112
+Modules in train mode: 113
 Modules in eval mode: 0
 Total FLOPs: 0
 /home/chocolatine/actions-runner/_work/torch-uncertainty/torch-uncertainty/.venv/lib/python3.13/site-packages/lightning/pytorch/utilities/_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
@@ -708,11 +709,11 @@ as well as the OOD set. Typing the next line will automatically compute the in-d
 │     AUPR     │          90.244%          │
 │    AUROC     │          82.968%          │
 │   Entropy    │          0.35547          │
-│    FPR95     │          56.070%          │
-│  SCOD_AUGRC  │          0.29514          │
-│  SCOD_AURC   │          0.47861          │
-│ SCOD_Cov_5R… │            nan            │
-│ SCOD_Risk_8… │          0.67228          │
+│    FPR95     │          56.080%          │
+│  SCOD_AUGRC  │          0.15048          │
+│  SCOD_AURC   │          0.24361          │
+│ SCOD_Cov_5R… │          0.03197          │
+│ SCOD_Risk_8… │          0.34330          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
@@ -764,10 +765,10 @@ just change the routine’s <cite>ood_criterion</cite> and perform a second test
 │    AUROC     │          73.895%          │
 │   Entropy    │          0.35547          │
 │    FPR95     │          79.630%          │
-│  SCOD_AUGRC  │          0.31327          │
-│  SCOD_AURC   │          0.55455          │
-│ SCOD_Cov_5R… │            nan            │
-│ SCOD_Risk_8… │          0.68292          │
+│  SCOD_AUGRC  │          0.15929          │
+│  SCOD_AURC   │          0.28137          │
+│ SCOD_Cov_5R… │          0.00472          │
+│ SCOD_Risk_8… │          0.34759          │
 └──────────────┴───────────────────────────┘
 ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Test metric  ┃ Selective Classification  ┃
@@ -794,7 +795,7 @@ logit score compared to the maximum softmax probability but it could depend on t
 <h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
 <p>[1] Hendrycks, D., &amp; Gimpel, K. (2016). A baseline for detecting misclassified and out-of-distribution examples in neural networks. In ICLR 2017.</p>
 <p>[2] Hendrycks, D., Basart, S., Mazeika, M., Zou, A., Kwon, J., Mostajabi, M., … &amp; Song, D. (2019). Scaling out-of-distribution detection for real-world settings. In ICML 2022.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 28.534 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 29.033 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-classification-tutorial-ood-detection-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/36ef1fded00eb519b0338678b78aa0f9/tutorial_ood_detection.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tutorial_ood_detection.ipynb</span></code></a></p>

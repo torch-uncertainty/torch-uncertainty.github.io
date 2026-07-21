@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=c5b435e8"></script>
+    <script src="../../../_static/documentation_options.js?v=1019fba8"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -493,8 +493,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AUGRC</span><span class="p">,</span>
     <span class="n">AURC</span><span class="p">,</span>
-    <span class="n">SCODAUGRC</span><span class="p">,</span>
-    <span class="n">SCODAURC</span><span class="p">,</span>
     <span class="n">BrierScore</span><span class="p">,</span>
     <span class="n">CalibrationError</span><span class="p">,</span>
     <span class="n">CategoricalNLL</span><span class="p">,</span>
@@ -502,8 +500,6 @@
     <span class="n">MeanIntersectionOverUnion</span><span class="p">,</span>
     <span class="n">PAvPU</span><span class="p">,</span>
     <span class="n">RiskAt80Cov</span><span class="p">,</span>
-    <span class="n">SCODCovAt5Risk</span><span class="p">,</span>
-    <span class="n">SCODRiskAt80Cov</span><span class="p">,</span>
     <span class="n">SegmentationBinaryAUROC</span><span class="p">,</span>
     <span class="n">SegmentationBinaryAveragePrecision</span><span class="p">,</span>
     <span class="n">SegmentationFPR95</span><span class="p">,</span>
@@ -700,13 +696,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span><span class="p">:</span>
             <span class="n">ood_metrics</span> <span class="o">=</span> <span class="n">MetricCollection</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;AUROC&quot;</span><span class="p">:</span> <span class="n">SegmentationBinaryAUROC</span><span class="p">(),</span>
-                    <span class="s2">&quot;AUPR&quot;</span><span class="p">:</span> <span class="n">SegmentationBinaryAveragePrecision</span><span class="p">(),</span>
-                    <span class="s2">&quot;FPR95&quot;</span><span class="p">:</span> <span class="n">SegmentationFPR95</span><span class="p">(</span><span class="n">pos_label</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-                    <span class="s2">&quot;SCOD_AURC&quot;</span><span class="p">:</span> <span class="n">SCODAURC</span><span class="p">(),</span>
-                    <span class="s2">&quot;SCOD_AUGRC&quot;</span><span class="p">:</span> <span class="n">SCODAUGRC</span><span class="p">(),</span>
-                    <span class="s2">&quot;SCOD_Cov_5Risk&quot;</span><span class="p">:</span> <span class="n">SCODCovAt5Risk</span><span class="p">(),</span>
-                    <span class="s2">&quot;SCOD_Risk_80Cov&quot;</span><span class="p">:</span> <span class="n">SCODRiskAt80Cov</span><span class="p">(),</span>
+                    <span class="s2">&quot;AUROC&quot;</span><span class="p">:</span> <span class="n">SegmentationBinaryAUROC</span><span class="p">(</span><span class="n">ignore_index</span><span class="o">=</span><span class="mi">255</span><span class="p">),</span>
+                    <span class="s2">&quot;AUPR&quot;</span><span class="p">:</span> <span class="n">SegmentationBinaryAveragePrecision</span><span class="p">(</span><span class="n">ignore_index</span><span class="o">=</span><span class="mi">255</span><span class="p">),</span>
+                    <span class="s2">&quot;FPR95&quot;</span><span class="p">:</span> <span class="n">SegmentationFPR95</span><span class="p">(</span><span class="n">pos_label</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="mi">255</span><span class="p">),</span>
                 <span class="p">}</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_metrics</span> <span class="o">=</span> <span class="n">ood_metrics</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;ood/&quot;</span><span class="p">)</span>
@@ -872,13 +864,11 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_ood</span> <span class="ow">and</span> <span class="n">dataloader_idx</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="o">.</span><span class="n">input_type</span> <span class="o">==</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">PROB</span><span class="p">:</span>
-                <span class="n">ood_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="p">(</span>
-                    <span class="n">rearrange</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="s2">&quot;b c h w -&gt; b h w c&quot;</span><span class="p">)[</span><span class="o">~</span><span class="n">ignore_mask</span><span class="p">]</span>
-                <span class="p">)</span>
+                <span class="n">flat_probs</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="s2">&quot;b c h w -&gt; (b h w) c&quot;</span><span class="p">)</span>
+                <span class="n">ood_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="p">(</span><span class="n">flat_probs</span><span class="p">)</span><span class="o">.</span><span class="n">reshape_as</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="o">.</span><span class="n">input_type</span> <span class="o">==</span> <span class="n">OODCriterionInputType</span><span class="o">.</span><span class="n">ESTIMATOR_PROB</span><span class="p">:</span>
-                <span class="n">ood_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="p">(</span>
-                    <span class="n">rearrange</span><span class="p">(</span><span class="n">probs_per_est</span><span class="p">,</span> <span class="s2">&quot;b m c h w -&gt; b h w m c&quot;</span><span class="p">)[</span><span class="o">~</span><span class="n">ignore_mask</span><span class="p">]</span>
-                <span class="p">)</span>
+                <span class="n">flat_probs_per_est</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">probs_per_est</span><span class="p">,</span> <span class="s2">&quot;b m c h w -&gt; (b h w) m c&quot;</span><span class="p">)</span>
+                <span class="n">ood_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="p">(</span><span class="n">flat_probs_per_est</span><span class="p">)</span><span class="o">.</span><span class="n">reshape_as</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Unsupported input type for OOD criterion: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ood_criterion</span><span class="o">.</span><span class="n">input_type</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -887,8 +877,9 @@
             <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
             <span class="n">labels</span><span class="p">[</span><span class="n">id_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># ID examples</span>
             <span class="n">labels</span><span class="p">[</span><span class="n">ood_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># OOD examples</span>
+            <span class="n">labels</span><span class="p">[</span><span class="n">ignore_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">255</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ood_scores</span><span class="p">,</span> <span class="n">labels</span><span class="p">[</span><span class="o">~</span><span class="n">ignore_mask</span><span class="p">])</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_ood_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ood_scores</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SegmentationRoutine.on_validation_epoch_end">

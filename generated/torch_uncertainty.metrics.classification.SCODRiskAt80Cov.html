@@ -45,13 +45,15 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=c5b435e8"></script>
+    <script src="../_static/documentation_options.js?v=1019fba8"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.metrics.classification.SCODRiskAt80Cov';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -767,10 +769,42 @@
 <h1>SCODRiskAt80Cov<a class="headerlink" href="#scodriskat80cov" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.classification.SCODRiskAt80Cov">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.classification.</span></span><span class="sig-name descname"><span class="pre">SCODRiskAt80Cov</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/scod_risk_coverage.html#SCODRiskAt80Cov"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.SCODRiskAt80Cov" title="Link to this definition">#</a></dt>
-<dd><p>SCOD risk at 80% coverage.</p>
-<p>This is a specific case of <a class="reference internal" href="torch_uncertainty.metrics.classification.SCODRiskAtxCov.html#torch_uncertainty.metrics.classification.SCODRiskAtxCov" title="torch_uncertainty.metrics.classification.SCODRiskAtxCov"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCODRiskAtxCov</span></code></a> with
-<code class="docutils literal notranslate"><span class="pre">cov_threshold</span> <span class="pre">=</span> <span class="pre">0.8</span></code>.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.classification.</span></span><span class="sig-name descname"><span class="pre">SCODRiskAt80Cov</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ood_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/scod_risk_coverage.html#SCODRiskAt80Cov"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.SCODRiskAt80Cov" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the SCOD risk at 80% coverage.</p>
+<p>This is the fixed-coverage variant of
+<a class="reference internal" href="torch_uncertainty.metrics.classification.SCODRiskAtxCov.html#torch_uncertainty.metrics.classification.SCODRiskAtxCov" title="torch_uncertainty.metrics.classification.SCODRiskAtxCov"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCODRiskAtxCov</span></code></a> with
+<span class="math notranslate nohighlight">\(\gamma=0.8\)</span>. For <span class="math notranslate nohighlight">\(N\)</span> samples, it reports</p>
+<div class="math notranslate nohighlight">
+\[\operatorname{SCOD\text{-}Risk&#64;80Cov}
+=
+r\left(
+    \frac{\lceil 0.8N\rceil}{N}
+\right).\]</div>
+<p>Samples are ordered from lowest to highest OOD score before the risk is
+evaluated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ood_cost</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Relative cost <span class="math notranslate nohighlight">\(c_{\mathrm{OOD}}\)</span> of accepting an OOD
+sample. The cost of accepting a misclassified ID sample is
+<code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">ood_cost</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">0.5</span></code>.</p></li>
+<li><p><strong>kwargs</strong> – Additional keyword arguments passed to
+<code class="xref py py-class docutils literal notranslate"><span class="pre">torchmetrics.Metric</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>[1] <a class="reference external" href="https://openaccess.thecvf.com/content/ACCV2022/papers/Xia_Augmenting_Softmax_Information_for_Selective_Classification_with_Out-of-Distribution_Data_ACCV_2022_paper.pdf">Xia &amp; Bouganis. Augmenting Softmax Information for Selective
+Classification with Out-of-Distribution Data. ACCV, 2022.</a>.</p>
+<p>[2] <a class="reference external" href="https://arxiv.org/abs/2301.12386">Narasimhan et al. Plugin Estimators for Selective Classification
+with Out-of-Distribution Detection.</a>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="torch_uncertainty.metrics.classification.SCODRiskAtxCov.html#torch_uncertainty.metrics.classification.SCODRiskAtxCov" title="torch_uncertainty.metrics.classification.SCODRiskAtxCov"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCODRiskAtxCov</span></code></a>:</dt><dd><p>General metric with configurable coverage.</p>
+</dd>
+</dl>
+</div>
 </dd></dl>
 
 </section>

@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=c5b435e8"></script>
+    <script src="../../../../_static/documentation_options.js?v=1019fba8"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -472,35 +472,33 @@
                   
   <h1>Source code for torch_uncertainty.metrics.regression.quantile_calibration</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.distributions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Distribution</span><span class="p">,</span> <span class="n">Independent</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.classification</span><span class="w"> </span><span class="kn">import</span> <span class="n">BinaryCalibrationError</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.functional.classification.calibration_error</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_binning_bucketize</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">dim_zero_cat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">Metric</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">_PLOT_OUT_TYPE</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.metrics.classification.calibration.calibration_error</span><span class="w"> </span><span class="kn">import</span> <span class="n">reliability_chart</span>
 
 
 <div class="viewcode-block" id="QuantileCalibrationError">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.QuantileCalibrationError.html#torch_uncertainty.metrics.regression.QuantileCalibrationError">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">QuantileCalibrationError</span><span class="p">(</span><span class="n">BinaryCalibrationError</span><span class="p">):</span>
-    <span class="n">is_differentiable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">higher_is_better</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">full_state_update</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">not_implemented_error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">QuantileCalibrationError</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
+    <span class="n">is_differentiable</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">higher_is_better</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">full_state_update</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">covered</span><span class="p">:</span> <span class="n">Tensor</span>
+    <span class="n">total</span><span class="p">:</span> <span class="n">Tensor</span>
+    <span class="n">unsupported</span><span class="p">:</span> <span class="n">Tensor</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">num_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
         <span class="n">norm</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;l1&quot;</span><span class="p">,</span> <span class="s2">&quot;l2&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;l1&quot;</span><span class="p">,</span>
-        <span class="n">ignore_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">validate_args</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">ignore_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">validate_args</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Quantile Calibration Error for regression tasks.</span>
@@ -515,24 +513,54 @@
 <span class="sd">            \mathbf{1}\!\left[ y_i \in</span>
 <span class="sd">            \left[ F^{-1}_{\theta, x_i}\!\left(\tfrac{1 - \alpha}{2}\right),</span>
 <span class="sd">                   F^{-1}_{\theta, x_i}\!\left(\tfrac{1 + \alpha}{2}\right) \right]</span>
-<span class="sd">            \right],</span>
+<span class="sd">            \right].</span>
 
-<span class="sd">        where :math:`F^{-1}_{\theta, x_i}` is the predictive inverse CDF (computed via</span>
-<span class="sd">        the distribution&#39;s ``icdf`` method). The Quantile Calibration Error then</span>
-<span class="sd">        aggregates the gap :math:`|\hat{c}(\alpha) - \alpha|` over a regular grid of</span>
-<span class="sd">        :attr:`num_bins` confidence levels using the chosen :attr:`norm` — the regression</span>
-<span class="sd">        counterpart of the :class:`~torch_uncertainty.metrics.classification.CalibrationError`.</span>
+<span class="sd">        The metric evaluates this coverage on :attr:`num_bins` confidence levels</span>
+<span class="sd">        :math:`\alpha_k` regularly spaced between ``0.05`` and ``0.95``. It returns</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \operatorname{QCE}_{L_1}</span>
+<span class="sd">            = \frac{1}{K}\sum_{k=1}^{K}</span>
+<span class="sd">            \left|\hat{c}(\alpha_k)-\alpha_k\right|,</span>
+
+<span class="sd">        with analogous root-mean-square and maximum variants for ``norm=&quot;l2&quot;``</span>
+<span class="sd">        and ``norm=&quot;max&quot;``.</span>
+
+<span class="sd">        For :class:`~torch.distributions.Independent` distributions, calibration is</span>
+<span class="sd">        evaluated marginally: every scalar event component contributes one coverage</span>
+<span class="sd">        observation.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            num_bins: Number of bins to use for calibration. Defaults to ``15``.</span>
-<span class="sd">            norm: Norm to use for calibration error computation. Defaults to ``&quot;l1&quot;``.</span>
-<span class="sd">            ignore_index: Index to ignore during calibration. Defaults to ``None``.</span>
-<span class="sd">            validate_args: Whether to validate the input arguments. Defaults to ``True``.</span>
+<span class="sd">            num_bins: Number of confidence levels. Defaults to ``15``.</span>
+<span class="sd">            norm: Norm used to aggregate the calibration gaps. One of ``&quot;l1&quot;``,</span>
+<span class="sd">                ``&quot;l2&quot;``, or ``&quot;max&quot;``. Defaults to ``&quot;l1&quot;``.</span>
+<span class="sd">            ignore_index: Optional target value to ignore. Defaults to ``None``.</span>
+<span class="sd">            validate_args: Whether to validate input shapes. Defaults to ``True``.</span>
 <span class="sd">            kwargs: Additional keyword arguments, see `Advanced metric settings</span>
-<span class="sd">              &lt;https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs&gt;`_.</span>
+<span class="sd">                &lt;https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs&gt;`_.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">num_bins</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">ignore_index</span><span class="p">,</span> <span class="n">validate_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">conf_intervals</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">num_bins</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected `num_bins` to be at least 1, but got </span><span class="si">{</span><span class="n">num_bins</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">norm</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;l1&quot;</span><span class="p">,</span> <span class="s2">&quot;l2&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected `norm` to be one of (&#39;l1&#39;, &#39;l2&#39;, &#39;max&#39;), but got </span><span class="si">{</span><span class="n">norm</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_bins</span> <span class="o">=</span> <span class="n">num_bins</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm</span> <span class="o">=</span> <span class="n">norm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span> <span class="o">=</span> <span class="n">ignore_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_args</span> <span class="o">=</span> <span class="n">validate_args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;conf_intervals&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="n">num_bins</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span>
+            <span class="s2">&quot;covered&quot;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_bins</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">),</span>
+            <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;total&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">),</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span>
+            <span class="s2">&quot;unsupported&quot;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">),</span>
+            <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="QuantileCalibrationError.update">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.QuantileCalibrationError.html#torch_uncertainty.metrics.regression.QuantileCalibrationError.update">[docs]</a>
@@ -542,116 +570,105 @@
         <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">ignore_mask</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the metric with new predictions and targets.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the metric with predictive distributions and targets.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            dist: The predicted distribution.</span>
-<span class="sd">            target: The ground truth values.</span>
-<span class="sd">            ignore_mask: A mask to ignore certain values. Defaults to ``None``.</span>
+<span class="sd">            dist: Predicted distribution. It must implement ``icdf``.</span>
+<span class="sd">            target: Ground-truth values, with one value per predictive distribution.</span>
+<span class="sd">            ignore_mask: Boolean mask of targets to ignore. A mask over only the batch</span>
+<span class="sd">                dimensions is expanded over trailing event dimensions. Defaults to ``None``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">reduce_event_dims</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">Independent</span><span class="p">):</span>
-            <span class="n">iid_dist</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">base_dist</span>
-            <span class="n">reduce_event_dims</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">iid_dist</span> <span class="o">=</span> <span class="n">dist</span>
+        <span class="n">expected_shape</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">batch_shape</span> <span class="o">+</span> <span class="n">dist</span><span class="o">.</span><span class="n">event_shape</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_args</span> <span class="ow">and</span> <span class="n">target</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">expected_shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Expected `target` to have shape equal to the distribution batch and &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;event shapes (</span><span class="si">{</span><span class="n">expected_shape</span><span class="si">}</span><span class="s2">), but got </span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">marginal_dist</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">base_dist</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">Independent</span><span class="p">)</span> <span class="k">else</span> <span class="n">dist</span>
+        <span class="n">levels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf_intervals</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">iid_dist</span><span class="o">.</span><span class="n">icdf</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf_intervals</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
-
+            <span class="n">intervals</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span>
+                    <span class="n">marginal_dist</span><span class="o">.</span><span class="n">icdf</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">level</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+                    <span class="n">marginal_dist</span><span class="o">.</span><span class="n">icdf</span><span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">level</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">levels</span>
+            <span class="p">]</span>
         <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;The distribution does not support the `icdf()` method. &quot;</span>
-                <span class="s2">&quot;This metric will therefore return `nan` values. &quot;</span>
-                <span class="s2">&quot;Please use a distribution that implements `icdf()`.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;This metric will therefore return `nan`. Please use a &quot;</span>
+                <span class="s2">&quot;distribution that implements `icdf()`.&quot;</span><span class="p">,</span>
                 <span class="ne">UserWarning</span><span class="p">,</span>
                 <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">not_implemented_error</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unsupported</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">return</span>
 
-        <span class="n">confidences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf_intervals</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">*</span><span class="n">dist</span><span class="o">.</span><span class="n">batch_shape</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">correct_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">confidences</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf_intervals</span><span class="p">):</span>
-            <span class="n">b_min</span> <span class="o">=</span> <span class="n">iid_dist</span><span class="o">.</span><span class="n">icdf</span><span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">conf</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
-            <span class="n">bound_log_prob</span> <span class="o">=</span> <span class="n">iid_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">b_min</span><span class="p">)</span>
-            <span class="n">target_log_prob</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">reduce_event_dims</span><span class="p">:</span>
-                <span class="n">indep_dist</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Independent&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
-                <span class="n">bound_log_prob</span> <span class="o">=</span> <span class="n">bound_log_prob</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
-                    <span class="n">dim</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">indep_dist</span><span class="o">.</span><span class="n">reinterpreted_batch_ndims</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-                <span class="p">)</span>
-
-            <span class="n">correct_mask</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">bound_log_prob</span> <span class="o">&lt;=</span> <span class="n">target_log_prob</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
-
+        <span class="n">valid</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">&amp;=</span> <span class="n">target</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span>
         <span class="k">if</span> <span class="n">ignore_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">confidences</span> <span class="o">=</span> <span class="n">confidences</span><span class="p">[</span><span class="o">~</span><span class="n">ignore_mask</span><span class="p">]</span>
-            <span class="n">correct_mask</span> <span class="o">=</span> <span class="n">correct_mask</span><span class="p">[</span><span class="o">~</span><span class="n">ignore_mask</span><span class="p">]</span>
+            <span class="n">ignore_mask</span> <span class="o">=</span> <span class="n">ignore_mask</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
+            <span class="k">while</span> <span class="n">ignore_mask</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="n">target</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
+                <span class="n">ignore_mask</span> <span class="o">=</span> <span class="n">ignore_mask</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ignore_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">ignore_mask</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Expected `ignore_mask` to be broadcastable to </span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;but got </span><span class="si">{</span><span class="n">ignore_mask</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">err</span>
+            <span class="n">valid</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">ignore_mask</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">confidences</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">correct_mask</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span></div>
+        <span class="n">inside</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+            <span class="p">[(</span><span class="n">target</span> <span class="o">&gt;=</span> <span class="n">lower</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">target</span> <span class="o">&lt;=</span> <span class="n">upper</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">valid</span> <span class="k">for</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="ow">in</span> <span class="n">intervals</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">covered</span> <span class="o">+=</span> <span class="n">inside</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_bins</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">+=</span> <span class="n">valid</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="QuantileCalibrationError.compute">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.QuantileCalibrationError.html#torch_uncertainty.metrics.regression.QuantileCalibrationError.compute">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the quantile calibration error.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the Quantile Calibration Error.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unsupported</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">covered</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            Tensor: The quantile calibration error.</span>
-
-<span class="sd">        Warning:</span>
-<span class="sd">            If the distribution does not support ``icdf()``, this returns ``nan`` values.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">not_implemented_error</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">))</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span></div>
+        <span class="n">empirical_coverage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">covered</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span>
+        <span class="n">calibration_gap</span> <span class="o">=</span> <span class="p">(</span><span class="n">empirical_coverage</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf_intervals</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span> <span class="o">==</span> <span class="s2">&quot;l1&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">calibration_gap</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span> <span class="o">==</span> <span class="s2">&quot;l2&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">calibration_gap</span><span class="o">.</span><span class="n">square</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">calibration_gap</span><span class="o">.</span><span class="n">max</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="QuantileCalibrationError.plot">
 <a class="viewcode-back" href="../../../../generated/torch_uncertainty.metrics.regression.QuantileCalibrationError.html#torch_uncertainty.metrics.regression.QuantileCalibrationError.plot">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_PLOT_OUT_TYPE</span><span class="p">:</span>  <span class="c1"># pyrefly: ignore[bad-override]</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the quantile calibration reliability diagram.</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            NotImplementedError: If the distribution does not support ``icdf()``.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">not_implemented_error</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot empirical coverage against nominal coverage.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unsupported</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                 <span class="s2">&quot;The distribution does not support the `icdf()` method. &quot;</span>
-                <span class="s2">&quot;This metric will therefore return `nan` values. &quot;</span>
                 <span class="s2">&quot;Please use a distribution that implements `icdf()`.&quot;</span>
             <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;QuantileCalibrationError requires at least one valid target.&quot;</span><span class="p">)</span>
 
-        <span class="n">confidences</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confidences</span><span class="p">)</span>
-        <span class="n">accuracies</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracies</span><span class="p">)</span>
-
-        <span class="n">bin_boundaries</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
-            <span class="mi">0</span><span class="p">,</span>
-            <span class="mi">1</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">n_bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span>
-            <span class="n">device</span><span class="o">=</span><span class="n">confidences</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-            <span class="n">acc_bin</span><span class="p">,</span> <span class="n">conf_bin</span><span class="p">,</span> <span class="n">prop_bin</span> <span class="o">=</span> <span class="n">_binning_bucketize</span><span class="p">(</span>
-                <span class="n">confidences</span><span class="p">,</span> <span class="n">accuracies</span><span class="p">,</span> <span class="n">bin_boundaries</span>
-            <span class="p">)</span>
-
-        <span class="n">np_acc_bin</span> <span class="o">=</span> <span class="n">acc_bin</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-        <span class="n">np_conf_bin</span> <span class="o">=</span> <span class="n">conf_bin</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-        <span class="n">np_prop_bin</span> <span class="o">=</span> <span class="n">prop_bin</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-        <span class="n">np_bin_boundaries</span> <span class="o">=</span> <span class="n">bin_boundaries</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-
-        <span class="k">return</span> <span class="n">reliability_chart</span><span class="p">(</span>
-            <span class="n">accuracies</span><span class="o">=</span><span class="n">accuracies</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-            <span class="n">confidences</span><span class="o">=</span><span class="n">confidences</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
-            <span class="n">bin_accuracies</span><span class="o">=</span><span class="n">np_acc_bin</span><span class="p">,</span>
-            <span class="n">bin_confidences</span><span class="o">=</span><span class="n">np_conf_bin</span><span class="p">,</span>
-            <span class="n">bin_sizes</span><span class="o">=</span><span class="n">np_prop_bin</span><span class="p">,</span>
-            <span class="n">bins</span><span class="o">=</span><span class="n">np_bin_boundaries</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="n">nominal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf_intervals</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span>
+        <span class="n">empirical</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covered</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">nominal</span><span class="p">,</span> <span class="n">empirical</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Model&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Ideal&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Nominal Coverage (%)&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Empirical Coverage (%)&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
 </div>
 
 </pre></div>

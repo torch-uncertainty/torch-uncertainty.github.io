@@ -193,25 +193,26 @@ we will train for a single epoch and load a model from `TorchUncertainty's Huggi
  .. code-block:: none
 
     /home/chocolatine/actions-runner/_work/torch-uncertainty/torch-uncertainty/.venv/lib/python3.13/site-packages/lightning/pytorch/utilities/model_summary/model_summary.py:242: Precision 16-mixed is not supported by the model summary.  Estimated model size in MB will not be accurate. Using 32 bits instead.
-    ┏━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
-    ┃   ┃ Name             ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
-    ┡━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
-    │ 0 │ ood_criterion    │ MaxSoftmaxCriterion │      0 │ train │     0 │
-    │ 1 │ model            │ _ResNet             │ 11.2 M │ train │     0 │
-    │ 2 │ loss             │ CrossEntropyLoss    │      0 │ train │     0 │
-    │ 3 │ format_batch_fn  │ Identity            │      0 │ train │     0 │
-    │ 4 │ val_cls_metrics  │ MetricCollection    │      0 │ train │     0 │
-    │ 5 │ test_cls_metrics │ MetricCollection    │      0 │ train │     0 │
-    │ 6 │ test_id_entropy  │ Entropy             │      0 │ train │     0 │
-    │ 7 │ test_ood_metrics │ MetricCollection    │      0 │ train │     0 │
-    │ 8 │ test_ood_entropy │ Entropy             │      0 │ train │     0 │
-    │ 9 │ mixup            │ Identity            │      0 │ train │     0 │
-    └───┴──────────────────┴─────────────────────┴────────┴───────┴───────┘
+    ┏━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+    ┃    ┃ Name              ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
+    ┡━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+    │ 0  │ ood_criterion     │ MaxSoftmaxCriterion │      0 │ train │     0 │
+    │ 1  │ model             │ _ResNet             │ 11.2 M │ train │     0 │
+    │ 2  │ loss              │ CrossEntropyLoss    │      0 │ train │     0 │
+    │ 3  │ format_batch_fn   │ Identity            │      0 │ train │     0 │
+    │ 4  │ val_cls_metrics   │ MetricCollection    │      0 │ train │     0 │
+    │ 5  │ test_cls_metrics  │ MetricCollection    │      0 │ train │     0 │
+    │ 6  │ test_id_entropy   │ Entropy             │      0 │ train │     0 │
+    │ 7  │ test_ood_metrics  │ MetricCollection    │      0 │ train │     0 │
+    │ 8  │ test_scod_metrics │ MetricCollection    │      0 │ train │     0 │
+    │ 9  │ test_ood_entropy  │ Entropy             │      0 │ train │     0 │
+    │ 10 │ mixup             │ Identity            │      0 │ train │     0 │
+    └────┴───────────────────┴─────────────────────┴────────┴───────┴───────┘
     Trainable params: 11.2 M                                                        
     Non-trainable params: 0                                                         
     Total params: 11.2 M                                                            
     Total estimated model params size (MB): 44.696                                  
-    Modules in train mode: 112                                                      
+    Modules in train mode: 113                                                      
     Modules in eval mode: 0                                                         
     Total FLOPs: 0                                                                  
     /home/chocolatine/actions-runner/_work/torch-uncertainty/torch-uncertainty/.venv/lib/python3.13/site-packages/lightning/pytorch/utilities/_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
@@ -301,11 +302,11 @@ as well as the OOD set. Typing the next line will automatically compute the in-d
     │     AUPR     │          90.244%          │
     │    AUROC     │          82.968%          │
     │   Entropy    │          0.35547          │
-    │    FPR95     │          56.070%          │
-    │  SCOD_AUGRC  │          0.29514          │
-    │  SCOD_AURC   │          0.47861          │
-    │ SCOD_Cov_5R… │            nan            │
-    │ SCOD_Risk_8… │          0.67228          │
+    │    FPR95     │          56.080%          │
+    │  SCOD_AUGRC  │          0.15048          │
+    │  SCOD_AURC   │          0.24361          │
+    │ SCOD_Cov_5R… │          0.03197          │
+    │ SCOD_Risk_8… │          0.34330          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
@@ -373,10 +374,10 @@ just change the routine's `ood_criterion` and perform a second test.
     │    AUROC     │          73.895%          │
     │   Entropy    │          0.35547          │
     │    FPR95     │          79.630%          │
-    │  SCOD_AUGRC  │          0.31327          │
-    │  SCOD_AURC   │          0.55455          │
-    │ SCOD_Cov_5R… │            nan            │
-    │ SCOD_Risk_8… │          0.68292          │
+    │  SCOD_AUGRC  │          0.15929          │
+    │  SCOD_AURC   │          0.28137          │
+    │ SCOD_Cov_5R… │          0.00472          │
+    │ SCOD_Risk_8… │          0.34759          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
@@ -413,7 +414,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 28.534 seconds)
+   **Total running time of the script:** (0 minutes 29.033 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Classification_tutorial_ood_detection.py:

@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=c5b435e8"></script>
+    <script src="../_static/documentation_options.js?v=1019fba8"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -780,19 +780,26 @@ of the predicted distribution <span class="math notranslate nohighlight">\(p_\th
 \mathbf{1}\!\left[ y_i \in
 \left[ F^{-1}_{\theta, x_i}\!\left(\tfrac{1 - \alpha}{2}\right),
        F^{-1}_{\theta, x_i}\!\left(\tfrac{1 + \alpha}{2}\right) \right]
-\right],\]</div>
-<p>where <span class="math notranslate nohighlight">\(F^{-1}_{\theta, x_i}\)</span> is the predictive inverse CDF (computed via
-the distribution’s <code class="docutils literal notranslate"><span class="pre">icdf</span></code> method). The Quantile Calibration Error then
-aggregates the gap <span class="math notranslate nohighlight">\(|\hat{c}(\alpha) - \alpha|\)</span> over a regular grid of
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">num_bins</span></code> confidence levels using the chosen <code class="xref py py-attr docutils literal notranslate"><span class="pre">norm</span></code> — the regression
-counterpart of the <a class="reference internal" href="torch_uncertainty.metrics.classification.CalibrationError.html#torch_uncertainty.metrics.classification.CalibrationError" title="torch_uncertainty.metrics.classification.CalibrationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">CalibrationError</span></code></a>.</p>
+\right].\]</div>
+<p>The metric evaluates this coverage on <code class="xref py py-attr docutils literal notranslate"><span class="pre">num_bins</span></code> confidence levels
+<span class="math notranslate nohighlight">\(\alpha_k\)</span> regularly spaced between <code class="docutils literal notranslate"><span class="pre">0.05</span></code> and <code class="docutils literal notranslate"><span class="pre">0.95</span></code>. It returns</p>
+<div class="math notranslate nohighlight">
+\[\operatorname{QCE}_{L_1}
+= \frac{1}{K}\sum_{k=1}^{K}
+\left|\hat{c}(\alpha_k)-\alpha_k\right|,\]</div>
+<p>with analogous root-mean-square and maximum variants for <code class="docutils literal notranslate"><span class="pre">norm=&quot;l2&quot;</span></code>
+and <code class="docutils literal notranslate"><span class="pre">norm=&quot;max&quot;</span></code>.</p>
+<p>For <code class="xref py py-class docutils literal notranslate"><span class="pre">Independent</span></code> distributions, calibration is
+evaluated marginally: every scalar event component contributes one coverage
+observation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>num_bins</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Number of bins to use for calibration. Defaults to <code class="docutils literal notranslate"><span class="pre">15</span></code>.</p></li>
-<li><p><strong>norm</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'l1'</span></code>, <code class="docutils literal notranslate"><span class="pre">'l2'</span></code>, <code class="docutils literal notranslate"><span class="pre">'max'</span></code>]</span>) – Norm to use for calibration error computation. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;l1&quot;</span></code>.</p></li>
-<li><p><strong>ignore_index</strong> – Index to ignore during calibration. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-<li><p><strong>validate_args</strong> – Whether to validate the input arguments. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>num_bins</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Number of confidence levels. Defaults to <code class="docutils literal notranslate"><span class="pre">15</span></code>.</p></li>
+<li><p><strong>norm</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code>[<code class="docutils literal notranslate"><span class="pre">'l1'</span></code>, <code class="docutils literal notranslate"><span class="pre">'l2'</span></code>, <code class="docutils literal notranslate"><span class="pre">'max'</span></code>]</span>) – Norm used to aggregate the calibration gaps. One of <code class="docutils literal notranslate"><span class="pre">&quot;l1&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;l2&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;max&quot;</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;l1&quot;</span></code>.</p></li>
+<li><p><strong>ignore_index</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Optional target value to ignore. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>validate_args</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Whether to validate input shapes. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 <li><p><strong>kwargs</strong> – Additional keyword arguments, see <a class="reference external" href="https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs">Advanced metric settings</a>.</p></li>
 </ul>
 </dd>
@@ -800,31 +807,21 @@ counterpart of the <a class="reference internal" href="torch_uncertainty.metrics
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.regression.QuantileCalibrationError.compute">
 <span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/regression/quantile_calibration.html#QuantileCalibrationError.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.regression.QuantileCalibrationError.compute" title="Link to this definition">#</a></dt>
-<dd><p>Compute the quantile calibration error.</p>
+<dd><p>Compute the Quantile Calibration Error.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The quantile calibration error.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Tensor</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span></p>
 </dd>
 </dl>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>If the distribution does not support <code class="docutils literal notranslate"><span class="pre">icdf()</span></code>, this returns <code class="docutils literal notranslate"><span class="pre">nan</span></code> values.</p>
-</div>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.regression.QuantileCalibrationError.plot">
 <span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/regression/quantile_calibration.html#QuantileCalibrationError.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.regression.QuantileCalibrationError.plot" title="Link to this definition">#</a></dt>
-<dd><p>Plot the quantile calibration reliability diagram.</p>
+<dd><p>Plot empirical coverage against nominal coverage.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>NotImplementedError</strong> – If the distribution does not support <code class="docutils literal notranslate"><span class="pre">icdf()</span></code>.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Axes</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]]</span></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Axes</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]]</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -832,13 +829,14 @@ counterpart of the <a class="reference internal" href="torch_uncertainty.metrics
 <dl class="py method">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.regression.QuantileCalibrationError.update">
 <span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/regression/quantile_calibration.html#QuantileCalibrationError.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.regression.QuantileCalibrationError.update" title="Link to this definition">#</a></dt>
-<dd><p>Update the metric with new predictions and targets.</p>
+<dd><p>Update the metric with predictive distributions and targets.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dist</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distribution</span></code></span>) – The predicted distribution.</p></li>
-<li><p><strong>target</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span>) – The ground truth values.</p></li>
-<li><p><strong>ignore_mask</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – A mask to ignore certain values. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>dist</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distribution</span></code></span>) – Predicted distribution. It must implement <code class="docutils literal notranslate"><span class="pre">icdf</span></code>.</p></li>
+<li><p><strong>target</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span>) – Ground-truth values, with one value per predictive distribution.</p></li>
+<li><p><strong>ignore_mask</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Boolean mask of targets to ignore. A mask over only the batch
+dimensions is expanded over trailing event dimensions. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>

@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=c5b435e8"></script>
+    <script src="../../../_static/documentation_options.js?v=1019fba8"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -479,7 +479,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.figure</span><span class="w"> </span><span class="kn">import</span> <span class="n">Figure</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.metric</span><span class="w"> </span><span class="kn">import</span> <span class="n">Metric</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.compute</span><span class="w"> </span><span class="kn">import</span> <span class="n">_auc_compute</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">dim_zero_cat</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.utilities.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">_AX_TYPE</span>
 
@@ -532,6 +531,18 @@
 <span class="sd">            scores: uncertainty scores of shape :math:`(B,)`</span>
 <span class="sd">            errors: errors of shape :math:`(B,)`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">scores</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">errors</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected `scores` and `errors` to be one-dimensional tensors.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">scores</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">errors</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Expected `scores` and `errors` to have the same shape, but got &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scores</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">errors</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">errors</span><span class="o">.</span><span class="n">is_floating_point</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected `errors` to contain only finite values.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">errors</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected `errors` to contain only non-negative values.&quot;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span></div>
 
@@ -540,11 +551,11 @@
         <span class="n">scores</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">)</span>
         <span class="n">errors</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">scores</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">nan</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)],</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">nan</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">nan</span><span class="p">,</span> <span class="n">nan</span>
         <span class="n">error_rates</span> <span class="o">=</span> <span class="n">_ause_rejection_rate_compute</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
         <span class="n">optimal_error_rates</span> <span class="o">=</span> <span class="n">_ause_rejection_rate_compute</span><span class="p">(</span><span class="n">errors</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">error_rates</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">optimal_error_rates</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">error_rates</span><span class="p">,</span> <span class="n">optimal_error_rates</span>
 
 <div class="viewcode-block" id="AUSE.compute">
 <a class="viewcode-back" href="../../../generated/torch_uncertainty.metrics.AUSE.html#torch_uncertainty.metrics.AUSE.compute">[docs]</a>
@@ -556,12 +567,13 @@
 <span class="sd">            Tensor: The AUSE.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">error_rates</span><span class="p">,</span> <span class="n">optimal_error_rates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">partial_compute</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">error_rates</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">item</span><span class="p">():</span>
-            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)],</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">error_rates</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">error_rates</span>
         <span class="n">num_samples</span> <span class="o">=</span> <span class="n">error_rates</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">error_rates</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">error_rates</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">/=</span> <span class="n">num_samples</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">error_rates</span> <span class="o">-</span> <span class="n">optimal_error_rates</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">_auc_compute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)])</span></div>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">trapezoid</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="AUSE.plot">
@@ -589,23 +601,26 @@
 
         <span class="c1"># Computation of AUSEC</span>
         <span class="n">error_rates</span><span class="p">,</span> <span class="n">optimal_error_rates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">partial_compute</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">error_rates</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;AUSE requires at least two samples before plotting.&quot;</span><span class="p">)</span>
         <span class="n">num_samples</span> <span class="o">=</span> <span class="n">error_rates</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">error_rates</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">error_rates</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">/=</span> <span class="n">num_samples</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">error_rates</span> <span class="o">-</span> <span class="n">optimal_error_rates</span>
 
-        <span class="n">ausec</span> <span class="o">=</span> <span class="n">_auc_compute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">ausec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">trapezoid</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
-        <span class="n">rejection_rates</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_samples</span> <span class="o">*</span> <span class="mi">100</span>
+        <span class="n">rejection_rates</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span>
 
         <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
             <span class="n">rejection_rates</span><span class="p">,</span>
-            <span class="n">error_rates</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="n">error_rates</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Model&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">plot_oracle</span><span class="p">:</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
                 <span class="n">rejection_rates</span><span class="p">,</span>
-                <span class="n">optimal_error_rates</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+                <span class="n">optimal_error_rates</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
                 <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Oracle&quot;</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -643,13 +658,26 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">num_samples</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="n">order</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
-    <span class="n">errors</span> <span class="o">=</span> <span class="n">errors</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">dtype</span> <span class="k">if</span> <span class="n">errors</span><span class="o">.</span><span class="n">is_floating_point</span><span class="p">()</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">get_default_dtype</span><span class="p">()</span>
+    <span class="n">ordered_errors</span> <span class="o">=</span> <span class="n">errors</span><span class="p">[</span><span class="n">scores</span><span class="o">.</span><span class="n">argsort</span><span class="p">()]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
 
-    <span class="n">error_rates</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_samples</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">error_rates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="n">error_rates</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">error_rates</span> <span class="o">/</span> <span class="n">error_rates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># At rejection step k, the k samples with the highest uncertainty have</span>
+    <span class="c1"># been discarded. Since scores are sorted increasingly, the retained</span>
+    <span class="c1"># samples form the prefix ending at N-k.</span>
+    <span class="n">remaining_sum</span> <span class="o">=</span> <span class="n">ordered_errors</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">remaining_count</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+        <span class="n">num_samples</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="n">errors</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">error_rates</span> <span class="o">=</span> <span class="n">remaining_sum</span> <span class="o">/</span> <span class="n">remaining_count</span>
+
+    <span class="n">initial_error</span> <span class="o">=</span> <span class="n">ordered_errors</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">initial_error</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">error_rates</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">error_rates</span> <span class="o">/</span> <span class="n">initial_error</span>
 </pre></div>
 
                 </article>

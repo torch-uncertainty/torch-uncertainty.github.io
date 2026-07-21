@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=c5b435e8"></script>
+    <script src="../../../../_static/documentation_options.js?v=1019fba8"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -501,7 +501,7 @@
 <span class="sd">        equals the target recall level :math:`x`:</span>
 
 <span class="sd">        .. math::</span>
-<span class="sd">            \tau_x = \inf \left\{ \tau \;\middle|\;</span>
+<span class="sd">            \tau_x = \sup \left\{ \tau \;\middle|\;</span>
 <span class="sd">            \frac{|\{i : s_i \geq \tau,\, y_i = 1\}|}{|\{i : y_i = 1\}|} \geq x \right\},</span>
 
 <span class="sd">        where :math:`s_i` is the confidence score assigned to sample :math:`i` and</span>
@@ -576,55 +576,55 @@
 <span class="sd">            Tensor: The value of the FPRx.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">confidences</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confidences</span><span class="p">)</span>
-        <span class="n">targets</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_label</span>
-
-        <span class="c1"># map examples and labels to OOD first</span>
-        <span class="n">indx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">descending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">examples</span> <span class="o">=</span> <span class="n">confidences</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span>
-        <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">labels</span><span class="p">[:</span> <span class="n">torch</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">targets</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">True</span>
-
-        <span class="c1"># sort examples and labels by decreasing confidence</span>
-        <span class="n">desc_scores_indx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">examples</span><span class="p">,</span> <span class="n">descending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">examples</span> <span class="o">=</span> <span class="n">examples</span><span class="p">[</span><span class="n">desc_scores_indx</span><span class="p">]</span>
-        <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">desc_scores_indx</span><span class="p">]</span>
-
-        <span class="c1"># Get the indices of the distinct values</span>
-        <span class="n">distinct_value_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">examples</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">threshold_idxs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">distinct_value_indices</span><span class="p">,</span>
-                <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
-
-        <span class="c1"># accumulate the true positives with decreasing threshold</span>
-        <span class="n">true_pos</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="n">threshold_idxs</span><span class="p">]</span>
-        <span class="n">false_pos</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">threshold_idxs</span> <span class="o">-</span> <span class="n">true_pos</span>  <span class="c1"># add one because of zero-based indexing</span>
-
-        <span class="c1"># check that there is at least one OOD example</span>
-        <span class="k">if</span> <span class="n">true_pos</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">torch</span><span class="o">.</span><span class="n">nan</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-
-        <span class="n">recall</span> <span class="o">=</span> <span class="n">true_pos</span> <span class="o">/</span> <span class="n">true_pos</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-
-        <span class="n">last_ind</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">true_pos</span><span class="p">,</span> <span class="n">true_pos</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">recall</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">recall</span><span class="p">[:</span> <span class="n">last_ind</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-                <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">1.0</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
-        <span class="n">false_pos</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">false_pos</span><span class="p">[:</span> <span class="n">last_ind</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-                <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">0.0</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
-        <span class="n">cutoff</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">recall</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">recall_level</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">false_pos</span><span class="p">[</span><span class="n">cutoff</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="o">~</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span></div>
+        <span class="n">targets</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_fprx_compute</span><span class="p">(</span>
+            <span class="n">confidences</span><span class="p">,</span>
+            <span class="n">targets</span><span class="p">,</span>
+            <span class="n">recall_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">recall_level</span><span class="p">,</span>
+            <span class="n">pos_label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_label</span><span class="p">,</span>
+        <span class="p">)</span></div>
 </div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fprx_compute</span><span class="p">(</span>
+    <span class="n">confidences</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">recall_level</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">pos_label</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute a tie-aware FPR at a minimum requested recall.&quot;&quot;&quot;</span>
+    <span class="n">confidences</span> <span class="o">=</span> <span class="n">confidences</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">==</span> <span class="n">pos_label</span>
+    <span class="k">if</span> <span class="n">confidences</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected `confidences` and `target` to have the same shape.&quot;</span><span class="p">)</span>
+
+    <span class="n">num_positive</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">num_negative</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">num_positive</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">num_negative</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">confidences</span><span class="o">.</span><span class="n">dtype</span> <span class="k">if</span> <span class="n">confidences</span><span class="o">.</span><span class="n">is_floating_point</span><span class="p">()</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">confidences</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">recall_level</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">confidences</span><span class="o">.</span><span class="n">new_tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="n">order</span> <span class="o">=</span> <span class="n">confidences</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">descending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">sorted_scores</span> <span class="o">=</span> <span class="n">confidences</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
+    <span class="n">sorted_labels</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
+
+    <span class="c1"># Evaluate thresholds only after complete groups of tied scores. Splitting a</span>
+    <span class="c1"># tie could claim a recall/FPR pair that no score threshold can achieve.</span>
+    <span class="n">threshold_idxs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sorted_scores</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="n">sorted_scores</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">labels</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">labels</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">true_positive</span> <span class="o">=</span> <span class="n">sorted_labels</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="n">threshold_idxs</span><span class="p">]</span>
+    <span class="n">false_positive</span> <span class="o">=</span> <span class="n">threshold_idxs</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">true_positive</span>
+    <span class="n">recall</span> <span class="o">=</span> <span class="n">true_positive</span> <span class="o">/</span> <span class="n">num_positive</span>
+
+    <span class="n">cutoff</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">recall</span> <span class="o">&gt;=</span> <span class="n">recall_level</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">false_positive</span><span class="p">[</span><span class="n">cutoff</span><span class="p">]</span> <span class="o">/</span> <span class="n">num_negative</span>
 
 
 <div class="viewcode-block" id="FPR95">

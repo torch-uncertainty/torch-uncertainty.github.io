@@ -45,13 +45,15 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=c5b435e8"></script>
+    <script src="../_static/documentation_options.js?v=1019fba8"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"], ["$", "$"]], "displayMath": [["\\[", "\\]"], ["$$", "$$"]]}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'generated/torch_uncertainty.metrics.classification.SCODRiskAtxCov';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../_static/favicon.ico"/>
@@ -767,72 +769,64 @@
 <h1>SCODRiskAtxCov<a class="headerlink" href="#scodriskatxcov" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.classification.SCODRiskAtxCov">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.classification.</span></span><span class="sig-name descname"><span class="pre">SCODRiskAtxCov</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cov_threshold</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/scod_risk_coverage.html#SCODRiskAtxCov"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.SCODRiskAtxCov" title="Link to this definition">#</a></dt>
-<dd><p>Compute the risk at a specified coverage threshold.</p>
-<p>This metric calculates the error rate (risk) at a given coverage level.
-The coverage threshold determines the fraction of samples considered,
-sorted by model confidence. The metric is useful in evaluating the
-trade-off between coverage and risk in predictive models.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.classification.</span></span><span class="sig-name descname"><span class="pre">SCODRiskAtxCov</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cov_threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ood_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/scod_risk_coverage.html#SCODRiskAtxCov"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.SCODRiskAtxCov" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the SCOD risk at a specified coverage.</p>
+<p>This metric applies
+<a class="reference internal" href="torch_uncertainty.metrics.classification.RiskAtxCov.html#torch_uncertainty.metrics.classification.RiskAtxCov" title="torch_uncertainty.metrics.classification.RiskAtxCov"><code class="xref py py-class docutils literal notranslate"><span class="pre">RiskAtxCov</span></code></a> to the joint
+SCOD loss defined by
+<a class="reference internal" href="torch_uncertainty.metrics.classification.SCODAURC.html#torch_uncertainty.metrics.classification.SCODAURC" title="torch_uncertainty.metrics.classification.SCODAURC"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCODAURC</span></code></a>.</p>
+<p>For a target coverage <span class="math notranslate nohighlight">\(\gamma\in[0,1]\)</span>, let</p>
+<div class="math notranslate nohighlight">
+\[k_\gamma = \left\lceil \gamma N \right\rceil.\]</div>
+<p>Samples are ordered from lowest to highest OOD score, and the reported
+SCOD risk is</p>
+<div class="math notranslate nohighlight">
+\[\operatorname{SCOD\text{-}Risk&#64;Cov}(\gamma)
+=
+r\left(\frac{k_\gamma}{N}\right)
+=
+\frac{1}{k_\gamma}
+\sum_{j=1}^{k_\gamma}\ell_{\sigma(j)}.\]</div>
+<p>As input to <code class="docutils literal notranslate"><span class="pre">forward</span></code> and <code class="docutils literal notranslate"><span class="pre">update</span></code>, the metric accepts:</p>
+<ul class="simple">
+<li><p><strong>ood_scores</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): Float tensor containing OOD
+scores, where larger values indicate more OOD-like samples.</p></li>
+<li><p><strong>classification_errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): Boolean or binary
+tensor indicating misclassified ID samples.</p></li>
+<li><p><strong>is_ood</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): Boolean or binary tensor indicating
+OOD samples.</p></li>
+</ul>
+<p>As output to <code class="docutils literal notranslate"><span class="pre">forward</span></code> and <code class="docutils literal notranslate"><span class="pre">compute</span></code>, the metric returns:</p>
+<ul class="simple">
+<li><p><strong>scod_risk</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): Scalar tensor containing the SCOD
+risk at the requested coverage. Lower values are better.</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cov_threshold</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – The coverage threshold at which to compute the risk.</p></li>
-<li><p><strong>kwargs</strong> – Additional arguments to pass to the metric class.</p></li>
+<li><p><strong>cov_threshold</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Target coverage <span class="math notranslate nohighlight">\(\gamma\)</span>.</p></li>
+<li><p><strong>ood_cost</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Relative cost <span class="math notranslate nohighlight">\(c_{\mathrm{OOD}}\)</span> of accepting an OOD
+sample. The cost of accepting a misclassified ID sample is
+<code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">ood_cost</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">0.5</span></code>.</p></li>
+<li><p><strong>kwargs</strong> – Additional keyword arguments passed to
+<code class="xref py py-class docutils literal notranslate"><span class="pre">torchmetrics.Metric</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
-<p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.metrics.classification</span><span class="w"> </span><span class="kn">import</span> <span class="n">RiskAtxCov</span>
-
-<span class="c1"># Initialize the metric with a coverage threshold of 0.5 (50%)</span>
-<span class="n">metric</span> <span class="o">=</span> <span class="n">RiskAtxCov</span><span class="p">(</span><span class="n">cov_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-
-<span class="c1"># Simulated predicted probabilities (N samples, C classes)</span>
-<span class="n">predicted_probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
-    <span class="p">[</span>
-        <span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>  <span class="c1"># Correct (class 0)</span>
-        <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span>  <span class="c1"># Incorrect (class 1)</span>
-        <span class="p">[</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">],</span>  <span class="c1"># Correct (class 0)</span>
-        <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>  <span class="c1"># Incorrect (class 1)</span>
-        <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>  <span class="c1"># Correct (class 0)</span>
-        <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">],</span>  <span class="c1"># Correct (class 1)</span>
-        <span class="p">[</span><span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">],</span>  <span class="c1"># Incorrect (class 1)</span>
-        <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span>  <span class="c1"># Correct (class 1)</span>
-    <span class="p">]</span>
-<span class="p">)</span>
-
-<span class="c1"># Simulated ground truth labels</span>
-<span class="n">ground_truth</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-
-<span class="c1"># Update the metric with the probabilities and labels</span>
-<span class="n">metric</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">predicted_probs</span><span class="p">,</span> <span class="n">ground_truth</span><span class="p">)</span>
-
-<span class="c1"># Compute the risk at the specified coverage threshold</span>
-<span class="n">risk_at_cov</span> <span class="o">=</span> <span class="n">metric</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-
-<span class="c1"># Output the result</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Risk at coverage threshold: </span><span class="si">{</span><span class="n">risk_at_cov</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="c1"># output : Risk at coverage threshold: 0.25</span>
-</pre></div>
+<p class="rubric">References</p>
+<p>[1] <a class="reference external" href="https://openaccess.thecvf.com/content/ACCV2022/papers/Xia_Augmenting_Softmax_Information_for_Selective_Classification_with_Out-of-Distribution_Data_ACCV_2022_paper.pdf">Xia &amp; Bouganis. Augmenting Softmax Information for Selective
+Classification with Out-of-Distribution Data. ACCV, 2022.</a>.</p>
+<p>[2] <a class="reference external" href="https://arxiv.org/abs/2301.12386">Narasimhan et al. Plugin Estimators for Selective Classification
+with Out-of-Distribution Detection.</a>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="torch_uncertainty.metrics.classification.SCODAURC.html#torch_uncertainty.metrics.classification.SCODAURC" title="torch_uncertainty.metrics.classification.SCODAURC"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCODAURC</span></code></a>:</dt><dd><p>Definition of the SCOD loss and selective risk.</p>
+</dd>
+<dt><a class="reference internal" href="torch_uncertainty.metrics.classification.RiskAtxCov.html#torch_uncertainty.metrics.classification.RiskAtxCov" title="torch_uncertainty.metrics.classification.RiskAtxCov"><code class="xref py py-class docutils literal notranslate"><span class="pre">RiskAtxCov</span></code></a>:</dt><dd><p>Corresponding selective-classification metric.</p>
+</dd>
+</dl>
 </div>
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.classification.SCODRiskAtxCov.update">
-<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ood_scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/scod_risk_coverage.html#SCODRiskAtxCov.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.SCODRiskAtxCov.update" title="Link to this definition">#</a></dt>
-<dd><p>Store SCOD confidence scores and associated detection errors.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ood_scores</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span>) – OOD scores where higher means more OOD-like.</p></li>
-<li><p><strong>targets</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span>) – Binary labels, with 0 for ID and 1 for OOD.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -884,10 +878,7 @@ trade-off between coverage and risk in predictive models.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.metrics.classification.SCODRiskAtxCov"><code class="docutils literal notranslate"><span class="pre">SCODRiskAtxCov</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.metrics.classification.SCODRiskAtxCov.update"><code class="docutils literal notranslate"><span class="pre">SCODRiskAtxCov.update()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.metrics.classification.SCODRiskAtxCov"><code class="docutils literal notranslate"><span class="pre">SCODRiskAtxCov</span></code></a></li>
 </ul>
   </nav></div>
 

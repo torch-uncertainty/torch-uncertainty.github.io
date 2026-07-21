@@ -206,12 +206,6 @@ datamodule). Three dense, segmentation-specific binary metrics are then computed
   :class:`~torch_uncertainty.metrics.segmentation.SegmentationBinaryAveragePrecision`.
 - ``ood/FPR95`` —
   :class:`~torch_uncertainty.metrics.segmentation.SegmentationFPR95`.
-- ``ood/SCOD_AURC`` — :class:`~torch_uncertainty.metrics.classification.SCODAURC`.
-- ``ood/SCOD_AUGRC`` — :class:`~torch_uncertainty.metrics.classification.SCODAUGRC`.
-- ``ood/SCOD_Cov_5Risk`` —
-  :class:`~torch_uncertainty.metrics.classification.SCODCovAt5Risk`.
-- ``ood/SCOD_Risk_80Cov`` —
-  :class:`~torch_uncertainty.metrics.classification.SCODRiskAt80Cov`.
 
 The OOD score is again controlled by ``ood_criterion``. See the
 :doc:`MUAD segmentation tutorial <auto_tutorials/Segmentation/tutorial_muad_seg>` for an

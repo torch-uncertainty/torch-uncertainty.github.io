@@ -140,7 +140,7 @@ Now, let's visualize a few images from the dataset. For this task, we use the vi
 
     In distribution data:
 
-    <PIL.Image.Image image mode=L size=28x28 at 0x7FC0C81400F0>
+    <PIL.Image.Image image mode=L size=28x28 at 0x709A6A3BF9D0>
 
 
 
@@ -161,7 +161,7 @@ Now, let's visualize a few images from the dataset. For this task, we use the vi
 
     Out of distribution data:
 
-    <PIL.Image.Image image mode=L size=28x28 at 0x7FC0C8141630>
+    <PIL.Image.Image image mode=L size=28x28 at 0x709A6A3BD1D0>
 
 
 
@@ -281,25 +281,26 @@ This means that the model is trained to predict the most likely class for each i
 
  .. code-block:: none
 
-    ┏━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
-    ┃   ┃ Name             ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
-    ┡━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
-    │ 0 │ ood_criterion    │ MaxSoftmaxCriterion │      0 │ train │     0 │
-    │ 1 │ model            │ LeNet               │ 44.4 K │ train │     0 │
-    │ 2 │ loss             │ CrossEntropyLoss    │      0 │ train │     0 │
-    │ 3 │ format_batch_fn  │ Identity            │      0 │ train │     0 │
-    │ 4 │ val_cls_metrics  │ MetricCollection    │      0 │ train │     0 │
-    │ 5 │ test_cls_metrics │ MetricCollection    │      0 │ train │     0 │
-    │ 6 │ test_id_entropy  │ Entropy             │      0 │ train │     0 │
-    │ 7 │ test_ood_metrics │ MetricCollection    │      0 │ train │     0 │
-    │ 8 │ test_ood_entropy │ Entropy             │      0 │ train │     0 │
-    │ 9 │ mixup            │ Identity            │      0 │ train │     0 │
-    └───┴──────────────────┴─────────────────────┴────────┴───────┴───────┘
+    ┏━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+    ┃    ┃ Name              ┃ Type                ┃ Params ┃ Mode  ┃ FLOPs ┃
+    ┡━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+    │ 0  │ ood_criterion     │ MaxSoftmaxCriterion │      0 │ train │     0 │
+    │ 1  │ model             │ LeNet               │ 44.4 K │ train │     0 │
+    │ 2  │ loss              │ CrossEntropyLoss    │      0 │ train │     0 │
+    │ 3  │ format_batch_fn   │ Identity            │      0 │ train │     0 │
+    │ 4  │ val_cls_metrics   │ MetricCollection    │      0 │ train │     0 │
+    │ 5  │ test_cls_metrics  │ MetricCollection    │      0 │ train │     0 │
+    │ 6  │ test_id_entropy   │ Entropy             │      0 │ train │     0 │
+    │ 7  │ test_ood_metrics  │ MetricCollection    │      0 │ train │     0 │
+    │ 8  │ test_scod_metrics │ MetricCollection    │      0 │ train │     0 │
+    │ 9  │ test_ood_entropy  │ Entropy             │      0 │ train │     0 │
+    │ 10 │ mixup             │ Identity            │      0 │ train │     0 │
+    └────┴───────────────────┴─────────────────────┴────────┴───────┴───────┘
     Trainable params: 44.4 K                                                        
     Non-trainable params: 0                                                         
     Total params: 44.4 K                                                            
     Total estimated model params size (MB): 0.178                                   
-    Modules in train mode: 45                                                       
+    Modules in train mode: 46                                                       
     Modules in eval mode: 0                                                         
     Total FLOPs: 0                                                                  
 
@@ -327,38 +328,38 @@ Evaluate the trained model on the test set - pay attention to the cls/Acc metric
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃      Classification       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     Acc      │          88.380%          │
-    │    Brier     │          0.18667          │
-    │   Entropy    │          0.53347          │
-    │     NLL      │          0.40366          │
+    │     Acc      │          80.610%          │
+    │    Brier     │          0.27929          │
+    │   Entropy    │          0.57209          │
+    │     NLL      │          0.60136          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          6.133%           │
-    │     MCE      │          81.462%          │
-    │    SmECE     │          6.205%           │
-    │     aECE     │          6.188%           │
+    │     ECE      │          1.691%           │
+    │     MCE      │          48.891%          │
+    │    SmECE     │          1.944%           │
+    │     aECE     │          1.805%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       OOD Detection       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     AUPR     │          55.632%          │
-    │    AUROC     │          55.662%          │
-    │   Entropy    │          0.64113          │
-    │    FPR95     │          87.890%          │
-    │  SCOD_AUGRC  │          0.23586          │
-    │  SCOD_AURC   │          0.42549          │
-    │ SCOD_Cov_5R… │            nan            │
-    │ SCOD_Risk_8… │          0.48800          │
+    │     AUPR     │          50.734%          │
+    │    AUROC     │          51.418%          │
+    │   Entropy    │          0.56793          │
+    │    FPR95     │          90.190%          │
+    │  SCOD_AUGRC  │          0.13370          │
+    │  SCOD_AURC   │          0.23962          │
+    │ SCOD_Cov_5R… │          0.01960          │
+    │ SCOD_Risk_8… │          0.28116          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          2.045%           │
-    │     AURC     │          2.580%           │
-    │  Cov_5Risk   │          80.370%          │
-    │  Risk_80Cov  │          4.875%           │
+    │    AUGRC     │          4.324%           │
+    │     AURC     │          5.541%           │
+    │  Cov_5Risk   │          58.330%          │
+    │  Risk_80Cov  │          11.362%          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -458,59 +459,60 @@ replicate and change the initialization of your networks to ensure diversity.
     │ 5  │ test_cls_metrics     │ MetricCollection    │      0 │ train │     0 │
     │ 6  │ test_id_entropy      │ Entropy             │      0 │ train │     0 │
     │ 7  │ test_ood_metrics     │ MetricCollection    │      0 │ train │     0 │
-    │ 8  │ test_ood_entropy     │ Entropy             │      0 │ train │     0 │
-    │ 9  │ test_id_ens_metrics  │ MetricCollection    │      0 │ train │     0 │
-    │ 10 │ test_ood_ens_metrics │ MetricCollection    │      0 │ train │     0 │
-    │ 11 │ mixup                │ Identity            │      0 │ train │     0 │
+    │ 8  │ test_scod_metrics    │ MetricCollection    │      0 │ train │     0 │
+    │ 9  │ test_ood_entropy     │ Entropy             │      0 │ train │     0 │
+    │ 10 │ test_id_ens_metrics  │ MetricCollection    │      0 │ train │     0 │
+    │ 11 │ test_ood_ens_metrics │ MetricCollection    │      0 │ train │     0 │
+    │ 12 │ mixup                │ Identity            │      0 │ train │     0 │
     └────┴──────────────────────┴─────────────────────┴────────┴───────┴───────┘
     Trainable params: 88.9 K                                                        
     Non-trainable params: 0                                                         
     Total params: 88.9 K                                                            
     Total estimated model params size (MB): 0.355                                   
-    Modules in train mode: 62                                                       
+    Modules in train mode: 63                                                       
     Modules in eval mode: 0                                                         
     Total FLOPs: 0                                                                  
-    Epoch 2/2  ━━━━━━━━━━━━━━━━ 118/118 0:00:01 •       117.76it/s v_num: 1.000     
-                                        0:00:00                    train_loss: 0.541
-                                                                   Acc: 90.680      
+    Epoch 2/2  ━━━━━━━━━━━━━━━━ 118/118 0:00:01 •       124.90it/s v_num: 1.000     
+                                        0:00:00                    train_loss: 0.559
+                                                                   Acc: 89.320      
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃      Classification       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     Acc      │          90.680%          │
-    │    Brier     │          0.14461          │
-    │   Entropy    │          0.47847          │
-    │     NLL      │          0.31123          │
+    │     Acc      │          89.320%          │
+    │    Brier     │          0.16128          │
+    │   Entropy    │          0.47719          │
+    │     NLL      │          0.34107          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Calibration        ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     ECE      │          6.033%           │
-    │     MCE      │          14.706%          │
-    │    SmECE     │          5.739%           │
-    │     aECE     │          6.033%           │
+    │     ECE      │          5.084%           │
+    │     MCE      │          24.670%          │
+    │    SmECE     │          4.839%           │
+    │     aECE     │          5.035%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃       OOD Detection       ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │     AUPR     │          88.613%          │
-    │    AUROC     │          91.232%          │
-    │   Entropy    │          1.31397          │
-    │    FPR95     │          27.310%          │
-    │  SCOD_AUGRC  │          0.14693          │
-    │  SCOD_AURC   │          0.19593          │
-    │ SCOD_Cov_5R… │            nan            │
-    │ SCOD_Risk_8… │          0.39681          │
-    │ ens_Disagre… │          0.46740          │
-    │ ens_Entropy  │          1.23189          │
-    │    ens_MI    │          0.08208          │
+    │     AUPR     │          88.418%          │
+    │    AUROC     │          91.278%          │
+    │   Entropy    │          1.29346          │
+    │    FPR95     │          26.520%          │
+    │  SCOD_AUGRC  │          0.08391          │
+    │  SCOD_AURC   │          0.11240          │
+    │ SCOD_Cov_5R… │          0.40840          │
+    │ SCOD_Risk_8… │          0.22556          │
+    │ ens_Disagre… │          0.59830          │
+    │ ens_Entropy  │          1.16581          │
+    │    ens_MI    │          0.12765          │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃ Selective Classification  ┃
     ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │    AUGRC     │          1.201%           │
-    │     AURC     │          1.401%           │
-    │  Cov_5Risk   │          89.940%          │
-    │  Risk_80Cov  │          2.400%           │
+    │    AUGRC     │          1.524%           │
+    │     AURC     │          1.800%           │
+    │  Cov_5Risk   │          86.550%          │
+    │  Risk_80Cov  │          3.463%           │
     └──────────────┴───────────────────────────┘
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┃ Test metric  ┃        Complexity         ┃
@@ -518,7 +520,7 @@ replicate and change the initialization of your networks to ensure diversity.
     │    flops     │          2.31 G           │
     │    params    │          88.85 K          │
     └──────────────┴───────────────────────────┘
-    Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5/5 0:00:00 • 0:00:00 40.71it/s 
+    Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5/5 0:00:00 • 0:00:00 45.36it/s 
 
 
 
@@ -614,10 +616,10 @@ on `HuggingFace <https://huggingface.co/ENSTA-U2IS/tutorial-models>`_ and TorchU
     │    AUROC     │          99.205%          │
     │   Entropy    │          1.25233          │
     │    FPR95     │          2.630%           │
-    │  SCOD_AUGRC  │          0.12699          │
-    │  SCOD_AURC   │          0.15693          │
-    │ SCOD_Cov_5R… │          0.51250          │
-    │ SCOD_Risk_8… │          0.37656          │
+    │  SCOD_AUGRC  │          0.06379          │
+    │  SCOD_AURC   │          0.07883          │
+    │ SCOD_Cov_5R… │          0.54605          │
+    │ SCOD_Risk_8… │          0.18922          │
     │ ens_Disagre… │          0.38779          │
     │ ens_Entropy  │          1.01787          │
     │    ens_MI    │          0.23446          │
@@ -636,7 +638,7 @@ on `HuggingFace <https://huggingface.co/ENSTA-U2IS/tutorial-models>`_ and TorchU
     │    flops     │          9.23 G           │
     │    params    │         355.41 K          │
     └──────────────┴───────────────────────────┘
-    Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5/5 0:00:00 • 0:00:00 41.91it/s 
+    Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5/5 0:00:00 • 0:00:00 47.22it/s 
 
 
 
@@ -755,19 +757,20 @@ and the Packed-Conv2D, `here <https://torch-uncertainty.github.io/generated/torc
     │ 5  │ test_cls_metrics     │ MetricCollection    │      0 │ train │     0 │
     │ 6  │ test_id_entropy      │ Entropy             │      0 │ train │     0 │
     │ 7  │ test_ood_metrics     │ MetricCollection    │      0 │ train │     0 │
-    │ 8  │ test_ood_entropy     │ Entropy             │      0 │ train │     0 │
-    │ 9  │ test_id_ens_metrics  │ MetricCollection    │      0 │ train │     0 │
-    │ 10 │ test_ood_ens_metrics │ MetricCollection    │      0 │ train │     0 │
-    │ 11 │ mixup                │ Identity            │      0 │ train │     0 │
+    │ 8  │ test_scod_metrics    │ MetricCollection    │      0 │ train │     0 │
+    │ 9  │ test_ood_entropy     │ Entropy             │      0 │ train │     0 │
+    │ 10 │ test_id_ens_metrics  │ MetricCollection    │      0 │ train │     0 │
+    │ 11 │ test_ood_ens_metrics │ MetricCollection    │      0 │ train │     0 │
+    │ 12 │ mixup                │ Identity            │      0 │ train │     0 │
     └────┴──────────────────────┴─────────────────────┴────────┴───────┴───────┘
     Trainable params: 45.7 K                                                        
     Non-trainable params: 0                                                         
     Total params: 45.7 K                                                            
     Total estimated model params size (MB): 0.183                                   
-    Modules in train mode: 55                                                       
+    Modules in train mode: 56                                                       
     Modules in eval mode: 0                                                         
     Total FLOPs: 0                                                                  
-    Epoch 2/2  ━━━━━━━━━━━━━━━━ 118/118 0:00:01 •       123.97it/s v_num: 3.000     
+    Epoch 2/2  ━━━━━━━━━━━━━━━━ 118/118 0:00:01 •       121.56it/s v_num: 3.000     
                                         0:00:00                    train_loss: 1.120
                                                                    Acc: 78.710      
     ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -792,11 +795,11 @@ and the Packed-Conv2D, `here <https://torch-uncertainty.github.io/generated/torc
     │     AUPR     │          62.696%          │
     │    AUROC     │          66.105%          │
     │   Entropy    │          1.64804          │
-    │    FPR95     │          70.550%          │
-    │  SCOD_AUGRC  │          0.20975          │
-    │  SCOD_AURC   │          0.33683          │
-    │ SCOD_Cov_5R… │            nan            │
-    │ SCOD_Risk_8… │          0.47056          │
+    │    FPR95     │          70.530%          │
+    │  SCOD_AUGRC  │          0.12199          │
+    │  SCOD_AURC   │          0.19311          │
+    │ SCOD_Cov_5R… │          0.13730          │
+    │ SCOD_Risk_8… │          0.27669          │
     │ ens_Disagre… │          0.46878          │
     │ ens_Entropy  │          1.36889          │
     │    ens_MI    │          0.27915          │
@@ -815,7 +818,7 @@ and the Packed-Conv2D, `here <https://torch-uncertainty.github.io/generated/torc
     │    flops     │          1.51 G           │
     │    params    │          45.67 K          │
     └──────────────┴───────────────────────────┘
-    Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5/5 0:00:00 • 0:00:00 42.48it/s 
+    Testing ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5/5 0:00:00 • 0:00:00 48.09it/s 
 
 
 
@@ -857,7 +860,7 @@ The grouping loss is a measure of uncertainty orthogonal to calibration. Have a 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 26.861 seconds)
+   **Total running time of the script:** (0 minutes 26.967 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_Ensemble_Methods_tutorial_from_de_to_pe.py:

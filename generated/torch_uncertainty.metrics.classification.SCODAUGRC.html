@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=c5b435e8"></script>
+    <script src="../_static/documentation_options.js?v=1019fba8"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -769,59 +769,71 @@
 <h1>SCODAUGRC<a class="headerlink" href="#scodaugrc" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.classification.SCODAUGRC">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.classification.</span></span><span class="sig-name descname"><span class="pre">SCODAUGRC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/scod_risk_coverage.html#SCODAUGRC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.SCODAUGRC" title="Link to this definition">#</a></dt>
-<dd><p>Calculate The Area Under the Generalized Risk-Coverage curve (AUGRC).</p>
-<p>The Area Under the Generalized Risk-Coverage curve (AUGRC) for selective classification
-performance assessment. Unlike AURC, it weights the error rate at each coverage level
-by the coverage itself, reducing the influence of the most confident samples and
-making the metric more sensitive to performance at intermediate coverage levels.</p>
-<p>Using the same notation as <a class="reference internal" href="torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC" title="torch_uncertainty.metrics.classification.AURC"><code class="xref py py-class docutils literal notranslate"><span class="pre">AURC</span></code></a>, the AUGRC is defined as</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.classification.</span></span><span class="sig-name descname"><span class="pre">SCODAUGRC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ood_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/scod_risk_coverage.html#SCODAUGRC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.SCODAUGRC" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the Area Under the Generalized SCOD Risk-Coverage curve.</p>
+<p>This metric applies the generalized risk-coverage construction of
+<a class="reference internal" href="torch_uncertainty.metrics.classification.AUGRC.html#torch_uncertainty.metrics.classification.AUGRC" title="torch_uncertainty.metrics.classification.AUGRC"><code class="xref py py-class docutils literal notranslate"><span class="pre">AUGRC</span></code></a> to the joint SCOD
+loss defined by
+<a class="reference internal" href="torch_uncertainty.metrics.classification.SCODAURC.html#torch_uncertainty.metrics.classification.SCODAURC" title="torch_uncertainty.metrics.classification.SCODAURC"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCODAURC</span></code></a>.</p>
+<p>Let <span class="math notranslate nohighlight">\(r(\kappa)\)</span> denote the SCOD selective risk at coverage
+<span class="math notranslate nohighlight">\(\kappa\)</span>. The generalized SCOD risk is
+<span class="math notranslate nohighlight">\(\kappa r(\kappa)\)</span>, and its area is</p>
 <div class="math notranslate nohighlight">
-\[\text{AUGRC} = \int_0^1 \kappa \cdot r(\kappa)\,\mathrm{d}\kappa
-\approx \frac{1}{N} \sum_{k=1}^{N} \frac{k}{N} \cdot r\!\left(\tfrac{k}{N}\right)\]</div>
-<p>As input to <code class="docutils literal notranslate"><span class="pre">forward</span></code> and <code class="docutils literal notranslate"><span class="pre">update</span></code> the metric accepts the following input:</p>
+\[\operatorname{SCOD\text{-}AUGRC}
+= \int_0^1 \kappa r(\kappa)\,\mathrm{d}\kappa.\]</div>
+<p>At empirical coverage <span class="math notranslate nohighlight">\(\kappa_k=k/N\)</span>, this uses</p>
+<div class="math notranslate nohighlight">
+\[\kappa_k r(\kappa_k)
+= \frac{1}{N}\sum_{j=1}^{k}\ell_{\sigma(j)},\]</div>
+<p>where <span class="math notranslate nohighlight">\(\ell_i\)</span> is the SCOD loss and <span class="math notranslate nohighlight">\(\sigma\)</span> orders samples
+from lowest to highest OOD score.</p>
+<p>As input to <code class="docutils literal notranslate"><span class="pre">forward</span></code> and <code class="docutils literal notranslate"><span class="pre">update</span></code>, the metric accepts:</p>
 <ul class="simple">
-<li><p><strong>preds</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): A float tensor of shape
-<code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">...)</span></code> containing probabilities for each observation.</p></li>
-<li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): An int tensor of shape
-<code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">...)</span></code> containing ground-truth labels.</p></li>
+<li><p><strong>ood_scores</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): Float tensor containing OOD
+scores, where larger values indicate more OOD-like samples.</p></li>
+<li><p><strong>classification_errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): Boolean or binary
+tensor indicating misclassified ID samples.</p></li>
+<li><p><strong>is_ood</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): Boolean or binary tensor indicating
+OOD samples.</p></li>
 </ul>
-<p>As output to <code class="docutils literal notranslate"><span class="pre">forward</span></code> and <code class="docutils literal notranslate"><span class="pre">compute</span></code> the metric returns the
-following output:</p>
+<p>As output to <code class="docutils literal notranslate"><span class="pre">forward</span></code> and <code class="docutils literal notranslate"><span class="pre">compute</span></code>, the metric returns:</p>
 <ul class="simple">
-<li><p><strong>Augrc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): A scalar tensor containing the
-area under the risk-coverage curve</p></li>
+<li><p><strong>scod_augrc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): Scalar tensor containing the area
+under the generalized SCOD risk-coverage curve. Lower values are better.</p></li>
 </ul>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>kwargs</strong> – Additional keyword arguments.</p>
-</dd>
-</dl>
-<p class="rubric">References</p>
-<p>[1] <a class="reference external" href="https://arxiv.org/pdf/2407.01032">Traub et al. Overcoming Common Flaws in the Evaluation of Selective Classification Systems</a>.</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC" title="torch_uncertainty.metrics.classification.AURC"><code class="xref py py-class docutils literal notranslate"><span class="pre">AURC</span></code></a> : Parent class, the AURC metric</p></li>
-</ul>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.classification.SCODAUGRC.update">
-<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ood_scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/scod_risk_coverage.html#SCODAUGRC.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.SCODAUGRC.update" title="Link to this definition">#</a></dt>
-<dd><p>Store SCOD confidence scores and associated detection errors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ood_scores</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span>) – OOD scores where higher means more OOD-like.</p></li>
-<li><p><strong>targets</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span>) – Binary labels, with 0 for ID and 1 for OOD.</p></li>
+<li><p><strong>ood_cost</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Relative cost <span class="math notranslate nohighlight">\(c_{\mathrm{OOD}}\)</span> of accepting an OOD
+sample. The cost of accepting a misclassified ID sample is
+<code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">ood_cost</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">0.5</span></code>.</p></li>
+<li><p><strong>kwargs</strong> – Additional keyword arguments passed to
+<code class="xref py py-class docutils literal notranslate"><span class="pre">torchmetrics.Metric</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SCOD-AUGRC is the Torch-Uncertainty generalized risk-coverage metric
+applied to the SCOD loss. It is a natural SCOD extension of AUGRC, but
+it is not introduced under this name in the original SCOD papers.</p>
+</div>
+<p class="rubric">References</p>
+<p>[1] <a class="reference external" href="https://openaccess.thecvf.com/content/ACCV2022/papers/Xia_Augmenting_Softmax_Information_for_Selective_Classification_with_Out-of-Distribution_Data_ACCV_2022_paper.pdf">Xia &amp; Bouganis. Augmenting Softmax Information for Selective
+Classification with Out-of-Distribution Data. ACCV, 2022.</a>.</p>
+<p>[2] <a class="reference external" href="https://arxiv.org/abs/2301.12386">Narasimhan et al. Plugin Estimators for Selective Classification
+with Out-of-Distribution Detection.</a>.</p>
+<p>[3] <a class="reference external" href="https://arxiv.org/abs/2407.01032">Traub et al. Overcoming Common Flaws in the Evaluation of
+Selective Classification Systems.</a>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="torch_uncertainty.metrics.classification.SCODAURC.html#torch_uncertainty.metrics.classification.SCODAURC" title="torch_uncertainty.metrics.classification.SCODAURC"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCODAURC</span></code></a>:</dt><dd><p>Definition of the SCOD loss and selective risk.</p>
+</dd>
+<dt><a class="reference internal" href="torch_uncertainty.metrics.classification.AUGRC.html#torch_uncertainty.metrics.classification.AUGRC" title="torch_uncertainty.metrics.classification.AUGRC"><code class="xref py py-class docutils literal notranslate"><span class="pre">AUGRC</span></code></a>:</dt><dd><p>Original generalized risk-coverage metric.</p>
 </dd>
 </dl>
-</dd></dl>
-
+</div>
 </dd></dl>
 
 </section>
@@ -873,10 +885,7 @@ area under the risk-coverage curve</p></li>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.metrics.classification.SCODAUGRC"><code class="docutils literal notranslate"><span class="pre">SCODAUGRC</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.metrics.classification.SCODAUGRC.update"><code class="docutils literal notranslate"><span class="pre">SCODAUGRC.update()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.metrics.classification.SCODAUGRC"><code class="docutils literal notranslate"><span class="pre">SCODAUGRC</span></code></a></li>
 </ul>
   </nav></div>
 

@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=c5b435e8"></script>
+    <script src="../_static/documentation_options.js?v=1019fba8"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -807,6 +807,12 @@ conformal scores. Defaults to <code class="docutils literal notranslate"><span c
 <p>This implementation only works in the multiclass setting. Raise an issue
 if binary support is needed.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Outputs are uniform probability vectors over the selected classes. Empty
+thresholded sets are replaced by the lowest-score singleton before
+normalization.</p>
+</div>
 <dl class="simple">
 <dt>Reference:</dt><dd><ul class="simple">
 <li><p><a class="reference external" href="https://arxiv.org/abs/2009.14193">Angelopoulos, A. N., Bates, S., Jordan, M., &amp; Malik, J. (2021).
@@ -822,6 +828,13 @@ Uncertainty Sets for Image Classifiers using Conformal Prediction. ICLR 2021</a>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A probability vector for each sample. Its support is the conformal
+prediction set, with equal probability assigned to every included class.
+If thresholding produces an empty prediction set, the class with the
+lowest non-conformity score is included before normalization. Consequently,
+every returned row is finite and sums to one.</p>
 </dd>
 </dl>
 </dd></dl>

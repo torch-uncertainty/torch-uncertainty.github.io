@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../../_static/documentation_options.js?v=c5b435e8"></script>
+    <script src="../../../../_static/documentation_options.js?v=1019fba8"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -476,7 +476,9 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">Metric</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.classification</span><span class="w"> </span><span class="kn">import</span> <span class="n">BinaryAveragePrecision</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.functional.classification</span><span class="w"> </span><span class="kn">import</span> <span class="n">binary_average_precision</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">._binary</span><span class="w"> </span><span class="kn">import</span> <span class="n">binary_images</span><span class="p">,</span> <span class="n">binary_target_has_classes</span>
 
 
 <div class="viewcode-block" id="SegmentationBinaryAveragePrecision">
@@ -513,6 +515,11 @@
 <span class="sd">        As for :class:`SegmentationBinaryAUROC`, image-wise averaging is the convention</span>
 <span class="sd">        used in the dense OOD-detection literature.</span>
 
+<span class="sd">        Images without positive pixels are excluded because their Average Precision is</span>
+<span class="sd">        undefined. The metric returns ``nan`` if no valid image was observed. A</span>
+<span class="sd">        one-dimensional input is treated as one image; otherwise, the first dimension</span>
+<span class="sd">        is the image batch dimension.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            thresholds: Optional explicit thresholds for the PR curve, see</span>
 <span class="sd">                :class:`~torchmetrics.classification.BinaryAveragePrecision`.</span>
@@ -522,21 +529,35 @@
 <span class="sd">                &lt;https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs&gt;`_.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">aupr_metric</span> <span class="o">=</span> <span class="n">BinaryAveragePrecision</span><span class="p">(</span>
-            <span class="n">thresholds</span><span class="o">=</span><span class="n">thresholds</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="n">ignore_index</span><span class="p">,</span> <span class="n">validate_args</span><span class="o">=</span><span class="n">validate_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span> <span class="o">=</span> <span class="n">thresholds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span> <span class="o">=</span> <span class="n">ignore_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_args</span> <span class="o">=</span> <span class="n">validate_args</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;binary_aupr&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s2">&quot;total&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">dist_reduce_fx</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preds</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pyrefly: ignore[bad-override]</span>
-        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">aupr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aupr_metric</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">binary_aupr</span> <span class="o">+=</span> <span class="n">aupr</span> <span class="o">*</span> <span class="n">batch_size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">+=</span> <span class="n">batch_size</span>
+        <span class="k">for</span> <span class="n">image_preds</span><span class="p">,</span> <span class="n">image_target</span> <span class="ow">in</span> <span class="n">binary_images</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">binary_target_has_classes</span><span class="p">(</span>
+                <span class="n">image_target</span><span class="p">,</span>
+                <span class="n">ignore_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span><span class="p">,</span>
+                <span class="n">require_negative</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thresholds</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">):</span>
+                <span class="n">thresholds</span> <span class="o">=</span> <span class="n">thresholds</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">image_preds</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">binary_aupr</span> <span class="o">+=</span> <span class="n">binary_average_precision</span><span class="p">(</span>
+                <span class="n">image_preds</span><span class="p">,</span>
+                <span class="n">image_target</span><span class="p">,</span>
+                <span class="n">thresholds</span><span class="o">=</span><span class="n">thresholds</span><span class="p">,</span>
+                <span class="n">ignore_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_index</span><span class="p">,</span>
+                <span class="n">validate_args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validate_args</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">binary_aupr</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">binary_aupr</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_aupr</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total</span></div>
 
 </pre></div>

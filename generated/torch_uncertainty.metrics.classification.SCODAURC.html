@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=c5b435e8"></script>
+    <script src="../_static/documentation_options.js?v=1019fba8"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -769,72 +769,93 @@
 <h1>SCODAURC<a class="headerlink" href="#scodaurc" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torch_uncertainty.metrics.classification.SCODAURC">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.classification.</span></span><span class="sig-name descname"><span class="pre">SCODAURC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/scod_risk_coverage.html#SCODAURC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.SCODAURC" title="Link to this definition">#</a></dt>
-<dd><p>Calculate Area Under the Risk-Coverage curve.</p>
-<p>The Area Under the Risk-Coverage curve (AURC) is the main metric for
-Selective Classification (SC) performance assessment. It evaluates the
-quality of uncertainty estimates by measuring the ability to
-discriminate between correct and incorrect predictions based on their
-rank (and not their values in contrast with calibration).</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torch_uncertainty.metrics.classification.</span></span><span class="sig-name descname"><span class="pre">SCODAURC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ood_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/scod_risk_coverage.html#SCODAURC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.SCODAURC" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the Area Under the SCOD Risk-Coverage curve.</p>
+<p>Selective Classification with Out-of-Distribution Detection (SCOD)
+evaluates a classifier and a rejection rule jointly. Unlike ordinary OOD
+detection, SCOD penalizes both accepted OOD samples and accepted,
+misclassified in-distribution (ID) samples.</p>
+<p>Let <span class="math notranslate nohighlight">\(s_i\)</span> be an OOD score for sample <span class="math notranslate nohighlight">\(i\)</span>, where larger values
+indicate that a sample is more likely to be OOD. Let
+<span class="math notranslate nohighlight">\(o_i \in \{0, 1\}\)</span> indicate whether the sample is OOD and let
+<span class="math notranslate nohighlight">\(e_i \in \{0, 1\}\)</span> indicate whether an ID sample is misclassified.
+For an OOD acceptance cost <span class="math notranslate nohighlight">\(c_{\mathrm{OOD}} \in [0, 1]\)</span>, the
+per-sample SCOD loss is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\ell_i =
+\begin{cases}
+    0,
+    &amp; o_i = 0,\ e_i = 0,\\
+    1 - c_{\mathrm{OOD}},
+    &amp; o_i = 0,\ e_i = 1,\\
+    c_{\mathrm{OOD}},
+    &amp; o_i = 1.
+\end{cases}\end{split}\]</div>
+<p>Equivalently,</p>
+<div class="math notranslate nohighlight">
+\[\ell_i =
+c_{\mathrm{OOD}} o_i
++ (1 - c_{\mathrm{OOD}})(1-o_i)e_i.\]</div>
+<p>This convention corresponds to the cost <span class="math notranslate nohighlight">\(c_{\mathrm{fn}}\)</span> used by
+Narasimhan et al. The parameter <span class="math notranslate nohighlight">\(\beta\)</span> used by Xia and Bouganis
+instead denotes the ID misclassification cost, and therefore satisfies</p>
+<div class="math notranslate nohighlight">
+\[\beta = 1 - c_{\mathrm{OOD}}.\]</div>
 <p>Let <span class="math notranslate nohighlight">\(\sigma\)</span> be the permutation sorting the <span class="math notranslate nohighlight">\(N\)</span> samples by
-descending top-class confidence, so that
-<span class="math notranslate nohighlight">\(\hat{p}_{\sigma(1)} \geq \cdots \geq \hat{p}_{\sigma(N)}\)</span>.
-The error rate at coverage <span class="math notranslate nohighlight">\(\kappa = k/N\)</span> is</p>
+increasing OOD score,</p>
 <div class="math notranslate nohighlight">
-\[r\!\left(\tfrac{k}{N}\right) = \frac{1}{k}
-\sum_{i=1}^{k} \mathbf{1}\!\left[\hat{y}_{\sigma(i)} \neq y_{\sigma(i)}\right]\]</div>
-<p>and the AURC is</p>
+\[s_{\sigma(1)} \leq \cdots \leq s_{\sigma(N)},\]</div>
+<p>so that samples most likely to be accepted appear first. At empirical
+coverage <span class="math notranslate nohighlight">\(\kappa_k = k/N\)</span>, the SCOD selective risk is</p>
 <div class="math notranslate nohighlight">
-\[\text{AURC} = \int_0^1 r(\kappa)\,\mathrm{d}\kappa
-\approx \frac{1}{N} \sum_{k=1}^{N} r\!\left(\tfrac{k}{N}\right)\]</div>
-<p>As input to <code class="docutils literal notranslate"><span class="pre">forward</span></code> and <code class="docutils literal notranslate"><span class="pre">update</span></code> the metric accepts the following input:</p>
+\[r(\kappa_k)
+= \frac{1}{k}\sum_{j=1}^{k}\ell_{\sigma(j)}.\]</div>
+<p>The SCOD-AURC is the area under this joint risk-coverage curve:</p>
+<div class="math notranslate nohighlight">
+\[\operatorname{SCOD\text{-}AURC}
+= \int_0^1 r(\kappa)\,\mathrm{d}\kappa.\]</div>
+<p>The discrete integration and finite-sample normalization follow
+<a class="reference internal" href="torch_uncertainty.metrics.classification.AURC.html#torch_uncertainty.metrics.classification.AURC" title="torch_uncertainty.metrics.classification.AURC"><code class="xref py py-class docutils literal notranslate"><span class="pre">AURC</span></code></a>.</p>
+<p>As input to <code class="docutils literal notranslate"><span class="pre">forward</span></code> and <code class="docutils literal notranslate"><span class="pre">update</span></code>, the metric accepts:</p>
 <ul class="simple">
-<li><p><strong>preds</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): A float tensor of shape
-<code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">...)</span></code> containing probabilities for each observation.</p></li>
-<li><p><strong>target</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): An int tensor of shape
-<code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">...)</span></code> containing ground-truth labels.</p></li>
+<li><p><strong>ood_scores</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): Float tensor containing one OOD
+score per sample. Larger values must indicate more OOD-like samples.</p></li>
+<li><p><strong>classification_errors</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): Boolean or binary
+tensor indicating misclassified ID samples. Values corresponding to OOD
+samples are ignored.</p></li>
+<li><p><strong>is_ood</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): Boolean or binary tensor indicating
+which samples are OOD.</p></li>
 </ul>
-<p>As output to <code class="docutils literal notranslate"><span class="pre">forward</span></code> and <code class="docutils literal notranslate"><span class="pre">compute</span></code> the metric returns the
-following output:</p>
+<p>As output to <code class="docutils literal notranslate"><span class="pre">forward</span></code> and <code class="docutils literal notranslate"><span class="pre">compute</span></code>, the metric returns:</p>
 <ul class="simple">
-<li><p><strong>Aurc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): A scalar tensor containing the
-area under the risk-coverage curve</p></li>
+<li><p><strong>scod_aurc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code>): Scalar tensor containing the area
+under the SCOD risk-coverage curve. Lower values are better.</p></li>
 </ul>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>kwargs</strong> – Additional keyword arguments.</p>
-</dd>
-</dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">torch_uncertainty.metrics.classification</span><span class="w"> </span><span class="kn">import</span> <span class="n">AURC</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aurc</span> <span class="o">=</span> <span class="n">AURC</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">aurc</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">aurc</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-<span class="go">tensor(0.0833)  # Example output</span>
-</pre></div>
-</div>
-<p class="rubric">References</p>
-<p>[1] <a class="reference external" href="https://papers.nips.cc/paper_files/paper/2017/file/4a8423d5e91fda00bb7e46540e2b0cf1-Paper.pdf">Geifman &amp; El-Yaniv. Selective classification for deep neural networks. In NeurIPS, 2017</a>.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="torch_uncertainty.metrics.classification.SCODAURC.update">
-<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ood_scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torch_uncertainty/metrics/classification/scod_risk_coverage.html#SCODAURC.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torch_uncertainty.metrics.classification.SCODAURC.update" title="Link to this definition">#</a></dt>
-<dd><p>Store SCOD confidence scores and associated detection errors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ood_scores</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span>) – OOD scores where higher means more OOD-like.</p></li>
-<li><p><strong>targets</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span>) – Binary labels, with 0 for ID and 1 for OOD.</p></li>
+<li><p><strong>ood_cost</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Relative cost <span class="math notranslate nohighlight">\(c_{\mathrm{OOD}}\)</span> of accepting an OOD
+sample. The cost of accepting a misclassified ID sample is
+<code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">ood_cost</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">0.5</span></code>.</p></li>
+<li><p><strong>kwargs</strong> – Additional keyword arguments passed to
+<code class="xref py py-class docutils literal notranslate"><span class="pre">torchmetrics.Metric</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
-</dd>
 </dl>
-</dd></dl>
-
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The empirical ratio of ID to OOD samples determines the mixture
+proportion evaluated by this metric. Results obtained with different
+ID/OOD ratios are therefore not directly comparable unless the mixture
+proportions are controlled.</p>
+</div>
+<p class="rubric">References</p>
+<p>[1] <a class="reference external" href="https://openaccess.thecvf.com/content/ACCV2022/papers/Xia_Augmenting_Softmax_Information_for_Selective_Classification_with_Out-of-Distribution_Data_ACCV_2022_paper.pdf">Xia &amp; Bouganis. Augmenting Softmax Information for Selective
+Classification with Out-of-Distribution Data. ACCV, 2022.</a>.</p>
+<p>[2] <a class="reference external" href="https://arxiv.org/abs/2301.12386">Narasimhan et al. Plugin Estimators for Selective Classification
+with Out-of-Distribution Detection.</a>.</p>
+<p>[3] <a class="reference external" href="https://papers.nips.cc/paper_files/paper/2017/file/4a8423d5e91fda00bb7e46540e2b0cf1-Paper.pdf">Geifman &amp; El-Yaniv. Selective Classification for Deep Neural
+Networks. NeurIPS, 2017.</a>.</p>
 </dd></dl>
 
 </section>
@@ -886,10 +907,7 @@ area under the risk-coverage curve</p></li>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.metrics.classification.SCODAURC"><code class="docutils literal notranslate"><span class="pre">SCODAURC</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.metrics.classification.SCODAURC.update"><code class="docutils literal notranslate"><span class="pre">SCODAURC.update()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#torch_uncertainty.metrics.classification.SCODAURC"><code class="docutils literal notranslate"><span class="pre">SCODAURC</span></code></a></li>
 </ul>
   </nav></div>
 
