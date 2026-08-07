@@ -478,6 +478,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchmetrics.classification.calibration_error</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BinaryCalibrationError</span><span class="p">,</span>
     <span class="n">MulticlassCalibrationError</span><span class="p">,</span>
@@ -702,8 +703,35 @@
     <span class="p">)</span>
 
 
-<span class="c1"># overwrite the plot method of the original metrics</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_calibration_error_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="n">confidences</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confidences</span><span class="p">)</span>
+    <span class="n">accuracies</span> <span class="o">=</span> <span class="n">dim_zero_cat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracies</span><span class="p">)</span>
+    <span class="n">bin_boundaries</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">confidences</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">acc_bin</span><span class="p">,</span> <span class="n">conf_bin</span><span class="p">,</span> <span class="n">prop_bin</span> <span class="o">=</span> <span class="n">_binning_bucketize</span><span class="p">(</span><span class="n">confidences</span><span class="p">,</span> <span class="n">accuracies</span><span class="p">,</span> <span class="n">bin_boundaries</span><span class="p">)</span>
+    <span class="n">gap</span> <span class="o">=</span> <span class="n">conf_bin</span> <span class="o">-</span> <span class="n">acc_bin</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;over&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">gap</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">prop_bin</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;under&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">((</span><span class="o">-</span><span class="n">gap</span><span class="p">)</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">prop_bin</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span> <span class="o">==</span> <span class="s2">&quot;l1&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">gap</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">*</span> <span class="n">prop_bin</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span> <span class="o">==</span> <span class="s2">&quot;l2&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">gap</span><span class="o">.</span><span class="n">square</span><span class="p">()</span> <span class="o">*</span> <span class="n">prop_bin</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">gap</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+
 <span class="k">class</span><span class="w"> </span><span class="nc">TUBinaryCalibrationError</span><span class="p">(</span><span class="n">BinaryCalibrationError</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">direction</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;over&quot;</span><span class="p">,</span> <span class="s2">&quot;under&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span>
+
+    <span class="n">compute</span> <span class="o">=</span> <span class="n">_calibration_error_compute</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Reliability Diagram&quot;</span><span class="p">,</span>
@@ -716,6 +744,17 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">TUMulticlassCalibrationError</span><span class="p">(</span><span class="n">MulticlassCalibrationError</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">direction</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;over&quot;</span><span class="p">,</span> <span class="s2">&quot;under&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span>
+
+    <span class="n">compute</span> <span class="o">=</span> <span class="n">_calibration_error_compute</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Reliability Diagram&quot;</span><span class="p">,</span>
@@ -736,6 +775,7 @@
         <span class="n">adaptive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">num_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
         <span class="n">norm</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;l1&quot;</span><span class="p">,</span> <span class="s2">&quot;l2&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;l1&quot;</span><span class="p">,</span>
+        <span class="n">direction</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;over&quot;</span><span class="p">,</span> <span class="s2">&quot;under&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ignore_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">validate_args</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -759,6 +799,19 @@
 
 <span class="sd">            \text{ECE} = \sum_{m=1}^{M} \frac{|B_m|}{N}</span>
 <span class="sd">            \left| \operatorname{acc}(B_m) - \operatorname{conf}(B_m) \right|</span>
+
+<span class="sd">        For the L1 norm, setting ``direction=&quot;over&quot;`` gives ECE+ by retaining</span>
+<span class="sd">        only overconfidence gaps, while ``direction=&quot;under&quot;`` gives ECE- by</span>
+<span class="sd">        retaining only underconfidence gaps:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \begin{aligned}</span>
+<span class="sd">            \operatorname{ECE}^{+} &amp;= \sum_{m=1}^{M} \frac{|B_m|}{N}</span>
+<span class="sd">            [\operatorname{conf}(B_m) - \operatorname{acc}(B_m)]_{+}, \\</span>
+<span class="sd">            \operatorname{ECE}^{-} &amp;= \sum_{m=1}^{M} \frac{|B_m|}{N}</span>
+<span class="sd">            [\operatorname{acc}(B_m) - \operatorname{conf}(B_m)]_{+}.</span>
+<span class="sd">            \end{aligned}</span>
 
 <span class="sd">        **Maximum Calibration Error (MCE):**</span>
 
@@ -789,6 +842,9 @@
 <span class="sd">            num_bins : Number of bins to divide the probability space. Defaults to ``10``.</span>
 <span class="sd">            norm: Specifies the type of norm to use: ``&quot;l1&quot;``, ``&quot;l2&quot;``, or ``&quot;max&quot;``.</span>
 <span class="sd">                Defaults to ``&quot;l1&quot;``.</span>
+<span class="sd">            direction: Whether to retain only overconfidence (``&quot;over&quot;``) or</span>
+<span class="sd">                underconfidence (``&quot;under&quot;``) terms. Only available with the</span>
+<span class="sd">                L1 norm and non-adaptive binning. Defaults to ``None``.</span>
 <span class="sd">            num_classes: Number of classes for ``&quot;multiclass&quot;`` tasks.</span>
 <span class="sd">                Required when task is ``&quot;multiclass&quot;``. Defaults to ``None``.</span>
 <span class="sd">            ignore_index: Index to ignore during calculations. Defaults to ``None``.</span>
@@ -837,6 +893,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;n_bins&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`n_bins` does not exist in TorchUncertainty, use `num_bins`.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">direction</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;over&quot;</span><span class="p">,</span> <span class="s2">&quot;under&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`direction` must be one of `None`, `&#39;over&#39;`, or `&#39;under&#39;`.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">direction</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">adaptive</span> <span class="ow">or</span> <span class="n">norm</span> <span class="o">!=</span> <span class="s2">&quot;l1&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`direction` is only supported for non-adaptive L1 ECE.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">adaptive</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">AdaptiveCalibrationError</span><span class="p">(</span>
                 <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
@@ -852,6 +912,7 @@
             <span class="p">{</span>
                 <span class="s2">&quot;n_bins&quot;</span><span class="p">:</span> <span class="n">num_bins</span><span class="p">,</span>
                 <span class="s2">&quot;norm&quot;</span><span class="p">:</span> <span class="n">norm</span><span class="p">,</span>
+                <span class="s2">&quot;direction&quot;</span><span class="p">:</span> <span class="n">direction</span><span class="p">,</span>
                 <span class="s2">&quot;ignore_index&quot;</span><span class="p">:</span> <span class="n">ignore_index</span><span class="p">,</span>
                 <span class="s2">&quot;validate_args&quot;</span><span class="p">:</span> <span class="n">validate_args</span><span class="p">,</span>
             <span class="p">}</span>
